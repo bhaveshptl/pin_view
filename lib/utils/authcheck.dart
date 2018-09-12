@@ -9,7 +9,9 @@ class AuthCheck {
   Future<bool> checkStatus() async {
     String cookie;
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    futureCookie.then((value) => cookie = value);
+    await futureCookie.then((value) {
+      cookie = value;
+    });
 
     return new http.Client().get(
       ApiUtil.AUTH_CHECK_URL,

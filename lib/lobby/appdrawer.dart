@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/modal/user.dart';
 
+import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -20,7 +19,9 @@ class AppDrawerState extends State<AppDrawer> {
     String userInfo;
     String cookie;
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    futureCookie.then((value) => cookie = value);
+    futureCookie.then((value) {
+      cookie = value;
+    });
 
     Future<dynamic> futureUserInfo = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_REFERENCE_USER_KEY);
