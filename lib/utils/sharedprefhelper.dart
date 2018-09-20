@@ -20,6 +20,16 @@ class SharedPrefHelper {
     return pref.get(ApiUtil.SHARED_PREFERENCE_KEY);
   }
 
+  saveWSCookieToStorage(String cookie) async {
+    final pref = await _prefs;
+    pref.setString(ApiUtil.WS_SHARED_PREFERENCE_KEY, cookie);
+  }
+
+  getWSCookie() async {
+    final pref = await _prefs;
+    return pref.get(ApiUtil.WS_SHARED_PREFERENCE_KEY);
+  }
+
   removeCookie() async {
     final pref = await _prefs;
     return pref.remove(ApiUtil.SHARED_PREFERENCE_KEY);

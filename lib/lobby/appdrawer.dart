@@ -13,7 +13,7 @@ class AppDrawer extends StatefulWidget {
 }
 
 class AppDrawerState extends State<AppDrawer> {
-  User user;
+  User _user;
   @override
   Widget build(BuildContext context) {
     String userInfo;
@@ -28,7 +28,7 @@ class AppDrawerState extends State<AppDrawer> {
     futureUserInfo.then((value) {
       userInfo = json.decode(value);
       setState(() {
-        user = User.fromJson(json.decode(userInfo));
+        _user = User.fromJson(json.decode(userInfo));
       });
     });
 
@@ -36,8 +36,7 @@ class AppDrawerState extends State<AppDrawer> {
       new http.Client().get(
         ApiUtil.LOGOUT_URL,
         headers: {'Content-type': 'application/json', "cookie": cookie},
-      ).then((http.Response res) {
-        print(res.body);
+      ).then((http.Response res) {        
       });
     }
 
@@ -47,7 +46,7 @@ class AppDrawerState extends State<AppDrawer> {
           new DrawerHeader(
             child: new Center(
                 child: Text(
-              user == null ? "" : user.loginName,
+              _user == null ? "" : _user.loginName,
               style: TextStyle(color: Theme.of(context).primaryColorLight),
             )),
             decoration: BoxDecoration(
