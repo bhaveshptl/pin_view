@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/lobby/tabs/statustab.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/lobby/tabs/running.dart';
-import 'package:playfantasy/lobby/tabs/upcoming.dart';
-import 'package:playfantasy/lobby/tabs/completed.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class LobbyWidget extends StatefulWidget {
@@ -121,9 +119,18 @@ class LobbyWidgetState extends State<LobbyWidget> {
             flex: 1,
             child: TabBarView(
               children: <Widget>[
-                Upcoming(upcomingLeagues),
-                Running(liveLeagues),
-                Completed(completedLeagues),
+                StatusTab(
+                  leagues: upcomingLeagues,
+                  leagueStatus: LeagueStatus.UPCOMING,
+                ),
+                StatusTab(
+                  leagues: liveLeagues,
+                  leagueStatus: LeagueStatus.LIVE,
+                ),
+                StatusTab(
+                  leagues: completedLeagues,
+                  leagueStatus: LeagueStatus.COMPLETED,
+                ),
               ],
             ),
           ),

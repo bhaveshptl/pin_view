@@ -8,7 +8,6 @@ import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authcheck.dart';
-import 'package:playfantasy/utils/websocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
 
@@ -39,7 +38,6 @@ setWSCookie() async {
 ///
 void main() async {
   Widget _homePage = LandingPage();
-  Websocket().connect(ApiUtil.WEBSOCKET_URL);
 
   bool _result = await authCheck.checkStatus();
   if (_result) {

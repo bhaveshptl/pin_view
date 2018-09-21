@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
 
 class LeagueCard extends StatelessWidget {
   final League _league;
   final bool clickable;
-  LeagueCard(this._league, {this.clickable = true});
+  final Function onClick;
+  LeagueCard(this._league, {this.onClick, this.clickable = true});
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +21,8 @@ class LeagueCard extends StatelessWidget {
             child: FlatButton(
               padding: EdgeInsets.all(0.0),
               onPressed: () {
-                if (clickable) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => LeagueDetail(_league)),
-                  );
+                if (clickable && onClick != null) {
+                  onClick(_league);
                 }
               },
               child: Row(
