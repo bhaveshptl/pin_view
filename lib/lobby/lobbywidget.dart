@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:playfantasy/lobby/tabs/statustab.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/lobby/tabs/statustab.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class LobbyWidget extends StatefulWidget {
@@ -17,7 +16,24 @@ List<League> upcomingLeagues = [];
 List<League> completedLeagues = [];
 Map<String, dynamic> lobbyUpdatePackate = {};
 
-class LobbyWidgetState extends State<LobbyWidget> {
+class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      FantasyWebSocket().connect(url: ApiUtil.WEBSOCKET_URL, onWSMsg: _onWsMsg);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ModalRoute.of(context).isCurrent) {
+      FantasyWebSocket().register(_onWsMsg);
+    }
+  }
+
   _createLobbyObject() {
     lobbyUpdatePackate["iType"] = 1;
     lobbyUpdatePackate["sportsId"] = 1;
@@ -27,11 +43,11 @@ class LobbyWidgetState extends State<LobbyWidget> {
     FantasyWebSocket().connect(
         url: ApiUtil.WEBSOCKET_URL,
         onWSMsg: (onData) {
-          _setOnWsMsg(onData);
+          _onWsMsg(onData);
         });
   }
 
-  _setOnWsMsg(onData) {
+  _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
     if (_response["bReady"] == 1) {
@@ -54,15 +70,7 @@ class LobbyWidgetState extends State<LobbyWidget> {
     _createLobbyObject();
     _createWSConnection();
 
-    WidgetsBinding.instance
-        .addObserver(new LifecycleEventHandler(resumeCallBack: () {
-      print("object");
-    }));
-
-    SystemChannels.lifecycle.setMessageHandler((msg) {
-      debugPrint('SystemChannels> $msg');
-      if (msg == AppLifecycleState.resumed.toString()) setState(() {});
-    });
+    WidgetsBinding.instance.addObserver(this);
   }
 
   _seperateLeaguesByRunningStatus(List<League> leagues) {
@@ -91,81 +99,64 @@ class LobbyWidgetState extends State<LobbyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Column(
-        children: <Widget>[
-          new Container(
-            constraints: BoxConstraints(maxHeight: 150.0),
-            child: new Material(
-              color: Theme.of(context).primaryColor,
-              child: TabBar(
-                tabs: <Widget>[
-                  Tooltip(
-                    message: "Upcoming matches",
-                    child: Tab(
-                      text: "UPCOMING",
+    return Scaffold(
+      key: _scaffoldKey,
+      body: DefaultTabController(
+        length: 3,
+        child: Column(
+          children: <Widget>[
+            new Container(
+              constraints: BoxConstraints(maxHeight: 150.0),
+              child: new Material(
+                color: Theme.of(context).primaryColor,
+                child: TabBar(
+                  tabs: <Widget>[
+                    Tooltip(
+                      message: "Upcoming matches",
+                      child: Tab(
+                        text: "UPCOMING",
+                      ),
                     ),
+                    Tooltip(
+                      message: "Live matches",
+                      child: Tab(text: "LIVE"),
+                    ),
+                    Tooltip(
+                      message: "Completed matches",
+                      child: Tab(text: "RESULT"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            new Expanded(
+              flex: 1,
+              child: TabBarView(
+                children: <Widget>[
+                  StatusTab(
+                    leagues: upcomingLeagues,
+                    leagueStatus: LeagueStatus.UPCOMING,
                   ),
-                  Tooltip(
-                    message: "Live matches",
-                    child: Tab(text: "LIVE"),
+                  StatusTab(
+                    leagues: liveLeagues,
+                    leagueStatus: LeagueStatus.LIVE,
                   ),
-                  Tooltip(
-                    message: "Completed matches",
-                    child: Tab(text: "RESULT"),
+                  StatusTab(
+                    leagues: completedLeagues,
+                    leagueStatus: LeagueStatus.COMPLETED,
                   ),
                 ],
               ),
             ),
-          ),
-          new Expanded(
-            flex: 1,
-            child: TabBarView(
-              children: <Widget>[
-                StatusTab(
-                  leagues: upcomingLeagues,
-                  leagueStatus: LeagueStatus.UPCOMING,
-                ),
-                StatusTab(
-                  leagues: liveLeagues,
-                  leagueStatus: LeagueStatus.LIVE,
-                ),
-                StatusTab(
-                  leagues: completedLeagues,
-                  leagueStatus: LeagueStatus.COMPLETED,
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-}
-
-class LifecycleEventHandler extends WidgetsBindingObserver {
-  LifecycleEventHandler({this.resumeCallBack, this.suspendingCallBack});
-
-  final Function resumeCallBack;
-  final Function suspendingCallBack;
-
-  @override
-  Future<Null> didChangeAppLifecycleState(AppLifecycleState state) async {
-    switch (state) {
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-      case AppLifecycleState.suspending:
-        await suspendingCallBack();
-        break;
-      case AppLifecycleState.resumed:
-        await resumeCallBack();
-        break;
-    }
   }
 }
