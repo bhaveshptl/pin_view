@@ -19,6 +19,9 @@ Map<String, dynamic> lobbyUpdatePackate = {};
 class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  ///
+  /// Reconnect websocket after resumed from lock screen or inactive state.
+  /// 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -26,6 +29,10 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     }
   }
 
+  ///
+  /// Register ws message on pop next page of navigator.
+  /// Workaround for now. Need to find better solution.
+  ///
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
