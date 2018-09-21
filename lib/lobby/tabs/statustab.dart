@@ -11,9 +11,9 @@ class StatusTab extends StatelessWidget {
   StatusTab({this.leagues, this.leagueStatus});
 
   onLeagueSelect(BuildContext context, League league) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => LeagueDetail(league)),
-    );
+    MaterialPageRoute route =
+        MaterialPageRoute(builder: (context) => LeagueDetail(league));
+    Navigator.of(context).push(route);
   }
 
   @override

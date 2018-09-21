@@ -1,12 +1,11 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:playfantasy/lobby/tabs/statustab.dart';
-import 'package:web_socket_channel/io.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class LobbyWidget extends StatefulWidget {
   @override
@@ -19,46 +18,51 @@ List<League> completedLeagues = [];
 Map<String, dynamic> lobbyUpdatePackate = {};
 
 class LobbyWidgetState extends State<LobbyWidget> {
-  IOWebSocketChannel _channel;
-
-  setWebsocketCookie() async {
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getWSCookie();
-    await futureCookie.then((value) {
-      setState(() {
-        if (value != null) {
-          _channel = IOWebSocketChannel.connect(ApiUtil.WEBSOCKET_URL + value);
-        }
-      });
-    });
-
-    _setOnWsMsg();
-  }
-
-  _setOnWsMsg() {
+  _createLobbyObject() {
     lobbyUpdatePackate["iType"] = 1;
     lobbyUpdatePackate["sportsId"] = 1;
-    _channel.stream.listen((onData) {
-      Map<String, dynamic> _response = json.decode(onData);
+  }
 
-      if (_response["bReady"] == 1) {
-        _channel.sink.add(json.encode(lobbyUpdatePackate));
-      } else if (_response["iType"] == 1 && _response["bSuccessful"] == true) {
-        List<League> _leagues = [];
-        List<dynamic> _mapLeagues = json.decode(_response["data"]);
+  _createWSConnection() {
+    FantasyWebSocket().connect(
+        url: ApiUtil.WEBSOCKET_URL,
+        onWSMsg: (onData) {
+          _setOnWsMsg(onData);
+        });
+  }
 
-        for (dynamic league in _mapLeagues) {
-          _leagues.add(League.fromJson(league));
-        }
+  _setOnWsMsg(onData) {
+    Map<String, dynamic> _response = json.decode(onData);
 
-        _seperateLeaguesByRunningStatus(_leagues);
+    if (_response["bReady"] == 1) {
+      FantasyWebSocket().sendMessage(lobbyUpdatePackate);
+    } else if (_response["iType"] == 1 && _response["bSuccessful"] == true) {
+      List<League> _leagues = [];
+      List<dynamic> _mapLeagues = json.decode(_response["data"]);
+
+      for (dynamic league in _mapLeagues) {
+        _leagues.add(League.fromJson(league));
       }
-    });
+
+      _seperateLeaguesByRunningStatus(_leagues);
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    setWebsocketCookie();
+    _createLobbyObject();
+    _createWSConnection();
+
+    WidgetsBinding.instance
+        .addObserver(new LifecycleEventHandler(resumeCallBack: () {
+      print("object");
+    }));
+
+    SystemChannels.lifecycle.setMessageHandler((msg) {
+      debugPrint('SystemChannels> $msg');
+      if (msg == AppLifecycleState.resumed.toString()) setState(() {});
+    });
   }
 
   _seperateLeaguesByRunningStatus(List<League> leagues) {
@@ -141,7 +145,27 @@ class LobbyWidgetState extends State<LobbyWidget> {
 
   @override
   void dispose() {
-    _channel.sink.close();
     super.dispose();
+  }
+}
+
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  LifecycleEventHandler({this.resumeCallBack, this.suspendingCallBack});
+
+  final Function resumeCallBack;
+  final Function suspendingCallBack;
+
+  @override
+  Future<Null> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.suspending:
+        await suspendingCallBack();
+        break;
+      case AppLifecycleState.resumed:
+        await resumeCallBack();
+        break;
+    }
   }
 }

@@ -1,17 +1,14 @@
-import 'dart:async';
 import 'dart:convert';
-import 'package:web_socket_channel/io.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
 
 const int DEFAULT_SELECTED_BOTTOM_NAVIGATION_INDEX = 0;
@@ -33,67 +30,59 @@ Map<String, dynamic> lobbyUpdatePackate = {};
 class LeagueDetailState extends State<LeagueDetail> {
   String title = "Match";
 
-  IOWebSocketChannel _channel;
+  _onWsMsg(onData) {
+    Map<String, dynamic> _response = json.decode(onData);
 
-  setWebsocketCookie() async {
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getWSCookie();
-    await futureCookie.then((value) {
+    if (_response["bReady"] == 1) {
+      _getL1Data();
+    } else if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
       setState(() {
-        if (value != null) {
-          _channel = IOWebSocketChannel.connect(ApiUtil.WEBSOCKET_URL + value);
-        }
+        l1Data = L1.fromJson(_response["data"]["l1"]);
+        _widgets = [
+          Contests(widget._league, l1Data),
+          CreateTeam(widget._league, l1Data),
+          MyContests(),
+          CreateContest(widget._league),
+          AddCash(),
+        ];
+        _currentIndex = _currentIndex;
       });
-    });
-
-    _setOnWsMsg();
+    }
   }
 
-  _setOnWsMsg() {
+  _createL1WSObject() {
     lobbyUpdatePackate["iType"] = 5;
     lobbyUpdatePackate["sportsId"] = 1;
     lobbyUpdatePackate["bResAvail"] = true;
     lobbyUpdatePackate["id"] = widget._league.leagueId;
-    _channel.stream.listen((onData) {
-      Map<String, dynamic> _response = json.decode(onData);
+  }
 
-      if (_response["bReady"] == 1) {
-        _channel.sink.add(json.encode(lobbyUpdatePackate));
-      } else if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
-        setState(() {
-          l1Data = L1.fromJson(_response["data"]["l1"]);
-          _widgets = [
-            Contests(widget._league, l1Data),
-            CreateTeam(widget._league, l1Data),
-            MyContests(),
-            CreateContest(widget._league),
-            AddCash(),
-          ];
-          _currentIndex = _currentIndex;
-        });
-      }
-    });
+  _getL1Data() {
+    FantasyWebSocket().sendMessage(lobbyUpdatePackate);
   }
 
   @override
   initState() {
     super.initState();
-    setWebsocketCookie();
+    FantasyWebSocket().register(_onWsMsg);
+    _createL1WSObject();
+    _getL1Data();
   }
 
   _onNavigationSelectionChange(int index) {
     setState(() {
       switch (index) {
         case 1:
-          Navigator.of(context).push(
-              new MaterialPageRoute(builder: (context) => _widgets[index]));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => _widgets[index]));
           break;
         case 3:
-          Navigator.of(context).push(new MaterialPageRoute(
+          Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => CreateContest(widget._league),
           ));
           break;
         case 4:
-          Navigator.of(context).push(new MaterialPageRoute(
+          Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => _widgets[index], fullscreenDialog: true));
           break;
         default:
@@ -145,7 +134,6 @@ class LeagueDetailState extends State<LeagueDetail> {
     super.dispose();
     _widgets = [];
     _currentIndex = DEFAULT_SELECTED_BOTTOM_NAVIGATION_INDEX;
-    _channel.sink.close();
   }
 
   @override
