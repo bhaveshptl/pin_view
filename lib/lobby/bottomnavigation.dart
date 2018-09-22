@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 
 class LobbyBottomNavigation extends StatelessWidget {
   final int _screenIndex;
-  final int _currentIndex;
   final Function onNavigationSelectionChange;
 
-  LobbyBottomNavigation(
-      this._currentIndex, this.onNavigationSelectionChange, this._screenIndex);
+  LobbyBottomNavigation(this.onNavigationSelectionChange, this._screenIndex);
 
-  void onTabTapped(int index) {
-    onNavigationSelectionChange(index);
+  void onTabTapped(BuildContext context, int index) {
+    onNavigationSelectionChange(context, index);
   }
 
   @override
@@ -21,8 +19,9 @@ class LobbyBottomNavigation extends StatelessWidget {
             caption: TextStyle(color: Theme.of(context).primaryColorDark)),
       ),
       child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: onTabTapped,
+        onTap: (int index) {
+          onTabTapped(context, index);
+        },
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(

@@ -2,30 +2,33 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/tabs/statustab.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class LobbyWidget extends StatefulWidget {
+  final int sportType;
+
+  LobbyWidget({this.sportType = 1});
+
   @override
   State<StatefulWidget> createState() => LobbyWidgetState();
 }
 
-List<League> liveLeagues = [];
-List<League> upcomingLeagues = [];
-List<League> completedLeagues = [];
-Map<String, dynamic> lobbyUpdatePackate = {};
-
 class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  int registeredSportType;
+  List<League> liveLeagues = [];
+  List<League> upcomingLeagues = [];
+  List<League> completedLeagues = [];
+  Map<String, dynamic> lobbyUpdatePackate = {};
 
   ///
   /// Reconnect websocket after resumed from lock screen or inactive state.
-  /// 
+  ///
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      FantasyWebSocket().connect(url: ApiUtil.WEBSOCKET_URL, onWSMsg: _onWsMsg);
+      sockets.connect();
     }
   }
 
@@ -37,28 +40,26 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (ModalRoute.of(context).isCurrent) {
-      FantasyWebSocket().register(_onWsMsg);
+      sockets.register(_onWsMsg);
     }
   }
 
   _createLobbyObject() {
     lobbyUpdatePackate["iType"] = 1;
-    lobbyUpdatePackate["sportsId"] = 1;
+    registeredSportType = widget.sportType;
+    lobbyUpdatePackate["sportsId"] = widget.sportType;
   }
 
   _createWSConnection() {
-    FantasyWebSocket().connect(
-        url: ApiUtil.WEBSOCKET_URL,
-        onWSMsg: (onData) {
-          _onWsMsg(onData);
-        });
+    sockets.connect();
+    sockets.register(_onWsMsg);
   }
 
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
     if (_response["bReady"] == 1) {
-      FantasyWebSocket().sendMessage(lobbyUpdatePackate);
+      sockets.sendMessage(lobbyUpdatePackate);
     } else if (_response["iType"] == 1 && _response["bSuccessful"] == true) {
       List<League> _leagues = [];
       List<dynamic> _mapLeagues = json.decode(_response["data"]);
@@ -76,8 +77,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     super.initState();
     _createLobbyObject();
     _createWSConnection();
-
-    WidgetsBinding.instance.addObserver(this);
   }
 
   _seperateLeaguesByRunningStatus(List<League> leagues) {
@@ -106,6 +105,10 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    if (registeredSportType != widget.sportType) {
+      _createLobbyObject();
+      sockets.sendMessage(lobbyUpdatePackate);
+    }
     return Scaffold(
       key: _scaffoldKey,
       body: DefaultTabController(
@@ -159,11 +162,5 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 }

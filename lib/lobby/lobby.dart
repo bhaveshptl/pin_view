@@ -9,34 +9,32 @@ import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 
 class Lobby extends StatefulWidget {
-  final List<Widget> _widgets = [
-    LobbyWidget(),
-    SearchContest(),
-    MyContests(),
-    EarnCash(),
-    AddCash(),
-  ];
-
   @override
   State<StatefulWidget> createState() => LobbyState();
 }
 
-int _currentIndex = 0;
-
 class LobbyState extends State<Lobby> {
-  _onNavigationSelectionChange(int index) {
+  int _sportType = 1;
+
+  _onNavigationSelectionChange(BuildContext context, int index) {
     setState(() {
       switch (index) {
         case 1:
           Navigator.of(context).push(
               new MaterialPageRoute(builder: (context) => SearchContest()));
           break;
+        case 2:
+          Navigator.of(context)
+              .push(new MaterialPageRoute(builder: (context) => MyContests()));
+          break;
+        case 3:
+          Navigator.of(context)
+              .push(new MaterialPageRoute(builder: (context) => EarnCash()));
+          break;
         case 4:
           Navigator.of(context).push(new MaterialPageRoute(
               builder: (context) => AddCash(), fullscreenDialog: true));
           break;
-        default:
-          _currentIndex = index;
       }
     });
   }
@@ -47,7 +45,45 @@ class LobbyState extends State<Lobby> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        title: Text("LOBBY"),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            DropdownButton(
+              style: TextStyle(
+                  color: Colors.black45,
+                  fontSize: Theme.of(context).primaryTextTheme.title.fontSize),
+              onChanged: (value) {
+                setState(() {
+                  _sportType = value;
+                });
+              },
+              value: _sportType,
+              items: [
+                DropdownMenuItem(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                    child: Text("CRICKET"),
+                  ),
+                  value: 1,
+                ),
+                DropdownMenuItem(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                    child: Text("FOOTBALL"),
+                  ),
+                  value: 2,
+                ),
+                DropdownMenuItem(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                    child: Text("KABADDI"),
+                  ),
+                  value: 3,
+                )
+              ],
+            ),
+          ],
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.help_outline),
@@ -57,9 +93,11 @@ class LobbyState extends State<Lobby> {
         ],
       ),
       drawer: AppDrawer(),
-      body: widget._widgets[_currentIndex],
+      body: LobbyWidget(
+        sportType: _sportType,
+      ),
       bottomNavigationBar:
-          LobbyBottomNavigation(_currentIndex, _onNavigationSelectionChange, 0),
+          LobbyBottomNavigation(_onNavigationSelectionChange, 0),
     );
   }
 }

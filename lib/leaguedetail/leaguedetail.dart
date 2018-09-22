@@ -1,21 +1,15 @@
 import 'dart:convert';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
-
 import 'package:flutter/material.dart';
+
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
-
-const int DEFAULT_SELECTED_BOTTOM_NAVIGATION_INDEX = 0;
-
-L1 l1Data;
-int _currentIndex = DEFAULT_SELECTED_BOTTOM_NAVIGATION_INDEX;
-List<Widget> _widgets = [];
 
 class LeagueDetail extends StatefulWidget {
   final League _league;
@@ -25,10 +19,10 @@ class LeagueDetail extends StatefulWidget {
   State<StatefulWidget> createState() => LeagueDetailState();
 }
 
-Map<String, dynamic> lobbyUpdatePackate = {};
-
 class LeagueDetailState extends State<LeagueDetail> {
+  L1 l1Data;
   String title = "Match";
+  Map<String, dynamic> lobbyUpdatePackate = {};
 
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
@@ -38,14 +32,6 @@ class LeagueDetailState extends State<LeagueDetail> {
     } else if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
       setState(() {
         l1Data = L1.fromJson(_response["data"]["l1"]);
-        _widgets = [
-          Contests(widget._league, l1Data),
-          CreateTeam(widget._league, l1Data),
-          MyContests(),
-          CreateContest(widget._league),
-          AddCash(),
-        ];
-        _currentIndex = _currentIndex;
       });
     }
   }
@@ -58,23 +44,28 @@ class LeagueDetailState extends State<LeagueDetail> {
   }
 
   _getL1Data() {
-    FantasyWebSocket().sendMessage(lobbyUpdatePackate);
+    sockets.sendMessage(lobbyUpdatePackate);
   }
 
   @override
   initState() {
     super.initState();
-    FantasyWebSocket().register(_onWsMsg);
+    sockets.register(_onWsMsg);
     _createL1WSObject();
     _getL1Data();
   }
 
-  _onNavigationSelectionChange(int index) {
+  _onNavigationSelectionChange(BuildContext context, int index) {
     setState(() {
       switch (index) {
         case 1:
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => _widgets[index]));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CreateTeam(widget._league, l1Data)));
+          break;
+        case 2:
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => MyContests(),
+          ));
           break;
         case 3:
           Navigator.of(context).push(MaterialPageRoute(
@@ -83,10 +74,8 @@ class LeagueDetailState extends State<LeagueDetail> {
           break;
         case 4:
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => _widgets[index], fullscreenDialog: true));
+              builder: (context) => AddCash(), fullscreenDialog: true));
           break;
-        default:
-          _currentIndex = index;
       }
     });
   }
@@ -131,9 +120,8 @@ class LeagueDetailState extends State<LeagueDetail> {
 
   @override
   void dispose() {
+    sockets.unRegister(_onWsMsg);
     super.dispose();
-    _widgets = [];
-    _currentIndex = DEFAULT_SELECTED_BOTTOM_NAVIGATION_INDEX;
   }
 
   @override
@@ -153,9 +141,9 @@ class LeagueDetailState extends State<LeagueDetail> {
           )
         ],
       ),
-      body: _widgets.length > 0 ? _widgets[_currentIndex] : new Container(),
+      body: l1Data == null ? Container() : Contests(widget._league, l1Data),
       bottomNavigationBar:
-          LobbyBottomNavigation(_currentIndex, _onNavigationSelectionChange, 1),
+          LobbyBottomNavigation(_onNavigationSelectionChange, 1),
     );
   }
 }

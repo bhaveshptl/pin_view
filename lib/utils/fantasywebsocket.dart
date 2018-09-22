@@ -1,25 +1,25 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:web_socket_channel/io.dart';
 
+FantasyWebSocket sockets = new FantasyWebSocket();
+
 class FantasyWebSocket {
-  String url;
-  static Function _onWSMsg;
   static IOWebSocketChannel _channel;
+  static ObserverList<Function> _listeners = new ObserverList<Function>();
 
   FantasyWebSocket._internal();
   factory FantasyWebSocket() => FantasyWebSocket._internal();
 
-  connect({url, onWSMsg}) async {
-    url = url;
-    _onWSMsg = onWSMsg;
-
+  connect() async {
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getWSCookie();
 
     await futureCookie.then((value) {
       if (value != null) {
-        _channel = IOWebSocketChannel.connect(url + value);
+        _channel = IOWebSocketChannel.connect(ApiUtil.WEBSOCKET_URL + value);
         _listenWSMsg();
       }
     });
@@ -27,27 +27,35 @@ class FantasyWebSocket {
 
   _listenWSMsg() {
     if (_channel != null && _channel.stream != null) {
-      _channel.stream.listen((onData) {
-        onMsg(onData);
-      });
+      _channel.stream.listen(
+        (onData) {
+          onMsg(onData);
+        },
+        onError: (error, StackTrace stackTrace) {},
+        onDone: () {
+          print("object");
+        },
+      );
     }
   }
 
   static onMsg(onData) {
-    if (_onWSMsg != null) {
-      _onWSMsg(onData);
+    if (_listeners != null) {
+      for (Function callback in _listeners) {
+        callback(onData);
+      }
     }
   }
 
   register(Function onWsMsg) {
-    _onWSMsg = onWsMsg;
+    _listeners.add(onWsMsg);
   }
 
-  sendMessage(Map<String, dynamic> msg) {
+  sendMessage(Map<String, dynamic> msg) async {
     _channel.sink.add(json.encode(msg));
   }
 
-  unRegister() {
-    _onWSMsg = null;
+  unRegister(onWsMsg) {
+    _listeners.remove(onWsMsg);
   }
 }
