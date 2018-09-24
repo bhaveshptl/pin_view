@@ -154,10 +154,22 @@ class MyTeamsState extends State<MyTeams> {
         ExpansionPanel(
           isExpanded: index == _selectedItemIndex,
           headerBuilder: (context, isExpanded) {
-            return Row(
-              children: <Widget>[
-                getExpansionHeader(context, isExpanded, myTeam),
-              ],
+            return FlatButton(
+              onPressed: () {
+                setState(() {
+                  int curIndex = widget.myTeams.indexOf(myTeam);
+                  if (curIndex == _selectedItemIndex) {
+                    _selectedItemIndex = -1;
+                  } else {
+                    _selectedItemIndex = curIndex;
+                  }
+                });
+              },
+              child: Row(
+                children: <Widget>[
+                  getExpansionHeader(context, isExpanded, myTeam),
+                ],
+              ),
             );
           },
           body: _getExpansionBody(myTeam),
