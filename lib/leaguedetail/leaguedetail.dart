@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
+import 'package:playfantasy/leaguedetail/myteams.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
-import 'package:playfantasy/leaguedetail/createteam.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League _league;
@@ -19,10 +20,34 @@ class LeagueDetail extends StatefulWidget {
   State<StatefulWidget> createState() => LeagueDetailState();
 }
 
-class LeagueDetailState extends State<LeagueDetail> {
+class LeagueDetailState extends State<LeagueDetail>
+    with WidgetsBindingObserver {
   L1 l1Data;
+  List<MyTeam> _myTeams;
   String title = "Match";
-  Map<String, dynamic> lobbyUpdatePackate = {};
+  Map<String, dynamic> l1UpdatePackate = {};
+
+  ///
+  /// Reconnect websocket after resumed from lock screen or inactive state.
+  ///
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      sockets.sendMessage(l1UpdatePackate);
+    }
+  }
+
+  ///
+  /// Register ws message on pop next page of navigator.
+  /// Workaround for now. Need to find better solution.
+  ///
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ModalRoute.of(context).isCurrent) {
+      sockets.sendMessage(l1UpdatePackate);
+    }
+  }
 
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
@@ -32,19 +57,22 @@ class LeagueDetailState extends State<LeagueDetail> {
     } else if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
       setState(() {
         l1Data = L1.fromJson(_response["data"]["l1"]);
+        _myTeams = (_response["data"]["myteams"] as List)
+            .map((i) => MyTeam.fromJson(i))
+            .toList();
       });
     }
   }
 
   _createL1WSObject() {
-    lobbyUpdatePackate["iType"] = 5;
-    lobbyUpdatePackate["sportsId"] = 1;
-    lobbyUpdatePackate["bResAvail"] = true;
-    lobbyUpdatePackate["id"] = widget._league.leagueId;
+    l1UpdatePackate["iType"] = 5;
+    l1UpdatePackate["sportsId"] = 1;
+    l1UpdatePackate["bResAvail"] = true;
+    l1UpdatePackate["id"] = widget._league.leagueId;
   }
 
   _getL1Data() {
-    sockets.sendMessage(lobbyUpdatePackate);
+    sockets.sendMessage(l1UpdatePackate);
   }
 
   @override
@@ -60,7 +88,11 @@ class LeagueDetailState extends State<LeagueDetail> {
       switch (index) {
         case 1:
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => CreateTeam(widget._league, l1Data)));
+              builder: (context) => MyTeams(
+                    league: widget._league,
+                    l1Data: l1Data,
+                    myTeams: _myTeams,
+                  )));
           break;
         case 2:
           Navigator.of(context).push(MaterialPageRoute(

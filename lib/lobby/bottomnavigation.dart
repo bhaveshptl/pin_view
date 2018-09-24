@@ -53,7 +53,7 @@ class LobbyBottomNavigation extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              _screenIndex == 0 ? 'CONTEST CODE' : "CREATE TEAM",
+              _screenIndex == 0 ? 'CONTEST CODE' : "MY TEAMS",
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(

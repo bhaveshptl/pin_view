@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 
 class ChooseCaptain extends StatefulWidget {
-  final FanTeamRule _fanTeamRules;
-  final List<Player> _selectedPlayers;
-  final Function _onSave;
+  final FanTeamRule fanTeamRules;
+  final List<Player> selectedPlayers;
+  final Function onSave;
+  final Player captain;
+  final Player viceCaptain;
 
-  ChooseCaptain(this._fanTeamRules, this._selectedPlayers, this._onSave);
+  ChooseCaptain(
+      {this.fanTeamRules,
+      this.selectedPlayers,
+      this.onSave,
+      this.captain,
+      this.viceCaptain});
 
   @override
   State<StatefulWidget> createState() => ChooseCaptainState();
@@ -15,6 +22,13 @@ class ChooseCaptain extends StatefulWidget {
 class ChooseCaptainState extends State<ChooseCaptain> {
   Player _captain;
   Player _vCaptain;
+
+  @override
+  void initState() {
+    super.initState();
+    _captain = widget.captain;
+    _vCaptain = widget.viceCaptain;
+  }
 
   void _showErrorMessage(String _message) {
     showModalBottomSheet<void>(
@@ -65,7 +79,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                         _showErrorMessage(
                             "Captain and vice captain selection is necessary to save team.");
                       } else {
-                        widget._onSave(_captain, _vCaptain);
+                        widget.onSave(_captain, _vCaptain);
                       }
                     },
                     child: Text("SAVE TEAM"),
@@ -100,7 +114,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                         flex: 3,
                         child: Text(
                           "CAPTAIN (" +
-                              widget._fanTeamRules.captainMult.toString() +
+                              widget.fanTeamRules.captainMult.toString() +
                               "X)",
                           textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -110,7 +124,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                         flex: 3,
                         child: Text(
                           "VICE CAPTAIN (" +
-                              widget._fanTeamRules.vcMult.toString() +
+                              widget.fanTeamRules.vcMult.toString() +
                               "X)",
                           textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -127,9 +141,9 @@ class ChooseCaptainState extends State<ChooseCaptain> {
               children: <Widget>[
                 Expanded(
                   child: ListView.builder(
-                    itemCount: widget._selectedPlayers.length,
+                    itemCount: widget.selectedPlayers.length,
                     itemBuilder: (context, index) {
-                      final _player = widget._selectedPlayers[index];
+                      final _player = widget.selectedPlayers[index];
                       final _firstName = _player.name.split(" ")[0];
                       final _lastName = _player.name.split(" ").length > 0
                           ? _player.name.split(" ")[1]

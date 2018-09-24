@@ -28,7 +28,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      sockets.connect();
+      sockets.sendMessage(lobbyUpdatePackate);
     }
   }
 
@@ -40,7 +40,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (ModalRoute.of(context).isCurrent) {
-      sockets.register(_onWsMsg);
+      sockets.sendMessage(lobbyUpdatePackate);
     }
   }
 

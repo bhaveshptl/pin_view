@@ -212,9 +212,11 @@ class Player {
   final String playingStyleDesc;
   final int countryId;
   final String countryName;
-  final int seriesScore;
+  final dynamic seriesScore;
   final int score;
   final dynamic credit;
+  String jerseyUrl;
+  int teamId;
   Player({
     this.id,
     this.name,
@@ -227,6 +229,8 @@ class Player {
     this.seriesScore,
     this.score,
     this.credit,
+    this.jerseyUrl,
+    this.teamId,
   });
 
   factory Player.fromJson(Map<String, dynamic> json) {
@@ -242,8 +246,26 @@ class Player {
       seriesScore: json["seriesScore"],
       score: json["score"],
       credit: json["credit"],
+      jerseyUrl: json["jerseyUrl"],
+      teamId: json["teamId"],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "sportsId": sportsId,
+        "sportName": sportName,
+        "playingStyleId": playingStyleId,
+        "playingStyleDesc": playingStyleDesc,
+        "countryId": countryId,
+        "countryName": countryName,
+        "seriesScore": seriesScore,
+        "score": score,
+        "credit": credit,
+        "jerseyUrl": jerseyUrl,
+        "teamId": teamId,
+      };
 }
 
 class PlayingStyle {

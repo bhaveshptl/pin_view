@@ -1,68 +1,131 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:playfantasy/leaguedetail/choosecaptain.dart';
+import 'package:http/http.dart' as http;
+import 'package:playfantasy/modal/createteamresponse.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/leaguedetail/choosecaptain.dart';
 import 'package:playfantasy/leaguedetail/playingstyletab.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+
+class TeamCreationMode {
+  static const int CREATE_TEAM = 1;
+  static const int EDIT_TEAM = 2;
+  static const int CLONE_TEAM = 3;
+}
 
 class CreateTeam extends StatefulWidget {
-  final L1 _l1Data;
-  final League _league;  
+  final int mode;
+  final L1 l1Data;
+  final League league;
+  final MyTeam selectedTeam;
 
-  CreateTeam(this._league, this._l1Data);
+  CreateTeam({this.league, this.l1Data, this.mode, this.selectedTeam});
 
   @override
   State<StatefulWidget> createState() => CreateTeamState();
 }
 
 class CreateTeamState extends State<CreateTeam> {
-  String _avgCredits = "0";
-  FanTeamRule _fanTeamRules;
   double _usedCredits = 0.0;
   int _selectedPlayersCount = 0;
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  Player _captain;
+  Player _vCaptain;
+  String _avgCredits = "0";
+  FanTeamRule _fanTeamRules;
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
-  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Map<int, List<Player>> _selectedPlayersByStyleId = {};
 
   @override
   void initState() {
     super.initState();
-    _fanTeamRules = widget._l1Data.league.fanTeamRules;
-    _avgCredits = (widget._l1Data.league.fanTeamRules.credits /
-            widget._l1Data.league.fanTeamRules.playersTotal)
+    _addPlayerTeamId();
+
+    _selectedPlayers =
+        widget.selectedTeam != null ? widget.selectedTeam.players : [];
+
+    _fanTeamRules = widget.l1Data.league.fanTeamRules;
+    _avgCredits = (widget.l1Data.league.fanTeamRules.credits /
+            widget.l1Data.league.fanTeamRules.playersTotal)
         .toStringAsFixed(2);
-  }
 
-  _createTabsBasedOnPlayingStyle() {
-    final List<PlayingStyle> _playingStyles =
-        _fanTeamRules != null ? _fanTeamRules.styles : [];
-    List<Widget> tabs = [];
-    for (PlayingStyle style in _playingStyles) {
-      tabs.add(
-        Tab(
-          icon: new Icon(Icons.home),
-          text: "PICK " +
-              (style.rule.length > 0 && style.rule[0] == style.rule[1]
-                  ? style.rule[0].toString()
-                  : style.rule[0].toString() + "-" + style.rule[1].toString()),
-        ),
-      );
+    if (widget.mode == TeamCreationMode.CLONE_TEAM ||
+        widget.mode == TeamCreationMode.EDIT_TEAM) {
+      _editOrCloneTeam();
     }
-    return Container(
-      color: Colors.black12,
-      child: TabBar(
-        tabs: tabs,
-        labelColor: Theme.of(context).primaryColorDark,
-        unselectedLabelColor: Theme.of(context).primaryColorDark,
-      ),
-    );
   }
 
-  int _getPlayerIndex(Player _player) {
+  _addPlayerTeamId() {
+    List<Player> teamAPlayers =
+        widget.l1Data.league.rounds[0].matches[0].teamA.players;
+    List<Player> teamBPlayers =
+        widget.l1Data.league.rounds[0].matches[0].teamB.players;
+
+    for (Player player in teamAPlayers) {
+      player.teamId = widget.l1Data.league.rounds[0].matches[0].teamA.id;
+      player.jerseyUrl =
+          widget.l1Data.league.rounds[0].matches[0].teamA.jerseyUrl;
+      if (widget.mode == TeamCreationMode.EDIT_TEAM ||
+          widget.mode == TeamCreationMode.CLONE_TEAM) {
+        if (widget.selectedTeam.viceCaptain == player.id) {
+          _vCaptain = player;
+        } else if (widget.selectedTeam.captain == player.id) {
+          _captain = player;
+        }
+      }
+    }
+
+    for (Player player in teamBPlayers) {
+      player.teamId = widget.l1Data.league.rounds[0].matches[0].teamB.id;
+      player.jerseyUrl =
+          widget.l1Data.league.rounds[0].matches[0].teamB.jerseyUrl;
+      if (widget.mode == TeamCreationMode.EDIT_TEAM ||
+          widget.mode == TeamCreationMode.CLONE_TEAM) {
+        if (widget.selectedTeam.viceCaptain == player.id) {
+          _vCaptain = player;
+        } else if (widget.selectedTeam.captain == player.id) {
+          _captain = player;
+        }
+      }
+    }
+  }
+
+  ///
+  /// Iterate selected players and calculate player credits
+  /// to edit or clone team.
+  ///
+  _editOrCloneTeam() {
+    _seperatePlayersByPlayingStyle();
+    calculatePlayerCredits(_selectedPlayers);
+  }
+
+  ///
+  /// Iterate selected players and create map by [playingStyleId] -> List[players].
+  ///
+  _seperatePlayersByPlayingStyle() {
+    _selectedPlayersByStyleId = {};
+    for (Player player in _selectedPlayers) {
+      if (_selectedPlayersByStyleId[player.playingStyleId] == null) {
+        _selectedPlayersByStyleId[player.playingStyleId] = [];
+      }
+      _selectedPlayersByStyleId[player.playingStyleId].add(player);
+    }
+  }
+
+  ///
+  /// returns player index in selected player lisr.
+  ///
+  int _getPlayerIndex(Player player) {
     int selectedPlayerIndex = -1;
     int currentIndex = 0;
-    for (Player player in _selectedPlayers) {
-      if (_player.id == player.id) {
+    for (Player selectedPlayer in _selectedPlayers) {
+      if (player.id == selectedPlayer.id) {
         selectedPlayerIndex = currentIndex;
       }
       currentIndex++;
@@ -70,9 +133,11 @@ class CreateTeamState extends State<CreateTeam> {
     return selectedPlayerIndex;
   }
 
-  _getSelectedPlayerCountForStyle(int _styleIndex) {
+  ///
+  /// Returns selected player count of give [style].
+  ///
+  _getSelectedPlayerCountForStyle(PlayingStyle style) {
     int _playerCount = 0;
-    final PlayingStyle style = _fanTeamRules.styles[_styleIndex];
     for (Player player in _selectedPlayers) {
       if (player.playingStyleId == style.id) {
         _playerCount++;
@@ -81,46 +146,38 @@ class CreateTeamState extends State<CreateTeam> {
     return _playerCount;
   }
 
-  _getForeignPlayerCount() {
-    int _foreignPlayerCount = 0;
-    for (Player player in _selectedPlayers) {
-      if (player.countryId !=
-          widget._l1Data.league.rounds[0].matches[0].series.countryId) {
-        _foreignPlayerCount++;
+  ///
+  /// It will toggle player selection after validating player selection
+  /// and re-calculate player credits.
+  /// It will also re-create tabs which is currently active.
+  ///
+  void _selectPlayer(PlayingStyle style, Player player) {
+    final _selectedPlayerIndex = _getPlayerIndex(player);
+
+    setState(() {
+      if (_selectedPlayerIndex == -1) {
+        if (!_isValidPlayerSelection(style, player)) {
+          return;
+        }
+        _selectedPlayers.add(player);
+      } else {
+        _selectedPlayers.removeAt(_selectedPlayerIndex);
       }
-    }
-    return _foreignPlayerCount;
+
+      _seperatePlayersByPlayingStyle();
+      calculatePlayerCredits(_selectedPlayers);
+    });
   }
 
-  int _getPlayerTeamId(Player _player) {
-    bool _bIsPlayerFound = false;
-    List<Player> _teamAPlayers =
-        widget._l1Data.league.rounds[0].matches[0].teamA.players;
-
-    for (Player player in _teamAPlayers) {
-      if (player.id == _player.id) {
-        _bIsPlayerFound = true;
-      }
-    }
-
-    return _bIsPlayerFound
-        ? widget._l1Data.league.rounds[0].matches[0].teamA.id
-        : widget._l1Data.league.rounds[0].matches[0].teamB.id;
-  }
-
-  _getPlayerCountPerTeam(int teamId) {
-    int _playersPerTeamCount = 0;
-    for (Player player in _selectedPlayers) {
-      if (_getPlayerTeamId(player) != teamId) {
-        _playersPerTeamCount++;
-      }
-    }
-    return _playersPerTeamCount;
-  }
-
-  bool _isValidPlayerSelection(int _styleIndex, Player _player) {
-    final PlayingStyle style = _fanTeamRules.styles[_styleIndex];
-    final int _stylePlayerCount = _getSelectedPlayerCountForStyle(_styleIndex);
+  ///
+  /// It will check if player to be selected is according to team selection
+  /// or not. it will return true if its valid else false and show message
+  /// accordingly.
+  ///
+  /// [style] Playing style object of [player] to validate.
+  ///
+  bool _isValidPlayerSelection(PlayingStyle style, Player player) {
+    final int _stylePlayerCount = _getSelectedPlayerCountForStyle(style);
 
     if (_selectedPlayers.length >= _fanTeamRules.playersTotal) {
       _showErrorMessage("You can't choose more than " +
@@ -129,7 +186,7 @@ class CreateTeamState extends State<CreateTeam> {
       return false;
     }
 
-    if ((_usedCredits + _player.credit) > _fanTeamRules.credits) {
+    if ((_usedCredits + player.credit) > _fanTeamRules.credits) {
       _showErrorMessage("You can't use more than " +
           _fanTeamRules.credits.toString() +
           " credits.");
@@ -145,8 +202,8 @@ class CreateTeamState extends State<CreateTeam> {
       return false;
     }
 
-    if (_player.countryId !=
-            widget._l1Data.league.rounds[0].matches[0].series.countryId &&
+    if (player.countryId !=
+            widget.l1Data.league.rounds[0].matches[0].series.countryId &&
         _getForeignPlayerCount() >= _fanTeamRules.playersForeign) {
       _showErrorMessage("You can't choose more than " +
           _fanTeamRules.playersForeign.toString() +
@@ -154,8 +211,7 @@ class CreateTeamState extends State<CreateTeam> {
       return false;
     }
 
-    if (_getPlayerCountPerTeam(_getPlayerTeamId(_player)) >=
-        _fanTeamRules.playersPerTeam) {
+    if (_getPlayerCountPerTeam(player.teamId) >= _fanTeamRules.playersPerTeam) {
       _showErrorMessage("You can't choose more than " +
           _fanTeamRules.playersPerTeam.toString() +
           " players from one team.");
@@ -165,63 +221,85 @@ class CreateTeamState extends State<CreateTeam> {
     return true;
   }
 
-  bool _selectPlayer(int _styleIndex, Player _player) {
-    final _selectedPlayerIndex = _getPlayerIndex(_player);
-
-    if (_selectedPlayerIndex == -1) {
-      if (!_isValidPlayerSelection(_styleIndex, _player)) {
-        return false;
+  ///
+  /// It will return selected players count for team
+  /// with given [teamId].
+  ///
+  _getPlayerCountPerTeam(int teamId) {
+    int _playersPerTeamCount = 0;
+    for (Player player in _selectedPlayers) {
+      if (player.teamId == teamId) {
+        _playersPerTeamCount++;
       }
-
-      _selectedPlayers.add(_player);
-    } else {
-      _selectedPlayers.removeAt(_selectedPlayerIndex);
     }
+    return _playersPerTeamCount;
+  }
 
-    setState(() {
-      double usedCredits = 0.0;
-      _selectedPlayersCount = _selectedPlayers.length;
-      for (Player player in _selectedPlayers) {
-        usedCredits += player.credit;
-        if (_playerCountByStyle[player.playingStyleId] == null) {
-          _playerCountByStyle[player.playingStyleId.toString()] = 0;
-        }
-        _playerCountByStyle[player.playingStyleId.toString()]++;
+  ///
+  /// It will calculate selected team used credits, number of players selected,
+  /// and average credits user can use for next playera selection.
+  /// [selectedPlayers] is List of players selected for which calculations should
+  /// done.
+  ///
+  void calculatePlayerCredits(List<Player> selectedPlayers) {
+    double usedCredits = 0.0;
+    _selectedPlayersCount = selectedPlayers.length;
+    for (Player player in selectedPlayers) {
+      usedCredits += player.credit;
+      if (_playerCountByStyle[player.playingStyleId] == null) {
+        _playerCountByStyle[player.playingStyleId.toString()] = 0;
       }
-      _usedCredits = usedCredits;
-      _avgCredits = _selectedPlayersCount != _fanTeamRules.playersTotal
-          ? ((_fanTeamRules.credits - usedCredits) /
-                  (_fanTeamRules.playersTotal - _selectedPlayersCount))
-              .toStringAsFixed(2)
-          : "-";
-    });
+      _playerCountByStyle[player.playingStyleId.toString()]++;
+    }
+    _usedCredits = usedCredits;
+    _avgCredits = _selectedPlayersCount != _fanTeamRules.playersTotal
+        ? ((_fanTeamRules.credits - usedCredits) /
+                (_fanTeamRules.playersTotal - _selectedPlayersCount))
+            .toStringAsFixed(2)
+        : "-";
+  }
 
+  ///
+  /// Check for team validation based on team creation rules.
+  /// Use this method when user click on choose captain/next.
+  ///
+  bool _isValidTeam() {
+    if (!isPlayerStyleCriteriaMatch()) {
+      return false;
+    }
+    if (_getForeignPlayerCount() > _fanTeamRules.playersForeign) {
+      return false;
+    }
+    if (_selectedPlayers.length != _fanTeamRules.playersTotal) {
+      _showErrorMessage("Plese select " +
+          (_fanTeamRules.playersTotal - _selectedPlayers.length).toString() +
+          " more players to create your dream team.");
+      return false;
+    }
     return true;
   }
 
-  void _showErrorMessage(String _message) {
-    showModalBottomSheet<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Text(
-              _message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Theme.of(context).accentColor, fontSize: 24.0),
-            ),
-          ),
-        );
-      },
-    );
+  ///
+  /// It will return foreign players count.
+  ///
+  _getForeignPlayerCount() {
+    int _foreignPlayerCount = 0;
+    for (Player player in _selectedPlayers) {
+      if (player.countryId !=
+          widget.l1Data.league.rounds[0].matches[0].series.countryId) {
+        _foreignPlayerCount++;
+      }
+    }
+    return _foreignPlayerCount;
   }
 
+  ///
+  /// It will check if all playing style player selection is matched
+  /// according to team creation rules or not.
+  ///
   bool isPlayerStyleCriteriaMatch() {
-    int i = 0;
     for (PlayingStyle style in _fanTeamRules.styles) {
-      int playingStyleCount = _getSelectedPlayerCountForStyle(i);
+      int playingStyleCount = _getSelectedPlayerCountForStyle(style);
       if (!(playingStyleCount >= style.rule[0] &&
           playingStyleCount <= style.rule[1])) {
         if (playingStyleCount > style.rule[1]) {
@@ -239,34 +317,14 @@ class CreateTeamState extends State<CreateTeam> {
         }
         return false;
       }
-      i++;
     }
     return true;
   }
 
-  bool _isValidTeam() {
-    if (!isPlayerStyleCriteriaMatch()) {
-      return false;
-    }
-    if (_getForeignPlayerCount() > _fanTeamRules.playersForeign) {
-      return false;
-    }
-    if (_selectedPlayers.length != _fanTeamRules.playersTotal) {
-      _showErrorMessage("Plese select " +
-          (_fanTeamRules.playersTotal - _selectedPlayers.length).toString() +
-          " more players to create your dream team.");
-      return false;
-    }
-    return true;
-  }
-
-  void _onSaveCaptains(Player captain, Player viceCaptain) {
-    Navigator.of(context).pop();
-    //  TODO
-    //  Add logic to save team and pop current page.
-    Navigator.of(context).pop();
-  }
-
+  ///
+  /// It will show bottom panel popup for captain
+  /// and vice captain selection.
+  ///
   void _showChooseCaptain() {
     _scaffoldKey.currentState.showBottomSheet((context) {
       return Container(
@@ -279,11 +337,69 @@ class CreateTeamState extends State<CreateTeam> {
             ),
           ],
         ),
-        // color: Colors.blueGrey,
         height: 550.0,
-        child: ChooseCaptain(_fanTeamRules, _selectedPlayers, _onSaveCaptains),
+        child: ChooseCaptain(
+          fanTeamRules: _fanTeamRules,
+          selectedPlayers: _selectedPlayers,
+          onSave: _onSaveCaptains,
+          captain: _captain,
+          viceCaptain: _vCaptain,
+        ),
       );
     });
+  }
+
+  ///
+  /// Iterate playing style array get from team creation rules
+  /// and create tabs for each playing style and returns tab
+  /// object which includes tab icon and other UI.
+  ///
+  _createTabsBasedOnPlayingStyle() {
+    final List<PlayingStyle> _playingStyles =
+        _fanTeamRules != null ? _fanTeamRules.styles : [];
+    List<Widget> tabs = [];
+    for (PlayingStyle style in _playingStyles) {
+      tabs.add(
+        Tab(
+          icon: new Icon(Icons.home),
+          text: "PICK " +
+              (style.rule.length > 0 && style.rule[0] == style.rule[1]
+                  ? style.rule[0].toString()
+                  : style.rule[0].toString() + "-" + style.rule[1].toString()),
+        ),
+      );
+    }
+
+    return Container(
+      color: Colors.black12,
+      child: TabBar(
+        tabs: tabs,
+        labelColor: Theme.of(context).primaryColorDark,
+        unselectedLabelColor: Theme.of(context).primaryColorDark,
+      ),
+    );
+  }
+
+  ///
+  /// It will show [message] in bottom sheet.
+  ///
+  void _showErrorMessage(String message) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Theme.of(context).accentColor, fontSize: 24.0),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -291,8 +407,8 @@ class CreateTeamState extends State<CreateTeam> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-            widget._league.teamA.name + " vs " + widget._league.teamB.name),
+        title:
+            Text(widget.league.teamA.name + " vs " + widget.league.teamB.name),
       ),
       body: Column(
         children: <Widget>[
@@ -321,8 +437,8 @@ class CreateTeamState extends State<CreateTeam> {
                             child: Text(
                               _selectedPlayersCount.toString() +
                                   "/" +
-                                  (widget._l1Data != null
-                                      ? widget._l1Data.league.fanTeamRules
+                                  (widget.l1Data != null
+                                      ? widget.l1Data.league.fanTeamRules
                                           .playersTotal
                                           .toString()
                                       : ""),
@@ -359,9 +475,9 @@ class CreateTeamState extends State<CreateTeam> {
                             child: Text(
                               _usedCredits.toString() +
                                   "/" +
-                                  (widget._l1Data != null
+                                  (widget.l1Data != null
                                       ? widget
-                                          ._l1Data.league.fanTeamRules.credits
+                                          .l1Data.league.fanTeamRules.credits
                                           .toString()
                                       : ""),
                               textAlign: TextAlign.center,
@@ -418,10 +534,34 @@ class CreateTeamState extends State<CreateTeam> {
               child: Scaffold(
                 body: TabBarView(
                   children: [
-                    PlayingStyleTab(0, widget._l1Data, _selectPlayer),
-                    PlayingStyleTab(1, widget._l1Data, _selectPlayer),
-                    PlayingStyleTab(2, widget._l1Data, _selectPlayer),
-                    PlayingStyleTab(3, widget._l1Data, _selectPlayer),
+                    PlayingStyleTab(
+                      style: _fanTeamRules.styles[0],
+                      l1Data: widget.l1Data,
+                      onPlayerSelect: _selectPlayer,
+                      selectedPlayers:
+                          _selectedPlayersByStyleId[_fanTeamRules.styles[0].id],
+                    ),
+                    PlayingStyleTab(
+                      style: _fanTeamRules.styles[1],
+                      l1Data: widget.l1Data,
+                      onPlayerSelect: _selectPlayer,
+                      selectedPlayers:
+                          _selectedPlayersByStyleId[_fanTeamRules.styles[1].id],
+                    ),
+                    PlayingStyleTab(
+                      style: _fanTeamRules.styles[2],
+                      l1Data: widget.l1Data,
+                      onPlayerSelect: _selectPlayer,
+                      selectedPlayers:
+                          _selectedPlayersByStyleId[_fanTeamRules.styles[2].id],
+                    ),
+                    PlayingStyleTab(
+                      style: _fanTeamRules.styles[3],
+                      l1Data: widget.l1Data,
+                      onPlayerSelect: _selectPlayer,
+                      selectedPlayers:
+                          _selectedPlayersByStyleId[_fanTeamRules.styles[3].id],
+                    ),
                   ],
                 ),
                 bottomNavigationBar: _createTabsBasedOnPlayingStyle(),
@@ -442,5 +582,92 @@ class CreateTeamState extends State<CreateTeam> {
         ],
       ),
     );
+  }
+
+  _getTeamToSave() {
+    Map<String, dynamic> team = {
+      "matchId": widget.league.matchId,
+      "leagueId": widget.l1Data.league.id,
+      "seriesId": widget.league.series.id,
+      "captain": _captain.id,
+      "viceCaptain": _vCaptain.id,
+      "players": _selectedPlayers,
+      "name": "",
+    };
+
+    if (widget.mode == TeamCreationMode.EDIT_TEAM) {
+      team["fanTeamId"] = widget.selectedTeam.id;
+      team["name"] = widget.selectedTeam.name;
+    }
+
+    return team;
+  }
+
+  void _onSaveCaptains(Player captain, Player viceCaptain) {
+    Navigator.of(context).pop();
+
+    _captain = captain;
+    _vCaptain = viceCaptain;
+
+    if (widget.mode == TeamCreationMode.EDIT_TEAM) {
+      _updateTeam(_getTeamToSave());
+    } else {
+      createTeam(_getTeamToSave());
+    }
+  }
+
+  void createTeam(Map<String, dynamic> team) async {
+    String cookie;
+    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+    await futureCookie.then((value) {
+      cookie = value;
+    });
+
+    return new http.Client()
+        .post(
+      ApiUtil.CREATE_TEAM,
+      headers: {
+        'Content-type': 'application/json',
+        "cookie": cookie,
+        "channelId": "3"
+      },
+      body: json.encoder.convert(team),
+    )
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 300) {
+        CreateTeamResponse response =
+            CreateTeamResponse.fromJson(json.decode(res.body));
+        Navigator.pop(context, response.message);
+      } else {
+        _showErrorMessage("Getting error while saving team.");
+      }
+    }).whenComplete(() => print('completed'));
+  }
+
+  void _updateTeam(Map<String, dynamic> team) async {
+    String cookie;
+    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+    await futureCookie.then((value) {
+      cookie = value;
+    });
+
+    return new http.Client()
+        .put(
+      ApiUtil.EDIT_TEAM + widget.selectedTeam.id.toString(),
+      headers: {
+        'Content-type': 'application/json',
+        "cookie": cookie,
+        "channelId": "3"
+      },
+      body: json.encoder.convert(team),
+    )
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 300) {
+        Map<String, dynamic> response = json.decode(res.body);
+        Navigator.of(context).pop(response["message"]);
+      } else {
+        _showErrorMessage("Getting error while updating team.");
+      }
+    }).whenComplete(() => print('completed'));
   }
 }

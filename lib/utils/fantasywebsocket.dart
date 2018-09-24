@@ -52,7 +52,9 @@ class FantasyWebSocket {
   }
 
   sendMessage(Map<String, dynamic> msg) async {
-    _channel.sink.add(json.encode(msg));
+    if (_channel != null) {
+      _channel.sink.add(json.encode(msg));
+    }
   }
 
   unRegister(onWsMsg) {

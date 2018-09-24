@@ -8,9 +8,11 @@ class ApiUtil {
   static const PAYMENT_BASE_URL = "https://test.justkhel.com";
   static const DEPOSIT_URL = PAYMENT_BASE_URL + "/deposit";
 
-  static const BASE_API_URL = BASE_URL + "/api";
-  static const LOGIN_URL = BASE_API_URL + "/ups/login";
-  static const LOGOUT_URL = BASE_API_URL + "/ups/logout";
-  static const GET_COOKIE_URL = BASE_API_URL + "/lobby/getcookie";
-  static const AUTH_CHECK_URL = BASE_API_URL + "/ups/login/status";
+  static const BASE_API_URL = BASE_URL + "/api/";
+  static const LOGIN_URL = BASE_API_URL + "ups/login";
+  static const LOGOUT_URL = BASE_API_URL + "ups/logout";
+  static const GET_COOKIE_URL = BASE_API_URL + "lobby/getcookie";
+  static const AUTH_CHECK_URL = BASE_API_URL + "ups/login/status";
+  static const CREATE_TEAM = BASE_API_URL + "lobby/fanteam";
+  static const EDIT_TEAM = BASE_API_URL + "lobby/fanteam/";
 }

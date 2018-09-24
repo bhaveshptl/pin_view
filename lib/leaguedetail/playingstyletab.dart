@@ -1,73 +1,48 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 
-class PlayingStyleTab extends StatefulWidget {
-  final L1 _l1Data;
-  final int _styleIndex;
-  final Function _onPlayerSelect;
+class PlayingStyleTab extends StatelessWidget {
+  final L1 l1Data;
+  final PlayingStyle style;
+  final Function onPlayerSelect;
+  final List<Player> selectedPlayers;
 
-  PlayingStyleTab(this._styleIndex, this._l1Data, this._onPlayerSelect);
-
-  @override
-  State<StatefulWidget> createState() => PlayingStyleTabState();
-}
-
-class PlayingStyleTabState extends State<PlayingStyleTab>
-    with AutomaticKeepAliveClientMixin {
-  PlayingStyle _style;
-  List<Player> _selectedPlayers = [];
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      _style = widget._l1Data.league.fanTeamRules.styles[widget._styleIndex];
-    });
-  }
+  PlayingStyleTab(
+      {this.style, this.l1Data, this.onPlayerSelect, this.selectedPlayers});
 
   int _getPlayerIndex(Player _player) {
     int selectedPlayerIndex = -1;
     int currentIndex = 0;
-    for (Player player in _selectedPlayers) {
-      if (_player.id == player.id) {
-        selectedPlayerIndex = currentIndex;
+    if (selectedPlayers != null) {
+      for (Player player in selectedPlayers) {
+        if (_player.id == player.id) {
+          selectedPlayerIndex = currentIndex;
+        }
+        currentIndex++;
       }
-      currentIndex++;
     }
     return selectedPlayerIndex;
   }
 
   _doPlayerSelection(Player _player) {
-    bool _bSuccess = widget._onPlayerSelect(widget._styleIndex, _player);
-    if (_bSuccess) {
-      int selectedPlayerIndex = _getPlayerIndex(_player);
-      setState(() {
-        if (selectedPlayerIndex == -1) {
-          _selectedPlayers.add(_player);
-        } else {
-          _selectedPlayers.removeAt(selectedPlayerIndex);
-        }
-      });
-    }
+    onPlayerSelect(style, _player);
   }
 
   Widget _playerListView() {
     List<Player> teamAPlayers =
-        widget._l1Data.league.rounds[0].matches[0].teamA.players;
+        l1Data.league.rounds[0].matches[0].teamA.players;
     List<Player> teamBPlayers =
-        widget._l1Data.league.rounds[0].matches[0].teamB.players;
+        l1Data.league.rounds[0].matches[0].teamB.players;
     List<Player> tabPlayers = [];
 
     for (Player player in teamAPlayers) {
-      if (player.playingStyleId == _style.id) {
+      if (player.playingStyleId == style.id) {
         tabPlayers.add(player);
       }
     }
     for (Player player in teamBPlayers) {
-      if (player.playingStyleId == _style.id) {
+      if (player.playingStyleId == style.id) {
         tabPlayers.add(player);
       }
     }
@@ -117,19 +92,15 @@ class PlayingStyleTabState extends State<PlayingStyleTab>
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: tabPlayers.length,
+              itemCount: tabPlayers.length + 1,
               itemBuilder: (context, index) {
-                final _player = tabPlayers[index];
-                final _firstName = _player.name.split(" ")[0];
-                final _lastName = _player.name.split(" ").length > 0
-                    ? _player.name.split(" ")[1]
-                    : "";
-                final String _playerInitials =
-                    (_firstName.length > 0 ? _firstName.substring(0, 1) : "")
-                            .toUpperCase() +
-                        (_lastName.length > 0 ? _lastName.substring(0, 1) : "")
-                            .toUpperCase();
-
+                final _player =
+                    index >= tabPlayers.length ? null : tabPlayers[index];
+                if (_player == null) {
+                  return Container(
+                    height: 64.0,
+                  );
+                }
                 return FlatButton(
                   onPressed: () {
                     _doPlayerSelection(_player);
@@ -144,8 +115,14 @@ class PlayingStyleTabState extends State<PlayingStyleTab>
                         flex: 2,
                         child: CircleAvatar(
                           minRadius: 20.0,
-                          child: Text(_playerInitials),
-                          backgroundColor: Theme.of(context).primaryColor,
+                          backgroundColor: Colors.black12,
+                          child: Container(
+                            height: 24.0,
+                            child: CachedNetworkImage(
+                              imageUrl: _player.jerseyUrl,
+                              placeholder: CircularProgressIndicator(),
+                            ),
+                          ),
                         ),
                       ),
                       Expanded(
@@ -177,6 +154,20 @@ class PlayingStyleTabState extends State<PlayingStyleTab>
     );
   }
 
+  _shouldShowSelectionWarning() {
+    final int _selectedPlayerCount =
+        selectedPlayers == null ? 0 : selectedPlayers.length;
+    if (style.rule[0] == style.rule[1] &&
+        _selectedPlayerCount == style.rule[0]) {
+      return false;
+    } else if (style.rule[0] != style.rule[1] &&
+        _selectedPlayerCount >= style.rule[0] &&
+        _selectedPlayerCount <= style.rule[1]) {
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -190,18 +181,27 @@ class PlayingStyleTabState extends State<PlayingStyleTab>
               children: <Widget>[
                 Text(
                   "PICK " +
-                      (_style != null && _style.rule.length > 0
-                          ? (_style.rule[0] == _style.rule[1]
-                              ? _style.rule[0].toString()
-                              : _style.rule[0].toString() +
+                      (style != null && style.rule.length > 0
+                          ? (style.rule[0] == style.rule[1]
+                              ? style.rule[0].toString()
+                              : style.rule[0].toString() +
                                   "-" +
-                                  _style.rule[1].toString())
+                                  style.rule[1].toString())
                           : "") +
                       " " +
-                      _style.label.toUpperCase(),
+                      style.label.toUpperCase(),
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
+                _shouldShowSelectionWarning()
+                    ? Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: Icon(
+                          Icons.warning,
+                          color: Colors.white70,
+                        ),
+                      )
+                    : Container(),
               ],
             ),
           ),

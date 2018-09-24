@@ -38,15 +38,19 @@ class ContestsState extends State<Contests> {
         Row(
           children: <Widget>[
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: LeagueCard(
-                  widget._league,
-                  clickable: false,
-                ),
+              child: LeagueCard(
+                widget._league,
+                clickable: false,
               ),
             ),
           ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom:4.0),
+          child: Divider(
+            height: 2.0,
+            color: Colors.black12,
+          ),
         ),
         Expanded(
           child: ListView.builder(
