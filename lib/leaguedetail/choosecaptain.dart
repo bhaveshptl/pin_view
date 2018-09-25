@@ -146,18 +146,6 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     itemCount: widget.selectedPlayers.length,
                     itemBuilder: (context, index) {
                       final _player = widget.selectedPlayers[index];
-                      final _firstName = _player.name.split(" ")[0];
-                      final _lastName = _player.name.split(" ").length > 0
-                          ? _player.name.split(" ")[1]
-                          : "";
-                      final String _playerInitials = (_firstName.length > 0
-                                  ? _firstName.substring(0, 1)
-                                  : "")
-                              .toUpperCase() +
-                          (_lastName.length > 0
-                                  ? _lastName.substring(0, 1)
-                                  : "")
-                              .toUpperCase();
 
                       return Padding(
                         padding: EdgeInsets.only(bottom: 8.0),
