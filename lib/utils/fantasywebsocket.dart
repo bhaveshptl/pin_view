@@ -60,4 +60,11 @@ class FantasyWebSocket {
   unRegister(onWsMsg) {
     _listeners.remove(onWsMsg);
   }
+
+  reset() {
+    if (_channel != null && _channel.sink != null) {
+      _channel.sink.close();
+    }
+    _listeners = ObserverList<Function>();
+  }
 }

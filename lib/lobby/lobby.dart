@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
@@ -39,65 +41,89 @@ class LobbyState extends State<Lobby> {
     });
   }
 
+  Future<bool> _onWillPop() {
+    return showDialog(
+      context: context,
+      builder: (context) => new AlertDialog(
+            title: new Text('Are you sure?'),
+            content: new Text('Do you want to exit an App'),
+            actions: <Widget>[
+              new FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: new Text('No'),
+              ),
+              new FlatButton(
+                onPressed: () => exit(0),
+                child: new Text('Yes'),
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            DropdownButton(
-              style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: Theme.of(context).primaryTextTheme.title.fontSize),
-              onChanged: (value) {
-                setState(() {
-                  _sportType = value;
-                });
-              },
-              value: _sportType,
-              items: [
-                DropdownMenuItem(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                    child: Text("CRICKET"),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0.0,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              DropdownButton(
+                style: TextStyle(
+                    color: Colors.black45,
+                    fontSize:
+                        Theme.of(context).primaryTextTheme.title.fontSize),
+                onChanged: (value) {
+                  setState(() {
+                    _sportType = value;
+                  });
+                },
+                value: _sportType,
+                items: [
+                  DropdownMenuItem(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                      child: Text("CRICKET"),
+                    ),
+                    value: 1,
                   ),
-                  value: 1,
-                ),
-                DropdownMenuItem(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                    child: Text("FOOTBALL"),
+                  DropdownMenuItem(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                      child: Text("FOOTBALL"),
+                    ),
+                    value: 2,
                   ),
-                  value: 2,
-                ),
-                DropdownMenuItem(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                    child: Text("KABADDI"),
-                  ),
-                  value: 3,
-                )
-              ],
-            ),
+                  DropdownMenuItem(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                      child: Text("KABADDI"),
+                    ),
+                    value: 3,
+                  )
+                ],
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.help_outline),
+              tooltip: "Help - How to play",
+              onPressed: () {},
+            )
           ],
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.help_outline),
-            tooltip: "Help - How to play",
-            onPressed: () {},
-          )
-        ],
+        drawer: AppDrawer(),
+        body: LobbyWidget(
+          sportType: _sportType,
+        ),
+        bottomNavigationBar:
+            LobbyBottomNavigation(_onNavigationSelectionChange, 0),
       ),
-      drawer: AppDrawer(),
-      body: LobbyWidget(
-        sportType: _sportType,
-      ),
-      bottomNavigationBar:
-          LobbyBottomNavigation(_onNavigationSelectionChange, 0),
     );
   }
 }

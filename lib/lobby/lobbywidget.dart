@@ -163,4 +163,10 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       ),
     );
   }
+
+  @override
+    void dispose() {
+      sockets.reset();
+      super.dispose();
+    }
 }

@@ -58,18 +58,18 @@ class PlayingStyleTab extends StatelessWidget {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Text(""),
                       ),
                       Expanded(
-                        flex: 8,
+                        flex: 9,
                         child: Text(
                           "NAME",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Text(
                           "SERIES SCORE",
                           textAlign: TextAlign.center,
@@ -77,7 +77,7 @@ class PlayingStyleTab extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Text(
                           "CREDITS",
                           textAlign: TextAlign.center,
@@ -112,7 +112,7 @@ class PlayingStyleTab extends StatelessWidget {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: CircleAvatar(
                           minRadius: 20.0,
                           backgroundColor: Colors.black12,
@@ -126,18 +126,18 @@ class PlayingStyleTab extends StatelessWidget {
                         ),
                       ),
                       Expanded(
-                        flex: 8,
+                        flex: 9,
                         child: Text(_player.name),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Text(
                           _player.seriesScore.toString(),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: Text(
                           _player.credit.toString(),
                           textAlign: TextAlign.center,
@@ -199,6 +199,10 @@ class PlayingStyleTab extends StatelessWidget {
                         child: Icon(
                           Icons.warning,
                           color: Colors.white70,
+                          size: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .fontSize,
                         ),
                       )
                     : Container(),

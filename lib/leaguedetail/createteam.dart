@@ -360,12 +360,83 @@ class CreateTeamState extends State<CreateTeam> {
     List<Widget> tabs = [];
     for (PlayingStyle style in _playingStyles) {
       tabs.add(
-        Tab(
-          icon: new Icon(Icons.home),
-          text: "PICK " +
-              (style.rule.length > 0 && style.rule[0] == style.rule[1]
-                  ? style.rule[0].toString()
-                  : style.rule[0].toString() + "-" + style.rule[1].toString()),
+        Padding(
+          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+          child: Tab(
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Stack(
+                    children: <Widget>[
+                      Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Expanded(
+                                child: Icon(Icons.home),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(top: 6.0),
+                                child: Text(
+                                  "PICK " +
+                                      (style.rule.length > 0 &&
+                                              style.rule[0] == style.rule[1]
+                                          ? style.rule[0].toString()
+                                          : style.rule[0].toString() +
+                                              "-" +
+                                              style.rule[1].toString()),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              CircleAvatar(
+                                maxRadius: 8.0,
+                                backgroundColor:
+                                    Theme.of(context).primaryColorDark,
+                                child:
+                                    _selectedPlayersByStyleId[style.id] == null
+                                        ? Text(
+                                            0.toString(),
+                                            style: TextStyle(
+                                                fontSize: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .caption
+                                                    .fontSize),
+                                          )
+                                        : Text(
+                                            _selectedPlayersByStyleId[style.id]
+                                                .length
+                                                .toString(),
+                                            style: TextStyle(
+                                                fontSize: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .caption
+                                                    .fontSize),
+                                          ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       );
     }
@@ -378,6 +449,21 @@ class CreateTeamState extends State<CreateTeam> {
         unselectedLabelColor: Theme.of(context).primaryColorDark,
       ),
     );
+  }
+
+  _getTabsBodyBasedOnPlayingStyle() {
+    List<PlayingStyleTab> tabsBody = [];
+    for (PlayingStyle style in _fanTeamRules.styles) {
+      tabsBody.add(
+        PlayingStyleTab(
+          style: style,
+          l1Data: widget.l1Data,
+          onPlayerSelect: _selectPlayer,
+          selectedPlayers: _selectedPlayersByStyleId[style.id],
+        ),
+      );
+    }
+    return tabsBody;
   }
 
   ///
@@ -533,36 +619,7 @@ class CreateTeamState extends State<CreateTeam> {
               length: 4,
               child: Scaffold(
                 body: TabBarView(
-                  children: [
-                    PlayingStyleTab(
-                      style: _fanTeamRules.styles[0],
-                      l1Data: widget.l1Data,
-                      onPlayerSelect: _selectPlayer,
-                      selectedPlayers:
-                          _selectedPlayersByStyleId[_fanTeamRules.styles[0].id],
-                    ),
-                    PlayingStyleTab(
-                      style: _fanTeamRules.styles[1],
-                      l1Data: widget.l1Data,
-                      onPlayerSelect: _selectPlayer,
-                      selectedPlayers:
-                          _selectedPlayersByStyleId[_fanTeamRules.styles[1].id],
-                    ),
-                    PlayingStyleTab(
-                      style: _fanTeamRules.styles[2],
-                      l1Data: widget.l1Data,
-                      onPlayerSelect: _selectPlayer,
-                      selectedPlayers:
-                          _selectedPlayersByStyleId[_fanTeamRules.styles[2].id],
-                    ),
-                    PlayingStyleTab(
-                      style: _fanTeamRules.styles[3],
-                      l1Data: widget.l1Data,
-                      onPlayerSelect: _selectPlayer,
-                      selectedPlayers:
-                          _selectedPlayersByStyleId[_fanTeamRules.styles[3].id],
-                    ),
-                  ],
+                  children: _getTabsBodyBasedOnPlayingStyle(),
                 ),
                 bottomNavigationBar: _createTabsBasedOnPlayingStyle(),
                 floatingActionButton: FloatingActionButton(

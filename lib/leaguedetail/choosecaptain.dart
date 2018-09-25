@@ -181,7 +181,9 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                     : _captain.id == _player.id,
                                 onChanged: (bool value) {
                                   setState(() {
-                                    if (!(_vCaptain != null &&
+                                    if (_captain == _player) {
+                                      _captain = null;
+                                    } else if (!(_vCaptain != null &&
                                         _vCaptain.id == _player.id)) {
                                       _captain = _player;
                                     }
@@ -197,7 +199,9 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                     : _vCaptain.id == _player.id,
                                 onChanged: (bool value) {
                                   setState(() {
-                                    if (!(_captain != null &&
+                                    if (_vCaptain == _player) {
+                                      _vCaptain = null;
+                                    } else if (!(_captain != null &&
                                         _captain.id == _player.id)) {
                                       _vCaptain = _player;
                                     }
