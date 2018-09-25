@@ -181,36 +181,49 @@ class MyTeamsState extends State<MyTeams> {
     return items;
   }
 
+  Player getPlayer(int playerId, MyTeam myTeam) {
+    for (Player player in myTeam.players) {
+      if (player.id == playerId) {
+        return player;
+      }
+    }
+    return null;
+  }
+
   Widget getExpansionHeader(
       BuildContext context, bool isExpanded, MyTeam myTeam) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.only(left: 24.0),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(myTeam.name),
-            isExpanded
-                ? Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      IconButton(
-                        padding: EdgeInsets.all(0.0),
-                        onPressed: () {
-                          _onEditTeam(context);
-                        },
-                        icon: Icon(Icons.edit),
-                      ),
-                      IconButton(
-                        padding: EdgeInsets.all(0.0),
-                        onPressed: () {
-                          _onCloneTeam(context);
-                        },
-                        icon: Icon(Icons.content_copy),
+            Row(
+              children: <Widget>[
+                Text(myTeam.name),
+                isExpanded
+                    ? Row(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          IconButton(
+                            padding: EdgeInsets.all(0.0),
+                            onPressed: () {
+                              _onEditTeam(context);
+                            },
+                            icon: Icon(Icons.edit),
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.all(0.0),
+                            onPressed: () {
+                              _onCloneTeam(context);
+                            },
+                            icon: Icon(Icons.content_copy),
+                          )
+                        ],
                       )
-                    ],
-                  )
-                : Container(),
+                    : Container(),
+              ],
+            )
           ],
         ),
       ),
@@ -219,6 +232,9 @@ class MyTeamsState extends State<MyTeams> {
 
   Widget _getExpansionBody(MyTeam myTeam) {
     List<ListTile> items = [];
+    Player captain = getPlayer(myTeam.captain, myTeam);
+    Player vCaptain = getPlayer(myTeam.viceCaptain, myTeam);
+
     for (Player player in myTeam.players) {
       items.add(
         ListTile(
@@ -235,14 +251,28 @@ class MyTeamsState extends State<MyTeams> {
                             height: 24.0,
                             child: CachedNetworkImage(
                               imageUrl: player.jerseyUrl,
-                              placeholder: CircularProgressIndicator(),
+                              placeholder: Container(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
+                                height: 18.0,
+                                width: 18.0,
+                              ),
                             ),
                           ),
                         ),
                 ),
                 Expanded(
                   flex: 4,
-                  child: Text(player.name),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(player.name),
+                      captain == player
+                          ? Text("2X")
+                          : (vCaptain == player ? Text("1.5X") : Container()),
+                    ],
+                  ),
                 ),
                 Expanded(
                   flex: 1,

@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/modal/createteamresponse.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/modal/createteamresponse.dart';
 import 'package:playfantasy/leaguedetail/choosecaptain.dart';
 import 'package:playfantasy/leaguedetail/playingstyletab.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class TeamCreationMode {
   static const int CREATE_TEAM = 1;
@@ -216,6 +216,22 @@ class CreateTeamState extends State<CreateTeam> {
           _fanTeamRules.playersPerTeam.toString() +
           " players from one team.");
       return false;
+    }
+
+    for (PlayingStyle style in _fanTeamRules.styles) {
+      int playerCountForStyle = _selectedPlayersByStyleId[style.id] == null
+          ? 0
+          : _selectedPlayersByStyleId[style.id].length;
+      if ((_fanTeamRules.playersTotal - (_selectedPlayersCount + 1) <
+              style.rule[0] - playerCountForStyle) &&
+          player.playingStyleId != style.id) {
+        _showErrorMessage("Minimum " +
+            style.rule[0].toString() +
+            " " +
+            style.label +
+            " should be selected.");
+        return false;
+      }
     }
 
     return true;

@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PlayingStyleTab extends StatelessWidget {
   final L1 l1Data;
@@ -120,7 +120,13 @@ class PlayingStyleTab extends StatelessWidget {
                             height: 24.0,
                             child: CachedNetworkImage(
                               imageUrl: _player.jerseyUrl,
-                              placeholder: CircularProgressIndicator(),
+                              placeholder: Container(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
+                                height: 18.0,
+                                width: 18.0,
+                              ),
                             ),
                           ),
                         ),

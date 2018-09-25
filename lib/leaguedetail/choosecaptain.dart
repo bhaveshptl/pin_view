@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:playfantasy/modal/l1.dart';
 
 class ChooseCaptain extends StatefulWidget {
@@ -165,8 +167,20 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                               flex: 2,
                               child: CircleAvatar(
                                 minRadius: 20.0,
-                                child: Text(_playerInitials),
-                                backgroundColor: Theme.of(context).primaryColor,
+                                backgroundColor: Colors.black12,
+                                child: Container(
+                                  height: 24.0,
+                                  child: CachedNetworkImage(
+                                    imageUrl: _player.jerseyUrl,
+                                    placeholder: Container(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                      ),
+                                      height: 18.0,
+                                      width: 18.0,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                             Expanded(
