@@ -5,7 +5,7 @@ class ApiUtil {
   static const WEBSOCKET_URL = "wss://lobby-stg.playfantasy.com/path?pid=";
 
   static const BASE_URL = "https://stg.playfantasy.com";
-  static const PAYMENT_BASE_URL = "https://test.justkhel.com";
+  static const PAYMENT_BASE_URL = BASE_URL;
   static const DEPOSIT_URL = PAYMENT_BASE_URL + "/deposit";
 
   static const BASE_API_URL = BASE_URL + "/api/";
@@ -15,4 +15,9 @@ class ApiUtil {
   static const AUTH_CHECK_URL = BASE_API_URL + "ups/login/status";
   static const CREATE_TEAM = BASE_API_URL + "lobby/fanteam";
   static const EDIT_TEAM = BASE_API_URL + "lobby/fanteam/";
+  static const GET_MY_CONTEST_MY_TEAMS =
+      BASE_API_URL + "lobby/user/contest/teams";
+  static const JOIN_CONTEST = BASE_API_URL + "v2/lobby/joincontest";
+  static const STATE_LIST = BASE_API_URL + "verify/states-list";
+  static const UPDATE_DOB_STATE = BASE_API_URL + "ups/user/updateUser";
 }

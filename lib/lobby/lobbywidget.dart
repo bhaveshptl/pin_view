@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/tabs/statustab.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 
@@ -124,16 +125,20 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                     Tooltip(
                       message: "Upcoming matches",
                       child: Tab(
-                        text: "UPCOMING",
+                        text: strings.get("UPCOMING").toUpperCase(),
                       ),
                     ),
                     Tooltip(
                       message: "Live matches",
-                      child: Tab(text: "LIVE"),
+                      child: Tab(
+                        text: strings.get("LIVE").toUpperCase(),
+                      ),
                     ),
                     Tooltip(
                       message: "Completed matches",
-                      child: Tab(text: "RESULT"),
+                      child: Tab(
+                        text: strings.get("RESULT").toUpperCase(),
+                      ),
                     ),
                   ],
                 ),
@@ -165,8 +170,8 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   }
 
   @override
-    void dispose() {
-      sockets.reset();
-      super.dispose();
-    }
+  void dispose() {
+    sockets.reset();
+    super.dispose();
+  }
 }

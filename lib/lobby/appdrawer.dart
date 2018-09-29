@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/profilepages/verification.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class AppDrawer extends StatefulWidget {
   @override
@@ -32,23 +34,63 @@ class AppDrawerState extends State<AppDrawer> {
       });
     });
 
-    doLogout() {
+    _doLogout() {
       new http.Client().get(
         ApiUtil.LOGOUT_URL,
         headers: {'Content-type': 'application/json', "cookie": cookie},
-      ).then((http.Response res) {        
-      });
+      ).then((http.Response res) {});
+    }
+
+    _onVerify() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Verification(),
+        ),
+      );
     }
 
     return Drawer(
       child: ListView(
         children: <Widget>[
           new DrawerHeader(
-            child: new Center(
-                child: Text(
-              _user == null ? "" : _user.loginName,
-              style: TextStyle(color: Theme.of(context).primaryColorLight),
-            )),
+            child: Stack(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        RaisedButton(
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _onVerify();
+                          },
+                          child: Text(
+                            strings.get("VERIFY").toUpperCase(),
+                            style: TextStyle(
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Center(
+                      child: Text(
+                        _user == null ? "" : _user.loginName,
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorLight),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColorDark,
             ),
@@ -140,7 +182,7 @@ class AppDrawerState extends State<AppDrawer> {
           ListTile(
             title: Text('LOG OUT'),
             onTap: () async {
-              doLogout();
+              _doLogout();
               Navigator.pop(context);
               SharedPrefHelper.internal().removeCookie();
               Navigator.of(context).pushReplacementNamed("/landingpage");

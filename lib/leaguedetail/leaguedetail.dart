@@ -11,6 +11,7 @@ import 'package:playfantasy/leaguedetail/myteams.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League _league;
@@ -23,9 +24,11 @@ class LeagueDetail extends StatefulWidget {
 class LeagueDetailState extends State<LeagueDetail>
     with WidgetsBindingObserver {
   L1 l1Data;
+  String cookie;
   List<MyTeam> _myTeams;
   String title = "Match";
   Map<String, dynamic> l1UpdatePackate = {};
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   ///
   /// Reconnect websocket after resumed from lock screen or inactive state.
@@ -83,6 +86,23 @@ class LeagueDetailState extends State<LeagueDetail>
     _getL1Data();
   }
 
+  _launchAddCash() async {
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        setState(() {
+          cookie = value;
+        });
+      });
+    }
+
+    Navigator.of(context).push(new MaterialPageRoute(
+        builder: (context) => AddCash(
+              cookie: cookie,
+            ),
+        fullscreenDialog: true));
+  }
+
   _onNavigationSelectionChange(BuildContext context, int index) {
     setState(() {
       switch (index) {
@@ -105,8 +125,7 @@ class LeagueDetailState extends State<LeagueDetail>
           ));
           break;
         case 4:
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => AddCash(), fullscreenDialog: true));
+          _launchAddCash();
           break;
       }
     });
@@ -159,6 +178,7 @@ class LeagueDetailState extends State<LeagueDetail>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(title),
         actions: <Widget>[
@@ -173,7 +193,14 @@ class LeagueDetailState extends State<LeagueDetail>
           )
         ],
       ),
-      body: l1Data == null ? Container() : Contests(widget._league, l1Data),
+      body: l1Data == null
+          ? Container()
+          : Contests(
+              league: widget._league,
+              l1Data: l1Data,
+              myTeams: _myTeams,
+              scaffoldKey: _scaffoldKey,
+            ),
       bottomNavigationBar:
           LobbyBottomNavigation(_onNavigationSelectionChange, 1),
     );

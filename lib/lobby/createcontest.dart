@@ -293,11 +293,12 @@ class CreateContestState extends State<CreateContest> {
                                               child: Text(
                                                 "Number of prizes",
                                                 style: TextStyle(
-                                                    color: Colors.white70,
-                                                    fontSize: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .subhead
-                                                        .fontSize),
+                                                  color: Colors.white70,
+                                                  fontSize: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .subhead
+                                                      .fontSize,
+                                                ),
                                               ),
                                             ),
                                           ],

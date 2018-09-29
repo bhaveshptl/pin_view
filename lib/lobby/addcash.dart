@@ -1,18 +1,16 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 
-import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 
-String cookie = "";
 bool bShowAppBar = true;
 Map<String, String> depositResponse;
 
 class AddCash extends StatefulWidget {
-  AddCash();
+  final String cookie;
+  AddCash({this.cookie});
 
   @override
   State<StatefulWidget> createState() => AddCashState();
@@ -29,20 +27,15 @@ class AddCashState extends State<AddCash> {
 
   @override
   Widget build(BuildContext context) {
-    if (cookie == null || cookie.length == 0) {
+    if (widget.cookie == null || widget.cookie.length == 0) {
       return Container();
     } else {
       return getWebviewWidget(context);
     }
   }
 
-  setWebviewCookie() async {
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      setState(() {
-        cookie = value;
-      });
-    });
+  setWebviewCookie() {
+    _webView.evalJavascript("document.cookie='" + widget.cookie + "'");
   }
 
   setAppBarVisibility(bool bShow) {
@@ -59,7 +52,7 @@ class AddCashState extends State<AddCash> {
           return TransactionSuccess(transactionResult, () {
             depositResponse = null;
             Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           });
         },
       );
@@ -76,7 +69,7 @@ class AddCashState extends State<AddCash> {
           }, () {
             depositResponse = null;
             Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(false);
           });
         },
       );
@@ -84,13 +77,11 @@ class AddCashState extends State<AddCash> {
   }
 
   getWebviewWidget(BuildContext context) {
-    _webView.evalJavascript(
-        "document.cookie='" + cookie.replaceAll("httpOnly", "") + "'");
-
     _webView.onStateChanged.listen(
       (WebViewStateChanged state) {
         Uri uri = Uri.dataFromString(state.url);
-        if (uri.path.indexOf(ApiUtil.PAYMENT_BASE_URL + "/lobby") != -1 && uri.hasQuery) {
+        if (uri.path.indexOf(ApiUtil.PAYMENT_BASE_URL + "/lobby") != -1 &&
+            uri.hasQuery) {
           if (depositResponse == null) {
             depositResponse = uri.queryParameters;
             _webView.close();
@@ -114,12 +105,14 @@ class AddCashState extends State<AddCash> {
             withJavascript: true,
             withLocalStorage: true,
             enableAppScheme: true,
+            headers: {"set-cookie": widget.cookie},
           )
         : WebviewScaffold(
             url: ApiUtil.DEPOSIT_URL,
             withJavascript: true,
             withLocalStorage: true,
             enableAppScheme: true,
+            headers: {"set-cookie": widget.cookie},
           );
   }
 }

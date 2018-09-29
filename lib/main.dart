@@ -8,6 +8,7 @@ import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authcheck.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
 
@@ -37,6 +38,7 @@ setWSCookie() async {
 /// Bootstraping APP.
 ///
 void main() async {
+  strings.set();
   Widget _homePage = LandingPage();
 
   bool _result = await authCheck.checkStatus();
@@ -45,8 +47,8 @@ void main() async {
     _homePage = new Lobby();
   }
 
-  FlutterWebviewPlugin()
-      .launch("https://test.justkhel.com/lobby", hidden: true);
+  // FlutterWebviewPlugin()
+  //     .launch(ApiUtil.BASE_URL, hidden: true);
 
   runApp(
     new MaterialApp(

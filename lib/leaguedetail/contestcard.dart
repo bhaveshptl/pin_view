@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:playfantasy/contestdetail/contestdetail.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 
 class ContestCard extends StatelessWidget {
-  final Contest _contest;
-  final Function _onClick;
+  final Contest contest;
+  final Function onJoin;
+  final Function onClick;
 
-  ContestCard(this._contest, this._onClick);
+  ContestCard({this.contest, this.onClick, this.onJoin});
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: _contest.id.toString() + " - " + _contest.name,
+      message: contest.id.toString() + " - " + contest.name,
       child: Card(
         elevation: 3.0,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         child: FlatButton(
           onPressed: () {
-            _onClick(_contest);
+            onClick(contest);
           },
           padding: EdgeInsets.all(0.0),
           child: Column(
@@ -35,7 +35,7 @@ class ContestCard extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
                             child: Text(
-                              _contest.brand["info"],
+                              contest.brand["info"],
                               style: TextStyle(color: Colors.white70),
                             ),
                           ),
@@ -45,7 +45,7 @@ class ContestCard extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      _contest.name,
+                      contest.name,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -53,7 +53,7 @@ class ContestCard extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 10.0, right: 10.0),
                       child: Text(
-                        "#" + _contest.id.toString(),
+                        "#" + contest.id.toString(),
                         textAlign: TextAlign.right,
                         style: TextStyle(color: Colors.black12),
                       ),
@@ -76,7 +76,7 @@ class ContestCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 "₹" +
-                                    _contest.prizeDetails[0]["totalPrizeAmount"]
+                                    contest.prizeDetails[0]["totalPrizeAmount"]
                                         .toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -129,7 +129,7 @@ class ContestCard extends StatelessWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: <Widget>[
-                                          Text(_contest.prizeDetails[0]
+                                          Text(contest.prizeDetails[0]
                                                   ["noOfPrizes"]
                                               .toString())
                                         ],
@@ -146,10 +146,10 @@ class ContestCard extends StatelessWidget {
                             padding: EdgeInsets.only(left: 10.0, bottom: 5.0),
                             child: Row(
                               children: <Widget>[
-                                _contest.bonusAllowed > 0
+                                contest.bonusAllowed > 0
                                     ? Tooltip(
                                         message: "You can use " +
-                                            _contest.bonusAllowed.toString() +
+                                            contest.bonusAllowed.toString() +
                                             "% of entry fee amount from bonus.",
                                         child: Padding(
                                           padding:
@@ -170,10 +170,10 @@ class ContestCard extends StatelessWidget {
                                         ),
                                       )
                                     : Container(),
-                                _contest.teamsAllowed > 1
+                                contest.teamsAllowed > 1
                                     ? Tooltip(
                                         message: "You can participate with " +
-                                            _contest.teamsAllowed.toString() +
+                                            contest.teamsAllowed.toString() +
                                             " different teams.",
                                         child: CircleAvatar(
                                           backgroundColor: Colors.redAccent,
@@ -192,9 +192,9 @@ class ContestCard extends StatelessWidget {
                                     : Container(),
                                 Expanded(
                                   child: Text(
-                                    _contest.joined.toString() +
+                                    contest.joined.toString() +
                                         "/" +
-                                        _contest.size.toString() +
+                                        contest.size.toString() +
                                         " joined",
                                     textAlign: TextAlign.center,
                                   ),
@@ -218,13 +218,17 @@ class ContestCard extends StatelessWidget {
                       children: <Widget>[
                         Tooltip(
                           message: "Join contest with ₹" +
-                              _contest.entryFee.toString() +
+                              contest.entryFee.toString() +
                               " entry fee.",
                           child: RaisedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              if (onJoin != null) {
+                                onJoin(contest);
+                              }
+                            },
                             color: Theme.of(context).primaryColorDark,
                             child: Text(
-                              "₹" + _contest.entryFee.toString(),
+                              "₹" + contest.entryFee.toString(),
                               style: TextStyle(color: Colors.white70),
                             ),
                           ),
