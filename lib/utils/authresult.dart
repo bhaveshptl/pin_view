@@ -33,7 +33,7 @@ class AuthResult {
     });
   }
 
-  processResult() async {
+  processResult(Function done) async {
     if (response.statusCode == 200) {
       SharedPrefHelper.internal()
           .saveCookieToStorage(response.headers["set-cookie"]);
@@ -41,6 +41,7 @@ class AuthResult {
           ApiUtil.SHARED_REFERENCE_USER_KEY, json.encode(response.body));
       await setWSCookie();
       Navigator.of(context).pushReplacementNamed("/lobby");
+      done();
     } else {
       final dynamic res = json.decode(response.body).cast<String, dynamic>();
       setState(() {

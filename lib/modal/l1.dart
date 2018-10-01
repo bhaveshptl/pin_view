@@ -307,7 +307,7 @@ class Contest {
   final int visibilityId;
   final String visibilityInfo;
   final String contestJoinCode;
-  final int joined;
+  int joined;
   final List<dynamic> prizeDetails;
   final Map<String, dynamic> brand;
   final int milestones;

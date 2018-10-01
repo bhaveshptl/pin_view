@@ -188,6 +188,8 @@ class StringTable {
       "EMAIL": "E-mail",
       "MOBILE": "Mobile",
       "KYC": "KYC (ID and address verification)",
+      "SEND_OTP": "Send OTP",
+      "UPLOAD": "Upload",
     };
   }
 }

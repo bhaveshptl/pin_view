@@ -13,12 +13,14 @@ class JoinContest extends StatefulWidget {
   final Contest contest;
   final Function onError;
   final List<MyTeam> myTeams;
+  final Function onCreateTeam;
 
   JoinContest({
     this.matchId,
     this.contest,
     this.myTeams,
     this.onError,
+    this.onCreateTeam,
   });
 
   @override
@@ -26,20 +28,23 @@ class JoinContest extends StatefulWidget {
 }
 
 class JoinContestState extends State<JoinContest> {
-  double userBonus = 0.0;
-  double userCashBalance = 0.0;
-  int _selectedTeamId = -1;
+  String cookie = "";  
+  int _selectedTeamId = -1;  
   List<MyTeam> _myUniqueTeams = [];
+
+  double _cashBalance = 0.0;
+  double _bonusBalance = 0.0;
 
   _joinContest(BuildContext context) async {
     if (_selectedTeamId == null || _selectedTeamId == -1) {
+      widget.onCreateTeam(context, widget.contest);
     } else {
-      String cookie = "";
-
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
+      if (cookie == null || cookie == "") {
+        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+        await futureCookie.then((value) {
+          cookie = value;
+        });
+      }
 
       await http.Client()
           .post(
@@ -63,7 +68,7 @@ class JoinContestState extends State<JoinContest> {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["error"] == false) {
               Navigator.of(context).pop(response["message"]);
-            } else if(response["error"] == true){
+            } else if (response["error"] == true) {
               Navigator.of(context).pop(response["message"]);
             }
           } else if (res.statusCode == 401) {
@@ -100,12 +105,12 @@ class JoinContestState extends State<JoinContest> {
   }
 
   getMyContestTeams() async {
-    String cookie = "";
-
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
+    if (cookie == null || cookie == "") {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
 
     await http.Client()
         .post(
@@ -131,6 +136,38 @@ class JoinContestState extends State<JoinContest> {
     );
   }
 
+  _getUserBalance() async {
+    if (cookie == null || cookie == "") {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
+
+    await http.Client()
+        .post(
+      ApiUtil.USER_BALANCE,
+      headers: {'Content-type': 'application/json', "cookie": cookie},
+      body: json.encode({
+        "contestId": widget.contest.id,
+        "leagueId": widget.contest.leagueId
+      }),
+    )
+        .then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+          setState(() {
+            _cashBalance =
+                (response["withdrawable"] + response["depositBucket"])
+                    .toDouble();
+            _bonusBalance = (response["nonWithdrawable"]).toDouble();
+          });
+        }
+      },
+    );
+  }
+
   List<DropdownMenuItem> _getTeamList() {
     List<DropdownMenuItem> listTeams = [];
     if (_myUniqueTeams != null && _myUniqueTeams.length > 0) {
@@ -148,17 +185,16 @@ class JoinContestState extends State<JoinContest> {
           ),
         );
       }
-    } else {
-      listTeams.add(
-        DropdownMenuItem(
-          child: Container(
-            width: 110.0,
-            child: Text(""),
-          ),
-          value: -1,
-        ),
-      );
     }
+    listTeams.add(
+      DropdownMenuItem(
+        child: Container(
+          width: 110.0,
+          child: Text(strings.get("CREATE_TEAM")),
+        ),
+        value: -1,
+      ),
+    );
     return listTeams;
   }
 
@@ -166,19 +202,62 @@ class JoinContestState extends State<JoinContest> {
   void initState() {
     super.initState();
     getMyContestTeams();
+    _getUserBalance();
   }
 
   @override
   Widget build(BuildContext context) {
     double bonusUsable =
         (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
-    double usableBonus = userBonus > bonusUsable ? bonusUsable : userBonus;
+    double usableBonus = _bonusBalance > bonusUsable ? bonusUsable : _bonusBalance;
 
     return AlertDialog(
       title: Text(strings.get("CONFIRMATION").toUpperCase()),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          "CASH",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                              strings.rupee + _cashBalance.toStringAsFixed(2)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          "BONUS",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                              strings.rupee + _bonusBalance.toStringAsFixed(2)),
+                        ),
+                      ],
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Row(

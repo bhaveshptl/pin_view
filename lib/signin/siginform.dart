@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-
-import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/authresult.dart';
 
 class SigninForm extends StatefulWidget {
+  final Function onSubmit;
+
+  SigninForm({this.onSubmit});
+
   @override
   State<StatefulWidget> createState() => new SigninFormState();
 }
@@ -17,21 +16,6 @@ class SigninFormState extends State<SigninForm> {
 
   @override
   Widget build(BuildContext context) {
-    doSignIn() async {
-      return new http.Client()
-          .post(
-        ApiUtil.LOGIN_URL,
-        headers: {'Content-type': 'application/json'},
-        body: json.encoder.convert({
-          "context": {"channel_id": 3},
-          "value": {"auth_attribute": _authName, "password": _password}
-        }),
-      )
-          .then((http.Response res) {
-        AuthResult(res, context, setState).processResult();
-      }).whenComplete(() => print('completed'));
-    }
-
     return Form(
       key: formKey,
       child: new Container(
@@ -101,7 +85,7 @@ class SigninFormState extends State<SigninForm> {
                   onPressed: () {
                     if (formKey.currentState.validate()) {
                       formKey.currentState.save();
-                      doSignIn();
+                      widget.onSubmit(_authName, _password);
                     }
                   },
                 ),

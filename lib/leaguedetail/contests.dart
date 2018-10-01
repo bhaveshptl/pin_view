@@ -56,6 +56,7 @@ class ContestsState extends State<Contests> {
           return JoinContest(
             contest: contest,
             myTeams: widget.myTeams,
+            onCreateTeam: _onCreateTeam,
             matchId: widget.l1Data.league.rounds[0].matches[0].id,
             onError: onJoinContestError,
           );

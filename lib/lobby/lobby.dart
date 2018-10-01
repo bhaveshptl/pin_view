@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/lobby/earncash.dart';
@@ -17,8 +18,15 @@ class Lobby extends StatefulWidget {
 }
 
 class LobbyState extends State<Lobby> {
-  int _sportType = 1;
   String cookie;
+  int _sportType = 1;
+  bool _bShowLoader = false;
+
+  _showLoader(bool bShow) {
+    setState(() {
+      _bShowLoader = bShow;
+    });
+  }
 
   _launchAddCash() async {
     if (cookie == null) {
@@ -88,63 +96,80 @@ class LobbyState extends State<Lobby> {
     // TODO: implement build
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0.0,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              DropdownButton(
-                style: TextStyle(
-                    color: Colors.black45,
-                    fontSize:
-                        Theme.of(context).primaryTextTheme.title.fontSize),
-                onChanged: (value) {
-                  setState(() {
-                    _sportType = value;
-                  });
-                },
-                value: _sportType,
-                items: [
-                  DropdownMenuItem(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                      child: Text(strings.get("CRICKET")),
-                    ),
-                    value: 1,
+      child: Stack(
+        children: <Widget>[
+          Scaffold(
+            appBar: AppBar(
+              elevation: 0.0,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  DropdownButton(
+                    style: TextStyle(
+                        color: Colors.black45,
+                        fontSize:
+                            Theme.of(context).primaryTextTheme.title.fontSize),
+                    onChanged: (value) {
+                      setState(() {
+                        _sportType = value;
+                      });
+                    },
+                    value: _sportType,
+                    items: [
+                      DropdownMenuItem(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8.0, right: 24.0),
+                          child: Text(strings.get("CRICKET")),
+                        ),
+                        value: 1,
+                      ),
+                      DropdownMenuItem(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8.0, right: 24.0),
+                          child: Text(strings.get("FOOTBALL")),
+                        ),
+                        value: 2,
+                      ),
+                      DropdownMenuItem(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8.0, right: 24.0),
+                          child: Text(strings.get("KABADDI")),
+                        ),
+                        value: 3,
+                      )
+                    ],
                   ),
-                  DropdownMenuItem(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                      child: Text(strings.get("FOOTBALL")),
-                    ),
-                    value: 2,
-                  ),
-                  DropdownMenuItem(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                      child: Text(strings.get("KABADDI")),
-                    ),
-                    value: 3,
-                  )
                 ],
               ),
-            ],
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.help_outline),
+                  tooltip: "Help - How to play",
+                  onPressed: () {},
+                )
+              ],
+            ),
+            drawer: AppDrawer(),
+            body: LobbyWidget(
+              sportType: _sportType,
+              showLoader: _showLoader,
+            ),
+            bottomNavigationBar:
+                LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.help_outline),
-              tooltip: "Help - How to play",
-              onPressed: () {},
-            )
-          ],
-        ),
-        drawer: AppDrawer(),
-        body: LobbyWidget(
-          sportType: _sportType,
-        ),
-        bottomNavigationBar:
-            LobbyBottomNavigation(_onNavigationSelectionChange, 0),
+          _bShowLoader
+              ? Center(
+                  child: Container(
+                    color: Colors.black54,
+                    child: Loader(),
+                    constraints: BoxConstraints.expand(),
+                  ),
+                )
+              : Container(),
+        ],
       ),
     );
   }

@@ -20,4 +20,11 @@ class ApiUtil {
   static const JOIN_CONTEST = BASE_API_URL + "v2/lobby/joincontest";
   static const STATE_LIST = BASE_API_URL + "verify/states-list";
   static const UPDATE_DOB_STATE = BASE_API_URL + "ups/user/updateUser";
+  static const VERIFICATION_STATUS = BASE_API_URL + "ups/user/verify";
+  static const SEND_OTP = BASE_API_URL + "verify/activate/mobile";
+  static const VERIFY_OTP = BASE_API_URL + "verify/mobile";
+  static const SEND_VERIFICATION_MAIL = BASE_API_URL + "verify/activate/mail";
+  static const KYC_DOC_LIST = BASE_API_URL + "verify/kyc-doc-list";
+  static const UPLOAD_DOC = BASE_API_URL + "verify/upload-doc/";
+  static const USER_BALANCE = BASE_API_URL + "lobby/userbalance";
 }

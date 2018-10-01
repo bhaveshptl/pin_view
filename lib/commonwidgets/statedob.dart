@@ -61,7 +61,7 @@ class StateDobState extends State<StateDob> {
       context: context,
       initialDate: _date,
       firstDate: DateTime(1947),
-      lastDate: DateTime(currentYear - 10),
+      lastDate: DateTime(currentYear),
     );
 
     if (picked != null) {

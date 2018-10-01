@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -30,32 +31,19 @@ class LeagueDetailState extends State<LeagueDetail>
   Map<String, dynamic> l1UpdatePackate = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  ///
-  /// Reconnect websocket after resumed from lock screen or inactive state.
-  ///
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      sockets.sendMessage(l1UpdatePackate);
-    }
-  }
+  bool _bShowLoader = false;
 
-  ///
-  /// Register ws message on pop next page of navigator.
-  /// Workaround for now. Need to find better solution.
-  ///
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (ModalRoute.of(context).isCurrent) {
-      sockets.sendMessage(l1UpdatePackate);
-    }
+  _showLoader(bool bShow) {
+    setState(() {
+      _bShowLoader = bShow;
+    });
   }
 
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
     if (_response["bReady"] == 1) {
+      _showLoader(true);
       _getL1Data();
     } else if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
       setState(() {
@@ -64,6 +52,44 @@ class LeagueDetailState extends State<LeagueDetail>
             .map((i) => MyTeam.fromJson(i))
             .toList();
       });
+      _showLoader(false);
+    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+      _applyL1DataUpdate(_response["diffData"]["ld"]);
+    } else if (_response["iType"] == 7 && _response["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+      setState(() {
+        _myTeams.add(teamAdded);
+      });
+    } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
+      _updateJoinCount(_response["data"]);
+    }
+  }
+
+  _updateJoinCount(Map<String, dynamic> _data) {
+    for (Contest _contest in l1Data.contests) {
+      if (_contest.id == _data["cId"]) {
+        setState(() {
+          _contest.joined = _data["iJC"];
+        });
+      }
+    }
+  }
+
+  _applyL1DataUpdate(Map<String, dynamic> _data) {
+    if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
+      l1Data.contests.addAll(_data["lstAdded"]);
+    }
+    if (_data["lstModified"] != null && _data["lstModified"].length > 0) {
+      List<dynamic> _modifiedContests = _data["lstModified"];
+      for (Map<String, dynamic> _changedContest in _modifiedContests) {
+        for (Contest _contest in l1Data.contests) {
+          if (_contest.id == _changedContest["id"]) {
+            setState(() {
+              _contest.joined = _changedContest["joined"];
+            });
+          }
+        }
+      }
     }
   }
 
@@ -75,6 +101,7 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _getL1Data() {
+    _showLoader(true);
     sockets.sendMessage(l1UpdatePackate);
   }
 
@@ -177,32 +204,45 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(title),
-        actions: <Widget>[
-          Tooltip(
-            message: "Contest filter",
-            child: IconButton(
-              icon: Icon(Icons.filter_list),
-              onPressed: () {
-                _showFilterDialog();
-              },
-            ),
-          )
-        ],
-      ),
-      body: l1Data == null
-          ? Container()
-          : Contests(
-              league: widget._league,
-              l1Data: l1Data,
-              myTeams: _myTeams,
-              scaffoldKey: _scaffoldKey,
-            ),
-      bottomNavigationBar:
-          LobbyBottomNavigation(_onNavigationSelectionChange, 1),
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(title),
+            actions: <Widget>[
+              Tooltip(
+                message: "Contest filter",
+                child: IconButton(
+                  icon: Icon(Icons.filter_list),
+                  onPressed: () {
+                    _showFilterDialog();
+                  },
+                ),
+              )
+            ],
+          ),
+          body: l1Data == null
+              ? Container()
+              : Contests(
+                  league: widget._league,
+                  l1Data: l1Data,
+                  myTeams: _myTeams,
+                  scaffoldKey: _scaffoldKey,
+                ),
+          bottomNavigationBar:
+              LobbyBottomNavigation(_onNavigationSelectionChange, 1),
+        ),
+        _bShowLoader
+            ? Center(
+                child: Container(
+                  color: Colors.black54,
+                  child: Loader(),
+                  constraints: BoxConstraints.expand(),
+                ),
+              )
+            : Container(),
+      ],
     );
   }
 }

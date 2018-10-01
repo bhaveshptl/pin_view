@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
@@ -38,6 +39,11 @@ setWSCookie() async {
 /// Bootstraping APP.
 ///
 void main() async {
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   strings.set();
   Widget _homePage = LandingPage();
 
@@ -47,8 +53,7 @@ void main() async {
     _homePage = new Lobby();
   }
 
-  // FlutterWebviewPlugin()
-  //     .launch(ApiUtil.BASE_URL, hidden: true);
+  FlutterWebviewPlugin().launch(ApiUtil.BASE_URL, hidden: true);
 
   runApp(
     new MaterialApp(

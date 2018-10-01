@@ -35,6 +35,7 @@ class ContestDetailState extends State<ContestDetail> {
           return JoinContest(
             contest: contest,
             myTeams: widget.myTeams,
+            onCreateTeam: _onCreateTeam,
             matchId: widget.l1Data.league.rounds[0].matches[0].id,
             onError: onJoinContestError,
           );

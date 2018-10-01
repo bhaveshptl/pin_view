@@ -105,14 +105,12 @@ class AddCashState extends State<AddCash> {
             withJavascript: true,
             withLocalStorage: true,
             enableAppScheme: true,
-            headers: {"set-cookie": widget.cookie},
           )
         : WebviewScaffold(
             url: ApiUtil.DEPOSIT_URL,
             withJavascript: true,
             withLocalStorage: true,
             enableAppScheme: true,
-            headers: {"set-cookie": widget.cookie},
           );
   }
 }

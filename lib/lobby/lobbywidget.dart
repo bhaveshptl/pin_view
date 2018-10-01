@@ -8,8 +8,9 @@ import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class LobbyWidget extends StatefulWidget {
   final int sportType;
+  final Function showLoader;
 
-  LobbyWidget({this.sportType = 1});
+  LobbyWidget({this.sportType = 1, this.showLoader});
 
   @override
   State<StatefulWidget> createState() => LobbyWidgetState();
@@ -22,28 +23,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   List<League> upcomingLeagues = [];
   List<League> completedLeagues = [];
   Map<String, dynamic> lobbyUpdatePackate = {};
-
-  ///
-  /// Reconnect websocket after resumed from lock screen or inactive state.
-  ///
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      sockets.sendMessage(lobbyUpdatePackate);
-    }
-  }
-
-  ///
-  /// Register ws message on pop next page of navigator.
-  /// Workaround for now. Need to find better solution.
-  ///
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (ModalRoute.of(context).isCurrent) {
-      sockets.sendMessage(lobbyUpdatePackate);
-    }
-  }
 
   _createLobbyObject() {
     lobbyUpdatePackate["iType"] = 1;
@@ -61,6 +40,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
 
     if (_response["bReady"] == 1) {
       sockets.sendMessage(lobbyUpdatePackate);
+      widget.showLoader(true);
     } else if (_response["iType"] == 1 && _response["bSuccessful"] == true) {
       List<League> _leagues = [];
       List<dynamic> _mapLeagues = json.decode(_response["data"]);
@@ -70,6 +50,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       }
 
       _seperateLeaguesByRunningStatus(_leagues);
+      widget.showLoader(false);
     }
   }
 
