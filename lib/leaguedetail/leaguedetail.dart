@@ -79,6 +79,17 @@ class LeagueDetailState extends State<LeagueDetail>
       });
     } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
       _updateJoinCount(_response["data"]);
+    } else if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+      int i = 0;
+      for (MyTeam _team in _myTeams) {
+        if (_team.id == teamUpdated.id) {
+          setState(() {
+            _myTeams[i] = teamUpdated;
+          });
+        }
+        i++;
+      }
     }
   }
 

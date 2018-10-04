@@ -16,6 +16,7 @@ import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/leaguedetail/contestcard.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
 
+const double TEAM_LOGO_HEIGHT = 24.0;
 class MyContestStatusTab extends StatefulWidget {
   final int leagueStatus;
   final List<League> leagues;
@@ -128,10 +129,10 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2.0,
                                             ),
-                                            height: 18.0,
-                                            width: 18.0,
+                                            width: TEAM_LOGO_HEIGHT,
+                                            height: TEAM_LOGO_HEIGHT,
                                           ),
-                                          height: 24.0,
+                                          height: TEAM_LOGO_HEIGHT,
                                         ),
                                       ),
                                       Text(
@@ -148,10 +149,10 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2.0,
                                             ),
-                                            height: 18.0,
-                                            width: 18.0,
+                                            width: TEAM_LOGO_HEIGHT,
+                                            height: TEAM_LOGO_HEIGHT,
                                           ),
-                                          height: 24.0,
+                                          height: TEAM_LOGO_HEIGHT,
                                         ),
                                       ),
                                     ],

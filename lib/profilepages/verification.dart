@@ -418,19 +418,30 @@ class VerificationState extends State<Verification> {
                           ExpansionPanel(
                             isExpanded: _selectedItemIndex == 0,
                             headerBuilder: (context, isExpanded) {
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 16.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      strings.get("EMAIL"),
-                                    ),
-                                    _bIsEmailVerified
-                                        ? Icon(Icons.check_circle_outline)
-                                        : Icon(Icons.remove_circle_outline),
-                                  ],
+                              return FlatButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (_selectedItemIndex == 0) {
+                                      _selectedItemIndex = -1;
+                                    } else {
+                                      _selectedItemIndex = 0;
+                                    }
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        strings.get("EMAIL"),
+                                      ),
+                                      _bIsEmailVerified
+                                          ? Icon(Icons.check_circle_outline)
+                                          : Icon(Icons.remove_circle_outline),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -541,19 +552,30 @@ class VerificationState extends State<Verification> {
                           ExpansionPanel(
                             isExpanded: _selectedItemIndex == 1,
                             headerBuilder: (context, isExpanded) {
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 16.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      strings.get("MOBILE"),
-                                    ),
-                                    _bIsMobileVerified
-                                        ? Icon(Icons.check_circle_outline)
-                                        : Icon(Icons.remove_circle_outline),
-                                  ],
+                              return FlatButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (_selectedItemIndex == 0) {
+                                      _selectedItemIndex = -1;
+                                    } else {
+                                      _selectedItemIndex = 0;
+                                    }
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        strings.get("MOBILE"),
+                                      ),
+                                      _bIsMobileVerified
+                                          ? Icon(Icons.check_circle_outline)
+                                          : Icon(Icons.remove_circle_outline),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -692,21 +714,34 @@ class VerificationState extends State<Verification> {
                           ExpansionPanel(
                             isExpanded: _selectedItemIndex == 2,
                             headerBuilder: (context, isExpanded) {
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 16.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text(
-                                      strings.get("KYC"),
-                                    ),
-                                    _verificationStatus == "VERIFIED"
-                                        ? Icon(Icons.check_circle_outline)
-                                        : _verificationStatus == "DOC_SUBMITTED"
-                                            ? Icon(Icons.check)
-                                            : Icon(Icons.remove_circle_outline)
-                                  ],
+                              return FlatButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (_selectedItemIndex == 0) {
+                                      _selectedItemIndex = -1;
+                                    } else {
+                                      _selectedItemIndex = 0;
+                                    }
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 16.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        strings.get("KYC"),
+                                      ),
+                                      _verificationStatus == "VERIFIED"
+                                          ? Icon(Icons.check_circle_outline)
+                                          : _verificationStatus ==
+                                                  "DOC_SUBMITTED"
+                                              ? Icon(Icons.check)
+                                              : Icon(
+                                                  Icons.remove_circle_outline)
+                                    ],
+                                  ),
                                 ),
                               );
                             },

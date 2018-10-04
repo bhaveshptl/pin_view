@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -6,6 +8,7 @@ import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class MyTeams extends StatefulWidget {
   final L1 l1Data;
@@ -19,8 +22,33 @@ class MyTeams extends StatefulWidget {
 }
 
 class MyTeamsState extends State<MyTeams> {
+  List<MyTeam> _myTeams;
   int _selectedItemIndex = -1;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _myTeams = widget.myTeams;
+    sockets.register(_onWsMsg);
+  }
+
+  _onWsMsg(onData) {
+    Map<String, dynamic> _response = json.decode(onData);
+
+    if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+      int i = 0;
+      for (MyTeam _team in _myTeams) {
+        if (_team.id == teamUpdated.id) {
+          setState(() {
+            _myTeams[i] = teamUpdated;
+          });
+        }
+        i++;
+      }
+    }
+  }
 
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
@@ -196,9 +224,9 @@ class MyTeamsState extends State<MyTeams> {
       child: Container(
         margin: const EdgeInsets.only(left: 24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(myTeam.name),
                 isExpanded
@@ -247,18 +275,16 @@ class MyTeamsState extends State<MyTeams> {
                       ? Container()
                       : CircleAvatar(
                           backgroundColor: Colors.black12,
-                          child: Container(
-                            height: 24.0,
-                            child: CachedNetworkImage(
-                              imageUrl: player.jerseyUrl,
-                              placeholder: Container(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                ),
-                                height: 18.0,
-                                width: 18.0,
+                          child: CachedNetworkImage(
+                            imageUrl: player.jerseyUrl,
+                            placeholder: Container(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
                               ),
+                              width: TEAM_LOGO_HEIGHT,
+                              height: TEAM_LOGO_HEIGHT,
                             ),
+                            height: TEAM_LOGO_HEIGHT,
                           ),
                         ),
                 ),
@@ -328,6 +354,12 @@ class MyTeamsState extends State<MyTeams> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    sockets.unRegister(_onWsMsg);
+    super.dispose();
   }
 
   @override

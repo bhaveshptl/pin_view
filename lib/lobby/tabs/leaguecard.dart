@@ -64,8 +64,8 @@ class LeagueCard extends StatelessWidget {
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2.0,
                                         ),
-                                        height: 18.0,
-                                        width: 18.0,
+                                        width: TEAM_LOGO_HEIGHT,
+                                        height: TEAM_LOGO_HEIGHT,
                                       ),
                                       height: TEAM_LOGO_HEIGHT,
                                     ),
@@ -101,8 +101,8 @@ class LeagueCard extends StatelessWidget {
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2.0,
                                         ),
-                                        height: 18.0,
-                                        width: 18.0,
+                                        width: TEAM_LOGO_HEIGHT,
+                                        height: TEAM_LOGO_HEIGHT,
                                       ),
                                       height: TEAM_LOGO_HEIGHT,
                                     ),

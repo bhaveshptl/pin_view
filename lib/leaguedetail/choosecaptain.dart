@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 
+const double TEAM_LOGO_HEIGHT = 24.0;
 class ChooseCaptain extends StatefulWidget {
   final FanTeamRule fanTeamRules;
   final List<Player> selectedPlayers;
@@ -156,18 +157,16 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                               child: CircleAvatar(
                                 minRadius: 20.0,
                                 backgroundColor: Colors.black12,
-                                child: Container(
-                                  height: 24.0,
-                                  child: CachedNetworkImage(
-                                    imageUrl: _player.jerseyUrl,
-                                    placeholder: Container(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.0,
-                                      ),
-                                      height: 18.0,
-                                      width: 18.0,
+                                child: CachedNetworkImage(
+                                  imageUrl: _player.jerseyUrl,
+                                  placeholder: Container(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
                                     ),
+                                    width: TEAM_LOGO_HEIGHT,
+                                    height: TEAM_LOGO_HEIGHT,
                                   ),
+                                  height: TEAM_LOGO_HEIGHT,
                                 ),
                               ),
                             ),

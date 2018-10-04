@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+const double TEAM_LOGO_HEIGHT = 24.0;
+
 class PlayingStyleTab extends StatelessWidget {
   final L1 l1Data;
   final PlayingStyle style;
@@ -116,18 +118,16 @@ class PlayingStyleTab extends StatelessWidget {
                         child: CircleAvatar(
                           minRadius: 20.0,
                           backgroundColor: Colors.black12,
-                          child: Container(
-                            height: 24.0,
-                            child: CachedNetworkImage(
-                              imageUrl: _player.jerseyUrl,
-                              placeholder: Container(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                ),
-                                height: 18.0,
-                                width: 18.0,
+                          child: CachedNetworkImage(
+                            imageUrl: _player.jerseyUrl,
+                            placeholder: Container(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
                               ),
+                              width: TEAM_LOGO_HEIGHT,
+                              height: TEAM_LOGO_HEIGHT,
                             ),
+                            height: TEAM_LOGO_HEIGHT,
                           ),
                         ),
                       ),
