@@ -1,6 +1,7 @@
 class ApiUtil {
   static const SHARED_PREFERENCE_KEY = "fantasy_cookie";
-  static const SHARED_REFERENCE_USER_KEY = "fantasy_user";
+  static const SHARED_PREFERENCE_USER_KEY = "fantasy_user";
+  static const SHARED_PREFERENCE_SPORT_SELECTION = "fantasy_sport_selection";
   static const WS_SHARED_PREFERENCE_KEY = "ws_fantasy_cookie";
   static const WEBSOCKET_URL = "wss://lobby-stg.playfantasy.com/path?pid=";
 
@@ -27,4 +28,6 @@ class ApiUtil {
   static const KYC_DOC_LIST = BASE_API_URL + "verify/kyc-doc-list";
   static const UPLOAD_DOC = BASE_API_URL + "verify/upload-doc/";
   static const USER_BALANCE = BASE_API_URL + "lobby/userbalance";
+
+  static const GET_MY_CONTESTS = BASE_API_URL + "lobby/user/mycontests/v2/";
 }

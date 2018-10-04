@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
@@ -15,8 +17,11 @@ import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class LeagueDetail extends StatefulWidget {
-  final League _league;
-  LeagueDetail(this._league);
+  final League league;
+  final List<League> leagues;
+  final Function onSportChange;
+
+  LeagueDetail(this.league, {this.leagues, this.onSportChange});
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -29,6 +34,8 @@ class LeagueDetailState extends State<LeagueDetail>
   List<MyTeam> _myTeams;
   String title = "Match";
   Map<String, dynamic> l1UpdatePackate = {};
+  Map<int, List<MyTeam>> _mapContestTeams = {};
+  Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _bShowLoader = false;
@@ -37,6 +44,16 @@ class LeagueDetailState extends State<LeagueDetail>
     setState(() {
       _bShowLoader = bShow;
     });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    sockets.register(_onWsMsg);
+    _createL1WSObject();
+
+    _getL1Data();
+    _getMyContests();
   }
 
   _onWsMsg(onData) {
@@ -77,7 +94,8 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _applyL1DataUpdate(Map<String, dynamic> _data) {
     if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
-      l1Data.contests.addAll(_data["lstAdded"]);
+      l1Data.contests
+          .addAll((_data["lstAdded"] as List).map((i) => Contest.fromJson(i)));
     }
     if (_data["lstModified"] != null && _data["lstModified"].length > 0) {
       List<dynamic> _modifiedContests = _data["lstModified"];
@@ -97,7 +115,7 @@ class LeagueDetailState extends State<LeagueDetail>
     l1UpdatePackate["iType"] = 5;
     l1UpdatePackate["sportsId"] = 1;
     l1UpdatePackate["bResAvail"] = true;
-    l1UpdatePackate["id"] = widget._league.leagueId;
+    l1UpdatePackate["id"] = widget.league.leagueId;
   }
 
   _getL1Data() {
@@ -105,12 +123,65 @@ class LeagueDetailState extends State<LeagueDetail>
     sockets.sendMessage(l1UpdatePackate);
   }
 
-  @override
-  initState() {
-    super.initState();
-    sockets.register(_onWsMsg);
-    _createL1WSObject();
-    _getL1Data();
+  _getMyContests() async {
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
+
+    return new http.Client().get(
+      ApiUtil.GET_MY_CONTESTS,
+      headers: {'Content-type': 'application/json', "cookie": cookie},
+    ).then((http.Response res) {
+      if (res.statusCode == 200) {
+        Map<String, dynamic> response = json.decode(res.body);
+        setState(() {
+          _mapMyContests = MyContest.fromJson(response).leagues;
+          _getMyContestMyTeams(_mapMyContests);
+        });
+      }
+    });
+  }
+
+  _getMyContestMyTeams(Map<String, List<Contest>> _mapMyContests) async {
+    List<int> _contestIds = [];
+    List<Contest> _contests = _mapMyContests[widget.league.leagueId.toString()];
+    if (_contests != null) {
+      for (Contest contest in _contests) {
+        _contestIds.add(contest.id);
+      }
+
+      if (cookie == null) {
+        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+        await futureCookie.then((value) {
+          cookie = value;
+        });
+      }
+
+      return new http.Client()
+          .post(
+        ApiUtil.GET_MY_CONTEST_MY_TEAMS,
+        headers: {'Content-type': 'application/json', "cookie": cookie},
+        body: json.encoder.convert(_contestIds),
+      )
+          .then((http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<int, List<MyTeam>> _mapContestMyTeams = {};
+          Map<String, dynamic> response = json.decode(res.body);
+          response.forEach((String key, dynamic value) {
+            List<MyTeam> _myTeams =
+                (value as List).map((i) => MyTeam.fromJson(i)).toList();
+            _mapContestMyTeams[int.parse(key)] = _myTeams;
+          });
+
+          setState(() {
+            _mapContestTeams = _mapContestMyTeams;
+          });
+        }
+      });
+    }
   }
 
   _launchAddCash() async {
@@ -136,19 +207,22 @@ class LeagueDetailState extends State<LeagueDetail>
         case 1:
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => MyTeams(
-                    league: widget._league,
+                    league: widget.league,
                     l1Data: l1Data,
                     myTeams: _myTeams,
                   )));
           break;
         case 2:
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => MyContests(),
+            builder: (context) => MyContests(
+                  leagues: widget.leagues,
+                  onSportChange: widget.onSportChange,
+                ),
           ));
           break;
         case 3:
           Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CreateContest(widget._league),
+            builder: (context) => CreateContest(widget.league),
           ));
           break;
         case 4:
@@ -225,10 +299,11 @@ class LeagueDetailState extends State<LeagueDetail>
           body: l1Data == null
               ? Container()
               : Contests(
-                  league: widget._league,
                   l1Data: l1Data,
                   myTeams: _myTeams,
+                  league: widget.league,
                   scaffoldKey: _scaffoldKey,
+                  mapContestTeams: _mapContestTeams,
                 ),
           bottomNavigationBar:
               LobbyBottomNavigation(_onNavigationSelectionChange, 1),

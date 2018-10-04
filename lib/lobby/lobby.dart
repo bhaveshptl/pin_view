@@ -7,6 +7,7 @@ import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
+import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
@@ -20,12 +21,36 @@ class Lobby extends StatefulWidget {
 class LobbyState extends State<Lobby> {
   String cookie;
   int _sportType = 1;
+  List<League> _leagues;
   bool _bShowLoader = false;
 
   _showLoader(bool bShow) {
     setState(() {
       _bShowLoader = bShow;
     });
+  }
+
+  @override
+  initState() {
+    super.initState();
+    _getSportsType();
+  }
+
+  _getSportsType() async {
+    Future<dynamic> futureCookie = SharedPrefHelper.internal().getSportsType();
+    await futureCookie.then((value) {
+      int _sport = int.parse(value);
+      _onSportSelectionChaged(_sport);
+    });
+  }
+
+  _onSportSelectionChaged(int _sport) {
+    if (_sportType != _sport) {
+      setState(() {
+        _sportType = _sport;
+      });
+      SharedPrefHelper().saveSportsType(_sportType.toString());
+    }
   }
 
   _launchAddCash() async {
@@ -53,8 +78,14 @@ class LobbyState extends State<Lobby> {
               new MaterialPageRoute(builder: (context) => SearchContest()));
           break;
         case 2:
-          Navigator.of(context)
-              .push(new MaterialPageRoute(builder: (context) => MyContests()));
+          Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (context) => MyContests(
+                    leagues: _leagues,
+                    onSportChange: _onSportSelectionChaged,
+                  ),
+            ),
+          );
           break;
         case 3:
           Navigator.of(context)
@@ -93,7 +124,6 @@ class LobbyState extends State<Lobby> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Stack(
@@ -110,9 +140,7 @@ class LobbyState extends State<Lobby> {
                         fontSize:
                             Theme.of(context).primaryTextTheme.title.fontSize),
                     onChanged: (value) {
-                      setState(() {
-                        _sportType = value;
-                      });
+                      _onSportSelectionChaged(value);
                     },
                     value: _sportType,
                     items: [
@@ -120,7 +148,7 @@ class LobbyState extends State<Lobby> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(strings.get("CRICKET")),
+                          child: Text(strings.get("CRICKET").toUpperCase()),
                         ),
                         value: 1,
                       ),
@@ -128,7 +156,7 @@ class LobbyState extends State<Lobby> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(strings.get("FOOTBALL")),
+                          child: Text(strings.get("FOOTBALL").toUpperCase()),
                         ),
                         value: 2,
                       ),
@@ -136,7 +164,7 @@ class LobbyState extends State<Lobby> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(strings.get("KABADDI")),
+                          child: Text(strings.get("KABADDI").toUpperCase()),
                         ),
                         value: 3,
                       )
@@ -156,6 +184,10 @@ class LobbyState extends State<Lobby> {
             body: LobbyWidget(
               sportType: _sportType,
               showLoader: _showLoader,
+              onLeagues: (value) {
+                _leagues = value;
+              },
+              onSportChange: _onSportSelectionChaged,
             ),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),

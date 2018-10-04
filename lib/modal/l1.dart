@@ -381,3 +381,18 @@ class Contest {
     );
   }
 }
+
+class MyContest {
+  Map<String, List<Contest>> leagues;
+
+  MyContest({this.leagues});
+
+  factory MyContest.fromJson(Map<String, dynamic> json) {
+    Map<String, List<Contest>> myContests = {};
+    json.forEach((String key, dynamic value) {
+      myContests[key] =
+          (value as List).map((i) => Contest.fromJson(i)).toList();
+    });
+    return MyContest(leagues: myContests);
+  }
+}

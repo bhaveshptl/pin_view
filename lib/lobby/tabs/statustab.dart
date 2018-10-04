@@ -7,12 +7,17 @@ import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 class StatusTab extends StatelessWidget {
   final int leagueStatus;
   final List<League> leagues;
+  final Function onSportChange;
 
-  StatusTab({this.leagues, this.leagueStatus});
+  StatusTab({this.leagues, this.leagueStatus, this.onSportChange});
 
   onLeagueSelect(BuildContext context, League league) {
-    MaterialPageRoute route =
-        MaterialPageRoute(builder: (context) => LeagueDetail(league));
+    MaterialPageRoute route = MaterialPageRoute(
+        builder: (context) => LeagueDetail(
+              league,
+              leagues: leagues,
+              onSportChange: onSportChange,
+            ));
     Navigator.of(context).push(route);
   }
 
@@ -47,7 +52,7 @@ class StatusTab extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).errorColor,
-                fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
+                fontSize: Theme.of(context).primaryTextTheme.headline.fontSize,
               ),
             ),
           ],

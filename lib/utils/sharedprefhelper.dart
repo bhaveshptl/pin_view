@@ -35,6 +35,16 @@ class SharedPrefHelper {
     return pref.remove(ApiUtil.SHARED_PREFERENCE_KEY);
   }
 
+  saveSportsType(String _sportType) async {
+    final pref = await _prefs;
+    pref.setString(ApiUtil.SHARED_PREFERENCE_SPORT_SELECTION, _sportType);
+  }
+
+  getSportsType() async {
+    final pref = await _prefs;
+    return pref.get(ApiUtil.SHARED_PREFERENCE_SPORT_SELECTION);
+  }
+
   saveToSharedPref(String key, String value) async {
     final pref = await _prefs;
     pref.setString(key, value);

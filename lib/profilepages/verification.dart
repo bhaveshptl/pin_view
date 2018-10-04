@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:async/async.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -56,11 +56,12 @@ class VerificationState extends State<Verification> {
   }
 
   _setAddressList() async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
 
     return new http.Client().get(
       ApiUtil.KYC_DOC_LIST,
@@ -360,35 +361,18 @@ class VerificationState extends State<Verification> {
       request.headers["cookie"] = cookie;
       http.StreamedResponse response = await request.send().then((onValue) {
         return http.Response.fromStream(onValue);
-      }).then((http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          Map<String, dynamic> response = json.decode(res.body);
-          setState(() {
-            _panVerificationStatus = response["pan_verification"];
-            _addressVerificationStatus = response["address_verification"];
-            _setDocVerificationStatus();
-          });
-        }
-      });
-      // http.MultipartFile _panFile;
-      // http.MultipartFile _addressFile;
-      // await http.MultipartFile.fromPath('package', _panImage.path)
-      //     .then((value) {
-      //   _panFile = value;
-      // });
-
-      // await http.MultipartFile.fromPath('package', _addressImage.path)
-      //     .then((value) {
-      //   _addressFile = value;
-      // });
-      // var request = new http.MultipartRequest(
-      //     "POST", Uri.parse(ApiUtil.UPLOAD_DOC + _selectedAddressDocType));
-      // request.files.add(_panFile);
-      // request.files.add(_addressFile);
-      // request.headers["cookie"] = cookie;
-      // request.send().then((response) {
-      //   if (response.statusCode == 200) print("Uploaded!");
-      // });
+      }).then(
+        (http.Response res) {
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            Map<String, dynamic> response = json.decode(res.body);
+            setState(() {
+              _panVerificationStatus = response["pan_verification"];
+              _addressVerificationStatus = response["address_verification"];
+              _setDocVerificationStatus();
+            });
+          }
+        },
+      );
     }
   }
 

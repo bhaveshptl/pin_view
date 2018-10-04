@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
@@ -7,14 +9,16 @@ import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class ContestDetail extends StatefulWidget {
-  final L1 l1Data;
   final League league;
   final Contest contest;
+
+  final L1 l1Data;
   final List<MyTeam> myTeams;
 
   ContestDetail({this.league, this.l1Data, this.contest, this.myTeams});
@@ -24,20 +28,99 @@ class ContestDetail extends StatefulWidget {
 }
 
 class ContestDetailState extends State<ContestDetail> {
+  L1 _l1Data;
   String cookie;
+  List<MyTeam> _myTeams;
+  Map<String, dynamic> l1UpdatePackate = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  onJoinContest(Contest contest) async {
-    if (widget.myTeams.length > 0) {
+  @override
+  initState() {
+    super.initState();
+    sockets.register(_onWsMsg);
+
+    _createL1WSObject();
+
+    if (widget.myTeams == null || widget.l1Data == null) {
+      _getL1Data();
+    } else {
+      _l1Data = widget.l1Data;
+      _myTeams = widget.myTeams;
+    }
+  }
+
+  _createL1WSObject() {
+    l1UpdatePackate["iType"] = 5;
+    l1UpdatePackate["sportsId"] = 1;
+    l1UpdatePackate["bResAvail"] = true;
+    l1UpdatePackate["id"] = widget.league.leagueId;
+  }
+
+  _getL1Data() {
+    sockets.sendMessage(l1UpdatePackate);
+  }
+
+  _onWsMsg(onData) {
+    Map<String, dynamic> _response = json.decode(onData);
+
+    if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
+      setState(() {
+        _l1Data = L1.fromJson(_response["data"]["l1"]);
+        _myTeams = (_response["data"]["myteams"] as List)
+            .map((i) => MyTeam.fromJson(i))
+            .toList();
+      });
+    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+      _applyL1DataUpdate(_response["diffData"]["ld"]);
+    } else if (_response["iType"] == 7 && _response["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+      setState(() {
+        _myTeams.add(teamAdded);
+      });
+    } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
+      _updateJoinCount(_response["data"]);
+    }
+  }
+
+  _updateJoinCount(Map<String, dynamic> _data) {
+    for (Contest _contest in _l1Data.contests) {
+      if (_contest.id == _data["cId"]) {
+        setState(() {
+          _contest.joined = _data["iJC"];
+        });
+      }
+    }
+  }
+
+  _applyL1DataUpdate(Map<String, dynamic> _data) {
+    if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
+      _l1Data.contests.addAll(_data["lstAdded"]);
+    }
+    if (_data["lstModified"] != null && _data["lstModified"].length > 0) {
+      List<dynamic> _modifiedContests = _data["lstModified"];
+      for (Map<String, dynamic> _changedContest in _modifiedContests) {
+        for (Contest _contest in _l1Data.contests) {
+          if (_contest.id == _changedContest["id"]) {
+            setState(() {
+              _contest.joined = _changedContest["joined"];
+            });
+          }
+        }
+      }
+    }
+  }
+
+  _onJoinContest(Contest contest) async {
+    if (_myTeams != null && _myTeams.length > 0) {
       final result = await showDialog(
         context: context,
         builder: (BuildContext context) {
           return JoinContest(
             contest: contest,
-            myTeams: widget.myTeams,
+            myTeams: _myTeams,
             onCreateTeam: _onCreateTeam,
-            matchId: widget.l1Data.league.rounds[0].matches[0].id,
-            onError: onJoinContestError,
+            matchId: _l1Data.league.rounds[0].matches[0].id,
+            onError: _onJoinContestError,
           );
         },
       );
@@ -84,7 +167,7 @@ class ContestDetailState extends State<ContestDetail> {
       MaterialPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
-              l1Data: widget.l1Data,
+              l1Data: _l1Data,
             ),
       ),
     );
@@ -94,12 +177,12 @@ class ContestDetailState extends State<ContestDetail> {
       _scaffoldKey.currentState
           .showSnackBar(SnackBar(content: Text("$result")));
       if (curContest != null) {
-        onJoinContest(curContest);
+        _onJoinContest(curContest);
       }
     }
   }
 
-  onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
+  _onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
     JoinContestError error;
     if (errorResponse["error"] == true) {
       error = JoinContestError([errorResponse["resultCode"]]);
@@ -210,7 +293,7 @@ class ContestDetailState extends State<ContestDetail> {
             ),
         fullscreenDialog: true));
     if (result == true) {
-      onJoinContest(curContest);
+      _onJoinContest(curContest);
     }
   }
 
@@ -291,7 +374,7 @@ class ContestDetailState extends State<ContestDetail> {
                               flex: 1,
                               child: RaisedButton(
                                 onPressed: () {
-                                  onJoinContest(widget.contest);
+                                  _onJoinContest(widget.contest);
                                 },
                                 color: Theme.of(context).primaryColorDark,
                                 child: Text(
@@ -432,5 +515,11 @@ class ContestDetailState extends State<ContestDetail> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    sockets.unRegister(_onWsMsg);
+    super.dispose();
   }
 }

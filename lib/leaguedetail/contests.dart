@@ -18,9 +18,15 @@ class Contests extends StatefulWidget {
   final L1 l1Data;
   final League league;
   final List<MyTeam> myTeams;
+  final Map<int, List<MyTeam>> mapContestTeams;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
-  Contests({this.league, this.l1Data, this.myTeams, this.scaffoldKey});
+  Contests(
+      {this.league,
+      this.l1Data,
+      this.myTeams,
+      this.scaffoldKey,
+      this.mapContestTeams});
 
   @override
   State<StatefulWidget> createState() => ContestsState();
@@ -39,9 +45,9 @@ class ContestsState extends State<Contests> {
     Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context) => ContestDetail(
+              contest: contest,
               league: widget.league,
               l1Data: widget.l1Data,
-              contest: contest,
               myTeams: widget.myTeams,
             ),
       ),
@@ -268,9 +274,13 @@ class ContestsState extends State<Contests> {
               return Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: ContestCard(
+                  league: widget.league,
                   contest: _contests[index],
                   onClick: _onContestClick,
                   onJoin: onJoinContest,
+                  myJoinedTeams: widget.mapContestTeams != null
+                      ? widget.mapContestTeams[_contests[index].id]
+                      : null,
                 ),
               );
             },

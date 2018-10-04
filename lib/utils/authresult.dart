@@ -38,7 +38,7 @@ class AuthResult {
       SharedPrefHelper.internal()
           .saveCookieToStorage(response.headers["set-cookie"]);
       SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_REFERENCE_USER_KEY, json.encode(response.body));
+          ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(response.body));
       await setWSCookie();
       Navigator.of(context).pushReplacementNamed("/lobby");
       done();

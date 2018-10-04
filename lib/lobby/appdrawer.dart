@@ -26,7 +26,7 @@ class AppDrawerState extends State<AppDrawer> {
     });
 
     Future<dynamic> futureUserInfo = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_REFERENCE_USER_KEY);
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY);
     futureUserInfo.then((value) {
       userInfo = json.decode(value);
       setState(() {

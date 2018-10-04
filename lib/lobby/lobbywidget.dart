@@ -8,9 +8,11 @@ import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class LobbyWidget extends StatefulWidget {
   final int sportType;
+  final Function onLeagues;
   final Function showLoader;
+  final Function onSportChange;
 
-  LobbyWidget({this.sportType = 1, this.showLoader});
+  LobbyWidget({this.sportType = 1, this.showLoader, this.onLeagues, this.onSportChange});
 
   @override
   State<StatefulWidget> createState() => LobbyWidgetState();
@@ -49,6 +51,9 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
         _leagues.add(League.fromJson(league));
       }
 
+      if (widget.onLeagues != null) {
+        widget.onLeagues(_leagues);
+      }
       _seperateLeaguesByRunningStatus(_leagues);
       widget.showLoader(false);
     }
@@ -131,14 +136,17 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                 children: <Widget>[
                   StatusTab(
                     leagues: upcomingLeagues,
+                    onSportChange: widget.onSportChange,
                     leagueStatus: LeagueStatus.UPCOMING,
                   ),
                   StatusTab(
                     leagues: liveLeagues,
+                    onSportChange: widget.onSportChange,
                     leagueStatus: LeagueStatus.LIVE,
                   ),
                   StatusTab(
                     leagues: completedLeagues,
+                    onSportChange: widget.onSportChange,
                     leagueStatus: LeagueStatus.COMPLETED,
                   ),
                 ],
