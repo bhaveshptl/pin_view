@@ -41,12 +41,12 @@ class ContestsState extends State<Contests> {
     _contests = widget.l1Data.contests;
   }
 
-  _onContestClick(Contest contest) {
+  _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
       new MaterialPageRoute(
         builder: (context) => ContestDetail(
               contest: contest,
-              league: widget.league,
+              league: league,
               l1Data: widget.l1Data,
               myTeams: widget.myTeams,
             ),

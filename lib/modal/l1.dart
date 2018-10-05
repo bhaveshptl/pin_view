@@ -69,7 +69,7 @@ class MatchInfo {
   final int id;
   final String name;
   final int startTime;
-  final String endTime;
+  final int endTime;
   final int status;
   final int sportType;
   MatchInfo({
@@ -289,34 +289,34 @@ class PlayingStyle {
 }
 
 class Contest {
-  final int id;
-  final String name;
-  final int templateId;
-  final int size;
-  final int prizeType;
-  final int entryFee;
-  final int minUsers;
-  final int serviceFee;
-  final int teamsAllowed;
-  final int leagueId;
-  final int releaseTime;
-  final int regStartTime;
-  final int startTime;
-  final int endTime;
-  final int status;
-  final int visibilityId;
-  final String visibilityInfo;
-  final String contestJoinCode;
+  int id;
+  String name;
+  int templateId;
+  int size;
+  int prizeType;
+  int entryFee;
+  int minUsers;
+  int serviceFee;
+  int teamsAllowed;
+  int leagueId;
+  int releaseTime;
+  int regStartTime;
+  int startTime;
+  int endTime;
+  int status;
+  int visibilityId;
+  String visibilityInfo;
+  String contestJoinCode;
   int joined;
-  final List<dynamic> prizeDetails;
-  final Map<String, dynamic> brand;
-  final int milestones;
-  final int inningsId;
-  final int bonusAllowed;
-  final bool guaranteed;
-  final bool recommended;
-  final bool deleted;
-  final bool hideBonusInfo;
+  List<dynamic> prizeDetails;
+  Map<String, dynamic> brand;
+  int milestones;
+  int inningsId;
+  int bonusAllowed;
+  bool guaranteed;
+  bool recommended;
+  bool deleted;
+  bool hideBonusInfo;
   Contest({
     this.id,
     this.name,

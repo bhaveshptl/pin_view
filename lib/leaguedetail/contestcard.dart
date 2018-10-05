@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:playfantasy/leaguedetail/contestcards/live.dart';
-import 'package:playfantasy/leaguedetail/contestcards/result.dart';
-import 'package:playfantasy/leaguedetail/contestcards/upcoming.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/leaguedetail/contestcards/live.dart';
+import 'package:playfantasy/leaguedetail/contestcards/result.dart';
+import 'package:playfantasy/leaguedetail/contestcards/upcoming.dart';
 
 class ContestCard extends StatelessWidget {
   final League league;

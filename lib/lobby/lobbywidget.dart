@@ -12,7 +12,11 @@ class LobbyWidget extends StatefulWidget {
   final Function showLoader;
   final Function onSportChange;
 
-  LobbyWidget({this.sportType = 1, this.showLoader, this.onLeagues, this.onSportChange});
+  LobbyWidget(
+      {this.sportType = 1,
+      this.showLoader,
+      this.onLeagues,
+      this.onSportChange});
 
   @override
   State<StatefulWidget> createState() => LobbyWidgetState();
@@ -56,7 +60,81 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       }
       _seperateLeaguesByRunningStatus(_leagues);
       widget.showLoader(false);
+    } else if (_response["iType"] == 2 && _response["bSuccessful"] == true) {
+      if (_response["data"]["bDataModified"] == true &&
+          (_response["data"]["lstAdded"] as List).length > 0) {
+        List<League> _addedLeagues = (_response["data"]["lstAdded"] as List)
+            .map((i) => League.fromJson(i))
+            .toList();
+        setState(() {
+          for (League _league in _addedLeagues) {
+            if (_league.status == LeagueStatus.UPCOMING) {
+              upcomingLeagues.add(_league);
+            } else if (_league.status == LeagueStatus.LIVE) {
+              liveLeagues.add(_league);
+            } else if (_league.status == LeagueStatus.COMPLETED) {
+              completedLeagues.add(_league);
+            }
+          }
+        });
+      } else if (_response["data"]["bDataModified"] == true &&
+          (_response["data"]["lstRemoved"] as List).length > 0) {
+        List<League> _removedLeagues = (_response["data"]["lstRemoved"] as List)
+            .map((i) => League.fromJson(i))
+            .toList();
+        setState(() {
+          for (League _league in _removedLeagues) {
+            if (_league.status == LeagueStatus.UPCOMING) {
+              int index = getLeagueIndex(upcomingLeagues, _league);
+              if (index != -1) {
+                upcomingLeagues.removeAt(index);
+              }
+            } else if (_league.status == LeagueStatus.LIVE) {
+              int index = getLeagueIndex(liveLeagues, _league);
+              if (index != -1) {
+                liveLeagues.removeAt(index);
+              }
+            } else if (_league.status == LeagueStatus.COMPLETED) {
+              int index = getLeagueIndex(completedLeagues, _league);
+              if (index != -1) {
+                completedLeagues.removeAt(index);
+              }
+            }
+          }
+        });
+      } else if (_response["data"]["bDataModified"] == true &&
+          (_response["data"]["lstModified"] as List).length > 0) {
+        List<League> _modifiedLeagues =
+            (_response["data"]["lstModified"] as List)
+                .map((i) => League.fromJson(i))
+                .toList();
+
+        List<League> _allLeagues = [];
+
+        _allLeagues.addAll(liveLeagues);
+        _allLeagues.addAll(upcomingLeagues);
+        _allLeagues.addAll(completedLeagues);
+
+        for (League _league in _modifiedLeagues) {
+          int index = getLeagueIndex(_allLeagues, _league);
+          if (index != -1) {
+            _allLeagues[index] = _league;
+            _seperateLeaguesByRunningStatus(_allLeagues);
+          }
+        }
+      }
     }
+  }
+
+  int getLeagueIndex(List<League> _leagues, League _league) {
+    int index = 0;
+    for (League _curLeague in _leagues) {
+      if (_curLeague.leagueId == _league.leagueId) {
+        return index;
+      }
+      index++;
+    }
+    return -1;
   }
 
   @override
