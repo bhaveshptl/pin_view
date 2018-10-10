@@ -1,15 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
 
+import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
-import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -39,8 +39,10 @@ class LobbyState extends State<Lobby> {
   _getSportsType() async {
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getSportsType();
     await futureCookie.then((value) {
-      int _sport = int.parse(value);
-      _onSportSelectionChaged(_sport);
+      if (value != null) {
+        int _sport = int.parse(value);
+        _onSportSelectionChaged(_sport);
+      }
     });
   }
 

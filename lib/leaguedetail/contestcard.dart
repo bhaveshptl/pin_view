@@ -12,6 +12,7 @@ class ContestCard extends StatelessWidget {
   final Contest contest;
   final Function onJoin;
   final Function onClick;
+  final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
   ContestCard(
@@ -19,6 +20,7 @@ class ContestCard extends StatelessWidget {
       this.onClick,
       this.onJoin,
       this.league,
+      this.onPrizeStructure,
       this.myJoinedTeams});
 
   @override
@@ -39,18 +41,21 @@ class ContestCard extends StatelessWidget {
                 padding: EdgeInsets.all(0.0),
                 child: league.status == LeagueStatus.UPCOMING
                     ? UpcomingContest(
+                        onJoin: onJoin,
                         contest: contest,
                         myJoinedTeams: myJoinedTeams,
-                        onJoin: onJoin,
+                        onPrizeStructure: onPrizeStructure,
                       )
                     : league.status == LeagueStatus.LIVE
                         ? LiveContest(
                             contest: contest,
                             myJoinedTeams: myJoinedTeams,
+                            onPrizeStructure: onPrizeStructure,
                           )
                         : ResultContest(
                             contest: contest,
                             myJoinedTeams: myJoinedTeams,
+                            onPrizeStructure: onPrizeStructure,
                           ),
               ),
               Banner(

@@ -28,8 +28,8 @@ class JoinContest extends StatefulWidget {
 }
 
 class JoinContestState extends State<JoinContest> {
-  String cookie = "";  
-  int _selectedTeamId = -1;  
+  String cookie = "";
+  int _selectedTeamId = -1;
   List<MyTeam> _myUniqueTeams = [];
 
   double _cashBalance = 0.0;
@@ -37,7 +37,7 @@ class JoinContestState extends State<JoinContest> {
 
   _joinContest(BuildContext context) async {
     if (_selectedTeamId == null || _selectedTeamId == -1) {
-      widget.onCreateTeam(context, widget.contest);
+      widget.onCreateTeam(context, widget.contest);      
     } else {
       if (cookie == null || cookie == "") {
         Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
@@ -209,7 +209,8 @@ class JoinContestState extends State<JoinContest> {
   Widget build(BuildContext context) {
     double bonusUsable =
         (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
-    double usableBonus = _bonusBalance > bonusUsable ? bonusUsable : _bonusBalance;
+    double usableBonus =
+        _bonusBalance > bonusUsable ? bonusUsable : _bonusBalance;
 
     return AlertDialog(
       title: Text(strings.get("CONFIRMATION").toUpperCase()),

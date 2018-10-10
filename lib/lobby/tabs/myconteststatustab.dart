@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/prizestructure.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -16,6 +17,7 @@ import 'package:playfantasy/leaguedetail/contestcard.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
+
 class MyContestStatusTab extends StatefulWidget {
   final int leagueStatus;
   final List<League> leagues;
@@ -109,7 +111,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                   : Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Card(
-                        elevation: 4.0,
+                        elevation: 2.0,
                         child: Column(
                           children: <Widget>[
                             Padding(
@@ -164,7 +166,9 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                                 Expanded(
                                   child: Column(
                                     children: _getContestsCard(
-                                        _leagueContests, _league),
+                                      _leagueContests,
+                                      _league,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -189,6 +193,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                 contest: _contest,
                 onJoin: _onJoinContest,
                 onClick: widget.onContestClick,
+                onPrizeStructure: _showPrizeStructure,
                 myJoinedTeams: widget.mapContestTeams[_contest.id],
               ),
             ),
@@ -197,6 +202,17 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
       );
     }
     return _cards;
+  }
+
+  void _showPrizeStructure(Contest contest) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return PrizeStructure(
+          contest: contest,
+        );
+      },
+    );
   }
 
   _onJoinContest(Contest contest) async {

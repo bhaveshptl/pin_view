@@ -79,6 +79,7 @@ class LeagueDetailState extends State<LeagueDetail>
       });
     } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
       _updateJoinCount(_response["data"]);
+      _updateContestTeams(_response["data"]);
     } else if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
       MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
       int i = 0;
@@ -101,6 +102,18 @@ class LeagueDetailState extends State<LeagueDetail>
         });
       }
     }
+  }
+
+  _updateContestTeams(Map<String, dynamic> _data) {
+    Map<String, dynamic> _mapContestTeamsUpdate = _data["teamsByContest"];
+    _mapContestTeamsUpdate.forEach((String key, dynamic _contestTeams) {
+      List<MyTeam> _teams = (_mapContestTeamsUpdate[key] as List)
+          .map((i) => MyTeam.fromJson(i))
+          .toList();
+      setState(() {
+        _mapContestTeams[int.parse(key)] = _teams;
+      });
+    });
   }
 
   _applyL1DataUpdate(Map<String, dynamic> _data) {

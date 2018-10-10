@@ -129,7 +129,7 @@ class StringTable {
       "P_G_E_CON_N_F": "Prize is Guaranteed even if contest is not filled",
       "M_NO_OF_ENTRIES": "Max number of Entries in this contest",
       "U_BONUS_USE": "upto ~ % of bonus can be used*",
-      "PRIZE_STRUCTURE": "Prize Structure",
+      "PRIZE_STRUCTURE": "Prize structure",
       "TOTAL_PRIZE_AMOUNT": "Total Prize Amount ",
       "B_S_PRIZE_BRKUP": "prize breakup for ~ winners is shown below",
       "PRIZE_AMOUNT": "Prize Amount",
@@ -190,6 +190,9 @@ class StringTable {
       "KYC": "KYC (ID and address verification)",
       "SEND_OTP": "Send OTP",
       "UPLOAD": "Upload",
+      "WINNINGS": "Winnings",
+      "TOTAL_WINNINGS": "Total winnings",
+      "NOTES": "Notes",
     };
   }
 }

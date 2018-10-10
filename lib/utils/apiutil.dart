@@ -30,4 +30,6 @@ class ApiUtil {
   static const USER_BALANCE = BASE_API_URL + "lobby/userbalance";
 
   static const GET_MY_CONTESTS = BASE_API_URL + "lobby/user/mycontests/v2/";
+  static const GET_CONTEST_TEAMS = BASE_API_URL + "lobby/contest/";
+  static const GET_PRIZESTRUCTURE = BASE_API_URL + "lobby/contest/";
 }

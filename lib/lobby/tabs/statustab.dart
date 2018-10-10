@@ -6,16 +6,21 @@ import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 
 class StatusTab extends StatelessWidget {
   final int leagueStatus;
-  final List<League> leagues;
   final Function onSportChange;
+  final List<League> allLeagues;
+  final List<League> statusLeagues;
 
-  StatusTab({this.leagues, this.leagueStatus, this.onSportChange});
+  StatusTab(
+      {this.statusLeagues,
+      this.leagueStatus,
+      this.onSportChange,
+      this.allLeagues});
 
   onLeagueSelect(BuildContext context, League league) {
     MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => LeagueDetail(
               league,
-              leagues: leagues,
+              leagues: allLeagues,
               onSportChange: onSportChange,
             ));
     Navigator.of(context).push(route);
@@ -29,12 +34,12 @@ class StatusTab extends StatelessWidget {
             ? "There are no running matches."
             : "There are no upcoming matches.";
 
-    if (leagues.length > 0) {
+    if (statusLeagues.length > 0) {
       return ListView.builder(
-        itemCount: leagues.length,
+        itemCount: statusLeagues.length,
         itemBuilder: (context, index) {
           return LeagueCard(
-            leagues[index],
+            statusLeagues[index],
             onClick: (league) {
               onLeagueSelect(context, league);
             },

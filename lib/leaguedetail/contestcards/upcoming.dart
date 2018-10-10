@@ -6,9 +6,11 @@ import 'package:playfantasy/modal/myteam.dart';
 class UpcomingContest extends StatelessWidget {
   final Contest contest;
   final Function onJoin;
+  final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
-  UpcomingContest({this.contest, this.myJoinedTeams, this.onJoin});
+  UpcomingContest(
+      {this.contest, this.myJoinedTeams, this.onJoin, this.onPrizeStructure});
 
   @override
   Widget build(BuildContext context) {
@@ -17,34 +19,33 @@ class UpcomingContest extends StatelessWidget {
             contest.size == contest.joined);
     return Column(
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Stack(
           children: <Widget>[
-            Expanded(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-                child: Text(
-                  contest.name,
-                  textAlign: TextAlign.center,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                  child: Text(
+                    contest.name,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
+              ],
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                child: Text(
-                  "#" + contest.id.toString(),
-                  textAlign: TextAlign.right,
-                  style: TextStyle(color: Colors.black12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                  child: Text(
+                    "#" + contest.id.toString(),
+                    textAlign: TextAlign.right,
+                    style: TextStyle(color: Colors.black12),
+                  ),
                 ),
-              ),
-            ),
+              ],
+            )
           ],
         ),
         Divider(
@@ -83,7 +84,11 @@ class UpcomingContest extends StatelessWidget {
                           message: "Number of winners.",
                           child: FlatButton(
                             padding: EdgeInsets.all(0.0),
-                            onPressed: () {},
+                            onPressed: () {
+                              if (onPrizeStructure != null) {
+                                onPrizeStructure(contest);
+                              }
+                            },
                             child: Column(
                               children: <Widget>[
                                 Row(

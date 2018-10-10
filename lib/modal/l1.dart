@@ -19,7 +19,7 @@ class LeagueDetails {
   final String name;
   final int startTime;
   final int endTime;
-  final int status;
+  int status;
   final List<Round> rounds;
   final List<dynamic> allowedContestTypes;
   LeagueDetails({

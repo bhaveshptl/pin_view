@@ -25,6 +25,7 @@ class LobbyWidget extends StatefulWidget {
 class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int registeredSportType;
+  List<League> _allLeagues;
   List<League> liveLeagues = [];
   List<League> upcomingLeagues = [];
   List<League> completedLeagues = [];
@@ -66,16 +67,23 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
         List<League> _addedLeagues = (_response["data"]["lstAdded"] as List)
             .map((i) => League.fromJson(i))
             .toList();
+
+        _allLeagues.addAll(_addedLeagues);
+        if (widget.onLeagues != null) {
+          widget.onLeagues(_allLeagues);
+        }
+
         setState(() {
-          for (League _league in _addedLeagues) {
-            if (_league.status == LeagueStatus.UPCOMING) {
-              upcomingLeagues.add(_league);
-            } else if (_league.status == LeagueStatus.LIVE) {
-              liveLeagues.add(_league);
-            } else if (_league.status == LeagueStatus.COMPLETED) {
-              completedLeagues.add(_league);
-            }
-          }
+          _seperateLeaguesByRunningStatus(_allLeagues);
+          // for (League _league in _addedLeagues) {
+          //   if (_league.status == LeagueStatus.UPCOMING) {
+          //     upcomingLeagues.add(_league);
+          //   } else if (_league.status == LeagueStatus.LIVE) {
+          //     liveLeagues.add(_league);
+          //   } else if (_league.status == LeagueStatus.COMPLETED) {
+          //     completedLeagues.add(_league);
+          //   }
+          // }
         });
       } else if (_response["data"]["bDataModified"] == true &&
           (_response["data"]["lstRemoved"] as List).length > 0) {
@@ -109,7 +117,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                 .map((i) => League.fromJson(i))
                 .toList();
 
-        List<League> _allLeagues = [];
+        _allLeagues = [];
 
         _allLeagues.addAll(liveLeagues);
         _allLeagues.addAll(upcomingLeagues);
@@ -119,8 +127,11 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
           int index = getLeagueIndex(_allLeagues, _league);
           if (index != -1) {
             _allLeagues[index] = _league;
-            _seperateLeaguesByRunningStatus(_allLeagues);
           }
+        }
+        _seperateLeaguesByRunningStatus(_allLeagues);
+        if (widget.onLeagues != null) {
+          widget.onLeagues(_allLeagues);
         }
       }
     }
@@ -162,6 +173,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       }
     }
     setState(() {
+      _allLeagues = leagues;
       liveLeagues = _liveLeagues;
       upcomingLeagues = _upcomingLeagues;
       completedLeagues = _completedLeagues;
@@ -213,17 +225,20 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
               child: TabBarView(
                 children: <Widget>[
                   StatusTab(
-                    leagues: upcomingLeagues,
+                    allLeagues: _allLeagues,
+                    statusLeagues: upcomingLeagues,
                     onSportChange: widget.onSportChange,
                     leagueStatus: LeagueStatus.UPCOMING,
                   ),
                   StatusTab(
-                    leagues: liveLeagues,
-                    onSportChange: widget.onSportChange,
+                    allLeagues: _allLeagues,
+                    statusLeagues: liveLeagues,
                     leagueStatus: LeagueStatus.LIVE,
+                    onSportChange: widget.onSportChange,
                   ),
                   StatusTab(
-                    leagues: completedLeagues,
+                    allLeagues: _allLeagues,
+                    statusLeagues: completedLeagues,
                     onSportChange: widget.onSportChange,
                     leagueStatus: LeagueStatus.COMPLETED,
                   ),

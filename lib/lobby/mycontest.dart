@@ -52,12 +52,55 @@ class MyContestsState extends State<MyContests> {
         _leagues = leagues;
       });
     } else if (_response["iType"] == 2 && _response["bSuccessful"] == true) {
+      if (_response["data"]["bDataModified"] == true &&
+          (_response["data"]["lstModified"] as List).length > 0) {
+        List<League> _modifiedLeagues =
+            (_response["data"]["lstModified"] as List)
+                .map((i) => League.fromJson(i))
+                .toList();
+        Map<String, List<Contest>> _mapMyAllContests = _mapUpcomingContest;
+        _mapMyAllContests.addAll(_mapLiveContest);
+        _mapMyAllContests.addAll(_mapResultContest);
+
+        for (League _league in _modifiedLeagues) {
+          int index = getLeagueIndex(_leagues, _league);
+          if (index != -1) {
+            _leagues[index] = _league;
+          }
+        }
+
+        setState(() {
+          _setContestsByStatus(_mapMyAllContests);
+        });
+      }
+    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+      _applyContestDataUpdate(_response["diffData"]["ld"]);
     } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
       _update(_response["data"]);
     }
   }
 
+  int getLeagueIndex(List<League> _leagues, League _league) {
+    int index = 0;
+    for (League _curLeague in _leagues) {
+      if (_curLeague.leagueId == _league.leagueId) {
+        return index;
+      }
+      index++;
+    }
+    return -1;
+  }
+
   _update(Map<String, dynamic> _data) {
+    Map<String, dynamic> _mapContestTeamsUpdate = _data["teamsByContest"];
+    _mapContestTeamsUpdate.forEach((String key, dynamic _contestTeams) {
+      List<MyTeam> _teams = (_mapContestTeamsUpdate[key] as List)
+          .map((i) => MyTeam.fromJson(i))
+          .toList();
+      setState(() {
+        _mapContestTeams[int.parse(key)] = _teams;
+      });
+    });
     _mapUpcomingContest.forEach((String key, List<Contest> _contests) {
       _updateContestJoinCount(_data, _contests);
     });
@@ -70,6 +113,156 @@ class MyContestsState extends State<MyContests> {
           _contest.joined = _data["iJC"];
         });
       }
+    }
+  }
+
+  _applyContestDataUpdate(Map<String, dynamic> _data) {
+    Map<String, List<Contest>> _mapMyAllContests = _mapUpcomingContest;
+    _mapMyAllContests.addAll(_mapLiveContest);
+    _mapMyAllContests.addAll(_mapResultContest);
+
+    if (_data["lstModified"] != null && _data["lstModified"].length >= 1) {
+      List<dynamic> _modifiedContests = _data["lstModified"];
+      for (Map<String, dynamic> _changedContest in _modifiedContests) {
+        _mapMyAllContests.forEach(
+          (String key, List<Contest> _contests) {
+            for (Contest _contest in _contests) {
+              if (_contest.id == _changedContest["id"]) {
+                setState(() {
+                  if (_changedContest["name"] != null &&
+                      _contest.name != _changedContest["name"]) {
+                    _contest.name = _changedContest["name"];
+                  }
+                  if (_changedContest["templateId"] != null &&
+                      _contest.templateId != _changedContest["templateId"]) {
+                    _contest.templateId = _changedContest["templateId"];
+                  }
+                  if (_changedContest["size"] != null &&
+                      _contest.size != _changedContest["size"]) {
+                    _contest.size = _changedContest["size"];
+                  }
+                  if (_changedContest["prizeType"] != null &&
+                      _contest.prizeType != _changedContest["prizeType"]) {
+                    _contest.prizeType = _changedContest["prizeType"];
+                  }
+                  if (_changedContest["entryFee"] != null &&
+                      _contest.entryFee != _changedContest["entryFee"]) {
+                    _contest.entryFee = _changedContest["entryFee"];
+                  }
+                  if (_changedContest["minUsers"] != null &&
+                      _contest.minUsers != _changedContest["minUsers"]) {
+                    _contest.minUsers = _changedContest["minUsers"];
+                  }
+                  if (_changedContest["serviceFee"] != null &&
+                      _contest.serviceFee != _changedContest["serviceFee"]) {
+                    _contest.serviceFee = _changedContest["serviceFee"];
+                  }
+                  if (_changedContest["teamsAllowed"] != null &&
+                      _contest.teamsAllowed !=
+                          _changedContest["teamsAllowed"]) {
+                    _contest.teamsAllowed = _changedContest["teamsAllowed"];
+                  }
+                  if (_changedContest["leagueId"] != null &&
+                      _contest.leagueId != _changedContest["leagueId"]) {
+                    _contest.leagueId = _changedContest["leagueId"];
+                  }
+                  if (_changedContest["releaseTime"] != null &&
+                      _contest.releaseTime != _changedContest["releaseTime"]) {
+                    _contest.releaseTime = _changedContest["releaseTime"];
+                  }
+                  if (_changedContest["regStartTime"] != null &&
+                      _contest.regStartTime !=
+                          _changedContest["regStartTime"]) {
+                    _contest.regStartTime = _changedContest["regStartTime"];
+                  }
+                  if (_changedContest["startTime"] != null &&
+                      _contest.startTime != _changedContest["startTime"]) {
+                    _contest.startTime = _changedContest["startTime"];
+                  }
+                  if (_changedContest["endTime"] != null &&
+                      _contest.endTime != _changedContest["endTime"]) {
+                    _contest.endTime = _changedContest["endTime"];
+                  }
+                  if (_changedContest["status"] != null &&
+                      _contest.status != _changedContest["status"]) {
+                    _contest.status = _changedContest["status"];
+                  }
+                  if (_changedContest["visibilityId"] != null &&
+                      _contest.visibilityId !=
+                          _changedContest["visibilityId"]) {
+                    _contest.visibilityId = _changedContest["visibilityId"];
+                  }
+                  if (_changedContest["visibilityInfo"] != null &&
+                      _contest.visibilityInfo !=
+                          _changedContest["visibilityInfo"]) {
+                    _contest.visibilityInfo = _changedContest["visibilityInfo"];
+                  }
+                  if (_changedContest["contestJoinCode"] != null &&
+                      _contest.contestJoinCode !=
+                          _changedContest["contestJoinCode"]) {
+                    _contest.contestJoinCode =
+                        _changedContest["contestJoinCode"];
+                  }
+                  if (_changedContest["joined"] != null &&
+                      _contest.joined != _changedContest["joined"]) {
+                    _contest.joined = _changedContest["joined"];
+                  }
+                  if (_changedContest["bonusAllowed"] != null &&
+                      _contest.bonusAllowed !=
+                          _changedContest["bonusAllowed"]) {
+                    _contest.bonusAllowed = _changedContest["bonusAllowed"];
+                  }
+                  if (_changedContest["guaranteed"] != null &&
+                      _contest.guaranteed != _changedContest["guaranteed"]) {
+                    _contest.guaranteed = _changedContest["guaranteed"];
+                  }
+                  if (_changedContest["recommended"] != null &&
+                      _contest.recommended != _changedContest["recommended"]) {
+                    _contest.recommended = _changedContest["recommended"];
+                  }
+                  if (_changedContest["deleted"] != null &&
+                      _contest.deleted != _changedContest["deleted"]) {
+                    _contest.deleted = _changedContest["deleted"];
+                  }
+                  if (_changedContest["brand"] != null &&
+                      _changedContest["brand"]["info"] != null &&
+                      _contest.brand["info"] !=
+                          _changedContest["brand"]["info"]) {
+                    _contest.brand["info"] = _changedContest["brand"]["info"];
+                  }
+                  if ((_changedContest["lstAdded"] as List).length > 0) {
+                    for (dynamic _prize in _changedContest["lstAdded"]) {
+                      _contest.prizeDetails.add(_prize);
+                    }
+                  }
+                  if ((_changedContest["lstModified"] as List).length > 0) {
+                    for (dynamic _modifiedPrize
+                        in _changedContest["lstModified"]) {
+                      for (dynamic _prize in _contest.prizeDetails) {
+                        if (_prize["id"] == _modifiedPrize["id"]) {
+                          if (_modifiedPrize["label"] != null) {
+                            _prize["label"] = _modifiedPrize["label"];
+                          }
+                          if (_modifiedPrize["noOfPrizes"] != null) {
+                            _prize["noOfPrizes"] = _modifiedPrize["noOfPrizes"];
+                          }
+                          if (_modifiedPrize["totalPrizeAmount"] != null) {
+                            _prize["totalPrizeAmount"] =
+                                _modifiedPrize["totalPrizeAmount"];
+                          }
+                        }
+                      }
+                    }
+                  }
+                });
+              }
+            }
+          },
+        );
+      }
+      setState(() {
+        _setContestsByStatus(_mapMyAllContests);
+      });
     }
   }
 
@@ -189,6 +382,7 @@ class MyContestsState extends State<MyContests> {
         builder: (context) => ContestDetail(
               league: league,
               contest: contest,
+              mapContestTeams: _mapContestTeams[contest.id],
             ),
       ),
     );
