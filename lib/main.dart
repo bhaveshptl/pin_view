@@ -53,7 +53,7 @@ void main() async {
     _homePage = new Lobby();
   }
 
-  FlutterWebviewPlugin().launch(ApiUtil.BASE_URL, hidden: true);
+  // FlutterWebviewPlugin().launch(ApiUtil.BASE_URL, hidden: true);
 
   runApp(
     new MaterialApp(

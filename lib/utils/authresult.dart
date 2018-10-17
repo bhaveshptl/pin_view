@@ -8,9 +8,8 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class AuthResult {
   Response response;
-  BuildContext context;
-  Function setState;
-  AuthResult(this.response, this.context, this.setState);
+  GlobalKey<ScaffoldState> scaffoldKey;
+  AuthResult(this.response, this.scaffoldKey);
 
   setWSCookie() async {
     String cookie;
@@ -40,14 +39,8 @@ class AuthResult {
       SharedPrefHelper.internal().saveToSharedPref(
           ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(response.body));
       await setWSCookie();
-      Navigator.of(context).pushReplacementNamed("/lobby");
+      Navigator.of(scaffoldKey.currentContext).pushReplacementNamed("/lobby");
       done();
-    } else {
-      final dynamic res = json.decode(response.body).cast<String, dynamic>();
-      setState(() {
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text(res['error'])));
-      });
     }
   }
 }

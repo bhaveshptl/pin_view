@@ -316,7 +316,6 @@ class ContestsState extends State<Contests> {
               ),
               FlatButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
                   _onCreateTeam(context, contest);
                 },
                 child: Text(strings.get("CREATE").toUpperCase()),
@@ -520,6 +519,7 @@ class ContestsState extends State<Contests> {
               return Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: ContestCard(
+                  l1Data: widget.l1Data,
                   league: widget.league,
                   contest: _contests[index],
                   onClick: _onContestClick,

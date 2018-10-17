@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">playfantasy</string>
+    <string name="facebook_app_id">159068018247606</string>
+    <string name="fb_login_protocol_scheme">fb159068018247606</string>
+    <!-- <string name="default_web_client_id">671728109308-09q2h8tngp5pgg9hirr0oct8ddbq4ss9.apps.googleusercontent.com</string> -->
+</resources>

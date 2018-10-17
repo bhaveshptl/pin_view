@@ -42,7 +42,9 @@ class ContestDetail extends StatefulWidget {
 class ContestDetailState extends State<ContestDetail> {
   L1 _l1Data;
   String cookie;
+  int _sportType = 1;
   List<MyTeam> _myTeams;
+  int _curPageOffset = 0;
   final int rowsPerPage = 10;
   TeamsDataSource _teamsDataSource;
   List<MyTeam> _mapContestTeams = [];
@@ -57,7 +59,25 @@ class ContestDetailState extends State<ContestDetail> {
     super.initState();
     sockets.register(_onWsMsg);
 
-    _createL1WSObject();
+    _createAndReqL1WS();
+    _mapContestTeams =
+        widget.mapContestTeams == null ? [] : widget.mapContestTeams;
+    _teamsDataSource = TeamsDataSource(
+      widget.league,
+      widget.contest.joined,
+    );
+    _teamsDataSource.setMyContestTeams(widget.contest, _mapContestTeams);
+    _teamsDataSource.changeLeagueStatus(widget.league.status);
+    _getContestTeams(0);
+  }
+
+  _createAndReqL1WS() async {
+    await _getSportsType();
+
+    l1UpdatePackate["iType"] = 5;
+    l1UpdatePackate["bResAvail"] = true;
+    l1UpdatePackate["sportsId"] = _sportType;
+    l1UpdatePackate["id"] = widget.league.leagueId;
 
     if (widget.myTeams == null || widget.l1Data == null) {
       _getL1Data();
@@ -65,21 +85,20 @@ class ContestDetailState extends State<ContestDetail> {
       _l1Data = widget.l1Data;
       _myTeams = widget.myTeams;
     }
-    _mapContestTeams = widget.mapContestTeams;
-    _teamsDataSource = TeamsDataSource(widget.league, widget.contest.joined);
-    _teamsDataSource.changeLeagueStatus(widget.league.status);
-    _getContestTeams(0);
-  }
-
-  _createL1WSObject() {
-    l1UpdatePackate["iType"] = 5;
-    l1UpdatePackate["sportsId"] = 1;
-    l1UpdatePackate["bResAvail"] = true;
-    l1UpdatePackate["id"] = widget.league.leagueId;
   }
 
   _getL1Data() {
     sockets.sendMessage(l1UpdatePackate);
+  }
+
+  _getSportsType() async {
+    Future<dynamic> futureSportType =
+        SharedPrefHelper.internal().getSportsType();
+    await futureSportType.then((value) {
+      if (value != null) {
+        _sportType = int.parse(value);
+      }
+    });
   }
 
   _onWsMsg(onData) {
@@ -133,14 +152,31 @@ class ContestDetailState extends State<ContestDetail> {
           .toList();
       setState(() {
         _mapContestTeams = _teams;
+        _teamsDataSource.updateMyContestTeam(widget.contest, _mapContestTeams);
+        if (_curPageOffset > (widget.contest.joined - rowsPerPage)) {
+          _getContestTeams(_curPageOffset);
+        }
       });
     });
   }
 
   _applyL1DataUpdate(Map<String, dynamic> _data) {
     if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
-      _l1Data.contests.addAll(
-          (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList());
+      List<Contest> _addedContests =
+          (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
+      setState(() {
+        for (Contest _contest in _addedContests) {
+          bool bFound = false;
+          for (Contest _curContest in _l1Data.contests) {
+            if (_curContest.id == _contest.id) {
+              bFound = true;
+            }
+          }
+          if (!bFound && _l1Data.league.id == _contest.leagueId) {
+            _l1Data.contests.add(_contest);
+          }
+        }
+      });
     }
     if (_data["lstModified"] != null && _data["lstModified"].length > 0) {
       List<dynamic> _modifiedContests = _data["lstModified"];
@@ -195,7 +231,6 @@ class ContestDetailState extends State<ContestDetail> {
               ),
               FlatButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
                   _onCreateTeam(context, contest);
                 },
                 child: Text(strings.get("CREATE").toUpperCase()),
@@ -353,6 +388,14 @@ class ContestDetailState extends State<ContestDetail> {
   }
 
   _getContestTeams(int offset) async {
+    _curPageOffset = offset;
+    int teamListOffset = offset;
+    if (offset == 0) {
+      _teamsDataSource.setTeams(offset, _mapContestTeams);
+    } else {
+      teamListOffset = offset - _mapContestTeams.length;
+    }
+
     if (cookie == null) {
       Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
       await futureCookie.then((value) {
@@ -364,9 +407,11 @@ class ContestDetailState extends State<ContestDetail> {
       ApiUtil.GET_CONTEST_TEAMS +
           widget.contest.id.toString() +
           "/teams/" +
-          offset.toString() +
+          teamListOffset.toString() +
           "/" +
-          rowsPerPage.toString(),
+          (offset == 0
+              ? (rowsPerPage - _mapContestTeams.length).toString()
+              : rowsPerPage.toString()),
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {
@@ -374,7 +419,9 @@ class ContestDetailState extends State<ContestDetail> {
           List<dynamic> response = json.decode(res.body);
           List<MyTeam> _teams =
               response.map((i) => MyTeam.fromJson(i)).toList();
-          _teamsDataSource.setTeams(offset, _teams);
+          _teamsDataSource.setTeams(
+              offset == 0 ? (offset + _mapContestTeams.length) : offset,
+              _teams);
         }
       },
     );
@@ -433,55 +480,6 @@ class ContestDetailState extends State<ContestDetail> {
         ),
       ),
     ];
-
-    // if (_l1Data.league.status != LeagueStatus.UPCOMING) {
-    //   _header.add(
-    //     DataColumn(
-    //       numeric: true,
-    //       onSort: (int index, bool bIsAscending) {},
-    //       label: Container(
-    //         child: Row(
-    //           // mainAxisAlignment: MainAxisAlignment.center,
-    //           children: <Widget>[
-    //             Text("SCORE"),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   );
-
-    //   _header.add(
-    //     DataColumn(
-    //       numeric: true,
-    //       onSort: (int index, bool bIsAscending) {},
-    //       label: Container(
-    //         child: Row(
-    //           // mainAxisAlignment: MainAxisAlignment.center,
-    //           children: <Widget>[
-    //             Text("RANK"),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   );
-    // }
-
-    // if (_l1Data.league.status == LeagueStatus.COMPLETED) {
-    //   _header.add(
-    //     DataColumn(
-    //       numeric: true,
-    //       onSort: (int index, bool bIsAscending) {},
-    //       label: Container(
-    //         child: Row(
-    //           mainAxisAlignment: MainAxisAlignment.center,
-    //           children: <Widget>[
-    //             Text("PRIZE"),
-    //           ],
-    //         ),
-    //       ),
-    //     ),
-    //   );
-    // }
 
     return _header;
   }
@@ -836,10 +834,13 @@ class ContestDetailState extends State<ContestDetail> {
                               )
                             ],
                           ),
-                          rowsPerPage: widget.contest.joined < rowsPerPage
+                          rowsPerPage: (widget.contest.joined +
+                                      _mapContestTeams.length) <
+                                  rowsPerPage
                               ? (widget.contest.joined == 0
                                   ? 1
-                                  : widget.contest.joined)
+                                  : (widget.contest.joined +
+                                      _mapContestTeams.length))
                               : rowsPerPage,
                           onPageChanged: (int firstVisibleIndex) {
                             _getContestTeams(firstVisibleIndex);
@@ -877,18 +878,35 @@ class ContestDetailState extends State<ContestDetail> {
 class TeamsDataSource extends DataTableSource {
   int size;
   double width;
-  int _leagueStatus;
   League league;
+  int _leagueStatus;
   BuildContext context;
   List<MyTeam> _teams = [];
+  List<MyTeam> myContestTeams;
 
   TeamsDataSource(League _league, int size) {
     this.size = size;
     league = _league;
     _leagueStatus = _league.status;
+  }
+
+  setMyContestTeams(Contest contest, List<MyTeam> _myContestTeams) {
+    this.size = contest.joined + _myContestTeams.length;
+    myContestTeams = _myContestTeams;
     for (int i = 0; i < size; i++) {
-      _teams.add(MyTeam());
+      if (i < _myContestTeams.length) {
+        _teams.add(_myContestTeams[i]);
+      } else {
+        _teams.add(MyTeam());
+      }
     }
+  }
+
+  updateMyContestTeam(Contest contest, List<MyTeam> _myContestTeams) {
+    this.size = contest.joined + _myContestTeams.length;
+    myContestTeams = _myContestTeams;
+
+    this.notifyListeners();
   }
 
   changeLeagueStatus(int _status) {
@@ -907,7 +925,7 @@ class TeamsDataSource extends DataTableSource {
     int curIndex = 0;
     int length = offset + _teams.length;
     for (int i = offset; i < length; i++) {
-      if (this._teams[i] == null) {
+      if (this._teams.length <= i) {
         this._teams.add(MyTeam());
       }
       this._teams[i] = _teams[curIndex];
@@ -924,11 +942,11 @@ class TeamsDataSource extends DataTableSource {
 
     return DataRow.byIndex(
       index: index,
-      cells: _getBody(_team),
+      cells: _getBody(_team, index < myContestTeams.length),
     );
   }
 
-  List<DataCell> _getBody(MyTeam _team) {
+  List<DataCell> _getBody(MyTeam _team, bool bIsMyJoinedTeam) {
     List<DataCell> _header = [
       DataCell(
         Container(
@@ -944,29 +962,34 @@ class TeamsDataSource extends DataTableSource {
                 child: _leagueStatus == LeagueStatus.UPCOMING
                     ? Column(
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Container(
-                                  width: 72.0,
-                                  child: OutlineButton(
-                                    padding: EdgeInsets.all(0.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24.0),
+                          bIsMyJoinedTeam
+                              ? Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 8.0),
+                                      child: Container(
+                                        width: 72.0,
+                                        child: OutlineButton(
+                                          padding: EdgeInsets.all(0.0),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(24.0),
+                                          ),
+                                          color: Theme.of(context)
+                                              .primaryColorDark,
+                                          onPressed: () {},
+                                          child: Text(
+                                            "SWITCH",
+                                            style: TextStyle(fontSize: 10.0),
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                    color: Theme.of(context).primaryColorDark,
-                                    onPressed: () {},
-                                    child: Text(
-                                      "SWITCH",
-                                      style: TextStyle(fontSize: 10.0),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Icon(Icons.chevron_right)
-                            ],
-                          ),
+                                    Icon(Icons.chevron_right)
+                                  ],
+                                )
+                              : Container(),
                         ],
                       )
                     : Row(
@@ -1007,22 +1030,6 @@ class TeamsDataSource extends DataTableSource {
         onTap: () {},
       ),
     ];
-
-    // if (_leagueStatus != LeagueStatus.UPCOMING) {
-    //   _header.add(DataCell(
-    //     Container(),
-    //   ));
-
-    //   _header.add(DataCell(
-    //     Container(),
-    //   ));
-    // }
-
-    // if (_leagueStatus == LeagueStatus.COMPLETED) {
-    //   _header.add(DataCell(
-    //     Container(),
-    //   ));
-    // }
 
     return _header;
   }

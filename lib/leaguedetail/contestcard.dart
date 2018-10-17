@@ -8,6 +8,7 @@ import 'package:playfantasy/leaguedetail/contestcards/result.dart';
 import 'package:playfantasy/leaguedetail/contestcards/upcoming.dart';
 
 class ContestCard extends StatelessWidget {
+  final L1 l1Data;
   final League league;
   final Contest contest;
   final Function onJoin;
@@ -16,7 +17,8 @@ class ContestCard extends StatelessWidget {
   final List<MyTeam> myJoinedTeams;
 
   ContestCard(
-      {this.contest,
+      {this.l1Data,
+      this.contest,
       this.onClick,
       this.onJoin,
       this.league,
@@ -39,14 +41,18 @@ class ContestCard extends StatelessWidget {
                   onClick(contest, league);
                 },
                 padding: EdgeInsets.all(0.0),
-                child: league.status == LeagueStatus.UPCOMING
+                child: (l1Data != null &&
+                            l1Data.league.status == LeagueStatus.UPCOMING) ||
+                        (l1Data == null &&
+                            league.status == LeagueStatus.UPCOMING)
                     ? UpcomingContest(
                         onJoin: onJoin,
                         contest: contest,
                         myJoinedTeams: myJoinedTeams,
                         onPrizeStructure: onPrizeStructure,
                       )
-                    : league.status == LeagueStatus.LIVE
+                    : (l1Data != null &&
+                            l1Data.league.status == LeagueStatus.LIVE)
                         ? LiveContest(
                             contest: contest,
                             myJoinedTeams: myJoinedTeams,

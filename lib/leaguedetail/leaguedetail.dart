@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -31,6 +32,7 @@ class LeagueDetailState extends State<LeagueDetail>
     with WidgetsBindingObserver {
   L1 l1Data;
   String cookie;
+  int _sportType = 1;
   List<MyTeam> _myTeams;
   String title = "Match";
   Map<String, dynamic> l1UpdatePackate = {};
@@ -52,7 +54,6 @@ class LeagueDetailState extends State<LeagueDetail>
     sockets.register(_onWsMsg);
     _createL1WSObject();
 
-    _getL1Data();
     _getMyContests();
   }
 
@@ -118,10 +119,20 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _applyL1DataUpdate(Map<String, dynamic> _data) {
     if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
+      List<Contest> _addedContests =
+          (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
       setState(() {
-        l1Data.contests.addAll((_data["lstAdded"] as List)
-            .map((i) => Contest.fromJson(i))
-            .toList());
+        for (Contest _contest in _addedContests) {
+          bool bFound = false;
+          for (Contest _curContest in l1Data.contests) {
+            if (_curContest.id == _contest.id) {
+              bFound = true;
+            }
+          }
+          if (!bFound && l1Data.league.id == _contest.leagueId) {
+            l1Data.contests.add(_contest);
+          }
+        }
       });
     }
     if (_data["lstRemoved"] != null && _data["lstRemoved"].length > 0) {
@@ -273,18 +284,65 @@ class LeagueDetailState extends State<LeagueDetail>
         }
       }
     }
+    if (_data["league"] != null) {
+      Map<String, dynamic> _modifiedleague = _data["league"];
+      if (_modifiedleague["name"] != null) {
+        setState(() {
+          l1Data.league.name = _modifiedleague["name"];
+        });
+      }
+      if (_modifiedleague["startTime"] != null) {
+        setState(() {
+          l1Data.league.startTime = _modifiedleague["startTime"];
+        });
+      }
+      if (_modifiedleague["endTime"] != null) {
+        setState(() {
+          l1Data.league.endTime = _modifiedleague["endTime"];
+        });
+      }
+      if (_modifiedleague["status"] != null) {
+        setState(() {
+          l1Data.league.status = _modifiedleague["status"];
+        });
+      }
+      if (_modifiedleague["fanTeamRules"] != null) {
+        setState(() {
+          l1Data.league.fanTeamRules = _modifiedleague["fanTeamRules"];
+        });
+      }
+      if (_modifiedleague["allowedContestTypes"] != null) {
+        setState(() {
+          l1Data.league.allowedContestTypes =
+              _modifiedleague["allowedContestTypes"];
+        });
+      }
+    }
   }
 
-  _createL1WSObject() {
+  _createL1WSObject() async {
+    await _getSportsType();
     l1UpdatePackate["iType"] = 5;
-    l1UpdatePackate["sportsId"] = 1;
     l1UpdatePackate["bResAvail"] = true;
+    l1UpdatePackate["sportsId"] = _sportType;
     l1UpdatePackate["id"] = widget.league.leagueId;
+
+    _getL1Data();
   }
 
   _getL1Data() {
     _showLoader(true);
     sockets.sendMessage(l1UpdatePackate);
+  }
+
+  _getSportsType() async {
+    Future<dynamic> futureSportType =
+        SharedPrefHelper.internal().getSportsType();
+    await futureSportType.then((value) {
+      if (value != null) {
+        _sportType = int.parse(value);
+      }
+    });
   }
 
   _getMyContests() async {
@@ -296,7 +354,7 @@ class LeagueDetailState extends State<LeagueDetail>
     }
 
     return new http.Client().get(
-      ApiUtil.GET_MY_CONTESTS,
+      ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode == 200) {

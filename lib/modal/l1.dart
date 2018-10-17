@@ -13,15 +13,15 @@ class L1 {
 }
 
 class LeagueDetails {
-  final FanTeamRule fanTeamRules;
+  FanTeamRule fanTeamRules;
   final int inningsId;
   final int id;
-  final String name;
-  final int startTime;
-  final int endTime;
+  String name;
+  int startTime;
+  int endTime;
   int status;
   final List<Round> rounds;
-  final List<dynamic> allowedContestTypes;
+  List<dynamic> allowedContestTypes;
   LeagueDetails({
     this.fanTeamRules,
     this.inningsId,

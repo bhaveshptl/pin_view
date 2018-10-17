@@ -14,6 +14,11 @@ class ApiUtil {
   static const LOGOUT_URL = BASE_API_URL + "ups/logout";
   static const GET_COOKIE_URL = BASE_API_URL + "lobby/getcookie";
   static const AUTH_CHECK_URL = BASE_API_URL + "ups/login/status";
+  static const GOOGLE_LOGIN_URL =
+      BASE_API_URL + "ups/socialLogin/withcontext/google/native";
+  static const FACEBOOK_LOGIN_URL =
+      BASE_API_URL + "ups/socialLogin/withcontext/facebook/native";
+
   static const CREATE_TEAM = BASE_API_URL + "lobby/fanteam";
   static const EDIT_TEAM = BASE_API_URL + "lobby/fanteam/";
   static const GET_MY_CONTEST_MY_TEAMS =

@@ -1,4 +1,4 @@
-package com.example.playfantasy;
+package com.algorin.playfantasy;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

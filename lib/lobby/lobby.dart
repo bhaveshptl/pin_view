@@ -37,8 +37,8 @@ class LobbyState extends State<Lobby> {
   }
 
   _getSportsType() async {
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getSportsType();
-    await futureCookie.then((value) {
+    Future<dynamic> futureSportType = SharedPrefHelper.internal().getSportsType();
+    await futureSportType.then((value) {
       if (value != null) {
         int _sport = int.parse(value);
         _onSportSelectionChaged(_sport);

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1032199315410",
+    "firebase_url": "https://playfantasy-219615.firebaseio.com",
+    "project_id": "playfantasy-219615",
+    "storage_bucket": "playfantasy-219615.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032199315410:android:daa4c98d9c9d46fb",
+        "android_client_info": {
+          "package_name": "com.algorin.playfantasy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032199315410-gabmcl9ksampvbbpsber0a6uuk8bdp7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMLhm7didZX7xwL_6E29R-AInxOMfvVDY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
