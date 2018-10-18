@@ -281,7 +281,7 @@ class MyContestsState extends State<MyContests> {
       ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
-      if (res.statusCode == 200) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
         setState(() {
           Map<String, List<Contest>> _mapMyContests =

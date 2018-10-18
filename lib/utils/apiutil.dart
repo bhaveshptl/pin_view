@@ -18,6 +18,7 @@ class ApiUtil {
       BASE_API_URL + "ups/socialLogin/withcontext/google/native";
   static const FACEBOOK_LOGIN_URL =
       BASE_API_URL + "ups/socialLogin/withcontext/facebook/native";
+  static const SIGN_UP = BASE_API_URL + "ups/signup";
 
   static const CREATE_TEAM = BASE_API_URL + "lobby/fanteam";
   static const EDIT_TEAM = BASE_API_URL + "lobby/fanteam/";

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+
 import 'package:playfantasy/signup/signup.dart';
-
 import 'package:playfantasy/utils/apiutil.dart';
-
 import 'package:playfantasy/utils/authresult.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class LandingPage extends StatefulWidget {
   @override
@@ -17,9 +17,17 @@ class LandingPage extends StatefulWidget {
 class LandingPageState extends State<LandingPage> {
   String _authName;
   String _password;
+  bool _obscureText = true;
 
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  // Toggles the password show status
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
 
   _launchSignup(BuildContext context) {
     Navigator.of(context).push(
@@ -149,13 +157,13 @@ class LandingPageState extends State<LandingPage> {
                       Row(
                         children: <Widget>[
                           Text(
-                            "Welcome back,",
+                            strings.get("WELCOME_TO_FANTASY"),
                             style: TextStyle(
                                 color: Colors.black87,
                                 fontWeight: FontWeight.bold,
                                 fontSize: Theme.of(context)
                                     .primaryTextTheme
-                                    .display1
+                                    .headline
                                     .fontSize),
                           ),
                         ],
@@ -165,7 +173,7 @@ class LandingPageState extends State<LandingPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              "Sign in to continue",
+                              strings.get("SIGN_IN_TO_CONTINUE"),
                               style: TextStyle(
                                   color: Colors.black38,
                                   fontSize: Theme.of(context)
@@ -193,7 +201,7 @@ class LandingPageState extends State<LandingPage> {
                           color: Colors.red,
                           textColor: Colors.white70,
                           child: Text(
-                            "GOOGLE",
+                            strings.get("GOOGLE").toUpperCase(),
                           ),
                         ),
                       ),
@@ -208,7 +216,7 @@ class LandingPageState extends State<LandingPage> {
                           color: Colors.blue,
                           textColor: Colors.white70,
                           child: Text(
-                            "FACEBOOK",
+                            strings.get("FACEBOOK").toUpperCase(),
                           ),
                         ),
                       ),
@@ -236,7 +244,7 @@ class LandingPageState extends State<LandingPage> {
                             ),
                             Expanded(
                               child: Text(
-                                "OR",
+                                strings.get("OR").toUpperCase(),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -269,11 +277,16 @@ class LandingPageState extends State<LandingPage> {
                               Expanded(
                                 child: TextFormField(
                                   onSaved: (val) => _authName = val,
-                                  decoration:
-                                      InputDecoration(labelText: 'Username'),
+                                  decoration: InputDecoration(
+                                    labelText: strings.get("USERNAME"),
+                                    icon: const Padding(
+                                      padding: const EdgeInsets.only(top: 15.0),
+                                      child: const Icon(Icons.face),
+                                    ),
+                                  ),
                                   validator: (value) {
                                     if (value.isEmpty) {
-                                      return 'Please enter username or email or mobile.';
+                                      return strings.get("USERNAME_ERROR");
                                     }
                                   },
                                 ),
@@ -285,13 +298,19 @@ class LandingPageState extends State<LandingPage> {
                               Expanded(
                                 child: TextFormField(
                                   onSaved: (val) => _password = val,
-                                  decoration:
-                                      InputDecoration(labelText: 'Password'),
+                                  decoration: InputDecoration(
+                                    labelText: strings.get("PASSWORD"),
+                                    icon: const Padding(
+                                      padding: const EdgeInsets.only(top: 15.0),
+                                      child: const Icon(Icons.lock),
+                                    ),
+                                  ),
                                   validator: (value) {
                                     if (value.isEmpty) {
-                                      return 'Please enter Password';
+                                      return strings.get("PASSWORD_ERROR");
                                     }
                                   },
+                                  obscureText: _obscureText,
                                 ),
                               )
                             ],
@@ -312,7 +331,7 @@ class LandingPageState extends State<LandingPage> {
                         onPressed: () {},
                         padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
                         child: Text(
-                          "Forgot password ?",
+                          strings.get("FORGOT_PASSWORD"),
                           style: TextStyle(color: Colors.black54),
                         ),
                       )
@@ -325,7 +344,6 @@ class LandingPageState extends State<LandingPage> {
                   children: <Widget>[
                     Expanded(
                       child: RaisedButton(
-                        padding: EdgeInsets.all(16.0),
                         onPressed: () {
                           if (formKey.currentState.validate()) {
                             formKey.currentState.save();
@@ -335,7 +353,7 @@ class LandingPageState extends State<LandingPage> {
                         color: Theme.of(context).primaryColor,
                         child: Container(
                           child: Text(
-                            "SIGN IN",
+                            strings.get("SIGNIN").toUpperCase(),
                             style: TextStyle(color: Colors.white70),
                           ),
                         ),
@@ -349,7 +367,7 @@ class LandingPageState extends State<LandingPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      "Don't have an account ?",
+                      strings.get("DONT_HAVE_ACCOUNT"),
                       style: TextStyle(color: Colors.black38),
                     ),
                     FlatButton(
@@ -358,7 +376,7 @@ class LandingPageState extends State<LandingPage> {
                       },
                       padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
                       child: Text(
-                        "Sign up",
+                        strings.get("SIGNUP").toUpperCase(),
                         style: TextStyle(
                             color: Colors.black54, fontWeight: FontWeight.bold),
                       ),

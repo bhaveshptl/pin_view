@@ -67,7 +67,7 @@ class VerificationState extends State<Verification> {
       ApiUtil.KYC_DOC_LIST,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
-      if (res.statusCode == 200) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
         List<dynamic> response = json.decode(res.body);
         setState(() {
           _addressList = response;
@@ -115,7 +115,7 @@ class VerificationState extends State<Verification> {
       ApiUtil.VERIFICATION_STATUS,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
-      if (res.statusCode == 200) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
         setState(() {
           email = response["email"];

@@ -714,7 +714,7 @@ class CreateTeamState extends State<CreateTeam> {
       } else {
         _showErrorMessage("Getting error while saving team.");
       }
-    }).whenComplete(() => print('completed'));
+    });
   }
 
   void _updateTeam(Map<String, dynamic> team) async {
@@ -741,6 +741,6 @@ class CreateTeamState extends State<CreateTeam> {
       } else {
         _showErrorMessage("Getting error while updating team.");
       }
-    }).whenComplete(() => print('completed'));
+    });
   }
 }

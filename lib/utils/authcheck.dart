@@ -17,11 +17,11 @@ class AuthCheck {
       ApiUtil.AUTH_CHECK_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
-      if (res.statusCode == 200) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
         return true;
       } else {
         return false;
       }
-    }).whenComplete(() => print('completed'));
+    });
   }
 }

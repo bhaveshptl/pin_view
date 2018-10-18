@@ -415,7 +415,7 @@ class ContestDetailState extends State<ContestDetail> {
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {
-        if (res.statusCode == 200) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
           List<dynamic> response = json.decode(res.body);
           List<MyTeam> _teams =
               response.map((i) => MyTeam.fromJson(i)).toList();

@@ -27,11 +27,9 @@ setWSCookie() async {
           headers: {'Content-type': 'application/json', "cookie": cookie},
           body: json.encoder.convert({}))
       .then((http.Response res) {
-    if (res.statusCode == 200) {
+    if (res.statusCode >= 200 && res.statusCode <= 299) {
       SharedPrefHelper().saveWSCookieToStorage(json.decode(res.body)["cookie"]);
     }
-  }).whenComplete(() {
-    print("completed");
   });
 }
 
