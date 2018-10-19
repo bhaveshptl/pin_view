@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:playfantasy/commonwidgets/forgotpassword.dart';
 
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -125,6 +126,20 @@ class LandingPageState extends State<LandingPage> {
         });
       }
     });
+  }
+
+  _showForgotPassword() async {
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ForgotPassword();
+      },
+    );
+
+    if (result != null) {
+      _scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text(strings.get("PASSWORD_CHANGED"))));
+    }
   }
 
   @override
@@ -289,6 +304,7 @@ class LandingPageState extends State<LandingPage> {
                                       return strings.get("USERNAME_ERROR");
                                     }
                                   },
+                                  keyboardType: TextInputType.emailAddress,
                                 ),
                               )
                             ],
@@ -328,7 +344,9 @@ class LandingPageState extends State<LandingPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
                       FlatButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _showForgotPassword();
+                        },
                         padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
                         child: Text(
                           strings.get("FORGOT_PASSWORD"),

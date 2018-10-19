@@ -201,6 +201,7 @@ class StringTable {
       "USERNAME": "Username",
       "EMAIL_OR_MOBILE": "E-mail ID or mobile",
       "EMAIL_OR_MOBILE_ERROR": "Please enter E-mail ID or mobile.",
+      "VALID_EMAIL_OR_MOBILE_ERROR": "Please enter valid E-mail ID or mobile.",
       "PASSWORD": "Password",
       "USERNAME_ERROR": "Please enter username or E-mail ID or mobile.",
       "PASSWORD_ERROR": "Please enter Password",
@@ -214,6 +215,19 @@ class StringTable {
       "BY_REGISTERING": "By signing up, You agree to our",
       "TERMS_AND_CONDITION": "Terms and conditions",
       "REFERRAL_CODE": "Referral code",
+      "FORGOT_PASS_TITLE": "Forgot password",
+      "FORGOT_PASS_EMAIL":
+          "Please enter E-mail ID or Mobile provided while registering with us.",
+      "ENTER_OTP": "Enter OTP",
+      "ENTER_OTP_ERROR": "OTP is required.",
+      "NEW_PASSWORD": "New password",
+      "NEW_PASSWORD_ERROR": "New password is required",
+      "REENTER_PASSWORD": "Re-enter password",
+      "REENTER_PASSWORD_ERROR": "Re-enter password is required",
+      "PASSWORD_NOT_MATCH": "Password doesn't match.",
+      "LINK_SENT":
+          "Link to reset password is sent to your Email. Click on the link to reset.",
+      "PASSWORD_CHANGED": "Password changed successfully"
     };
   }
 }

@@ -618,7 +618,7 @@ class VerificationState extends State<Verification> {
                                                       controller:
                                                           _otpController,
                                                       keyboardType:
-                                                          TextInputType.phone,
+                                                          TextInputType.number,
                                                       decoration:
                                                           InputDecoration(
                                                         labelText: "Enter OTP",

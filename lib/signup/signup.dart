@@ -307,6 +307,7 @@ class SignupState extends State<Signup> {
                                           .get("EMAIL_OR_MOBILE_ERROR");
                                     }
                                   },
+                                  keyboardType: TextInputType.emailAddress,
                                 ),
                               )
                             ],
