@@ -423,35 +423,45 @@ class LeagueDetailState extends State<LeagueDetail>
         fullscreenDialog: true));
   }
 
-  _onNavigationSelectionChange(BuildContext context, int index) {
-    setState(() {
-      switch (index) {
-        case 1:
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => MyTeams(
-                    league: widget.league,
-                    l1Data: l1Data,
-                    myTeams: _myTeams,
-                  )));
-          break;
-        case 2:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => MyContests(
-                  leagues: widget.leagues,
-                  onSportChange: widget.onSportChange,
-                ),
-          ));
-          break;
-        case 3:
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CreateContest(widget.league),
-          ));
-          break;
-        case 4:
-          _launchAddCash();
-          break;
-      }
-    });
+  _onNavigationSelectionChange(BuildContext context, int index) async {
+    var result;
+    switch (index) {
+      case 1:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => MyTeams(
+                  league: widget.league,
+                  l1Data: l1Data,
+                  myTeams: _myTeams,
+                )));
+        break;
+      case 2:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => MyContests(
+                leagues: widget.leagues,
+                onSportChange: widget.onSportChange,
+              ),
+        ));
+        break;
+      case 3:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CreateContest(
+                league: widget.league,
+                l1data: l1Data,
+                myTeams: _myTeams,
+              ),
+        ));
+        break;
+      case 4:
+        _launchAddCash();
+        break;
+    }
+    if (result != null) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(result),
+        ),
+      );
+    }
   }
 
   _showFilterDialog() {

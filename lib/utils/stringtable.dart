@@ -8,7 +8,7 @@ class StringTable {
   String rupee = "₹";
 
   String get(String title) {
-    return table[title];
+    return table[title] == null ? "" : table[title];
   }
 
   set() {
@@ -79,6 +79,19 @@ class StringTable {
       "SCORE": "Score",
       "YOU_WON": "You Won -",
       "CREATE_CONTEST": "Create contest",
+      "CONTEST_NAME": "Contest name (Optional)",
+      "ENTRY_FEE_NUMBER_ERROR":
+          "Entry fee should be valid number between 1 to 10,000",
+      "PARTICIPANTS_NUMBER_ERROR":
+          "Participants should be valid number between 2 to 100",
+      "TYPE": "Type",
+      "ENTRY_FEE_LIMIT": "Entry fee should be between 1 to 10,000",
+      "PARTICIPANTS": "Participants",
+      "PARTICIPANTS_LIMIT": "Participants should be between 2 to 100.",
+      "MULTY_ENTRY": "Multi entry",
+      "NUMBER_OF_PRIZE": "Number of prizes",
+      "CREATE_CONTEST_TOOLTIP":
+          "Ceate private contest and play with your friends.",
       "CREATE_TEAMS": "Create teams",
       "CREATE_TEAM_B_JC": "Create your Team before joining contest.",
       "CREATE_TEAM": "Create team",
@@ -107,7 +120,7 @@ class StringTable {
       "CAPTAIN": "Captain",
       "V_CAPTAIN": "V.Captain",
       "PLEASE_SELECT": "Please select",
-      "aND": "and",
+      "AND": "And",
       "JOIN_CONTEST": "Join Contest",
       "CASH_BALANCES": "Cash balance",
       "BONUS": "Bonus ",
@@ -203,7 +216,10 @@ class StringTable {
       "EMAIL_OR_MOBILE_ERROR": "Please enter E-mail ID or mobile.",
       "VALID_EMAIL_OR_MOBILE_ERROR": "Please enter valid E-mail ID or mobile.",
       "PASSWORD": "Password",
+      "INVALID_USERNAME_PASSWORD": "Invalid username and/or password.",
       "USERNAME_ERROR": "Please enter username or E-mail ID or mobile.",
+      "EMAIL_MIN_LENGTH_FAIL": "Please enter valid email.",
+      "PASSWORD_MIN_LENGTH_FAIL": "Password should have atleast 6 characters.",
       "PASSWORD_ERROR": "Please enter Password",
       "FORGOT_PASSWORD": "Forgot password ?",
       "SIGNIN": "Sign in",
@@ -227,7 +243,34 @@ class StringTable {
       "PASSWORD_NOT_MATCH": "Password doesn't match.",
       "LINK_SENT":
           "Link to reset password is sent to your Email. Click on the link to reset.",
-      "PASSWORD_CHANGED": "Password changed successfully"
+      "PASSWORD_CHANGED": "Password changed successfully",
+      "EARN_CASH_TITLE": "Invite & earn",
+      "FRIEND_SIGNUP_TEXT":
+          "When a friend signs up with your referral code, he will get ₹",
+      "VERIFY_EMAIL_MOBILE":
+          "Verify your email and mobile number and share referral code with your friends.",
+      "FRIEND_MOBILE_VERIFIED":
+          "Make sure your friend also verifies his email and mobile number.",
+      "USER_GETS_BONUS_TEXT_1": "You will get ₹",
+      "USER_GETS_BONUS_TEXT_2":
+          "into your unreleased bonus, Which will be released in packets based on your friend's spendings.",
+      "EARN_RS": "Share and earn ₹",
+      "GIVE_RS": "Give ₹",
+      "COPIED": "Copied to clipboard",
+      "COPY_CODE": "Copy code",
+      "SHARE_NOW": "Share now",
+      "FROM": "From",
+      "TO": "To",
+      "SWITCH_FROM": "You are switching team from",
+      "SOMETHING_WENT_WRONG":
+          "Something went wrong please check your inputs or internet connection.",
+      "REQUEST_OTP": "Request OTP",
+      "OTP_SENT": "OTP to reset password is sent to your mobile.",
+      "PASSWORD_SHOULD": "Password should have a ",
+      "MIN_CHAR": "minimum of 8 characters, ",
+      "ATLEAST_NUMBER":"Atleast 1 number, ",
+      "ATLEAST_ALPHABET": "Atleast 1 alphabet and ",
+      "ATLEAST_SPECIAL_CHARACTER": "Atleast 1 special character."
     };
   }
 }

@@ -1,35 +1,296 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:playfantasy/lobby/createprizestructure.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/joincontest.dart';
+import 'package:playfantasy/leaguedetail/createteam.dart';
+
+import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/modal/prizestructure.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/lobby/createprizestructure.dart';
 
 class CreateContest extends StatefulWidget {
-  final League _league;
+  final L1 l1data;
+  final League league;
+  final List<MyTeam> myTeams;
 
-  CreateContest(this._league);
+  CreateContest({this.league, this.l1data, this.myTeams});
 
   @override
   State<StatefulWidget> createState() => CreateContestState();
 }
 
 class CreateContestState extends State<CreateContest> {
-  int _totalPrize = 0;
+  int _entryFee;
+  String cookie;
+  int _prizeType;
   int _numberOfPrize = 0;
+  double _totalPrize = 0.0;
+  int _numberOfParticipants;
   bool _bIsMultyEntry = false;
-  final _customPrizeStructure = [];
-  final _suggestedPrizeStructure = [];
+
+  bool bShowJoinContest = false;
+  bool bWaitingForTeamCreation = false;
+
+  List<PrizeStructure> prizeStructure;
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  _onSearchContest() {
-    if (_formKey.currentState.validate()) {
-      _showComingsoonDialog();
+  final TextEditingController _nameController = new TextEditingController();
+  final TextEditingController _entryFeeController = new TextEditingController();
+  final TextEditingController _participantsController =
+      new TextEditingController();
+
+  L1 _l1Data;
+  List<MyTeam> _myTeams;
+
+  List<dynamic> allowedContestType;
+
+  @override
+  initState() {
+    super.initState();
+    sockets.register(_onWsMsg);
+
+    prizeStructure = [];
+    _l1Data = widget.l1data;
+    _myTeams = widget.myTeams;
+    allowedContestType = _l1Data.league.allowedContestTypes;
+
+    _entryFeeController.addListener(() {
+      if (_entryFeeController.text != "" &&
+          _entryFee != int.parse(_entryFeeController.text)) {
+        _entryFee = int.parse(_entryFeeController.text);
+        if ((_entryFee > 0 && _entryFee <= 10000) &&
+            (_numberOfParticipants != null &&
+                _numberOfParticipants > 1 &&
+                _numberOfParticipants <= 100)) {
+          _updateSuggestedPrizeStructure();
+        }
+      }
+    });
+
+    _participantsController.addListener(() {
+      if (_participantsController.text != "" &&
+          _numberOfParticipants != int.parse(_participantsController.text)) {
+        _numberOfParticipants = int.parse(_participantsController.text);
+        if ((_entryFee != null && _entryFee > 0 && _entryFee < 10000) &&
+            (_numberOfParticipants > 1 && _numberOfParticipants < 100)) {
+          _updateSuggestedPrizeStructure();
+        }
+      }
+    });
+  }
+
+  _onWsMsg(onData) {
+    Map<String, dynamic> _response = json.decode(onData);
+
+    if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
+      setState(() {
+        _l1Data = L1.fromJson(_response["data"]["l1"]);
+        _myTeams = (_response["data"]["myteams"] as List)
+            .map((i) => MyTeam.fromJson(i))
+            .toList();
+      });
+    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+      _applyL1DataUpdate(_response["diffData"]["ld"]);
+    } else if (_response["iType"] == 7 && _response["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+      setState(() {
+        bool bFound = false;
+        for (MyTeam _myTeam in _myTeams) {
+          if (_myTeam.id == teamAdded.id) {
+            bFound = true;
+          }
+        }
+        if (!bFound) {
+          _myTeams.add(teamAdded);
+        }
+        if (bShowJoinContest) {
+          _onCreateContest();
+        }
+        bWaitingForTeamCreation = false;
+      });
     }
   }
 
-  _onCustomPrizeStructure(final prizeStructure) {}
+  _applyL1DataUpdate(Map<String, dynamic> _data) {
+    if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
+      List<Contest> _addedContests =
+          (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
+      setState(() {
+        for (Contest _contest in _addedContests) {
+          bool bFound = false;
+          for (Contest _curContest in _l1Data.contests) {
+            if (_curContest.id == _contest.id) {
+              bFound = true;
+            }
+          }
+          if (!bFound && _l1Data.league.id == _contest.leagueId) {
+            _l1Data.contests.add(_contest);
+          }
+        }
+      });
+    }
+    if (_data["lstModified"] != null && _data["lstModified"].length > 0) {
+      List<dynamic> _modifiedContests = _data["lstModified"];
+      for (Map<String, dynamic> _changedContest in _modifiedContests) {
+        for (Contest _contest in _l1Data.contests) {
+          if (_contest.id == _changedContest["id"]) {
+            setState(() {
+              _contest.joined = _changedContest["joined"];
+            });
+          }
+        }
+      }
+    }
+  }
 
-  _onEditPrize() {
+  _onCreateContest() async {
+    if (_formKey.currentState.validate()) {
+      Map<String, dynamic> payload = {
+        "entryFee": _entryFee,
+        "fanTeamId": 0,
+        "inningsId": _l1Data.league.inningsId,
+        "leagueId": _l1Data.league.id,
+        "name": _nameController.text,
+        "prizeType": _prizeType,
+        "size": _numberOfParticipants,
+        "teamsAllowed": _bIsMultyEntry ? 6 : 1,
+        "totalPrizeAmount": getTotalPrizeAmount(prizeStructure),
+        "prizeStructure": getPrizeList(prizeStructure),
+      };
+
+      final result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return JoinContest(
+            myTeams: _myTeams,
+            onCreateTeam: _onCreateTeam,
+            createContestPayload: payload,
+            matchId: _l1Data.league.rounds[0].matches[0].id,
+          );
+        },
+      );
+
+      if (result != null) {
+        Navigator.of(context).pop(result);
+      }
+    }
+  }
+
+  void _onCreateTeam(BuildContext context, Contest contest,
+      {Map<String, dynamic> createContestPayload}) async {
+    final curContest = contest == null ? createContestPayload : contest;
+
+    bWaitingForTeamCreation = true;
+
+    Navigator.of(context).pop();
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: _l1Data,
+            ),
+      ),
+    );
+
+    if (result != null) {
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("$result")));
+      if (curContest != null) {
+        if (bWaitingForTeamCreation) {
+          bShowJoinContest = true;
+        } else {
+          _onCreateContest();
+        }
+      }
+      Navigator.of(context).pop();
+    }
+    bWaitingForTeamCreation = false;
+  }
+
+  getTotalPrizeAmount(List<PrizeStructure> _suggestedPrizes) {
+    double _totalPrize = 0.0;
+    _suggestedPrizes.forEach((PrizeStructure prizeStructure) {
+      _totalPrize += prizeStructure.amount;
+    });
+
+    return _totalPrize;
+  }
+
+  List<double> getPrizeList(List<PrizeStructure> _suggestedPrizes) {
+    List<double> prizes = [];
+    _suggestedPrizes.forEach((PrizeStructure prize) {
+      prizes.add(prize.amount);
+    });
+
+    return prizes;
+  }
+
+  _updateSuggestedPrizeStructure() async {
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        setState(() {
+          cookie = value;
+        });
+      });
+    }
+
+    http.Client().get(
+      ApiUtil.RECOMMENDED_PRIZE_STRUCTURE +
+          _numberOfParticipants.toString() +
+          "/" +
+          _entryFee.toString(),
+      headers: {'Content-type': 'application/json', "cookie": cookie},
+    ).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          List<PrizeStructureRange> prizeStructureRange =
+              (json.decode(res.body) as List)
+                  .map((i) => PrizeStructureRange.fromJson(i))
+                  .toList();
+          prizeStructure = getPrizeStructureFromRange(prizeStructureRange);
+          setState(() {
+            _totalPrize = getTotalPrizeAmount(prizeStructure);
+            _numberOfPrize = prizeStructure.length;
+          });
+        }
+      },
+    );
+  }
+
+  getPrizeStructureFromRange(List<PrizeStructureRange> range) {
+    List<PrizeStructure> prizeStructure = [];
+    range.forEach((PrizeStructureRange prizeRange) {
+      if (prizeRange.rank.indexOf("-") == -1) {
+        prizeStructure.add(PrizeStructure(
+            rank: int.parse(prizeRange.rank), amount: prizeRange.amount));
+      } else {
+        int startRange = int.parse(prizeRange.rank.split("-")[0]);
+        int endRange = int.parse(prizeRange.rank.split("-")[1]);
+        for (int i = startRange; i <= endRange; i++) {
+          prizeStructure
+              .add(PrizeStructure(rank: i, amount: prizeRange.amount));
+        }
+      }
+    });
+    return prizeStructure;
+  }
+
+  _onCustomPrizeStructure(final List<PrizeStructure> _prizeStructure) {
+    prizeStructure = _prizeStructure;
+  }
+
+  _onEditPrize() async {
+    FocusScope.of(context).requestFocus(FocusNode());
     _scaffoldKey.currentState.showBottomSheet((context) {
       return Container(
         decoration: new BoxDecoration(
@@ -41,12 +302,12 @@ class CreateContestState extends State<CreateContest> {
             ),
           ],
         ),
-        // color: Colors.blueGrey,
         height: 550.0,
         child: CreatePrizeStructure(
-          customPrizes: _customPrizeStructure,
-          suggestedPrizes: _suggestedPrizeStructure,
-          onSave: (prizeStructure) {
+          suggestedPrizes: prizeStructure,
+          scaffoldKey: _scaffoldKey,
+          totalPrize: _totalPrize,
+          onClose: (List<PrizeStructure> prizeStructure) {
             _onCustomPrizeStructure(prizeStructure);
           },
         ),
@@ -54,42 +315,11 @@ class CreateContestState extends State<CreateContest> {
     });
   }
 
-  _showComingsoonDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Create contest"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
-                    child: Text(
-                      "Coming Soon!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                  "We are currently working on this feature and will launch soon.")
-            ],
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      },
-    );
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return int.parse(s, onError: (e) => null) != null;
   }
 
   @override
@@ -97,7 +327,9 @@ class CreateContestState extends State<CreateContest> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Create contest"),
+        title: Text(
+          strings.get("CREATE_CONTEST"),
+        ),
       ),
       body: Column(
         children: <Widget>[
@@ -107,7 +339,7 @@ class CreateContestState extends State<CreateContest> {
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: LeagueCard(
-                    widget._league,
+                    widget.league,
                     clickable: false,
                   ),
                 ),
@@ -126,12 +358,9 @@ class CreateContestState extends State<CreateContest> {
                   ListTile(
                     leading: TextFormField(
                       decoration: InputDecoration(
-                        labelText: 'Contest name',
+                        labelText: strings.get("CONTEST_NAME"),
                       ),
-                      validator: (value) {},
-                      onEditingComplete: () {
-                        _onSearchContest();
-                      },
+                      controller: _nameController,
                       textInputAction: TextInputAction.next,
                     ),
                   ),
@@ -141,15 +370,19 @@ class CreateContestState extends State<CreateContest> {
                         Expanded(
                           flex: 1,
                           child: Text(
-                            "Type",
+                            strings.get("TYPE"),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                         Expanded(
                           flex: 4,
                           child: ContestTypeRadio(
-                            defaultValue: 0,
-                            onValueChanged: (int value) {},
+                            defaultValue:
+                                allowedContestType.indexOf(2) == -1 ? 1 : 2,
+                            allowedContestType: allowedContestType,
+                            onValueChanged: (int value) {
+                              _prizeType = value;
+                            },
                           ),
                         ),
                       ],
@@ -159,23 +392,25 @@ class CreateContestState extends State<CreateContest> {
                     leading: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Entry fee",
+                        labelText: strings.get("ENTRY_FEE"),
                         hintText: '1 - 10,000',
                         prefix: Padding(
                           padding: const EdgeInsets.only(left: 2.0, right: 4.0),
-                          child: Text('₹'),
+                          child: Text(strings.rupee),
                         ),
                       ),
+                      controller: _entryFeeController,
                       validator: (value) {
-                        final int entryFee = int.parse(value);
-                        if (value.isEmpty ||
-                            entryFee <= 0 ||
-                            entryFee > 10000) {
-                          return 'Entry fee should be between 1 to 10,000';
+                        if (isNumeric(value)) {
+                          final int entryFee = int.parse(value);
+                          if (value.isEmpty ||
+                              entryFee <= 0 ||
+                              entryFee > 10000) {
+                            return strings.get("ENTRY_FEE_LIMIT");
+                          }
+                        } else {
+                          return strings.get("ENTRY_FEE_NUMBER_ERROR");
                         }
-                      },
-                      onEditingComplete: () {
-                        _onSearchContest();
                       },
                       textInputAction: TextInputAction.next,
                     ),
@@ -184,32 +419,39 @@ class CreateContestState extends State<CreateContest> {
                     leading: TextFormField(
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: "Participants",
+                        labelText: strings.get("PARTICIPANTS"),
                         hintText: '2-100',
                       ),
+                      controller: _participantsController,
                       validator: (value) {
-                        final int noOfParticipants = int.parse(value);
-                        if (value.isEmpty ||
-                            noOfParticipants <= 1 ||
-                            noOfParticipants > 100) {
-                          return 'Participants should be between 2 to 100.';
+                        if (isNumeric(value)) {
+                          final int noOfParticipants = int.parse(value);
+                          if (value.isEmpty ||
+                              noOfParticipants <= 1 ||
+                              noOfParticipants > 100) {
+                            return strings.get("PARTICIPANTS_LIMIT");
+                          }
+                        } else {
+                          return strings.get("PARTICIPANTS_NUMBER_ERROR");
                         }
-                      },
-                      onEditingComplete: () {
-                        _onSearchContest();
                       },
                       textInputAction: TextInputAction.next,
                     ),
                   ),
                   ListTile(
                     leading: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          "Multi entry",
+                          strings.get("MULTY_ENTRY"),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Switch(
-                          onChanged: (bool value) {},
+                          onChanged: (bool value) {
+                            setState(() {
+                              _bIsMultyEntry = value;
+                            });
+                          },
                           value: _bIsMultyEntry,
                         ),
                       ],
@@ -238,7 +480,7 @@ class CreateContestState extends State<CreateContest> {
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(
-                                            "Total prize",
+                                            strings.get("TOTAL_PRIZE"),
                                             style: TextStyle(
                                                 color: Colors.white70,
                                                 fontSize: Theme.of(context)
@@ -253,15 +495,13 @@ class CreateContestState extends State<CreateContest> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Container(
-                                        height: 48.0,
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                                "₹ " + _totalPrize.toString()),
-                                          ),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(strings.rupee +
+                                              " " +
+                                              _totalPrize.toString()),
                                         ),
                                       ),
                                     ],
@@ -285,47 +525,52 @@ class CreateContestState extends State<CreateContest> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: <Widget>[
-                                        Stack(
-                                          children: <Widget>[
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text(
-                                                "Number of prizes",
-                                                style: TextStyle(
-                                                  color: Colors.white70,
-                                                  fontSize: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .subhead
-                                                      .fontSize,
-                                                ),
-                                              ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            strings.get("NUMBER_OF_PRIZE"),
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .fontSize,
                                             ),
-                                          ],
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                  Stack(
                                     children: <Widget>[
-                                      Container(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            _numberOfPrize.toString(),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              _numberOfPrize.toString(),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                      Container(
-                                        height: 48.0,
-                                        child: IconButton(
-                                          padding: EdgeInsets.all(0.0),
-                                          icon: Icon(Icons.edit),
-                                          onPressed: () {
-                                            _onEditPrize();
-                                          },
-                                        ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Container(
+                                            height: 28.0,
+                                            child: IconButton(
+                                              padding: EdgeInsets.all(0.0),
+                                              icon: Icon(Icons.edit),
+                                              iconSize: 16.0,
+                                              onPressed: () {
+                                                _onEditPrize();
+                                              },
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -339,8 +584,7 @@ class CreateContestState extends State<CreateContest> {
                   ),
                   ListTile(
                     leading: Tooltip(
-                      message:
-                          "Ceate private contest and play with your friends.",
+                      message: strings.get("CREATE_CONTEST_TOOLTIP"),
                       child: Padding(
                         padding: const EdgeInsets.only(top: 32.0),
                         child: RaisedButton(
@@ -355,7 +599,7 @@ class CreateContestState extends State<CreateContest> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  "CREATE",
+                                  strings.get("CREATE").toUpperCase(),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.white70),
                                 ),
@@ -363,7 +607,7 @@ class CreateContestState extends State<CreateContest> {
                             ],
                           ),
                           onPressed: () {
-                            _onSearchContest();
+                            _onCreateContest();
                           },
                         ),
                       ),
@@ -382,7 +626,9 @@ class CreateContestState extends State<CreateContest> {
 class ContestTypeRadio extends StatefulWidget {
   final Function onValueChanged;
   final int defaultValue;
-  ContestTypeRadio({this.defaultValue, this.onValueChanged});
+  final List<dynamic> allowedContestType;
+  ContestTypeRadio(
+      {this.defaultValue, this.onValueChanged, this.allowedContestType});
 
   @override
   State<StatefulWidget> createState() => ContestTypeRadioState();
@@ -394,7 +640,7 @@ class ContestTypeRadioState extends State<ContestTypeRadio> {
   @override
   void initState() {
     super.initState();
-    _radioValue = widget.defaultValue == null ? 0 : widget.defaultValue;
+    _radioValue = widget.defaultValue == null ? 2 : widget.defaultValue;
   }
 
   _handleRadioValueChange(value) {
@@ -413,13 +659,15 @@ class ContestTypeRadioState extends State<ContestTypeRadio> {
           child: Row(
             children: <Widget>[
               Radio(
-                value: 0,
+                value: 2,
                 groupValue: _radioValue,
                 onChanged: (int value) {
-                  _handleRadioValueChange(value);
+                  if (widget.allowedContestType.indexOf(2) != -1) {
+                    _handleRadioValueChange(value);
+                  }
                 },
               ),
-              Text("Cash"),
+              Text(strings.get("CASH")),
             ],
           ),
         ),
@@ -430,10 +678,12 @@ class ContestTypeRadioState extends State<ContestTypeRadio> {
                 value: 1,
                 groupValue: _radioValue,
                 onChanged: (int value) {
-                  _handleRadioValueChange(value);
+                  if (widget.allowedContestType.indexOf(1) != -1) {
+                    _handleRadioValueChange(value);
+                  }
                 },
               ),
-              Text("Practise"),
+              Text(strings.get("PRACTICE")),
             ],
           ),
         )

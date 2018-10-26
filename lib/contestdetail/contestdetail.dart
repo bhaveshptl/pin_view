@@ -13,7 +13,9 @@ import 'package:playfantasy/commonwidgets/statedob.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/contestdetail/viewteam.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
+import 'package:playfantasy/contestdetail/switchteam.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
 import 'package:playfantasy/commonwidgets/sharecontest.dart';
 import 'package:playfantasy/commonwidgets/prizestructure.dart';
@@ -62,10 +64,8 @@ class ContestDetailState extends State<ContestDetail> {
     _createAndReqL1WS();
     _mapContestTeams =
         widget.mapContestTeams == null ? [] : widget.mapContestTeams;
-    _teamsDataSource = TeamsDataSource(
-      widget.league,
-      widget.contest.joined,
-    );
+    _teamsDataSource = TeamsDataSource(widget.league, widget.contest,
+        widget.myTeams, _onViewTeam, _onSwitchTeam);
     _teamsDataSource.setMyContestTeams(widget.contest, _mapContestTeams);
     _teamsDataSource.changeLeagueStatus(widget.league.status);
     _getContestTeams(0);
@@ -110,6 +110,7 @@ class ContestDetailState extends State<ContestDetail> {
         _myTeams = (_response["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
+        _teamsDataSource.updateMyAllTeams(_myTeams);
       });
     } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
       _applyL1DataUpdate(_response["diffData"]["ld"]);
@@ -124,6 +125,7 @@ class ContestDetailState extends State<ContestDetail> {
         }
         if (!bFound) {
           _myTeams.add(teamAdded);
+          _teamsDataSource.updateMyAllTeams(_myTeams);
         }
         if (bShowJoinContest) {
           _onJoinContest(widget.contest);
@@ -240,6 +242,60 @@ class ContestDetailState extends State<ContestDetail> {
         },
       );
     }
+  }
+
+  void _onSwitchTeam(MyTeam _team) async {
+    final String result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SwitchTeam(
+          myTeams: _myTeams,
+          oldTeam: _team,
+          l1Data: widget.l1Data,
+          contest: widget.contest,
+          contestMyTeams: widget.mapContestTeams,
+        );
+      },
+    );
+
+    if (result != null) {
+      Map<String, dynamic> res = json.decode(result);
+      String message = res["msg"];
+      if (!res["error"]) {
+        updateTeams(res["oldTeam"], res["newTeam"]);
+      }
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("$message")));
+    }
+  }
+
+  updateTeams(int oldTeam, int newTeam) {
+    MyTeam teamToReplace;
+    _myTeams.forEach((MyTeam team) {
+      if (team.id == newTeam) {
+        teamToReplace = team;
+      }
+    });
+    for (int i = 0; i < _mapContestTeams.length; i++) {
+      if (_mapContestTeams[i].id == oldTeam) {
+        _mapContestTeams[i] = teamToReplace;
+      }
+    }
+
+    _teamsDataSource.updateMyContestTeam(widget.contest, _mapContestTeams);
+    _getContestTeams(_curPageOffset);
+  }
+
+  void _onViewTeam(MyTeam _team) {
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+          builder: (context) => ViewTeam(
+                team: _team,
+                league: widget.league,
+                contest: widget.contest,
+              ),
+          fullscreenDialog: true),
+    );
   }
 
   void _onCreateTeam(BuildContext context, Contest contest) async {
@@ -879,14 +935,24 @@ class TeamsDataSource extends DataTableSource {
   int size;
   double width;
   League league;
+  Contest contest;
   int _leagueStatus;
+  Function onViewTeam;
   BuildContext context;
+  Function onSwitchTeam;
   List<MyTeam> _teams = [];
   List<MyTeam> myContestTeams;
+  List<MyTeam> _myAllTeams = [];
+  List<MyTeam> _myUniqueTeams = [];
 
-  TeamsDataSource(League _league, int size) {
-    this.size = size;
+  TeamsDataSource(League _league, Contest _contest, List<MyTeam> myAllTeams,
+      Function _onViewTeam, Function _onSwitchTeam) {
     league = _league;
+    this.contest = _contest;
+    onViewTeam = _onViewTeam;
+    this.size = _contest.size;
+    onSwitchTeam = _onSwitchTeam;
+    this._myAllTeams = myAllTeams;
     _leagueStatus = _league.status;
   }
 
@@ -900,17 +966,44 @@ class TeamsDataSource extends DataTableSource {
         _teams.add(MyTeam());
       }
     }
+
+    setUniqueTeams();
   }
 
   updateMyContestTeam(Contest contest, List<MyTeam> _myContestTeams) {
     this.size = contest.joined + _myContestTeams.length;
     myContestTeams = _myContestTeams;
 
+    setUniqueTeams();
     this.notifyListeners();
+  }
+
+  updateMyAllTeams(List<MyTeam> _teams) {
+    _myAllTeams = _teams;
+
+    setUniqueTeams();
+    notifyListeners();
   }
 
   changeLeagueStatus(int _status) {
     _leagueStatus = _status;
+  }
+
+  setUniqueTeams() {
+    List<MyTeam> myUniqueTeams = [];
+    for (MyTeam team in (_myAllTeams == null ? [] : _myAllTeams)) {
+      bool bIsTeamUsed = false;
+      for (MyTeam contestTeam in myContestTeams) {
+        if (team.id == contestTeam.id) {
+          bIsTeamUsed = true;
+          break;
+        }
+      }
+      if (!bIsTeamUsed) {
+        myUniqueTeams.add(team);
+      }
+    }
+    _myUniqueTeams = myUniqueTeams;
   }
 
   setContext(BuildContext context) {
@@ -932,6 +1025,12 @@ class TeamsDataSource extends DataTableSource {
       curIndex++;
     }
     this.notifyListeners();
+  }
+
+  void updateTeams(int oldTeam, int newTeam) {
+    _teams.forEach((MyTeam team) {
+      if (team.id == oldTeam) {}
+    });
   }
 
   @override
@@ -957,77 +1056,75 @@ class TeamsDataSource extends DataTableSource {
               Container(
                 child: Text(_team.name == null ? "" : _team.name),
               ),
-              Container(
-                padding: EdgeInsets.all(0.0),
-                child: _leagueStatus == LeagueStatus.UPCOMING
-                    ? Column(
-                        children: <Widget>[
-                          bIsMyJoinedTeam
-                              ? Row(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: Container(
-                                        width: 72.0,
-                                        child: OutlineButton(
-                                          padding: EdgeInsets.all(0.0),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(24.0),
-                                          ),
-                                          color: Theme.of(context)
-                                              .primaryColorDark,
-                                          onPressed: () {},
-                                          child: Text(
-                                            "SWITCH",
-                                            style: TextStyle(fontSize: 10.0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(Icons.chevron_right)
-                                  ],
-                                )
-                              : Container(),
-                        ],
-                      )
-                    : Row(
-                        children: <Widget>[
-                          Container(
-                            width: 50.0,
-                            child: Text(
-                              _team.score != null
-                                  ? _team.score.toString()
-                                  : "-",
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Container(
-                            width: 50.0,
-                            child: Text(
-                              _team.score != null ? _team.rank.toString() : "-",
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          _leagueStatus == LeagueStatus.COMPLETED
-                              ? Container(
-                                  width: 50.0,
-                                  child: Text(
-                                    _team.score != null
-                                        ? _team.prize.toString()
-                                        : "-",
-                                    textAlign: TextAlign.center,
+              _leagueStatus == LeagueStatus.UPCOMING
+                  ? Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      bIsMyJoinedTeam && _myUniqueTeams.length > 0
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.only(right: 8.0),
+                              child: Container(
+                                width: 72.0,
+                                child: OutlineButton(
+                                  padding: EdgeInsets.all(0.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(24.0),
                                   ),
-                                )
-                              : Container(),
-                        ],
-                      ),
-              ),
+                                  color: Theme.of(context)
+                                      .primaryColorDark,
+                                  onPressed: () {
+                                    onSwitchTeam(_team);
+                                  },
+                                  child: Text(
+                                    "SWITCH",
+                                    style: TextStyle(fontSize: 10.0),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      Icon(Icons.chevron_right),
+                    ],
+                  )
+                  : Row(
+                      children: <Widget>[
+                        Container(
+                          width: 50.0,
+                          child: Text(
+                            _team.score != null
+                                ? _team.score.toString()
+                                : "-",
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Container(
+                          width: 50.0,
+                          child: Text(
+                            _team.score != null ? _team.rank.toString() : "-",
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        _leagueStatus == LeagueStatus.COMPLETED
+                            ? Container(
+                                width: 50.0,
+                                child: Text(
+                                  _team.score != null
+                                      ? _team.prize.toString()
+                                      : "-",
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
             ],
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          onViewTeam(_team);
+        },
       ),
     ];
 

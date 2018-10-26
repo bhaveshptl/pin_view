@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,17 +13,39 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   String _authName;
   String _otpCookie;
-  String _authError = "";
   int _forgotPassMode = 1;
-  String _passChangeError = "";
-  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  final GlobalKey<FormState> _newPassFormKey = new GlobalKey<FormState>();
-  final TextEditingController _authNameController = new TextEditingController();
-  final TextEditingController _otpController = new TextEditingController();
-  final TextEditingController _newPasswordController =
-      new TextEditingController();
+
+  String password = "";
+  bool bDigitsCountMatch = false;
+  bool bLettersCountMatch = false;
+  bool passConstraintMatch = false;
+  bool bSpecialCharCountMatch = false;
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _newPassFormKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final TextEditingController _otpController = TextEditingController();
+  final TextEditingController _authNameController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _reEnterPasswordController =
-      new TextEditingController();
+      TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _newPasswordController.addListener(() {
+      setState(() {
+        password = _newPasswordController.text;
+        bDigitsCountMatch = password.contains(RegExp('[0-9]'));
+        bLettersCountMatch = password.contains(RegExp('[A-z]'));
+        bSpecialCharCountMatch =
+            password.contains(RegExp('[_@#\$?().,!/:{}><;`*~%^&+=]'));
+        passConstraintMatch =
+            bDigitsCountMatch && bLettersCountMatch && bSpecialCharCountMatch;
+      });
+    });
+  }
 
   _requestOTP() async {
     _authName = _authNameController.text;
@@ -47,8 +68,22 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             _forgotPassMode = 3;
           }
         });
+      } else if (res.statusCode == 400) {
+        Map<String, dynamic> response = json.decode(res.body);
+        String error = response["error"] != null
+            ? response["error"]
+            : strings.get("SOMETHING_WENT_WRONG");
+        showMsg(error);
       }
     });
+  }
+
+  showMsg(String msg) {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(msg),
+      ),
+    );
   }
 
   String validateEmail(String value) {
@@ -62,7 +97,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   String validateMobile(String value) {
-    if (value.length != 10)
+    if (isNumeric(value) && value.length != 10)
       return 'Mobile Number must be of 10 digit';
     else
       return null;
@@ -92,273 +127,361 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         Map<String, dynamic> respose = json.decode(res.body);
         if (respose["err"] != null && respose["err"]) {
           setState(() {
-            _passChangeError = respose["errMsg"];
+            showMsg(respose["errMsg"]);
           });
         } else {
           Navigator.of(context).pop(true);
         }
-        print(res);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _forgotPassMode == 1
-        ? AlertDialog(
-            title: Text(
-              strings.get("FORGOT_PASS_TITLE"),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        strings.get("FORGOT_PASS_EMAIL"),
-                        textAlign: TextAlign.justify,
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(strings.get("FORGOT_PASS_TITLE")),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: _forgotPassMode == 1
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          strings.get("FORGOT_PASS_EMAIL"),
+                          textAlign: TextAlign.justify,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: _authNameController,
-                                    decoration: InputDecoration(
-                                      labelText: strings.get("EMAIL_OR_MOBILE"),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _authNameController,
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            strings.get("EMAIL_OR_MOBILE"),
+                                      ),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return strings
+                                              .get("EMAIL_OR_MOBILE_ERROR");
+                                        }
+                                      },
+                                      keyboardType: TextInputType.emailAddress,
                                     ),
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return strings
-                                            .get("EMAIL_OR_MOBILE_ERROR");
-                                      }
-                                    },
-                                    keyboardType: TextInputType.emailAddress,
                                   ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 24.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: RaisedButton(
+                            onPressed: () {
+                              String emailError =
+                                  validateEmail(_authNameController.text);
+                              String mobileError =
+                                  validateMobile(_authNameController.text);
+                              if ((!isNumeric(_authNameController.text) &&
+                                      emailError != null) ||
+                                  (isNumeric(_authNameController.text) &&
+                                      mobileError != null)) {
+                                showMsg(
+                                    strings.get("VALID_EMAIL_OR_MOBILE_ERROR"));
+                              } else {
+                                _requestOTP();
+                              }
+                            },
+                            color: Theme.of(context).primaryColor,
+                            child: Text(
+                              strings.get("REQUEST_OTP").toUpperCase(),
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              )
+            : Container(
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                  },
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _newPassFormKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          _forgotPassMode == 3
+                              ? Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Text(
+                                        strings.get("OTP_SENT"),
+                                        style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .fontSize),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              : Container(),
+                          _forgotPassMode == 2
+                              ? Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Text(
+                                        strings.get("LINK_SENT"),
+                                        style: TextStyle(color: Colors.black54),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              : Container(),
+                          _forgotPassMode == 2
+                              ? Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      8.0, 8.0, 8.0, 0.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Container(),
+                                      ),
+                                      Expanded(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 8.0),
+                                                child: Container(
+                                                  color: Colors.black12,
+                                                  height: 2.0,
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                strings.get("OR").toUpperCase(),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8.0),
+                                                child: Container(
+                                                  color: Colors.black12,
+                                                  height: 2.0,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _otpController,
+                                  decoration: InputDecoration(
+                                    labelText: strings.get("ENTER_OTP"),
+                                  ),
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return strings.get("ENTER_OTP_ERROR");
+                                    }
+                                  },
+                                  keyboardType: TextInputType.emailAddress,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  strings.get("AND").toUpperCase(),
+                                  style: TextStyle(color: Colors.black54),
                                 ),
                               ],
                             ),
-                            _authError.length > 0
-                                ? Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Text(
-                                          _authError,
-                                          style: TextStyle(
-                                              color: Colors.redAccent),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _newPasswordController,
+                                  decoration: InputDecoration(
+                                    labelText: strings.get("NEW_PASSWORD"),
+                                  ),
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return strings.get("NEW_PASSWORD_ERROR");
+                                    }
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  obscureText: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _reEnterPasswordController,
+                                  decoration: InputDecoration(
+                                    labelText: strings.get("REENTER_PASSWORD"),
+                                  ),
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return strings
+                                          .get("REENTER_PASSWORD_ERROR");
+                                    }
+                                  },
+                                  keyboardType: TextInputType.text,
+                                  obscureText: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 16.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  color: passConstraintMatch
+                                      ? Color.fromRGBO(0, 255, 0, 0.1)
+                                      : Color.fromRGBO(255, 0, 0, 0.1),
+                                  border: Border.all(
+                                    color: passConstraintMatch
+                                        ? Colors.teal
+                                        : Colors.red,
+                                  )),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                        child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                              text: strings
+                                                  .get("PASSWORD_SHOULD"),
+                                              style: TextStyle(
+                                                  color: Colors.teal)),
+                                          TextSpan(
+                                              text: strings.get("MIN_CHAR"),
+                                              style: TextStyle(
+                                                  color: password.length >= 8
+                                                      ? Colors.teal
+                                                      : Colors.red)),
+                                          TextSpan(
+                                              text:
+                                                  strings.get("ATLEAST_NUMBER"),
+                                              style: TextStyle(
+                                                  color: bDigitsCountMatch
+                                                      ? Colors.teal
+                                                      : Colors.red)),
+                                          TextSpan(
+                                              text: strings
+                                                  .get("ATLEAST_ALPHABET"),
+                                              style: TextStyle(
+                                                  color: bLettersCountMatch
+                                                      ? Colors.teal
+                                                      : Colors.red)),
+                                          TextSpan(
+                                              text: strings.get(
+                                                  "ATLEAST_SPECIAL_CHARACTER"),
+                                              style: TextStyle(
+                                                  color: bSpecialCharCountMatch
+                                                      ? Colors.teal
+                                                      : Colors.red)),
+                                        ],
+                                        style: TextStyle(
+                                          color: Colors.red,
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                : Container(),
-                          ],
-                        ),
+                                      ),
+                                    )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: RaisedButton(
+                                  onPressed: () {
+                                    FocusScope.of(context)
+                                        .requestFocus(new FocusNode());
+                                    if (_newPassFormKey.currentState
+                                        .validate()) {
+                                      if ((_newPasswordController.text ==
+                                          _reEnterPasswordController.text)) {
+                                        _submitNewPassword();
+                                      } else {
+                                        showMsg(
+                                            strings.get("PASSWORD_NOT_MATCH"));
+                                      }
+                                    }
+                                  },
+                                  color: Theme.of(context).primaryColor,
+                                  child: Text(
+                                    strings.get("SUBMIT").toUpperCase(),
+                                    style: TextStyle(color: Colors.white70),
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  strings.get("SUBMIT").toUpperCase(),
-                ),
-                onPressed: () {
-                  String emailError = validateEmail(_authNameController.text);
-                  String mobileError = validateMobile(_authNameController.text);
-                  if (emailError != null && mobileError != null) {
-                    setState(() {
-                      _authError = strings.get("VALID_EMAIL_OR_MOBILE_ERROR");
-                    });
-                  } else {
-                    setState(() {
-                      _authError = "";
-                    });
-                    _requestOTP();
-                  }
-                },
-              )
-            ],
-          )
-        : AlertDialog(
-            title: Text(
-              strings.get("FORGOT_PASS_TITLE"),
-            ),
-            content: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).requestFocus(new FocusNode());
-              },
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _newPassFormKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      _forgotPassMode == 2
-                          ? Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text(
-                                    strings.get("LINK_SENT"),
-                                  ),
-                                )
-                              ],
-                            )
-                          : Container(),
-                      _forgotPassMode == 2
-                          ? Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Container(),
-                                  ),
-                                  Expanded(
-                                    child: Row(
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8.0),
-                                            child: Container(
-                                              color: Colors.black12,
-                                              height: 2.0,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            strings.get("OR").toUpperCase(),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 8.0),
-                                            child: Container(
-                                              color: Colors.black12,
-                                              height: 2.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Container(),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextFormField(
-                              controller: _otpController,
-                              decoration: InputDecoration(
-                                labelText: strings.get("ENTER_OTP"),
-                              ),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return strings.get("ENTER_OTP_ERROR");
-                                }
-                              },
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextFormField(
-                              controller: _newPasswordController,
-                              decoration: InputDecoration(
-                                labelText: strings.get("NEW_PASSWORD"),
-                              ),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return strings.get("NEW_PASSWORD_ERROR");
-                                }
-                              },
-                              keyboardType: TextInputType.text,
-                              obscureText: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextFormField(
-                              controller: _reEnterPasswordController,
-                              decoration: InputDecoration(
-                                labelText: strings.get("REENTER_PASSWORD"),
-                              ),
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return strings.get("REENTER_PASSWORD_ERROR");
-                                }
-                              },
-                              keyboardType: TextInputType.text,
-                              obscureText: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                      _passChangeError.length > 0
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Text(
-                                    _passChangeError,
-                                    style: TextStyle(color: Colors.redAccent),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Container(),
-                    ],
                   ),
                 ),
               ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text(
-                  strings.get("SUBMIT").toUpperCase(),
-                ),
-                onPressed: () {
-                  FocusScope.of(context).requestFocus(new FocusNode());
-                  if (_newPassFormKey.currentState.validate()) {
-                    if ((_newPasswordController.text ==
-                        _reEnterPasswordController.text)) {
-                      _submitNewPassword();
-                    } else {
-                      setState(() {
-                        _passChangeError = strings.get("PASSWORD_NOT_MATCH");
-                      });
-                    }
-                  }
-                },
-              )
-            ],
-          );
+      ),
+    );
   }
 }

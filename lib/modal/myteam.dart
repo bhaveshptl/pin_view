@@ -56,4 +56,22 @@ class MyTeam {
       innings: json["innings"] == null ? 0 : json["innings"],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        "captain": captain,
+        "id": id,
+        "inningsId": inningsId,
+        "prize": prize,
+        "rank": rank,
+        "score": score,
+        "leagueId": leagueId,
+        "matchId": matchId,
+        "contestId": contestId,
+        "name": name,
+        "players": players,
+        "seriesId": seriesId,
+        "userId": userId,
+        "innings": innings,
+        "viceCaptain": viceCaptain,
+      };
 }

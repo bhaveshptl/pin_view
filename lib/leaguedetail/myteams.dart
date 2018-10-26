@@ -89,7 +89,11 @@ class MyTeamsState extends State<MyTeams> {
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
-              selectedTeam: widget.myTeams[_selectedItemIndex],
+              selectedTeam: MyTeam.fromJson(
+                json.decode(
+                  json.encode(widget.myTeams[_selectedItemIndex]),
+                ),
+              ),
               mode: TeamCreationMode.CLONE_TEAM,
             ),
       ),
@@ -97,6 +101,9 @@ class MyTeamsState extends State<MyTeams> {
     if (result != null) {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
     }
+    setState(() {
+      _selectedItemIndex = -1;
+    });
   }
 
   Widget _getEmptyMyTeamsWidget(BuildContext context) {
@@ -295,8 +302,14 @@ class MyTeamsState extends State<MyTeams> {
                     children: <Widget>[
                       Text(player.name),
                       captain == player
-                          ? Text("2X")
-                          : (vCaptain == player ? Text("1.5X") : Container()),
+                          ? Text(widget.l1Data.league.fanTeamRules.captainMult
+                                  .toString() +
+                              "X")
+                          : (vCaptain == player
+                              ? Text(widget.l1Data.league.fanTeamRules.vcMult
+                                      .toString() +
+                                  "X")
+                              : Container()),
                     ],
                   ),
                 ),

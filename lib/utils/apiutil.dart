@@ -20,14 +20,19 @@ class ApiUtil {
       BASE_API_URL + "ups/socialLogin/withcontext/facebook/native";
   static const SIGN_UP = BASE_API_URL + "ups/signup";
   static const FORGOT_PASSWORD = BASE_API_URL + "ups/forgotPassword";
-  static const RESET_PASSWORD = BASE_API_URL + "v2/ups/user/forgotPassword/resetpassword";
+  static const RESET_PASSWORD =
+      BASE_API_URL + "v2/ups/user/forgotPassword/resetpassword";
 
+  static const RECOMMENDED_PRIZE_STRUCTURE =
+      BASE_API_URL + "lobby/contest/prizestructure/suggestion/";
 
   static const CREATE_TEAM = BASE_API_URL + "lobby/fanteam";
   static const EDIT_TEAM = BASE_API_URL + "lobby/fanteam/";
   static const GET_MY_CONTEST_MY_TEAMS =
       BASE_API_URL + "lobby/user/contest/teams";
   static const JOIN_CONTEST = BASE_API_URL + "v2/lobby/joincontest";
+  static const SWITCH_CONTEST_TEAM = BASE_API_URL + "lobby/contest/switch";
+  static const CREATE_AND_JOIN_CONTEST = BASE_API_URL + "lobby/contest";
   static const STATE_LIST = BASE_API_URL + "verify/states-list";
   static const UPDATE_DOB_STATE = BASE_API_URL + "ups/user/updateUser";
   static const VERIFICATION_STATUS = BASE_API_URL + "ups/user/verify";
@@ -41,4 +46,7 @@ class ApiUtil {
   static const GET_MY_CONTESTS = BASE_API_URL + "lobby/user/mycontests/v2/";
   static const GET_CONTEST_TEAMS = BASE_API_URL + "lobby/contest/";
   static const GET_PRIZESTRUCTURE = BASE_API_URL + "lobby/contest/";
+  static const GET_TEAM_INFO = BASE_API_URL + "lobby/contest/";
+
+  static const GET_REFERRAL_CODE = BASE_API_URL + "ups/user/referdetails";
 }

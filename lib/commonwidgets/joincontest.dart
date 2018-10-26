@@ -14,6 +14,7 @@ class JoinContest extends StatefulWidget {
   final Function onError;
   final List<MyTeam> myTeams;
   final Function onCreateTeam;
+  final Map<String, dynamic> createContestPayload;
 
   JoinContest({
     this.matchId,
@@ -21,6 +22,7 @@ class JoinContest extends StatefulWidget {
     this.myTeams,
     this.onError,
     this.onCreateTeam,
+    this.createContestPayload,
   });
 
   @override
@@ -37,7 +39,10 @@ class JoinContestState extends State<JoinContest> {
 
   _joinContest(BuildContext context) async {
     if (_selectedTeamId == null || _selectedTeamId == -1) {
-      widget.onCreateTeam(context, widget.contest);      
+      widget.onCreateTeam(
+        context,
+        widget.contest,
+      );
     } else {
       if (cookie == null || cookie == "") {
         Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
@@ -61,6 +66,47 @@ class JoinContestState extends State<JoinContest> {
           "entryFee": widget.contest.entryFee,
           "sportsId": 1
         }),
+      )
+          .then(
+        (http.Response res) {
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            Map<String, dynamic> response = json.decode(res.body);
+            if (response["error"] == false) {
+              Navigator.of(context).pop(response["message"]);
+            } else if (response["error"] == true) {
+              Navigator.of(context).pop(response["message"]);
+            }
+          } else if (res.statusCode == 401) {
+            Map<String, dynamic> response = json.decode(res.body);
+            if (response["error"]["reasons"].length > 0) {
+              widget.onError(widget.contest, response["error"]);
+            }
+          }
+        },
+      );
+    }
+  }
+
+  _createAndJoinContest(BuildContext context) async {
+    if (_selectedTeamId == null || _selectedTeamId == -1) {
+      widget.onCreateTeam(context, widget.contest,
+          createContestPayload: widget.createContestPayload);
+    } else {
+      if (cookie == null || cookie == "") {
+        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+        await futureCookie.then((value) {
+          cookie = value;
+        });
+      }
+
+      Map<String, dynamic> payload = widget.createContestPayload;
+      payload["fanTeamId"] = _selectedTeamId;
+
+      await http.Client()
+          .post(
+        ApiUtil.CREATE_AND_JOIN_CONTEST,
+        headers: {'Content-type': 'application/json', "cookie": cookie},
+        body: json.encode(payload),
       )
           .then(
         (http.Response res) {
@@ -149,8 +195,10 @@ class JoinContestState extends State<JoinContest> {
       ApiUtil.USER_BALANCE,
       headers: {'Content-type': 'application/json', "cookie": cookie},
       body: json.encode({
-        "contestId": widget.contest.id,
-        "leagueId": widget.contest.leagueId
+        "contestId": widget.contest == null ? "" : widget.contest.id,
+        "leagueId": widget.contest == null
+            ? widget.createContestPayload["leagueId"]
+            : widget.contest.leagueId
       }),
     )
         .then(
@@ -201,16 +249,22 @@ class JoinContestState extends State<JoinContest> {
   @override
   void initState() {
     super.initState();
-    getMyContestTeams();
+    if (widget.contest != null) {
+      getMyContestTeams();
+    } else {
+      setUniqueTeams([]);
+    }
     _getUserBalance();
   }
 
   @override
   Widget build(BuildContext context) {
-    double bonusUsable =
-        (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
-    double usableBonus =
-        _bonusBalance > bonusUsable ? bonusUsable : _bonusBalance;
+    double bonusUsable = widget.contest == null
+        ? 0.0
+        : (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
+    double usableBonus = widget.contest == null
+        ? 0.0
+        : _bonusBalance > bonusUsable ? bonusUsable : _bonusBalance;
 
     return AlertDialog(
       title: Text(strings.get("CONFIRMATION").toUpperCase()),
@@ -277,7 +331,10 @@ class JoinContestState extends State<JoinContest> {
                     children: <Widget>[
                       Text(strings.rupee),
                       Text(
-                        widget.contest.entryFee.toStringAsFixed(2),
+                        widget.contest == null
+                            ? widget.createContestPayload["entryFee"]
+                                .toStringAsFixed(2)
+                            : widget.contest.entryFee.toStringAsFixed(2),
                         textAlign: TextAlign.right,
                       ),
                     ],
@@ -332,7 +389,10 @@ class JoinContestState extends State<JoinContest> {
                   children: <Widget>[
                     Text(strings.rupee),
                     Text(
-                      (widget.contest.entryFee - usableBonus)
+                      ((widget.contest == null
+                                  ? widget.createContestPayload["entryFee"]
+                                  : widget.contest.entryFee) -
+                              usableBonus)
                           .toStringAsFixed(2),
                       style: TextStyle(fontWeight: FontWeight.bold),
                       textAlign: TextAlign.right,
@@ -385,7 +445,11 @@ class JoinContestState extends State<JoinContest> {
         ),
         FlatButton(
           onPressed: () {
-            _joinContest(context);
+            if (widget.contest != null) {
+              _joinContest(context);
+            } else if (widget.createContestPayload != null) {
+              _createAndJoinContest(context);
+            }
           },
           child: Text(strings.get("JOIN").toUpperCase()),
         ),

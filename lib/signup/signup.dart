@@ -16,11 +16,11 @@ class Signup extends StatefulWidget {
 class SignupState extends State<Signup> {
   String _authName;
   String _password;
-  String _referralCode;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
 
   final formKey = new GlobalKey<FormState>();
+  final TextEditingController _referralCodeController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   _showReferralInput() {
@@ -45,7 +45,7 @@ class SignupState extends State<Signup> {
     }
     _payload["password"] = _password;
     _payload["context"] = {
-      "refCode": _referralCode,
+      "refCode": _referralCodeController.text,
       "channel_id": 3,
     };
 
@@ -60,19 +60,33 @@ class SignupState extends State<Signup> {
         AuthResult(res, _scaffoldKey).processResult(() {});
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
-        setState(() {
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(response['error']['erroMessage'])));
-        });
+        String error = response['error']['erroMessage'];
+        if (error == null && response['error']['errorCode'] != null) {
+          error = strings.get(response['error']['errorCode']);
+        } else if (error == null) {
+          error = strings.get("INVALID_USERNAME_PASSWORD");
+        }
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(error),
+          ),
+        );
       }
     });
   }
 
   bool isMobileNumber(String input) {
-    if (input.length == 10) {
+    if (input.length == 10 || isNumeric(input)) {
       return true;
     }
     return false;
+  }
+
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return int.parse(s, onError: (e) => null) != null;
   }
 
   _doGoogleLogin(BuildContext context) async {
@@ -241,108 +255,107 @@ class SignupState extends State<Signup> {
                   ],
                 ),
               ),
-              ListTile(
-                leading: Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 16.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: Container(),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Row(
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Container(),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Divider(
+                            color: Colors.black54,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            strings.get("OR").toUpperCase(),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: Colors.black54,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(),
+                  ),
+                ],
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
                           children: <Widget>[
-                            Expanded(
-                              child: Divider(
-                                color: Colors.black54,
-                              ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    onSaved: (val) => _authName = val,
+                                    decoration: InputDecoration(
+                                      labelText: strings.get("EMAIL_OR_MOBILE"),
+                                      icon: const Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: const Icon(Icons.face),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings
+                                            .get("EMAIL_OR_MOBILE_ERROR");
+                                      }
+                                    },
+                                    keyboardType: TextInputType.emailAddress,
+                                  ),
+                                )
+                              ],
                             ),
-                            Expanded(
-                              child: Text(
-                                strings.get("OR").toUpperCase(),
-                                textAlign: TextAlign.center,
-                              ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    onSaved: (val) => _password = val,
+                                    decoration: InputDecoration(
+                                      labelText: strings.get("PASSWORD"),
+                                      hintText: "Minimum 6 characters required",
+                                      icon: const Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: const Icon(Icons.lock),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings.get("PASSWORD_ERROR");
+                                      }
+                                    },
+                                    obscureText: _obscureText,
+                                  ),
+                                )
+                              ],
                             ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.black54,
-                              ),
-                            )
                           ],
                         ),
                       ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: ListTile(
-                  leading: Container(
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  onSaved: (val) => _authName = val,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("EMAIL_OR_MOBILE"),
-                                    icon: const Padding(
-                                      padding: const EdgeInsets.only(top: 15.0),
-                                      child: const Icon(Icons.face),
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings
-                                          .get("EMAIL_OR_MOBILE_ERROR");
-                                    }
-                                  },
-                                  keyboardType: TextInputType.emailAddress,
-                                ),
-                              )
-                            ],
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  onSaved: (val) => _password = val,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("PASSWORD"),
-                                    hintText: "Minimum 6 characters required",
-                                    icon: const Padding(
-                                      padding: const EdgeInsets.only(top: 15.0),
-                                      child: const Icon(Icons.lock),
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings.get("PASSWORD_ERROR");
-                                    }
-                                  },
-                                  obscureText: _obscureText,
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
                     ),
                   ),
-                ),
+                ],
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 0.0),
+                padding: const EdgeInsets.only(left: 16.0, top: 16.0),
                 child: Row(
                   children: <Widget>[
                     Text(
@@ -369,7 +382,7 @@ class SignupState extends State<Signup> {
                         children: <Widget>[
                           Expanded(
                             child: TextFormField(
-                              onSaved: (val) => _referralCode = val,
+                              controller: _referralCodeController,
                               decoration: InputDecoration(
                                 labelText: strings.get("REFERRAL_CODE"),
                               ),

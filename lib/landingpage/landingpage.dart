@@ -129,14 +129,12 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _showForgotPassword() async {
-    final result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ForgotPassword();
-      },
-    );
+    final result = await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => ForgotPassword(),
+      fullscreenDialog: true,
+    ));
 
-    if (result != null) {
+    if (result != null && result == true) {
       _scaffoldKey.currentState.showSnackBar(
           SnackBar(content: Text(strings.get("PASSWORD_CHANGED"))));
     }
@@ -239,122 +237,121 @@ class LandingPageState extends State<LandingPage> {
                   ],
                 ),
               ),
-              ListTile(
-                leading: Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 16.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: Container(),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Divider(
-                                color: Colors.black54,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                strings.get("OR").toUpperCase(),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.black54,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
               Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: ListTile(
-                  leading: Container(
-                    child: Form(
-                      key: formKey,
-                      child: Column(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: Container(),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Row(
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  onSaved: (val) => _authName = val,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("USERNAME"),
-                                    icon: const Padding(
-                                      padding: const EdgeInsets.only(top: 15.0),
-                                      child: const Icon(Icons.face),
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings.get("USERNAME_ERROR");
-                                    }
-                                  },
-                                  keyboardType: TextInputType.emailAddress,
-                                ),
-                              )
-                            ],
+                          Expanded(
+                            child: Divider(
+                              color: Colors.black54,
+                            ),
                           ),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  onSaved: (val) => _password = val,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("PASSWORD"),
-                                    icon: const Padding(
-                                      padding: const EdgeInsets.only(top: 15.0),
-                                      child: const Icon(Icons.lock),
-                                    ),
-                                  ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings.get("PASSWORD_ERROR");
-                                    }
-                                  },
-                                  obscureText: _obscureText,
-                                ),
-                              )
-                            ],
+                          Expanded(
+                            child: Text(
+                              strings.get("OR").toUpperCase(),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
+                          Expanded(
+                            child: Divider(
+                              color: Colors.black54,
+                            ),
+                          )
                         ],
                       ),
                     ),
-                  ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(),
+                    ),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: ListTile(
-                  leading: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      FlatButton(
-                        onPressed: () {
-                          _showForgotPassword();
-                        },
-                        padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
-                        child: Text(
-                          strings.get("FORGOT_PASSWORD"),
-                          style: TextStyle(color: Colors.black54),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    onSaved: (val) => _authName = val,
+                                    decoration: InputDecoration(
+                                      labelText: strings.get("USERNAME"),
+                                      icon: const Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: const Icon(Icons.face),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings.get("USERNAME_ERROR");
+                                      }
+                                    },
+                                    keyboardType: TextInputType.emailAddress,
+                                  ),
+                                )
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    onSaved: (val) => _password = val,
+                                    decoration: InputDecoration(
+                                      labelText: strings.get("PASSWORD"),
+                                      icon: const Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: const Icon(Icons.lock),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings.get("PASSWORD_ERROR");
+                                      }
+                                    },
+                                    obscureText: _obscureText,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
                         ),
-                      )
-                    ],
+                      ),
+                    ),
                   ),
+                ],
+              ),
+              ListTile(
+                leading: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        _showForgotPassword();
+                      },
+                      padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
+                      child: Text(
+                        strings.get("FORGOT_PASSWORD"),
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    )
+                  ],
                 ),
               ),
               ListTile(
