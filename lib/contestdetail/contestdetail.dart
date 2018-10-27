@@ -244,28 +244,38 @@ class ContestDetailState extends State<ContestDetail> {
     }
   }
 
-  void _onSwitchTeam(MyTeam _team) async {
-    final String result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SwitchTeam(
-          myTeams: _myTeams,
-          oldTeam: _team,
-          l1Data: widget.l1Data,
-          contest: widget.contest,
-          contestMyTeams: widget.mapContestTeams,
-        );
-      },
-    );
+  void _onSwitchTeam(MyTeam _team, List<MyTeam> myUniqueTeams) async {
+    if (myUniqueTeams.length > 0) {
+      final String result = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SwitchTeam(
+            myTeams: _myTeams,
+            oldTeam: _team,
+            l1Data: widget.l1Data,
+            contest: widget.contest,
+            contestMyTeams: widget.mapContestTeams,
+          );
+        },
+      );
 
-    if (result != null) {
-      Map<String, dynamic> res = json.decode(result);
-      String message = res["msg"];
-      if (!res["error"]) {
-        updateTeams(res["oldTeam"], res["newTeam"]);
+      if (result != null) {
+        Map<String, dynamic> res = json.decode(result);
+        String message = res["msg"];
+        if (!res["error"]) {
+          updateTeams(res["oldTeam"], res["newTeam"]);
+        }
+        _scaffoldKey.currentState
+            .showSnackBar(SnackBar(content: Text("$message")));
       }
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("$message")));
+    } else {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            strings.get("SWITCH_TEAM_NOT_AVAIL"),
+          ),
+        ),
+      );
     }
   }
 
@@ -358,8 +368,8 @@ class ContestDetailState extends State<ContestDetail> {
           break;
         case 6:
           _showJoinContestError(
-            message: "Alert",
-            title: "User is not verified.",
+            message: strings.get("ALERT"),
+            title: strings.get("NOT_VERIFIED"),
           );
           break;
       }
@@ -378,7 +388,9 @@ class ContestDetailState extends State<ContestDetail> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("OK"),
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
             )
           ],
         );
@@ -484,19 +496,20 @@ class ContestDetailState extends State<ContestDetail> {
   }
 
   List<DataColumn> _getDataTableHeader() {
-    double width = MediaQuery.of(context).size.width;
+    double width = MediaQuery.of(context).size.width - 20.0;
     List<DataColumn> _header = [
       DataColumn(
-        numeric: true,
         onSort: (int index, bool bIsAscending) {},
         label: Container(
-          padding: EdgeInsets.all(0.0),
-          width: width - (TABLE_COLUMN_PADDING * 2) - 20.0,
+          padding: EdgeInsets.only(right: 4.0),
+          width: width - (TABLE_COLUMN_PADDING * 2),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                child: Text('TEAMS'),
+                child: Text(
+                  strings.get("TEAMS"),
+                ),
               ),
               widget.league.status == LeagueStatus.COMPLETED ||
                       widget.league.status == LeagueStatus.LIVE
@@ -507,14 +520,14 @@ class ContestDetailState extends State<ContestDetail> {
                           Container(
                             width: 50.0,
                             child: Text(
-                              'SCORE',
+                              strings.get("SCORE").toUpperCase(),
                               textAlign: TextAlign.center,
                             ),
                           ),
                           Container(
                             width: 50.0,
                             child: Text(
-                              'RANK',
+                              strings.get("RANK").toUpperCase(),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -522,7 +535,7 @@ class ContestDetailState extends State<ContestDetail> {
                               ? Container(
                                   width: 50.0,
                                   child: Text(
-                                    'PRIZE',
+                                    strings.get("PRIZE").toUpperCase(),
                                     textAlign: TextAlign.center,
                                   ),
                                 )
@@ -555,7 +568,9 @@ class ContestDetailState extends State<ContestDetail> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Contest details"),
+        title: Text(
+          strings.get("CONTEST_DETAILS"),
+        ),
       ),
       body: Container(
         child: Column(
@@ -604,7 +619,7 @@ class ContestDetailState extends State<ContestDetail> {
                             ),
                             Container(
                               child: Tooltip(
-                                message: "Number of winners.",
+                                message: strings.get("NO_OF_WINNERS"),
                                 child: FlatButton(
                                   padding: EdgeInsets.all(0.0),
                                   onPressed: () {
@@ -620,7 +635,9 @@ class ContestDetailState extends State<ContestDetail> {
                                             padding: const EdgeInsets.only(
                                                 left: 16.0),
                                             child: Text(
-                                              "WINNERS",
+                                              strings
+                                                  .get("WINNERS")
+                                                  .toUpperCase(),
                                               style: TextStyle(
                                                 color: Colors.black45,
                                                 fontSize: Theme.of(context)
@@ -704,11 +721,13 @@ class ContestDetailState extends State<ContestDetail> {
                                           ? Row(
                                               children: <Widget>[
                                                 Tooltip(
-                                                  message: "You can use " +
-                                                      widget
-                                                          .contest.bonusAllowed
-                                                          .toString() +
-                                                      "% of entry fee amount from bonus.",
+                                                  message: strings
+                                                      .get("USE_BONUS")
+                                                      .replaceAll(
+                                                          "\$bonusPercent",
+                                                          widget.contest
+                                                              .bonusAllowed
+                                                              .toString()),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -734,7 +753,8 @@ class ContestDetailState extends State<ContestDetail> {
                                                 Text(
                                                   widget.contest.bonusAllowed
                                                           .toString() +
-                                                      "% bonus allowed.",
+                                                      strings.get(
+                                                          "PERCENT_BONUS_ALLOWED"),
                                                   style: TextStyle(
                                                       fontSize:
                                                           Theme.of(context)
@@ -751,12 +771,13 @@ class ContestDetailState extends State<ContestDetail> {
                                           ? Row(
                                               children: <Widget>[
                                                 Tooltip(
-                                                  message:
-                                                      "You can participate with " +
+                                                  message: strings
+                                                      .get("PARTICIPATE_WITH")
+                                                      .replaceAll(
+                                                          "count",
                                                           widget.contest
                                                               .teamsAllowed
-                                                              .toString() +
-                                                          " different teams.",
+                                                              .toString()),
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -780,11 +801,13 @@ class ContestDetailState extends State<ContestDetail> {
                                                   ),
                                                 ),
                                                 Text(
-                                                  "Maximum " +
-                                                      widget
-                                                          .contest.teamsAllowed
-                                                          .toString() +
-                                                      " entries allowed.",
+                                                  strings
+                                                      .get("MAXIMUM_ENTRY")
+                                                      .replaceAll(
+                                                          "\$count",
+                                                          widget.contest
+                                                              .teamsAllowed
+                                                              .toString()),
                                                   style: TextStyle(
                                                       fontSize:
                                                           Theme.of(context)
@@ -868,7 +891,7 @@ class ContestDetailState extends State<ContestDetail> {
                               const EdgeInsets.fromLTRB(16.0, 64.0, 16.0, 64.0),
                           child: Center(
                             child: Text(
-                              "No teams joined yet.\nBecome first player to join this contest.",
+                              strings.get("NO_JOINED"),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Theme.of(context).errorColor,
@@ -883,7 +906,9 @@ class ContestDetailState extends State<ContestDetail> {
                           header: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text('Leaderboard'),
+                              Text(
+                                strings.get("LEADERBOARD"),
+                              ),
                               IconButton(
                                 icon: Icon(Icons.file_download),
                                 onPressed: () {},
@@ -1058,44 +1083,41 @@ class TeamsDataSource extends DataTableSource {
               ),
               _leagueStatus == LeagueStatus.UPCOMING
                   ? Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      bIsMyJoinedTeam && _myUniqueTeams.length > 0
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.only(right: 8.0),
-                              child: Container(
-                                width: 72.0,
-                                child: OutlineButton(
-                                  padding: EdgeInsets.all(0.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(24.0),
-                                  ),
-                                  color: Theme.of(context)
-                                      .primaryColorDark,
-                                  onPressed: () {
-                                    onSwitchTeam(_team);
-                                  },
-                                  child: Text(
-                                    "SWITCH",
-                                    style: TextStyle(fontSize: 10.0),
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        bIsMyJoinedTeam
+                            ? Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Container(
+                                  width: 72.0,
+                                  child: OutlineButton(
+                                    padding: EdgeInsets.all(0.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24.0),
+                                    ),
+                                    color: Theme.of(context).primaryColorDark,
+                                    onPressed: () {
+                                      onSwitchTeam(_team, _myUniqueTeams);
+                                    },
+                                    child: Text(
+                                      strings.get("SWITCH").toUpperCase(),
+                                      style: TextStyle(fontSize: 10.0),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          : Container(),
-                      Icon(Icons.chevron_right),
-                    ],
-                  )
+                              )
+                            : Container(),
+                        bIsMyJoinedTeam
+                            ? Icon(Icons.chevron_right)
+                            : Container(),
+                      ],
+                    )
                   : Row(
                       children: <Widget>[
                         Container(
                           width: 50.0,
                           child: Text(
-                            _team.score != null
-                                ? _team.score.toString()
-                                : "-",
+                            _team.score != null ? _team.score.toString() : "-",
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -1117,13 +1139,23 @@ class TeamsDataSource extends DataTableSource {
                                 ),
                               )
                             : Container(),
+                        _team.score != null
+                            ? Icon(Icons.chevron_right)
+                            : Container(
+                                width: 20.0,
+                              )
                       ],
                     ),
             ],
           ),
         ),
         onTap: () {
-          onViewTeam(_team);
+          if (_team != null &&
+              _team.id != null &&
+              ((bIsMyJoinedTeam && _leagueStatus == LeagueStatus.UPCOMING) ||
+                  _leagueStatus != LeagueStatus.UPCOMING)) {
+            onViewTeam(_team);
+          }
         },
       ),
     ];

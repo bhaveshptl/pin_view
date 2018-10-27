@@ -75,15 +75,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
 
         setState(() {
           _seperateLeaguesByRunningStatus(_allLeagues);
-          // for (League _league in _addedLeagues) {
-          //   if (_league.status == LeagueStatus.UPCOMING) {
-          //     upcomingLeagues.add(_league);
-          //   } else if (_league.status == LeagueStatus.LIVE) {
-          //     liveLeagues.add(_league);
-          //   } else if (_league.status == LeagueStatus.COMPLETED) {
-          //     completedLeagues.add(_league);
-          //   }
-          // }
         });
       } else if (_response["data"]["bDataModified"] == true &&
           (_response["data"]["lstRemoved"] as List).length > 0) {
@@ -199,19 +190,19 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                 child: TabBar(
                   tabs: <Widget>[
                     Tooltip(
-                      message: "Upcoming matches",
+                      message: strings.get("UPCOMING_MATCHES"),
                       child: Tab(
                         text: strings.get("UPCOMING").toUpperCase(),
                       ),
                     ),
                     Tooltip(
-                      message: "Live matches",
+                      message: strings.get("LIVE_MATCHES"),
                       child: Tab(
                         text: strings.get("LIVE").toUpperCase(),
                       ),
                     ),
                     Tooltip(
-                      message: "Completed matches",
+                      message: strings.get("COMPLETED_MATCHES"),
                       child: Tab(
                         text: strings.get("RESULT").toUpperCase(),
                       ),

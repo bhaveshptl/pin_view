@@ -20,6 +20,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   bool bLettersCountMatch = false;
   bool passConstraintMatch = false;
   bool bSpecialCharCountMatch = false;
+  bool _passObscureText = true;
+  bool _repeatPassObscureText = true;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _newPassFormKey = GlobalKey<FormState>();
@@ -41,8 +43,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         bLettersCountMatch = password.contains(RegExp('[A-z]'));
         bSpecialCharCountMatch =
             password.contains(RegExp('[_@#\$?().,!/:{}><;`*~%^&+=]'));
-        passConstraintMatch =
-            bDigitsCountMatch && bLettersCountMatch && bSpecialCharCountMatch;
+        passConstraintMatch = bDigitsCountMatch &&
+            bLettersCountMatch &&
+            bSpecialCharCountMatch &&
+            password.length >= 8;
       });
     });
   }
@@ -351,6 +355,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   controller: _newPasswordController,
                                   decoration: InputDecoration(
                                     labelText: strings.get("NEW_PASSWORD"),
+                                    suffixIcon: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _passObscureText = !_passObscureText;
+                                        });
+                                      },
+                                      child: Icon(_passObscureText
+                                          ? Icons.visibility
+                                          : Icons.visibility_off),
+                                    ),
                                   ),
                                   validator: (value) {
                                     if (value.isEmpty) {
@@ -358,7 +372,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     }
                                   },
                                   keyboardType: TextInputType.text,
-                                  obscureText: true,
+                                  obscureText: _passObscureText,
                                 ),
                               ),
                             ],
@@ -370,6 +384,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   controller: _reEnterPasswordController,
                                   decoration: InputDecoration(
                                     labelText: strings.get("REENTER_PASSWORD"),
+                                    suffixIcon: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          _repeatPassObscureText =
+                                              !_repeatPassObscureText;
+                                        });
+                                      },
+                                      child: Icon(_repeatPassObscureText
+                                          ? Icons.visibility
+                                          : Icons.visibility_off),
+                                    ),
                                   ),
                                   validator: (value) {
                                     if (value.isEmpty) {
@@ -378,7 +403,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     }
                                   },
                                   keyboardType: TextInputType.text,
-                                  obscureText: true,
+                                  obscureText: _repeatPassObscureText,
                                 ),
                               ),
                             ],
@@ -456,7 +481,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                     FocusScope.of(context)
                                         .requestFocus(new FocusNode());
                                     if (_newPassFormKey.currentState
-                                        .validate()) {
+                                            .validate() &&
+                                        passConstraintMatch) {
                                       if ((_newPasswordController.text ==
                                           _reEnterPasswordController.text)) {
                                         _submitNewPassword();
@@ -464,6 +490,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                         showMsg(
                                             strings.get("PASSWORD_NOT_MATCH"));
                                       }
+                                    } else if (!passConstraintMatch) {
+                                      showMsg(strings.get(
+                                          "PASSWORD_CONSTRAINT_NOT_MATCHED"));
                                     }
                                   },
                                   color: Theme.of(context).primaryColor,

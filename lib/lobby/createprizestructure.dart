@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/prizestructure.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class CreatePrizeStructure extends StatefulWidget {
   final Function onClose;
@@ -54,7 +55,7 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
       totalDistribution += double.parse(_textController.text);
     });
     if (!(totalDistribution > 99.90 && totalDistribution <= 100.0)) {
-      return "Whole amount should be distrubuted.";
+      return strings.get("AMOUNT_SHOULD_DISTRIBUTED");
     }
     return "";
   }
@@ -79,7 +80,9 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
                         Navigator.of(context).pop();
                         widget.onClose(widget.suggestedPrizes);
                       },
-                      child: Text("CANCEL"),
+                      child: Text(
+                        strings.get("CANCEL").toUpperCase(),
+                      ),
                     ),
                   ),
                   Padding(
@@ -99,7 +102,9 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
                           ));
                         }
                       },
-                      child: Text("SAVE"),
+                      child: Text(
+                        strings.get("SAVE").toUpperCase(),
+                      ),
                     ),
                   ),
                 ],
@@ -115,7 +120,7 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    "Number of prizes",
+                    strings.get("NUMBER_OF_PRIZE"),
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Container(
@@ -187,21 +192,21 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
                                 Expanded(
                                   flex: 2,
                                   child: Text(
-                                    "Rank",
+                                    strings.get("RANK"),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
                                 Expanded(
                                   flex: 1,
                                   child: Text(
-                                    "Winning %",
+                                    strings.get("WINNING_PERCENT"),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
                                 Expanded(
                                   flex: 2,
                                   child: Text(
-                                    "Amount",
+                                    strings.get("AMOUNT"),
                                     textAlign: TextAlign.center,
                                   ),
                                 )

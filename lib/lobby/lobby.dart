@@ -37,7 +37,8 @@ class LobbyState extends State<Lobby> {
   }
 
   _getSportsType() async {
-    Future<dynamic> futureSportType = SharedPrefHelper.internal().getSportsType();
+    Future<dynamic> futureSportType =
+        SharedPrefHelper.internal().getSportsType();
     await futureSportType.then((value) {
       if (value != null) {
         int _sport = int.parse(value);
@@ -166,7 +167,9 @@ class LobbyState extends State<Lobby> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(strings.get("KABADDI").toUpperCase()),
+                          child: Text(
+                            strings.get("KABADDI").toUpperCase(),
+                          ),
                         ),
                         value: 3,
                       )
@@ -177,7 +180,7 @@ class LobbyState extends State<Lobby> {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.help_outline),
-                  tooltip: "Help - How to play",
+                  tooltip: strings.get("HOW_TO_PLAY"),
                   onPressed: () {},
                 )
               ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
 
@@ -67,14 +68,14 @@ class PlayingStyleTab extends StatelessWidget {
                       Expanded(
                         flex: 9,
                         child: Text(
-                          "NAME",
+                          strings.get("NAME").toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "SERIES SCORE",
+                          strings.get("SERIES_SCORE"),
                           textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -82,7 +83,7 @@ class PlayingStyleTab extends StatelessWidget {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "CREDITS",
+                          strings.get("CREDITS").toUpperCase(),
                           textAlign: TextAlign.center,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -187,7 +188,8 @@ class PlayingStyleTab extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
-                  "PICK " +
+                  strings.get("PICK").toUpperCase() +
+                      " " +
                       (style != null && style.rule.length > 0
                           ? (style.rule[0] == style.rule[1]
                               ? style.rule[0].toString()

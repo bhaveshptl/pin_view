@@ -9,6 +9,7 @@ import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
@@ -491,7 +492,9 @@ class LeagueDetailState extends State<LeagueDetail>
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text("OK"),
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -518,7 +521,7 @@ class LeagueDetailState extends State<LeagueDetail>
             title: Text(title),
             actions: <Widget>[
               Tooltip(
-                message: "Contest filter",
+                message: strings.get("CONTEST_FILTER"),
                 child: IconButton(
                   icon: Icon(Icons.filter_list),
                   onPressed: () {

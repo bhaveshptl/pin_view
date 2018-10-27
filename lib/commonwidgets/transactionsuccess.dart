@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class TransactionSuccess extends StatelessWidget {
   final Map<String, String> transactionResult;
@@ -9,7 +10,9 @@ class TransactionSuccess extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: new Text("Transaction Success!!"),
+      title: new Text(
+        strings.get("TRANSACTION_SUCCESS"),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -20,7 +23,7 @@ class TransactionSuccess extends StatelessWidget {
               text: TextSpan(
                 children: <TextSpan>[
                   new TextSpan(
-                    text: "Amount added ",
+                    text: strings.get("AMOUNT_ADDED") + " ",
                     style: new TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
@@ -38,7 +41,7 @@ class TransactionSuccess extends StatelessWidget {
               text: TextSpan(
                 children: <TextSpan>[
                   new TextSpan(
-                    text: "Updated balance ",
+                    text: strings.get("UPDATED_BALANCE") + " ",
                     style: new TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
@@ -62,7 +65,7 @@ class TransactionSuccess extends StatelessWidget {
               text: TextSpan(
                 children: <TextSpan>[
                   new TextSpan(
-                    text: "Order id ",
+                    text: strings.get("ORDER_ID") + " ",
                     style: new TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
@@ -80,7 +83,7 @@ class TransactionSuccess extends StatelessWidget {
               text: TextSpan(
                 children: <TextSpan>[
                   new TextSpan(
-                    text: "Transaction date ",
+                    text: strings.get("TRANSACTION_DATE") + " ",
                     style: new TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
@@ -96,7 +99,9 @@ class TransactionSuccess extends StatelessWidget {
       ),
       actions: <Widget>[
         new FlatButton(
-          child: Text("OK"),
+          child: Text(
+            strings.get("OK").toUpperCase(),
+          ),
           onPressed: () {
             this._actionConfirm();
           },

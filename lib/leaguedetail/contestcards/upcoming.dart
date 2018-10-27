@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class UpcomingContest extends StatelessWidget {
   final Contest contest;
@@ -81,7 +82,7 @@ class UpcomingContest extends StatelessWidget {
                       ),
                       Expanded(
                         child: Tooltip(
-                          message: "Number of winners.",
+                          message: strings.get("NO_OF_WINNERS"),
                           child: FlatButton(
                             padding: EdgeInsets.all(0.0),
                             onPressed: () {
@@ -98,7 +99,7 @@ class UpcomingContest extends StatelessWidget {
                                       padding:
                                           const EdgeInsets.only(left: 16.0),
                                       child: Text(
-                                        "WINNERS",
+                                        strings.get("WINNERS").toUpperCase(),
                                         style: TextStyle(
                                           color: Colors.black45,
                                           fontSize: Theme.of(context)
@@ -136,9 +137,9 @@ class UpcomingContest extends StatelessWidget {
                         children: <Widget>[
                           contest.bonusAllowed > 0
                               ? Tooltip(
-                                  message: "You can use " +
-                                      contest.bonusAllowed.toString() +
-                                      "% of entry fee amount from bonus.",
+                                  message: strings.get("USE_BONUS").replaceAll(
+                                      "\$bonusPercent",
+                                      contest.bonusAllowed.toString()),
                                   child: Padding(
                                     padding: const EdgeInsets.only(right: 8.0),
                                     child: CircleAvatar(
@@ -159,9 +160,12 @@ class UpcomingContest extends StatelessWidget {
                               : Container(),
                           contest.teamsAllowed > 1
                               ? Tooltip(
-                                  message: "You can participate with " +
-                                      contest.teamsAllowed.toString() +
-                                      " different teams.",
+                                  message: strings
+                                      .get("PARTICIPATE_WITH")
+                                      .replaceAll(
+                                        "count",
+                                        contest.teamsAllowed.toString(),
+                                      ),
                                   child: CircleAvatar(
                                     backgroundColor: Colors.redAccent,
                                     maxRadius: 10.0,
@@ -182,7 +186,8 @@ class UpcomingContest extends StatelessWidget {
                               contest.joined.toString() +
                                   "/" +
                                   contest.size.toString() +
-                                  " joined",
+                                  " " +
+                                  strings.get("JOINED").toLowerCase(),
                               textAlign: TextAlign.center,
                             ),
                           )

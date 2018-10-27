@@ -3,6 +3,7 @@ import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class StatusTab extends StatelessWidget {
   final int leagueStatus;
@@ -29,10 +30,10 @@ class StatusTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final noLeaguesMsg = leagueStatus == LeagueStatus.COMPLETED
-        ? "There are no completed matches."
+        ? strings.get("NO_COMPLETED_MATCHES")
         : leagueStatus == LeagueStatus.LIVE
-            ? "There are no running matches."
-            : "There are no upcoming matches.";
+            ? strings.get("NO_RUNNING_MATCHES")
+            : strings.get("NO_UPCOMING_MATCHES");
 
     if (statusLeagues.length > 0) {
       return ListView.builder(

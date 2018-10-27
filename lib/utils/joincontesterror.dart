@@ -1,3 +1,5 @@
+import 'package:playfantasy/utils/stringtable.dart';
+
 class JoinContestError {
   bool _bIsBlockedUser = false;
   String _title = "";
@@ -9,38 +11,33 @@ class JoinContestError {
     for (int error in errors) {
       switch (error) {
         case 1:
-          _title = "Account Blocked";
-          _errorMessage =
-              "Your account has been blocked.\nPlease contact us at support@playfantasy.com to get more information.";
+          _title = strings.get("ACCOUNT_BLOCKED");
+          _errorMessage = strings.get("AC_BLOCKED_MSG");
           _bIsBlockedUser = true;
           break;
         case 2:
-          _title = "Account Closed";
-          _errorMessage =
-              "Your account has been closed.\nPlease contact us at support@playfantasy.com to get more information.";
+          _title = strings.get("ACCOUNT_CLOSED");
+          _errorMessage = strings.get("AC_CLOSED_MSG");
           _bIsBlockedUser = true;
           break;
         case 4:
-          _title = "Alert";
-          _errorMessage =
-              "Your age is less than 18.\nYou cannot verificationFor.";
+          _title = strings.get("ALERT");
+          _errorMessage = strings.get("AGE_LESS_MSG_CASH_GAME");
           _bIsBlockedUser = true;
           break;
         case 5:
-          _title = "Alert";
-          _errorMessage =
-              "You are from a blocked state.\nHence, you cannot verificationFor.";
+          _title = strings.get("ALERT");
+          _errorMessage = strings.get("STATE_BLOCKED_MSG_CASH_GAME");
           _bIsBlockedUser = true;
           break;
         case 11:
-          _title = "Not in India";
-          _errorMessage = "You are not playing from India.";
+          _title = strings.get("N_I_A");
+          _errorMessage = strings.get("NOT_IN_INDIA_MSG");
           _bIsBlockedUser = true;
           break;
         case 13:
-          _title = "Not allowed";
-          _errorMessage =
-              "Contest is for only new users. You have already played contest(s).";
+          _title = strings.get("NOT_ALLOWED");
+          _errorMessage = strings.get("CONTEST_FOR_NEW");
           _bIsBlockedUser = true;
           break;
       }

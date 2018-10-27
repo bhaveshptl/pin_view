@@ -61,7 +61,6 @@ class SwitchTeamState extends State<SwitchTeam> {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
           if (response["error"] == false) {
-            
             Navigator.of(context).pop(
               json.encode({
                 "error": false,
@@ -165,7 +164,6 @@ class SwitchTeamState extends State<SwitchTeam> {
             ],
           ),
           Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
                 strings.get("TO"),
@@ -180,7 +178,6 @@ class SwitchTeamState extends State<SwitchTeam> {
                   children: <Widget>[
                     DropdownButton(
                       value: _selectedTeamId,
-                      // isDense: false,
                       items: _getTeamList(),
                       onChanged: (value) {
                         setState(() {

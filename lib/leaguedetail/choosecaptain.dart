@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
+
 class ChooseCaptain extends StatefulWidget {
   final FanTeamRule fanTeamRules;
   final List<Player> selectedPlayers;
@@ -68,7 +70,9 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("CANCEL"),
+                    child: Text(
+                      strings.get("CANCEL").toUpperCase(),
+                    ),
                   ),
                 ),
                 Padding(
@@ -80,12 +84,15 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     onPressed: () {
                       if (_captain == null || _vCaptain == null) {
                         _showErrorMessage(
-                            "Captain and vice captain selection is necessary to save team.");
+                          strings.get("CAPTAIN_VCAPTAIN_SELECTION"),
+                        );
                       } else {
                         widget.onSave(_captain, _vCaptain);
                       }
                     },
-                    child: Text("SAVE TEAM"),
+                    child: Text(
+                      strings.get("SAVE_TEAM").toUpperCase(),
+                    ),
                   ),
                 ),
               ],
@@ -116,7 +123,8 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "CAPTAIN (" +
+                          strings.get("CAPTAIN").toUpperCase() +
+                              " (" +
                               widget.fanTeamRules.captainMult.toString() +
                               "X)",
                           textAlign: TextAlign.center,
@@ -126,7 +134,8 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          "VICE CAPTAIN (" +
+                          strings.get("V_CAPTAIN") +
+                              " (" +
                               widget.fanTeamRules.vcMult.toString() +
                               "X)",
                           textAlign: TextAlign.center,

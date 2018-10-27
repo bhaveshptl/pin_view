@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +44,20 @@ class SharedPrefHelper {
   getSportsType() async {
     final pref = await _prefs;
     return pref.get(ApiUtil.SHARED_PREFERENCE_SPORT_SELECTION);
+  }
+
+  saveLanguageTable(
+      {String version, Map<String, dynamic> table, int lang}) async {
+    final pref = await _prefs;
+    pref.setString(
+      ApiUtil.LANGUAGE_TABLE,
+      json.encode({"version": version, "table": table, "language": lang}),
+    );
+  }
+
+  getLanguageTable() async {
+    final pref = await _prefs;
+    return pref.get(ApiUtil.LANGUAGE_TABLE);
   }
 
   saveToSharedPref(String key, String value) async {

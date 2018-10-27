@@ -450,19 +450,19 @@ class MyContestsState extends State<MyContests> {
                 child: TabBar(
                   tabs: <Widget>[
                     Tooltip(
-                      message: "Upcoming matches",
+                      message: strings.get("UPCOMING_MATCHES"),
                       child: Tab(
                         text: strings.get("UPCOMING").toUpperCase(),
                       ),
                     ),
                     Tooltip(
-                      message: "Live matches",
+                      message: strings.get("LIVE_MATCHES"),
                       child: Tab(
                         text: strings.get("LIVE").toUpperCase(),
                       ),
                     ),
                     Tooltip(
-                      message: "Completed matches",
+                      message: strings.get("COMPLETED_MATCHES"),
                       child: Tab(
                         text: strings.get("RESULT").toUpperCase(),
                       ),

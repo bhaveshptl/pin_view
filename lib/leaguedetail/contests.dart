@@ -339,7 +339,9 @@ class ContestsState extends State<Contests> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("OK"),
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
             )
           ],
         );
@@ -482,8 +484,8 @@ class ContestsState extends State<Contests> {
           break;
         case 6:
           _showJoinContestError(
-            message: "Alert",
-            title: "User is not verified.",
+            message: strings.get("ALERT"),
+            title: strings.get("NOT_VERIFIED"),
           );
           break;
       }

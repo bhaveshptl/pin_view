@@ -281,7 +281,7 @@ class JoinContestState extends State<JoinContest> {
                     Row(
                       children: <Widget>[
                         Text(
-                          "CASH",
+                          strings.get("CASH").toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Padding(
@@ -298,7 +298,7 @@ class JoinContestState extends State<JoinContest> {
                     Row(
                       children: <Widget>[
                         Text(
-                          "BONUS",
+                          strings.get("BONUS").toUpperCase(),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Padding(

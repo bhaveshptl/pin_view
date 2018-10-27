@@ -29,13 +29,6 @@ class SignupState extends State<Signup> {
     });
   }
 
-  // Toggles the password show status
-  void _toggle() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
-
   _doSignUp() async {
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
@@ -160,7 +153,9 @@ class SignupState extends State<Signup> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("SIGN UP"),
+        title: Text(
+          strings.get("SIGNUP"),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -330,11 +325,22 @@ class SignupState extends State<Signup> {
                                     onSaved: (val) => _password = val,
                                     decoration: InputDecoration(
                                       labelText: strings.get("PASSWORD"),
-                                      hintText: "Minimum 6 characters required",
+                                      hintText:
+                                          strings.get("MIN_CHARS_PASSWORD"),
                                       icon: const Padding(
                                         padding:
                                             const EdgeInsets.only(top: 15.0),
                                         child: const Icon(Icons.lock),
+                                      ),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _obscureText = !_obscureText;
+                                          });
+                                        },
+                                        child: Icon(_obscureText
+                                            ? Icons.visibility
+                                            : Icons.visibility_off),
                                       ),
                                     ),
                                     validator: (value) {

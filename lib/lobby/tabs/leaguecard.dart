@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
 
@@ -129,9 +130,9 @@ class LeagueCard extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         _league.status == LeagueStatus.COMPLETED
-                            ? "Completed"
+                            ? strings.get("COMPLETED")
                             : (_league.status == LeagueStatus.LIVE
-                                ? "In progress"
+                                ? strings.get("IN_PROGRESS")
                                 : "Timer"),
                         style: TextStyle(color: Theme.of(context).errorColor),
                       ),

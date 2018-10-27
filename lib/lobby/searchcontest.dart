@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class SearchContest extends StatefulWidget {
   @override
@@ -41,7 +42,9 @@ class SearchContestState extends State<SearchContest> {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text("OK"),
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -56,7 +59,7 @@ class SearchContestState extends State<SearchContest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Search contest"),
+        title: Text(strings.get("SEARCH_CONTEST")),
       ),
       body: Form(
         key: _formKey,
@@ -96,7 +99,7 @@ class SearchContestState extends State<SearchContest> {
                           padding:
                               const EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 8.0),
                           child: Tooltip(
-                            message: "Search contest using contest code.",
+                            message: strings.get("SEARCH_CONTEST_WITH_CODE"),
                             child: RaisedButton(
                               color: Theme.of(context).primaryColorDark,
                               child: Row(
@@ -109,7 +112,7 @@ class SearchContestState extends State<SearchContest> {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: Text(
-                                      "SEARCH",
+                                      strings.get("SEARCH").toUpperCase(),
                                       style: TextStyle(color: Colors.white70),
                                     ),
                                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class TransactionFailed extends StatelessWidget {
   final Map<String, String> transactionResult;
@@ -11,26 +12,26 @@ class TransactionFailed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: new Text("Your transaction of ₹" +
-          transactionResult["amount"] +
-          " has been failed !"),
+      title: Text(strings
+          .get("TRANSACTION_FAILED")
+          .replaceAll("\$amount", transactionResult["amount"].toString())),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          new Container(
+          Container(
             padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
             child: RichText(
               text: TextSpan(
                 children: <TextSpan>[
-                  new TextSpan(
-                    text: "Transaction date ",
-                    style: new TextStyle(
+                  TextSpan(
+                    text: strings.get("TRANSACTION_DATE"),
+                    style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
-                  new TextSpan(
+                  TextSpan(
                     text: transactionResult["date"],
-                    style: new TextStyle(color: Colors.black54),
+                    style: TextStyle(color: Colors.black54),
                   ),
                 ],
               ),
@@ -41,27 +42,26 @@ class TransactionFailed extends StatelessWidget {
             child: RichText(
               text: TextSpan(
                 children: <TextSpan>[
-                  new TextSpan(
-                    text: "Order id ",
-                    style: new TextStyle(
+                  TextSpan(
+                    text: strings.get("ORDER_ID") + " ",
+                    style: TextStyle(
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
-                  new TextSpan(
+                  TextSpan(
                     text: transactionResult["orderId"],
-                    style: new TextStyle(color: Colors.black54),
+                    style: TextStyle(color: Colors.black54),
                   ),
                 ],
               ),
             ),
           ),
-          Container(            
+          Container(
             child: RichText(
               text: TextSpan(
                 children: <TextSpan>[
-                  new TextSpan(
-                    text:
-                        "(For future reference in case amount has been debited from account)",
-                    style: new TextStyle(color: Colors.black54),
+                  TextSpan(
+                    text: strings.get("FUTURE_REFERENCE"),
+                    style: TextStyle(color: Colors.black54),
                   ),
                 ],
               ),
@@ -70,14 +70,18 @@ class TransactionFailed extends StatelessWidget {
         ],
       ),
       actions: <Widget>[
-        new FlatButton(
-          child: Text("RETRY"),
+        FlatButton(
+          child: Text(
+            strings.get("RETRY").toUpperCase(),
+          ),
           onPressed: () {
             this._actionConfirm();
           },
         ),
-        new FlatButton(
-          child: Text("CANCEL"),
+        FlatButton(
+          child: Text(
+            strings.get("CANCEL").toUpperCase(),
+          ),
           onPressed: () {
             this._actionReject();
           },

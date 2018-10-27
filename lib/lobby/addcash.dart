@@ -4,6 +4,7 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 bool bShowAppBar = true;
 Map<String, String> depositResponse;
@@ -99,7 +100,9 @@ class AddCashState extends State<AddCash> {
     return bShowAppBar
         ? WebviewScaffold(
             appBar: AppBar(
-              title: Text("Add Cash"),
+              title: Text(
+                strings.get("ADD_CASH"),
+              ),
             ),
             url: ApiUtil.DEPOSIT_URL,
             withJavascript: true,

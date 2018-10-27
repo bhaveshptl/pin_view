@@ -77,10 +77,10 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
 
   _getMyContestCards() {
     final noLeaguesMsg = widget.leagueStatus == LeagueStatus.COMPLETED
-        ? "There are no completed contests."
+        ? strings.get("NO_COMPLETED_CONTEST")
         : widget.leagueStatus == LeagueStatus.LIVE
-            ? "There are no running contests."
-            : "There are no upcoming contests.";
+            ? strings.get("NO_RUNNING_CONTEST")
+            : strings.get("NO_UPCOMING_CONTEST");
 
     return widget.mapMyContests.keys.length == 0
         ? Container(
@@ -294,7 +294,9 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("OK"),
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
             )
           ],
         );
@@ -415,8 +417,8 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
           break;
         case 6:
           _showJoinContestError(
-            message: "Alert",
-            title: "User is not verified.",
+            message: strings.get("ALERT"),
+            title: strings.get("NOT_VERIFIED"),
           );
           break;
       }

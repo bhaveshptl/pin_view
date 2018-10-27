@@ -23,13 +23,6 @@ class LandingPageState extends State<LandingPage> {
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  // Toggles the password show status
-  void _toggle() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
-
   _launchSignup(BuildContext context) {
     Navigator.of(context).push(
       new MaterialPageRoute(
@@ -279,7 +272,7 @@ class LandingPageState extends State<LandingPage> {
                 children: <Widget>[
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                      padding: EdgeInsets.only(left: 16.0, right: 16.0),
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -318,6 +311,16 @@ class LandingPageState extends State<LandingPage> {
                                         padding:
                                             const EdgeInsets.only(top: 15.0),
                                         child: const Icon(Icons.lock),
+                                      ),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _obscureText = !_obscureText;
+                                          });
+                                        },
+                                        child: Icon(_obscureText
+                                            ? Icons.visibility
+                                            : Icons.visibility_off),
                                       ),
                                     ),
                                     validator: (value) {

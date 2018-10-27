@@ -180,7 +180,9 @@ class PrizeStructureState extends State<PrizeStructure> {
       ),
       actions: <Widget>[
         FlatButton(
-          child: Text("CLOSE"),
+          child: Text(
+            strings.get("CLOSE").toUpperCase(),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
           },

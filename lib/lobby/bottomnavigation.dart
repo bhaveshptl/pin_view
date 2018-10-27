@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class LobbyBottomNavigation extends StatelessWidget {
   final int _screenIndex;
@@ -34,7 +35,9 @@ class LobbyBottomNavigation extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              _screenIndex == 0 ? 'ALL SERIES' : "CONTESTS",
+              _screenIndex == 0
+                  ? strings.get("ALL_SERIES").toUpperCase()
+                  : strings.get("CONTESTS").toUpperCase(),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(
@@ -53,7 +56,9 @@ class LobbyBottomNavigation extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              _screenIndex == 0 ? 'CONTEST CODE' : "MY TEAMS",
+              _screenIndex == 0
+                  ? strings.get("CONTEST_CODE").toUpperCase()
+                  : strings.get("MY_TEAMS").toUpperCase(),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(
@@ -72,7 +77,7 @@ class LobbyBottomNavigation extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              'MY CONTESTS',
+              strings.get("MY_CONTESTS").toUpperCase(),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(
@@ -91,7 +96,9 @@ class LobbyBottomNavigation extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              _screenIndex == 0 ? "EARN CASH" : 'CREATE CONTEST',
+              _screenIndex == 0
+                  ? strings.get("EARN_CASH").toUpperCase()
+                  : strings.get("CREATE_CONTEST").toUpperCase(),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(
@@ -110,7 +117,7 @@ class LobbyBottomNavigation extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             title: Text(
-              'ADD CASH',
+              strings.get("ADD_CASH").toUpperCase(),
               textAlign: TextAlign.center,
               maxLines: 2,
               style: TextStyle(

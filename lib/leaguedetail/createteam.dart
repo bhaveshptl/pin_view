@@ -10,6 +10,7 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/modal/createteamresponse.dart';
 import 'package:playfantasy/leaguedetail/choosecaptain.dart';
 import 'package:playfantasy/leaguedetail/playingstyletab.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class TeamCreationMode {
   static const int CREATE_TEAM = 1;
@@ -180,41 +181,57 @@ class CreateTeamState extends State<CreateTeam> {
     final int _stylePlayerCount = _getSelectedPlayerCountForStyle(style);
 
     if (_selectedPlayers.length >= _fanTeamRules.playersTotal) {
-      _showErrorMessage("You can't choose more than " +
-          _fanTeamRules.playersTotal.toString() +
-          " players.");
+      _showErrorMessage(
+        strings.get("PLAYER_SELECTION_LIMIT").replaceAll(
+              "\$limit",
+              _fanTeamRules.playersTotal.toString(),
+            ),
+      );
       return false;
     }
 
     if ((_usedCredits + player.credit) > _fanTeamRules.credits) {
-      _showErrorMessage("You can't use more than " +
-          _fanTeamRules.credits.toString() +
-          " credits.");
+      _showErrorMessage(
+        strings.get("PLAYER_CREDITS_LIMIT").replaceAll(
+              "\$limit",
+              _fanTeamRules.credits.toString(),
+            ),
+      );
       return false;
     }
 
     if (_stylePlayerCount >= style.rule[1]) {
-      _showErrorMessage("You can't choose more than " +
-          style.rule[1].toString() +
-          " " +
-          style.label +
-          ".");
+      _showErrorMessage(
+        strings
+            .get("PLAYER_STYLE_LIMIT")
+            .replaceAll(
+              "\$limit",
+              style.rule[1].toString(),
+            )
+            .replaceAll("\$label", style.label),
+      );
       return false;
     }
 
     if (player.countryId !=
             widget.l1Data.league.rounds[0].matches[0].series.countryId &&
         _getForeignPlayerCount() >= _fanTeamRules.playersForeign) {
-      _showErrorMessage("You can't choose more than " +
-          _fanTeamRules.playersForeign.toString() +
-          " foreign players.");
+      _showErrorMessage(
+        strings.get("PLAYER_CREDITS_LIMIT").replaceAll(
+              "\$limit",
+              _fanTeamRules.playersForeign.toString(),
+            ),
+      );
       return false;
     }
 
     if (_getPlayerCountPerTeam(player.teamId) >= _fanTeamRules.playersPerTeam) {
-      _showErrorMessage("You can't choose more than " +
-          _fanTeamRules.playersPerTeam.toString() +
-          " players from one team.");
+      _showErrorMessage(
+        strings.get("SINGLE_TEAM_PLAYER_LIMIT").replaceAll(
+              "\$limit",
+              _fanTeamRules.playersPerTeam.toString(),
+            ),
+      );
       return false;
     }
 
@@ -225,11 +242,15 @@ class CreateTeamState extends State<CreateTeam> {
       if ((_fanTeamRules.playersTotal - (_selectedPlayersCount + 1) <
               style.rule[0] - playerCountForStyle) &&
           player.playingStyleId != style.id) {
-        _showErrorMessage("Minimum " +
-            style.rule[0].toString() +
-            " " +
-            style.label +
-            " should be selected.");
+        _showErrorMessage(
+          strings
+              .get("PLAYER_STYLE_MIN_LIMIT")
+              .replaceAll(
+                "\$limit",
+                style.rule[0].toString(),
+              )
+              .replaceAll("\$label", style.label),
+        );
         return false;
       }
     }
@@ -287,9 +308,12 @@ class CreateTeamState extends State<CreateTeam> {
       return false;
     }
     if (_selectedPlayers.length != _fanTeamRules.playersTotal) {
-      _showErrorMessage("Plese select " +
-          (_fanTeamRules.playersTotal - _selectedPlayers.length).toString() +
-          " more players to create your dream team.");
+      _showErrorMessage(
+        strings.get("DREAM_TEAM_MSG").replaceAll(
+              "count",
+              (_fanTeamRules.playersTotal - _selectedPlayers.length).toString(),
+            ),
+      );
       return false;
     }
     return true;
@@ -319,17 +343,31 @@ class CreateTeamState extends State<CreateTeam> {
       if (!(playingStyleCount >= style.rule[0] &&
           playingStyleCount <= style.rule[1])) {
         if (playingStyleCount > style.rule[1]) {
-          _showErrorMessage("Only " +
-              style.rule[1].toString() +
-              " " +
-              style.label.toLowerCase() +
-              " allowed.");
+          _showErrorMessage(
+            strings
+                .get("STYLE_MAX_COUNT")
+                .replaceAll(
+                  "\$count",
+                  style.rule[1].toString(),
+                )
+                .replaceAll(
+                  "\$style",
+                  style.label.toLowerCase(),
+                ),
+          );
         } else if (playingStyleCount < style.rule[0]) {
-          _showErrorMessage("Minimum " +
-              style.rule[0].toString() +
-              " " +
-              style.label.toLowerCase() +
-              " should be selected.");
+          _showErrorMessage(
+            strings
+                .get("STYLE_MIN_COUNT")
+                .replaceAll(
+                  "\$count",
+                  style.rule[0].toString(),
+                )
+                .replaceAll(
+                  "\$style",
+                  style.label.toLowerCase(),
+                ),
+          );
         }
         return false;
       }
@@ -400,7 +438,8 @@ class CreateTeamState extends State<CreateTeam> {
                               Padding(
                                 padding: EdgeInsets.only(top: 6.0),
                                 child: Text(
-                                  "PICK " +
+                                  strings.get("PICK") +
+                                      " " +
                                       (style.rule.length > 0 &&
                                               style.rule[0] == style.rule[1]
                                           ? style.rule[0].toString()
@@ -526,7 +565,7 @@ class CreateTeamState extends State<CreateTeam> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            "PLAYERS",
+                            strings.get("PLAYERS").toUpperCase(),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -564,7 +603,7 @@ class CreateTeamState extends State<CreateTeam> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            "CREDITS",
+                            strings.get("CREDITS").toUpperCase(),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -602,7 +641,7 @@ class CreateTeamState extends State<CreateTeam> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            "AVG. CREDITS",
+                            strings.get("AVG_CREDITS"),
                             textAlign: TextAlign.center,
                           ),
                         ],
@@ -639,7 +678,7 @@ class CreateTeamState extends State<CreateTeam> {
                 ),
                 bottomNavigationBar: _createTabsBasedOnPlayingStyle(),
                 floatingActionButton: FloatingActionButton(
-                  tooltip: "Choose captain",
+                  tooltip: strings.get("CHOOSE_CAPTAIN"),
                   child: Icon(Icons.navigate_next),
                   onPressed: () {
                     if (_isValidTeam()) {
@@ -712,7 +751,9 @@ class CreateTeamState extends State<CreateTeam> {
             CreateTeamResponse.fromJson(json.decode(res.body));
         Navigator.pop(context, response.message);
       } else {
-        _showErrorMessage("Getting error while saving team.");
+        _showErrorMessage(
+          strings.get("SAVE_TEAM_ERROR"),
+        );
       }
     });
   }
@@ -739,7 +780,9 @@ class CreateTeamState extends State<CreateTeam> {
         Map<String, dynamic> response = json.decode(res.body);
         Navigator.of(context).pop(response["message"]);
       } else {
-        _showErrorMessage("Getting error while updating team.");
+        _showErrorMessage(
+          strings.get("UPDATE_TEAM_ERROR"),
+        );
       }
     });
   }

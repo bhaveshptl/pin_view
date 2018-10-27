@@ -9,6 +9,7 @@ import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class MyTeams extends StatefulWidget {
   final L1 l1Data;
@@ -111,7 +112,7 @@ class MyTeamsState extends State<MyTeams> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          "No teams available for this match.",
+          strings.get("TEAMS_NOT_AVAILABLE"),
           textAlign: TextAlign.center,
           style: TextStyle(
               color: Theme.of(context).errorColor,
@@ -134,7 +135,9 @@ class MyTeamsState extends State<MyTeams> {
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
                           Icon(Icons.add),
-                          Text("Create team")
+                          Text(
+                            strings.get("CREATE_TEAM"),
+                          ),
                         ],
                       ),
                     ),
@@ -344,14 +347,14 @@ class MyTeamsState extends State<MyTeams> {
                     Expanded(
                       flex: 4,
                       child: Text(
-                        "PLAYERS",
+                        strings.get("PLAYERS").toUpperCase(),
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                     Expanded(
                       flex: 1,
                       child: Text(
-                        "SCORE",
+                        strings.get("SCORE").toUpperCase(),
                         textAlign: TextAlign.center,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -380,7 +383,9 @@ class MyTeamsState extends State<MyTeams> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("My teams"),
+        title: Text(
+          strings.get("MY_TEAMS"),
+        ),
       ),
       body: Container(
         child: Column(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class ResultContest extends StatelessWidget {
   final Contest contest;
@@ -99,7 +100,7 @@ class ResultContest extends StatelessWidget {
                       ),
                       Expanded(
                         child: Tooltip(
-                          message: "Number of winners.",
+                          message: strings.get("NO_OF_WINNERS"),
                           child: FlatButton(
                             padding: EdgeInsets.all(0.0),
                             onPressed: () {
@@ -116,7 +117,7 @@ class ResultContest extends StatelessWidget {
                                       padding:
                                           const EdgeInsets.only(left: 16.0),
                                       child: Text(
-                                        "WINNERS",
+                                        strings.get("WINNERS").toUpperCase(),
                                         style: TextStyle(
                                           color: Colors.black45,
                                           fontSize: Theme.of(context)
@@ -157,7 +158,7 @@ class ResultContest extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  "Winnings",
+                                  strings.get("WINNINGS"),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.black45,
@@ -204,7 +205,7 @@ class ResultContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    "Joined",
+                                    strings.get("JOINED"),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.black45,
@@ -240,7 +241,7 @@ class ResultContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    "Best team",
+                                    strings.get("BEST_TEAM"),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.black45,
@@ -278,7 +279,7 @@ class ResultContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    "Rank",
+                                    strings.get("RANK"),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.black45,
@@ -316,7 +317,7 @@ class ResultContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    "Score",
+                                    strings.get("SCORE"),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.black45,

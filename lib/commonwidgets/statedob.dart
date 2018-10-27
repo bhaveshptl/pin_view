@@ -48,7 +48,9 @@ class StateDobState extends State<StateDob> {
           .then((http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 300) {
           if (widget.onSuccess != null) {
-            widget.onSuccess("State and Date of birth updated successfully.");
+            widget.onSuccess(
+              strings.get("STATE_DOB_UPDATED"),
+            );
           }
           Navigator.of(context).pop();
         }
@@ -206,7 +208,7 @@ class StateDobState extends State<StateDob> {
                   ? Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
-                        "Please select date of birth.",
+                        strings.get("SELECT_DOB"),
                         style: TextStyle(color: Theme.of(context).errorColor),
                       ),
                     )
