@@ -632,366 +632,405 @@ class ContestDetailState extends State<ContestDetail> {
           strings.get("CONTEST_DETAILS"),
         ),
       ),
-      body: Container(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: LeagueCard(widget.league, clickable: false),
-                ),
-              ],
-            ),
-            Divider(
-              color: Colors.black12,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            SliverPadding(
+              padding: new EdgeInsets.all(0.0),
+              sliver: new SliverList(
+                delegate: new SliverChildListDelegate(
+                  [
+                    Row(
                       children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Container(
-                              child: Row(
-                                children: <Widget>[
-                                  Text(
-                                    "₹" +
-                                        (widget.contest.prizeDetails != null
-                                            ? widget
-                                                .contest
-                                                .prizeDetails[0]
-                                                    ["totalPrizeAmount"]
-                                                .toString()
-                                            : 0.toString()),
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        color:
-                                            Theme.of(context).primaryColorDark,
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .display1
-                                            .fontSize),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              child: Tooltip(
-                                message: strings.get("NO_OF_WINNERS"),
-                                child: FlatButton(
-                                  padding: EdgeInsets.all(0.0),
-                                  onPressed: () {
-                                    _showPrizeStructure();
-                                  },
-                                  child: Column(
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                        Expanded(
+                          child: LeagueCard(widget.league, clickable: false),
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      color: Colors.black12,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Container(
+                                      child: Row(
                                         children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 16.0),
-                                            child: Text(
-                                              strings
-                                                  .get("WINNERS")
-                                                  .toUpperCase(),
-                                              style: TextStyle(
-                                                color: Colors.black45,
+                                          Text(
+                                            "₹" +
+                                                (widget.contest.prizeDetails !=
+                                                        null
+                                                    ? widget
+                                                        .contest
+                                                        .prizeDetails[0]
+                                                            ["totalPrizeAmount"]
+                                                        .toString()
+                                                    : 0.toString()),
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColorDark,
                                                 fontSize: Theme.of(context)
                                                     .primaryTextTheme
-                                                    .caption
-                                                    .fontSize,
-                                              ),
-                                            ),
+                                                    .display1
+                                                    .fontSize),
                                           ),
-                                          Icon(
-                                            Icons.chevron_right,
-                                            size: 16.0,
-                                            color: Colors.black26,
-                                          )
                                         ],
                                       ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(widget.contest.prizeDetails ==
-                                                  null
-                                              ? 0.toString()
-                                              : widget.contest
-                                                  .prizeDetails[0]["noOfPrizes"]
-                                                  .toString())
-                                        ],
+                                    ),
+                                    Container(
+                                      child: Tooltip(
+                                        message: strings.get("NO_OF_WINNERS"),
+                                        child: FlatButton(
+                                          padding: EdgeInsets.all(0.0),
+                                          onPressed: () {
+                                            _showPrizeStructure();
+                                          },
+                                          child: Column(
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 16.0),
+                                                    child: Text(
+                                                      strings
+                                                          .get("WINNERS")
+                                                          .toUpperCase(),
+                                                      style: TextStyle(
+                                                        color: Colors.black45,
+                                                        fontSize: Theme.of(
+                                                                context)
+                                                            .primaryTextTheme
+                                                            .caption
+                                                            .fontSize,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Icon(
+                                                    Icons.chevron_right,
+                                                    size: 16.0,
+                                                    color: Colors.black26,
+                                                  )
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Text(widget.contest
+                                                              .prizeDetails ==
+                                                          null
+                                                      ? 0.toString()
+                                                      : widget
+                                                          .contest
+                                                          .prizeDetails[0]
+                                                              ["noOfPrizes"]
+                                                          .toString())
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 16.0),
+                                        child: RaisedButton(
+                                          onPressed: () {
+                                            if (!bIsContestFull) {
+                                              _onJoinContest(widget.contest);
+                                            }
+                                          },
+                                          color: bIsContestFull
+                                              ? Theme.of(context).disabledColor
+                                              : Theme.of(context)
+                                                  .primaryColorDark,
+                                          child: Row(
+                                            children: <Widget>[
+                                              _mapContestTeams != null &&
+                                                      _mapContestTeams.length >
+                                                          0
+                                                  ? Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Icon(
+                                                        Icons.add,
+                                                        color: Colors.white70,
+                                                        size: 20.0,
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                              Text(
+                                                strings.rupee +
+                                                    widget.contest.entryFee
+                                                        .toString(),
+                                                style: TextStyle(
+                                                    color: Colors.white70),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 2,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(bottom: 5.0),
+                                              child: widget.contest
+                                                          .bonusAllowed >
+                                                      0
+                                                  ? Row(
+                                                      children: <Widget>[
+                                                        Tooltip(
+                                                          message: strings
+                                                              .get("USE_BONUS")
+                                                              .replaceAll(
+                                                                  "\$bonusPercent",
+                                                                  widget.contest
+                                                                      .bonusAllowed
+                                                                      .toString()),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right: 4.0),
+                                                            child: CircleAvatar(
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
+                                                              maxRadius: 10.0,
+                                                              child: Text(
+                                                                "B",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white70,
+                                                                    fontSize: Theme.of(
+                                                                            context)
+                                                                        .primaryTextTheme
+                                                                        .caption
+                                                                        .fontSize),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          widget.contest
+                                                                  .bonusAllowed
+                                                                  .toString() +
+                                                              strings.get(
+                                                                  "PERCENT_BONUS_ALLOWED"),
+                                                          style: TextStyle(
+                                                              fontSize: Theme.of(
+                                                                      context)
+                                                                  .primaryTextTheme
+                                                                  .caption
+                                                                  .fontSize),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : Container(),
+                                            ),
+                                            Container(
+                                              child: widget.contest
+                                                          .teamsAllowed >
+                                                      1
+                                                  ? Row(
+                                                      children: <Widget>[
+                                                        Tooltip(
+                                                          message: strings
+                                                              .get(
+                                                                  "PARTICIPATE_WITH")
+                                                              .replaceAll(
+                                                                  "count",
+                                                                  widget.contest
+                                                                      .teamsAllowed
+                                                                      .toString()),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    right: 4.0),
+                                                            child: CircleAvatar(
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
+                                                              maxRadius: 10.0,
+                                                              child: Text(
+                                                                "M",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white70,
+                                                                    fontSize: Theme.of(
+                                                                            context)
+                                                                        .primaryTextTheme
+                                                                        .caption
+                                                                        .fontSize),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          strings
+                                                              .get(
+                                                                  "MAXIMUM_ENTRY")
+                                                              .replaceAll(
+                                                                  "\$count",
+                                                                  widget.contest
+                                                                      .teamsAllowed
+                                                                      .toString()),
+                                                          style: TextStyle(
+                                                              fontSize: Theme.of(
+                                                                      context)
+                                                                  .primaryTextTheme
+                                                                  .caption
+                                                                  .fontSize),
+                                                        )
+                                                      ],
+                                                    )
+                                                  : Container(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        child: IconButton(
+                                          icon: Icon(Icons.share),
+                                          onPressed: () {
+                                            _shareContestDialog(context);
+                                          },
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                          widget.contest.joined.toString() +
+                                              "/" +
+                                              widget.contest.size.toString() +
+                                              " joined",
+                                          textAlign: TextAlign.right,
+                                        ),
                                       )
                                     ],
                                   ),
-                                ),
-                              ),
+                                )
+                              ],
                             ),
-                            Container(
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 16.0),
-                                child: RaisedButton(
-                                  onPressed: () {
-                                    if (!bIsContestFull) {
-                                      _onJoinContest(widget.contest);
-                                    }
-                                  },
-                                  color: bIsContestFull
-                                      ? Theme.of(context).disabledColor
-                                      : Theme.of(context).primaryColorDark,
-                                  child: Row(
-                                    children: <Widget>[
-                                      _mapContestTeams != null &&
-                                              _mapContestTeams.length > 0
-                                          ? Padding(
-                                              padding: const EdgeInsets.only(
-                                                  right: 8.0),
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.white70,
-                                                size: 20.0,
-                                              ),
-                                            )
-                                          : Container(),
-                                      Text(
-                                        strings.rupee +
-                                            widget.contest.entryFee.toString(),
-                                        style: TextStyle(color: Colors.white70),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: <Widget>[
-                              Expanded(
-                                flex: 2,
-                                child: Column(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.only(bottom: 5.0),
-                                      child: widget.contest.bonusAllowed > 0
-                                          ? Row(
-                                              children: <Widget>[
-                                                Tooltip(
-                                                  message: strings
-                                                      .get("USE_BONUS")
-                                                      .replaceAll(
-                                                          "\$bonusPercent",
-                                                          widget.contest
-                                                              .bonusAllowed
-                                                              .toString()),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 4.0),
-                                                    child: CircleAvatar(
-                                                      backgroundColor:
-                                                          Colors.redAccent,
-                                                      maxRadius: 10.0,
-                                                      child: Text(
-                                                        "B",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white70,
-                                                            fontSize: Theme.of(
-                                                                    context)
-                                                                .primaryTextTheme
-                                                                .caption
-                                                                .fontSize),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  widget.contest.bonusAllowed
-                                                          .toString() +
-                                                      strings.get(
-                                                          "PERCENT_BONUS_ALLOWED"),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          Theme.of(context)
-                                                              .primaryTextTheme
-                                                              .caption
-                                                              .fontSize),
-                                                ),
-                                              ],
-                                            )
-                                          : Container(),
-                                    ),
-                                    Container(
-                                      child: widget.contest.teamsAllowed > 1
-                                          ? Row(
-                                              children: <Widget>[
-                                                Tooltip(
-                                                  message: strings
-                                                      .get("PARTICIPATE_WITH")
-                                                      .replaceAll(
-                                                          "count",
-                                                          widget.contest
-                                                              .teamsAllowed
-                                                              .toString()),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 4.0),
-                                                    child: CircleAvatar(
-                                                      backgroundColor:
-                                                          Colors.redAccent,
-                                                      maxRadius: 10.0,
-                                                      child: Text(
-                                                        "M",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white70,
-                                                            fontSize: Theme.of(
-                                                                    context)
-                                                                .primaryTextTheme
-                                                                .caption
-                                                                .fontSize),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  strings
-                                                      .get("MAXIMUM_ENTRY")
-                                                      .replaceAll(
-                                                          "\$count",
-                                                          widget.contest
-                                                              .teamsAllowed
-                                                              .toString()),
-                                                  style: TextStyle(
-                                                      fontSize:
-                                                          Theme.of(context)
-                                                              .primaryTextTheme
-                                                              .caption
-                                                              .fontSize),
-                                                )
-                                              ],
-                                            )
-                                          : Container(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                child: IconButton(
-                                  icon: Icon(Icons.share),
-                                  onPressed: () {
-                                    _shareContestDialog(context);
-                                  },
-                                ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Text(
-                                  widget.contest.joined.toString() +
-                                      "/" +
-                                      widget.contest.size.toString() +
-                                      " joined",
-                                  textAlign: TextAlign.right,
-                                ),
-                              )
-                            ],
                           ),
-                        )
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    flex: widget.contest.joined,
-                    child: Container(
-                      height: 4.0,
-                      color: Colors.green,
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            flex: widget.contest.joined,
+                            child: Container(
+                              height: 4.0,
+                              color: Colors.green,
+                            ),
+                          ),
+                          Expanded(
+                            flex: widget.contest.size,
+                            child: Container(
+                              height: 4.0,
+                              color: Colors.black12,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    flex: widget.contest.size,
-                    child: Container(
-                      height: 4.0,
+                    Divider(
+                      height: 2.0,
                       color: Colors.black12,
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
-            Divider(
-              height: 2.0,
-              color: Colors.black12,
-            ),
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  widget.contest.joined == 0
-                      ? Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(16.0, 64.0, 16.0, 64.0),
-                          child: Center(
-                            child: Text(
-                              strings.get("NO_JOINED"),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Theme.of(context).errorColor,
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .title
-                                      .fontSize),
-                            ),
-                          ),
-                        )
-                      : PaginatedDataTable(
-                          header: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                strings.get("LEADERBOARD"),
+          ];
+        },
+        body: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Expanded(
+                child: ListView(
+                  children: <Widget>[
+                    widget.contest.joined == 0
+                        ? Padding(
+                            padding: const EdgeInsets.fromLTRB(
+                                16.0, 64.0, 16.0, 64.0),
+                            child: Center(
+                              child: Text(
+                                strings.get("NO_JOINED"),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Theme.of(context).errorColor,
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .fontSize),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.file_download),
-                                onPressed: () {},
-                              )
-                            ],
+                            ),
+                          )
+                        : PaginatedDataTable(
+                            header: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  strings.get("LEADERBOARD"),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.file_download),
+                                  onPressed: () {},
+                                )
+                              ],
+                            ),
+                            rowsPerPage: (widget.contest.joined +
+                                        _mapContestTeams.length) <
+                                    rowsPerPage
+                                ? (widget.contest.joined == 0
+                                    ? 1
+                                    : (widget.contest.joined +
+                                        _mapContestTeams.length))
+                                : rowsPerPage,
+                            onPageChanged: (int firstVisibleIndex) {
+                              _getContestTeams(firstVisibleIndex);
+                            },
+                            columns: _getDataTableHeader(),
+                            source: _teamsDataSource,
                           ),
-                          rowsPerPage: (widget.contest.joined +
-                                      _mapContestTeams.length) <
-                                  rowsPerPage
-                              ? (widget.contest.joined == 0
-                                  ? 1
-                                  : (widget.contest.joined +
-                                      _mapContestTeams.length))
-                              : rowsPerPage,
-                          onPageChanged: (int firstVisibleIndex) {
-                            _getContestTeams(firstVisibleIndex);
-                          },
-                          columns: _getDataTableHeader(),
-                          source: _teamsDataSource,
-                        ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
