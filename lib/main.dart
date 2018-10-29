@@ -13,10 +13,10 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
 
+String cookie;
 AuthCheck authCheck = new AuthCheck();
 
 setWSCookie() async {
-  String cookie;
   Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
   await futureCookie.then((value) {
     cookie = value;
@@ -33,6 +33,45 @@ setWSCookie() async {
   });
 }
 
+updateStringTable() async {
+  String table;
+  await SharedPrefHelper().getLanguageTable().then((value) {
+    table = value;
+  });
+
+  Map<String, dynamic> stringTable = json.decode(table == null ? "{}" : table);
+
+  await http.Client()
+      .post(
+    ApiUtil.UPDATE_LANGUAGE_TABLE,
+    headers: {'Content-type': 'application/json', "cookie": cookie},
+    body: json.encode({
+      "version": stringTable["version"],
+      "language": 1,
+    }),
+  )
+      .then((http.Response res) {
+    if (res.statusCode >= 200 && res.statusCode <= 299) {
+      Map<String, dynamic> response = json.decode(res.body);
+      if (response["update"]) {
+        strings.set(
+          language: response["language"],
+          table: response["table"],
+        );
+        SharedPrefHelper().saveLanguageTable(
+            version: response["version"],
+            lang: response["language"],
+            table: response["table"]);
+      } else {
+        strings.set(
+          language: stringTable["language"],
+          table: stringTable["table"],
+        );
+      }
+    }
+  });
+}
+
 ///
 /// Bootstraping APP.
 ///
@@ -42,7 +81,6 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  strings.set();
   Widget _homePage = LandingPage();
 
   bool _result = await authCheck.checkStatus();
@@ -50,6 +88,7 @@ void main() async {
     await setWSCookie();
     _homePage = new Lobby();
   }
+  await updateStringTable();
 
   // FlutterWebviewPlugin().launch(ApiUtil.BASE_URL, hidden: true);
 

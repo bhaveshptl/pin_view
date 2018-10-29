@@ -6,11 +6,11 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/modal/createteamresponse.dart';
 import 'package:playfantasy/leaguedetail/choosecaptain.dart';
 import 'package:playfantasy/leaguedetail/playingstyletab.dart';
-import 'package:playfantasy/utils/stringtable.dart';
 
 class TeamCreationMode {
   static const int CREATE_TEAM = 1;

@@ -407,12 +407,26 @@ class SignupState extends State<Signup> {
                         children: <Widget>[
                           Text(
                             strings.get("BY_REGISTERING"),
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .fontSize,
+                            ),
                           ),
                           Container(
                             height: 18.0,
                             child: FlatButton(
                               padding: EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
-                              child: Text(strings.get("TERMS_AND_CONDITION")),
+                              child: Text(
+                                strings.get("TERMS_AND_CONDITION"),
+                                style: TextStyle(
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .fontSize,
+                                ),
+                              ),
                               onPressed: () {},
                             ),
                           )

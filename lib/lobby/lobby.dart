@@ -78,7 +78,7 @@ class LobbyState extends State<Lobby> {
       switch (index) {
         case 1:
           Navigator.of(context).push(
-              new MaterialPageRoute(builder: (context) => SearchContest()));
+              new MaterialPageRoute(builder: (context) => SearchContest(leagues: _leagues,)));
           break;
         case 2:
           Navigator.of(context).push(

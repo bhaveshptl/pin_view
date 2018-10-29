@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:share/share.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
@@ -17,7 +19,6 @@ import 'package:playfantasy/contestdetail/viewteam.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/contestdetail/switchteam.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
-import 'package:playfantasy/commonwidgets/sharecontest.dart';
 import 'package:playfantasy/commonwidgets/prizestructure.dart';
 
 const TABLE_COLUMN_PADDING = 28;
@@ -301,6 +302,8 @@ class ContestDetailState extends State<ContestDetail> {
       new MaterialPageRoute(
           builder: (context) => ViewTeam(
                 team: _team,
+                l1Data: _l1Data,
+                myTeam: _myTeams,
                 league: widget.league,
                 contest: widget.contest,
               ),
@@ -455,6 +458,63 @@ class ContestDetailState extends State<ContestDetail> {
     }
   }
 
+  _shareContestDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          children: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Clipboard.setData(
+                  ClipboardData(text: widget.contest.contestJoinCode),
+                );
+                _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    content: Text(strings.get("CONTEST_COPIED")),
+                  ),
+                );
+                Navigator.of(context).pop();
+              },
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: Icon(Icons.content_copy),
+                  ),
+                  Text(
+                    strings.get("COPY_CONTEST_CODE").toUpperCase(),
+                  ),
+                ],
+              ),
+            ),
+            FlatButton(
+              onPressed: () {
+                String contestVisibility =
+                    widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
+                String contestCode = widget.contest.contestJoinCode;
+                String inviteMsg =
+                    "PLAY FANTASY - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code $contestCode and join us.";
+
+                Navigator.of(context).pop();
+                Share.share(inviteMsg);
+              },
+              child: Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: Icon(Icons.share),
+                  ),
+                  Text("SHARE NOW"),
+                ],
+              ),
+            )
+          ],
+        );
+      },
+    );
+  }
+
   _getContestTeams(int offset) async {
     _curPageOffset = offset;
     int teamListOffset = offset;
@@ -602,9 +662,13 @@ class ContestDetailState extends State<ContestDetail> {
                                 children: <Widget>[
                                   Text(
                                     "₹" +
-                                        widget.contest
-                                            .prizeDetails[0]["totalPrizeAmount"]
-                                            .toString(),
+                                        (widget.contest.prizeDetails != null
+                                            ? widget
+                                                .contest
+                                                .prizeDetails[0]
+                                                    ["totalPrizeAmount"]
+                                                .toString()
+                                            : 0.toString()),
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                         color:
@@ -658,9 +722,12 @@ class ContestDetailState extends State<ContestDetail> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: <Widget>[
-                                          Text(widget.contest
-                                              .prizeDetails[0]["noOfPrizes"]
-                                              .toString())
+                                          Text(widget.contest.prizeDetails ==
+                                                  null
+                                              ? 0.toString()
+                                              : widget.contest
+                                                  .prizeDetails[0]["noOfPrizes"]
+                                                  .toString())
                                         ],
                                       )
                                     ],
@@ -822,20 +889,12 @@ class ContestDetailState extends State<ContestDetail> {
                                   ],
                                 ),
                               ),
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  child: IconButton(
-                                    icon: Icon(Icons.share),
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        new MaterialPageRoute(
-                                          builder: (context) => ShareContest(),
-                                          fullscreenDialog: true,
-                                        ),
-                                      );
-                                    },
-                                  ),
+                              Container(
+                                child: IconButton(
+                                  icon: Icon(Icons.share),
+                                  onPressed: () {
+                                    _shareContestDialog(context);
+                                  },
                                 ),
                               ),
                               Expanded(

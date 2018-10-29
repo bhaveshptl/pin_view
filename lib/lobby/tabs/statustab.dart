@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 
 class StatusTab extends StatelessWidget {
   final int leagueStatus;

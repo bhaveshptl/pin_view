@@ -50,6 +50,7 @@ class ApiUtil {
   static const GET_CONTEST_TEAMS = BASE_API_URL + "lobby/contest/";
   static const GET_PRIZESTRUCTURE = BASE_API_URL + "lobby/contest/";
   static const GET_TEAM_INFO = BASE_API_URL + "lobby/contest/";
+  static const SEARCH_CONTEST = BASE_API_URL + "lobby/contest/private";
 
   static const GET_REFERRAL_CODE = BASE_API_URL + "ups/user/referdetails";
 }

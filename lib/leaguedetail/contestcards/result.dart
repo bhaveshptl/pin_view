@@ -221,7 +221,7 @@ class ResultContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    "₹" + contest.entryFee.toString(),
+                                    contest.joined.toString(),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],

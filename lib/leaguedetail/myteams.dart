@@ -1,15 +1,14 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
-import 'package:playfantasy/leaguedetail/createteam.dart';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/leaguedetail/createteam.dart';
 
 class MyTeams extends StatefulWidget {
   final L1 l1Data;

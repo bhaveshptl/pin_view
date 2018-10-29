@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
-import 'package:playfantasy/utils/stringtable.dart';
 
 bool bShowAppBar = true;
 Map<String, String> depositResponse;

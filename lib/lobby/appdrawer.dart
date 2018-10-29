@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/user.dart';
-import 'package:playfantasy/profilepages/verification.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/profilepages/verification.dart';
 
 class AppDrawer extends StatefulWidget {
   @override

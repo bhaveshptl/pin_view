@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:playfantasy/modal/prizestructure.dart';
+
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/modal/prizestructure.dart';
 
 class CreatePrizeStructure extends StatefulWidget {
   final Function onClose;

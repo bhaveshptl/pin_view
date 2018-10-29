@@ -1,24 +1,27 @@
 import 'dart:convert';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
-
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/leaguedetail/createteam.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
 
 class ViewTeam extends StatefulWidget {
-  final League league;
+  final L1 l1Data;
   final MyTeam team;
+  final League league;
   final Contest contest;
+  final List<MyTeam> myTeam;
 
-  ViewTeam({this.team, this.contest, this.league});
+  ViewTeam({this.team, this.myTeam, this.contest, this.league, this.l1Data});
 
   @override
   _ViewTeamState createState() => _ViewTeamState();
@@ -26,6 +29,14 @@ class ViewTeam extends StatefulWidget {
 
 class _ViewTeamState extends State<ViewTeam> {
   MyTeam _myTeamWithPlayers = MyTeam.fromJson({});
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    sockets.register(_onWsMsg);
+    _getTeamPlayers();
+  }
 
   _getTeamPlayers() async {
     String cookie;
@@ -51,17 +62,94 @@ class _ViewTeamState extends State<ViewTeam> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _getTeamPlayers();
+  getTeam() {
+    MyTeam _team;
+    widget.myTeam.forEach((MyTeam myTeam) {
+      if (myTeam.id == _myTeamWithPlayers.id) {
+        _team = myTeam;
+      }
+    });
+
+    return _team;
+  }
+
+  _onWsMsg(onData) {
+    Map<String, dynamic> _response = json.decode(onData);
+
+    if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+
+      if (widget.team.id == teamUpdated.id) {
+        setState(() {
+          _myTeamWithPlayers = teamUpdated;
+        });
+      }
+    }
+  }
+
+  void _onEditTeam(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: widget.l1Data,
+              selectedTeam: getTeam(),
+              mode: TeamCreationMode.EDIT_TEAM,
+            ),
+      ),
+    );
+
+    if (result != null) {
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("$result")));
+    }
+  }
+
+  void _onCloneTeam(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: widget.l1Data,
+              selectedTeam: MyTeam.fromJson(
+                json.decode(
+                  json.encode(getTeam()),
+                ),
+              ),
+              mode: TeamCreationMode.CLONE_TEAM,
+            ),
+      ),
+    );
+    if (result != null) {
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("$result")));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.team.name),
+        actions: <Widget>[
+          widget.league.status == LeagueStatus.UPCOMING
+              ? IconButton(
+                  icon: Icon(Icons.content_copy),
+                  onPressed: () {
+                    _onCloneTeam(context);
+                  },
+                )
+              : Container(),
+          widget.league.status == LeagueStatus.UPCOMING
+              ? IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    _onEditTeam(context);
+                  },
+                )
+              : Container(),
+        ],
       ),
       body: Padding(
         padding: widget.league.status != LeagueStatus.UPCOMING
@@ -274,5 +362,11 @@ class _ViewTeamState extends State<ViewTeam> {
                   height: 0.0,
                 ),
     );
+  }
+
+  @override
+  void dispose() {
+    sockets.unRegister(_onWsMsg);
+    super.dispose();
   }
 }

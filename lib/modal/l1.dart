@@ -368,7 +368,9 @@ class Contest {
       visibilityId: json["visibilityId"],
       visibilityInfo: json["visibilityInfo"],
       contestJoinCode: json["contestJoinCode"],
-      joined: json["joined"],
+      joined: json["joined"] == null && json["joinedTeamCount"] != null
+          ? json["joinedTeamCount"]
+          : json["joined"],
       prizeDetails: json["prizeDetails"],
       brand: json["brand"],
       milestones: json["milestones"],

@@ -1,63 +1,87 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/contestdetail/contestdetail.dart';
 
 class SearchContest extends StatefulWidget {
+  final List<League> leagues;
+
+  SearchContest({this.leagues});
+
   @override
   State<StatefulWidget> createState() => SearchContestState();
 }
 
 class SearchContestState extends State<SearchContest> {
+  String cookie = "";
   final _formKey = GlobalKey<FormState>();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final TextEditingController _contestCodeController = TextEditingController();
 
-  _onSearchContest() {
-    if (_formKey.currentState.validate()) {
-      _showComingsoonDialog();
-    }
+  _getLeague(int leagueId) {
+    League _league;
+    widget.leagues.forEach((League league) {
+      if (league.leagueId == leagueId) {
+        _league = league;
+      }
+    });
+    return _league;
   }
 
-  _showComingsoonDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Search contest"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
-                    child: Text(
-                      "Coming Soon!",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 24.0),
-                    ),
+  _onSearchContest() async {
+    if (_formKey.currentState.validate()) {
+      if (cookie == null || cookie == "") {
+        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+        await futureCookie.then((value) {
+          cookie = value;
+        });
+      }
+
+      await http.Client()
+          .post(
+        ApiUtil.SEARCH_CONTEST,
+        headers: {'Content-type': 'application/json', "cookie": cookie},
+        body: json.encode({"contestId": _contestCodeController.text}),
+      )
+          .then(
+        (http.Response res) {
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            Contest contest = Contest.fromJson(json.decode(res.body)[0]);
+            League league = _getLeague(contest.leagueId);
+            if (league == null) {
+              _scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    strings.get("LEAGUE_NOT_FOUND"),
                   ),
-                ],
-              ),
-              Text(
-                  "We are currently working on this feature and will launch soon.")
-            ],
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      },
-    );
+                ),
+              );
+            } else {
+              Navigator.of(context).push(
+                new MaterialPageRoute(
+                  builder: (context) => ContestDetail(
+                        contest: contest,
+                        league: league,
+                      ),
+                ),
+              );
+            }
+          } else if (res.statusCode == 401) {}
+        },
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(strings.get("SEARCH_CONTEST")),
       ),
@@ -83,6 +107,7 @@ class SearchContestState extends State<SearchContest> {
                                 return 'Contest code is required to search contest.';
                               }
                             },
+                            controller: _contestCodeController,
                             onEditingComplete: () {
                               _onSearchContest();
                             },
