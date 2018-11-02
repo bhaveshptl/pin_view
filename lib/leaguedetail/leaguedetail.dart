@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/leaguedetail/innings.dart';
+import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -30,7 +32,7 @@ class LeagueDetail extends StatefulWidget {
 }
 
 class LeagueDetailState extends State<LeagueDetail>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   L1 l1Data;
   String cookie;
   int _sportType = 1;
@@ -40,6 +42,8 @@ class LeagueDetailState extends State<LeagueDetail>
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  TabController tabController;
 
   bool _bShowLoader = false;
 
@@ -56,6 +60,7 @@ class LeagueDetailState extends State<LeagueDetail>
     _createL1WSObject();
 
     _getMyContests();
+    tabController = TabController(length: 2, vsync: this);
   }
 
   _onWsMsg(onData) {
@@ -64,7 +69,8 @@ class LeagueDetailState extends State<LeagueDetail>
     if (_response["bReady"] == 1) {
       _showLoader(true);
       _getL1Data();
-    } else if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.GET_ALL_L1 &&
+        _response["bSuccessful"] == true) {
       setState(() {
         l1Data = L1.fromJson(_response["data"]["l1"]);
         _myTeams = (_response["data"]["myteams"] as List)
@@ -72,17 +78,29 @@ class LeagueDetailState extends State<LeagueDetail>
             .toList();
       });
       _showLoader(false);
-    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
+        _response["bSuccessful"] == true) {
       _applyL1DataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == 7 && _response["bSuccessful"] == true) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
-      setState(() {
-        _myTeams.add(teamAdded);
-      });
-    } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        _response["bSuccessful"] == true) {
       _updateJoinCount(_response["data"]);
       _updateContestTeams(_response["data"]);
-    } else if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
+        _response["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+      bool bFound = false;
+      for (MyTeam _myTeam in _myTeams) {
+        if (_myTeam.id == teamAdded.id) {
+          bFound = true;
+        }
+      }
+      if (!bFound) {
+        setState(() {
+          _myTeams.add(teamAdded);
+        });
+      }
+    } else if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        _response["bSuccessful"] == true) {
       MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
       int i = 0;
       for (MyTeam _team in _myTeams) {
@@ -323,7 +341,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _createL1WSObject() async {
     await _getSportsType();
-    l1UpdatePackate["iType"] = 5;
+    l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
     l1UpdatePackate["bResAvail"] = true;
     l1UpdatePackate["sportsId"] = _sportType;
     l1UpdatePackate["id"] = widget.league.leagueId;
@@ -531,15 +549,75 @@ class LeagueDetailState extends State<LeagueDetail>
               )
             ],
           ),
-          body: l1Data == null
-              ? Container()
-              : Contests(
-                  l1Data: l1Data,
-                  myTeams: _myTeams,
-                  league: widget.league,
-                  scaffoldKey: _scaffoldKey,
-                  mapContestTeams: _mapContestTeams,
+          body: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: LeagueCard(
+                      widget.league,
+                      clickable: false,
+                      tabBar: TabBar(
+                        labelColor: Colors.black87,
+                        unselectedLabelColor: Colors.black38,
+                        controller: tabController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                            color: Theme.of(context).primaryColorDark,
+                          ),
+                          insets: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                        ),
+                        tabs: [
+                          Container(
+                            height: 24.0,
+                            child: Tab(
+                              text: "MATCH",
+                            ),
+                          ),
+                          Container(
+                            height: 24.0,
+                            child: Tab(
+                              text: "INNINGS",
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Scaffold(
+                  body: TabBarView(
+                    controller: tabController,
+                    children: <Widget>[
+                      l1Data == null
+                          ? Container()
+                          : Contests(
+                              l1Data: l1Data,
+                              myTeams: _myTeams,
+                              league: widget.league,
+                              scaffoldKey: _scaffoldKey,
+                              mapContestTeams: _mapContestTeams,
+                            ),
+                      l1Data == null
+                          ? Container()
+                          : Innings(
+                              l1Data: l1Data,
+                              myTeams: _myTeams,
+                              league: widget.league,
+                              leagues: widget.leagues,
+                              scaffoldKey: _scaffoldKey,
+                              mapContestTeams: _mapContestTeams,
+                              onSportChange: widget.onSportChange,
+                            ),
+                    ],
+                  ),
                 ),
+              ),
+            ],
+          ),
           bottomNavigationBar:
               LobbyBottomNavigation(_onNavigationSelectionChange, 1),
         ),

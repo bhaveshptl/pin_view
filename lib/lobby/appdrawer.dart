@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/lobby/earncash.dart';
 
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -45,6 +47,73 @@ class AppDrawerState extends State<AppDrawer> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => Verification(),
+        ),
+      );
+    }
+
+    _launchStaticPage(String name) {
+      String url = "";
+      String title = "";
+      switch (name) {
+        case "BECOME_PARTNER":
+          url = "";
+          title = "";
+          break;
+        case "SCORING":
+          title = "SCORING SYSTEM";
+          url = "https://www.playfantasy.com/assets/help.html?cache=" +
+              DateTime.now().millisecondsSinceEpoch.toString() +
+              "#ScoringSystem";
+          break;
+        case "HELP":
+          title = "HELP";
+          url = "https://www.playfantasy.com/assets/help.html?cache=" +
+              DateTime.now().millisecondsSinceEpoch.toString();
+          break;
+        case "FORUM":
+          title = "FORUM";
+          url = "http://forum.playfantasy.com/?cache=" +
+              DateTime.now().millisecondsSinceEpoch.toString();
+          break;
+        case "BLOG":
+          title = "BLOG";
+          url = "http://blog.playfantasy.com/?cache=" +
+              DateTime.now().millisecondsSinceEpoch.toString();
+          break;
+        case "ABOUT_US":
+          title = "ABOUT US";
+          url = "https://www.playfantasy.com/assets/aboutus.html?cache=" +
+              DateTime.now().millisecondsSinceEpoch.toString();
+          break;
+        case "T&C":
+          title = "TERMS AND CONDITIONS";
+          url = "https://www.playfantasy.com/assets/terms.html?cache=" +
+              DateTime.now().millisecondsSinceEpoch.toString();
+          break;
+        case "PRIVACY":
+          title = "PRIVACY POLICY";
+          url =
+              "https://www.playfantasy.com/assets/privacy_policy.html?cache=" +
+                  DateTime.now().millisecondsSinceEpoch.toString();
+          break;
+      }
+      Navigator.of(context).push(
+        new MaterialPageRoute(
+            builder: (context) => WebviewScaffold(
+                  url: url,
+                  appBar: AppBar(
+                    title: Text(title),
+                  ),
+                ),
+            fullscreenDialog: true),
+      );
+    }
+
+    _showEarnCash() {
+      Navigator.of(context).push(
+        new MaterialPageRoute(
+          builder: (context) => EarnCash(),
+          fullscreenDialog: true,
         ),
       );
     }
@@ -123,6 +192,7 @@ class AppDrawerState extends State<AppDrawer> {
             title: Text('EARN CASH'),
             onTap: () {
               Navigator.pop(context);
+              _showEarnCash();
             },
           ),
           ListTile(
@@ -135,12 +205,14 @@ class AppDrawerState extends State<AppDrawer> {
             title: Text('SCORING SYSTEM'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("SCORING");
             },
           ),
           ListTile(
             title: Text('HELP'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("HELP");
             },
           ),
           ListTile(
@@ -153,30 +225,35 @@ class AppDrawerState extends State<AppDrawer> {
             title: Text('FORUM'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("FORUM");
             },
           ),
           ListTile(
             title: Text('BLOG'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("BLOG");
             },
           ),
           ListTile(
             title: Text('ABOUT US'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("ABOUT_US");
             },
           ),
           ListTile(
             title: Text('TERMS AND CONDITION'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("T&C");
             },
           ),
           ListTile(
             title: Text('PRIVACY POLICY'),
             onTap: () {
               Navigator.pop(context);
+              _launchStaticPage("PRIVACY");
             },
           ),
           ListTile(

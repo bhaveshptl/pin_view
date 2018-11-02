@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:playfantasy/lobby/tabs/myconteststatustab.dart';
 class MyContests extends StatefulWidget {
   final List<League> leagues;
   final Function onSportChange;
+  final double tabBarHeight = 32.0;
 
   MyContests({this.leagues, this.onSportChange});
 
@@ -24,10 +26,14 @@ class MyContests extends StatefulWidget {
   }
 }
 
-class MyContestsState extends State<MyContests> {
+class MyContestsState extends State<MyContests>
+    with SingleTickerProviderStateMixin {
   String cookie;
   int _sportType = 1;
+  int selectedSegment = 0;
   List<League> _leagues = [];
+  TabController tabController;
+  Map<int, List<MyContestStatusTab>> tabs = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapLiveContest = {};
   Map<String, List<Contest>> _mapResultContest = {};
@@ -40,18 +46,21 @@ class MyContestsState extends State<MyContests> {
     _getMyContests();
     _leagues = widget.leagues;
     sockets.register(_onWsMsg);
+    tabController = TabController(length: 2, vsync: this);
   }
 
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
-    if (_response["iType"] == 1 && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.GET_ALL_SERIES &&
+        _response["bSuccessful"] == true) {
       List<dynamic> _mapLeagues = json.decode(_response["data"]);
       List<League> leagues =
           _mapLeagues.map((i) => League.fromJson(i)).toList();
       setState(() {
         _leagues = leagues;
       });
-    } else if (_response["iType"] == 2 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.LOBBY_REFRESH_DATA &&
+        _response["bSuccessful"] == true) {
       if (_response["data"]["bDataModified"] == true &&
           (_response["data"]["lstModified"] as List).length > 0) {
         List<League> _modifiedLeagues =
@@ -73,9 +82,11 @@ class MyContestsState extends State<MyContests> {
           _setContestsByStatus(_mapMyAllContests);
         });
       }
-    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
+        _response["bSuccessful"] == true) {
       _applyContestDataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        _response["bSuccessful"] == true) {
       _update(_response["data"]);
     }
   }
@@ -111,6 +122,7 @@ class MyContestsState extends State<MyContests> {
       if (_contest.id == _data["cId"]) {
         setState(() {
           _contest.joined = _data["iJC"];
+          updateTabs();
         });
       }
     }
@@ -325,7 +337,71 @@ class MyContestsState extends State<MyContests> {
       _mapLiveContest = mapLiveContest;
       _mapResultContest = mapResultContest;
       _mapUpcomingContest = mapUpcomingContest;
+      updateTabs();
     });
+  }
+
+  updateTabs() {
+    tabs = {
+      1: [
+        MyContestStatusTab(
+          leagues: _leagues,
+          fantasyType: 1,
+          scaffoldKey: _scaffoldKey,
+          onContestClick: _onContestClick,
+          mapContestTeams: _mapContestTeams,
+          mapMyContests: _mapUpcomingContest,
+          leagueStatus: LeagueStatus.UPCOMING,
+        ),
+        MyContestStatusTab(
+          leagues: _leagues,
+          fantasyType: 1,
+          scaffoldKey: _scaffoldKey,
+          mapMyContests: _mapLiveContest,
+          onContestClick: _onContestClick,
+          mapContestTeams: _mapContestTeams,
+          leagueStatus: LeagueStatus.LIVE,
+        ),
+        MyContestStatusTab(
+          leagues: _leagues,
+          fantasyType: 1,
+          scaffoldKey: _scaffoldKey,
+          onContestClick: _onContestClick,
+          mapMyContests: _mapResultContest,
+          mapContestTeams: _mapContestTeams,
+          leagueStatus: LeagueStatus.COMPLETED,
+        )
+      ],
+      2: [
+        MyContestStatusTab(
+          leagues: _leagues,
+          fantasyType: 2,
+          scaffoldKey: _scaffoldKey,
+          onContestClick: _onContestClick,
+          mapContestTeams: _mapContestTeams,
+          mapMyContests: _mapUpcomingContest,
+          leagueStatus: LeagueStatus.UPCOMING,
+        ),
+        MyContestStatusTab(
+          leagues: _leagues,
+          fantasyType: 2,
+          scaffoldKey: _scaffoldKey,
+          mapMyContests: _mapLiveContest,
+          onContestClick: _onContestClick,
+          mapContestTeams: _mapContestTeams,
+          leagueStatus: LeagueStatus.LIVE,
+        ),
+        MyContestStatusTab(
+          leagues: _leagues,
+          fantasyType: 2,
+          scaffoldKey: _scaffoldKey,
+          onContestClick: _onContestClick,
+          mapMyContests: _mapResultContest,
+          mapContestTeams: _mapContestTeams,
+          leagueStatus: LeagueStatus.COMPLETED,
+        )
+      ]
+    };
   }
 
   _getMyContestMyTeams(Map<String, List<Contest>> _mapMyContests) async {
@@ -362,6 +438,7 @@ class MyContestsState extends State<MyContests> {
 
         setState(() {
           _mapContestTeams = _mapContestMyTeams;
+          updateTabs();
         });
       }
     });
@@ -388,124 +465,127 @@ class MyContestsState extends State<MyContests> {
     );
   }
 
+  getMyContestTabs(int fantasyType) {
+    return Column(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: SizedBox(
+            width: 500.0,
+            child: CupertinoSegmentedControl<int>(
+              children: {
+                0: Text(strings.get("UPCOMING").toUpperCase()),
+                1: Text(strings.get("LIVE").toUpperCase()),
+                2: Text(strings.get("RESULT").toUpperCase()),
+              },
+              onValueChanged: (int newValue) {
+                setState(() {
+                  selectedSegment = newValue;
+                });
+              },
+              groupValue: selectedSegment,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 4.0,
+            ),
+            child: tabs[fantasyType] != null
+                ? tabs[fantasyType][selectedSegment]
+                : Container(),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        elevation: 0.0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            DropdownButton(
-              style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: Theme.of(context).primaryTextTheme.title.fontSize),
-              onChanged: (value) {
-                setState(() {
-                  _sportType = value;
+        key: _scaffoldKey,
+        appBar: AppBar(
+          elevation: 0.0,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              DropdownButton(
+                style: TextStyle(
+                    color: Colors.black45,
+                    fontSize:
+                        Theme.of(context).primaryTextTheme.title.fontSize),
+                onChanged: (value) {
+                  setState(() {
+                    _sportType = value;
 
-                  _getMyContests(checkForPrevSelection: false);
-                });
-                if (widget.onSportChange != null) {
-                  widget.onSportChange(value);
-                }
-              },
-              value: _sportType,
-              items: [
-                DropdownMenuItem(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                    child: Text(strings.get("CRICKET").toUpperCase()),
-                  ),
-                  value: 1,
-                ),
-                DropdownMenuItem(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                    child: Text(strings.get("FOOTBALL").toUpperCase()),
-                  ),
-                  value: 2,
-                ),
-                DropdownMenuItem(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                    child: Text(strings.get("KABADDI").toUpperCase()),
-                  ),
-                  value: 3,
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
-      body: DefaultTabController(
-        length: 3,
-        child: Column(
-          children: <Widget>[
-            new Container(
-              constraints: BoxConstraints(maxHeight: 150.0),
-              child: new Material(
-                color: Theme.of(context).primaryColor,
-                child: TabBar(
-                  tabs: <Widget>[
-                    Tooltip(
-                      message: strings.get("UPCOMING_MATCHES"),
-                      child: Tab(
-                        text: strings.get("UPCOMING").toUpperCase(),
-                      ),
+                    _getMyContests(checkForPrevSelection: false);
+                  });
+                  if (widget.onSportChange != null) {
+                    widget.onSportChange(value);
+                  }
+                },
+                value: _sportType,
+                items: [
+                  DropdownMenuItem(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                      child: Text(strings.get("CRICKET").toUpperCase()),
                     ),
-                    Tooltip(
-                      message: strings.get("LIVE_MATCHES"),
-                      child: Tab(
-                        text: strings.get("LIVE").toUpperCase(),
-                      ),
+                    value: 1,
+                  ),
+                  DropdownMenuItem(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                      child: Text(strings.get("FOOTBALL").toUpperCase()),
                     ),
-                    Tooltip(
-                      message: strings.get("COMPLETED_MATCHES"),
-                      child: Tab(
-                        text: strings.get("RESULT").toUpperCase(),
-                      ),
+                    value: 2,
+                  ),
+                  DropdownMenuItem(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
+                      child: Text(strings.get("KABADDI").toUpperCase()),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            new Expanded(
-              flex: 1,
-              child: TabBarView(
-                children: <Widget>[
-                  MyContestStatusTab(
-                    leagues: _leagues,
-                    scaffoldKey: _scaffoldKey,
-                    onContestClick: _onContestClick,
-                    mapContestTeams: _mapContestTeams,
-                    mapMyContests: _mapUpcomingContest,
-                    leagueStatus: LeagueStatus.UPCOMING,
-                  ),
-                  MyContestStatusTab(
-                    leagues: _leagues,
-                    scaffoldKey: _scaffoldKey,
-                    mapMyContests: _mapLiveContest,
-                    onContestClick: _onContestClick,
-                    mapContestTeams: _mapContestTeams,
-                    leagueStatus: LeagueStatus.LIVE,
-                  ),
-                  MyContestStatusTab(
-                    leagues: _leagues,
-                    scaffoldKey: _scaffoldKey,
-                    onContestClick: _onContestClick,
-                    mapMyContests: _mapResultContest,
-                    mapContestTeams: _mapContestTeams,
-                    leagueStatus: LeagueStatus.COMPLETED,
-                  ),
+                    value: 3,
+                  )
                 ],
               ),
+            ],
+          ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(widget.tabBarHeight),
+            child: TabBar(
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white30,
+              controller: tabController,
+              tabs: [
+                Container(
+                  height: widget.tabBarHeight,
+                  child: Tab(
+                    text: "MATCH",
+                  ),
+                ),
+                Container(
+                  height: widget.tabBarHeight,
+                  child: Tab(
+                    text: "INNINGS",
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        body: TabBarView(
+          controller: tabController,
+          children: <Widget>[
+            Container(
+              child: getMyContestTabs(1),
+            ),
+            Container(
+              child: getMyContestTabs(2),
             ),
           ],
-        ),
-      ),
-    );
+        ));
   }
 
   @override

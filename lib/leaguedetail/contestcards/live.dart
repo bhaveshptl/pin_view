@@ -189,6 +189,7 @@ class LiveContest extends StatelessWidget {
                     child: Row(
                       children: <Widget>[
                         Expanded(
+                          flex: 1,
                           child: Column(
                             children: <Widget>[
                               Row(
@@ -225,6 +226,7 @@ class LiveContest extends StatelessWidget {
                           color: Colors.black12,
                         ),
                         Expanded(
+                          flex: 2,
                           child: Column(
                             children: <Widget>[
                               Row(
@@ -263,6 +265,7 @@ class LiveContest extends StatelessWidget {
                           color: Colors.black12,
                         ),
                         Expanded(
+                          flex: 1,
                           child: Column(
                             children: <Widget>[
                               Row(
@@ -301,6 +304,7 @@ class LiveContest extends StatelessWidget {
                           color: Colors.black12,
                         ),
                         Expanded(
+                          flex: 1,
                           child: Column(
                             children: <Widget>[
                               Row(

@@ -7,10 +7,11 @@ import 'package:playfantasy/utils/stringtable.dart';
 const double TEAM_LOGO_HEIGHT = 24.0;
 
 class LeagueCard extends StatelessWidget {
+  final TabBar tabBar;
   final League _league;
   final bool clickable;
   final Function onClick;
-  LeagueCard(this._league, {this.onClick, this.clickable = true});
+  LeagueCard(this._league, {this.onClick, this.tabBar, this.clickable = true});
 
   @override
   Widget build(BuildContext context) {
@@ -27,118 +28,140 @@ class LeagueCard extends StatelessWidget {
                 onClick(_league);
               }
             },
-            child: Row(
+            child: Column(
               children: <Widget>[
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: EdgeInsets.all(7.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: EdgeInsets.all(7.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text(
-                              _league.matchName,
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .fontSize,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 5,
-                              child: Row(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(5.0),
-                                    child: CachedNetworkImage(
-                                      imageUrl: _league.teamA.logoUrl,
-                                      placeholder: Container(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.0,
-                                        ),
-                                        width: TEAM_LOGO_HEIGHT,
-                                        height: TEAM_LOGO_HEIGHT,
-                                      ),
-                                      height: TEAM_LOGO_HEIGHT,
-                                    ),
-                                  ),
-                                  Text(_league.teamA.name),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                "vs",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  _league.matchName,
+                                  style: TextStyle(
                                     fontSize: Theme.of(context)
                                         .primaryTextTheme
                                         .caption
                                         .fontSize,
-                                    color: Colors.black54),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Text(_league.teamB.name),
-                                  Padding(
-                                    padding: EdgeInsets.all(5.0),
-                                    child: CachedNetworkImage(
-                                      imageUrl: _league.teamB.logoUrl,
-                                      placeholder: Container(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.0,
-                                        ),
-                                        width: TEAM_LOGO_HEIGHT,
-                                        height: TEAM_LOGO_HEIGHT,
-                                      ),
-                                      height: TEAM_LOGO_HEIGHT,
-                                    ),
+                                    color: Colors.black54,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 5,
+                                  child: Row(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: CachedNetworkImage(
+                                          imageUrl: _league.teamA.logoUrl,
+                                          placeholder: Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                            ),
+                                            width: TEAM_LOGO_HEIGHT,
+                                            height: TEAM_LOGO_HEIGHT,
+                                          ),
+                                          height: TEAM_LOGO_HEIGHT,
+                                        ),
+                                      ),
+                                      Text(_league.teamA.name),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "vs",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: Theme.of(context)
+                                            .primaryTextTheme
+                                            .caption
+                                            .fontSize,
+                                        color: Colors.black54),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 5,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: <Widget>[
+                                      Text(_league.teamB.name),
+                                      Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: CachedNetworkImage(
+                                          imageUrl: _league.teamB.logoUrl,
+                                          placeholder: Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                            ),
+                                            width: TEAM_LOGO_HEIGHT,
+                                            height: TEAM_LOGO_HEIGHT,
+                                          ),
+                                          height: TEAM_LOGO_HEIGHT,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
                             )
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 40.0,
-                  width: 1.0,
-                  color: Colors.black12,
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        _league.status == LeagueStatus.COMPLETED
-                            ? strings.get("COMPLETED")
-                            : (_league.status == LeagueStatus.LIVE
-                                ? strings.get("IN_PROGRESS")
-                                : "Timer"),
-                        style: TextStyle(color: Theme.of(context).errorColor),
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      height: 40.0,
+                      width: 1.0,
+                      color: Colors.black12,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            _league.status == LeagueStatus.COMPLETED
+                                ? strings.get("COMPLETED")
+                                : (_league.status == LeagueStatus.LIVE
+                                    ? strings.get("IN_PROGRESS")
+                                    : "Timer"),
+                            style:
+                                TextStyle(color: Theme.of(context).errorColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+                tabBar != null
+                    ? Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(
+                              height: 0.5,
+                              color: Colors.black12,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container(),
+                tabBar != null
+                    ? Row(
+                        children: <Widget>[Expanded(child: tabBar)],
+                      )
+                    : Container(),
               ],
             ),
           ),

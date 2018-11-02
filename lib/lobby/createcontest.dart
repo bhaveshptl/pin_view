@@ -90,16 +90,19 @@ class CreateContestState extends State<CreateContest> {
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.GET_ALL_L1 &&
+        _response["bSuccessful"] == true) {
       setState(() {
         _l1Data = L1.fromJson(_response["data"]["l1"]);
         _myTeams = (_response["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
       });
-    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
+        _response["bSuccessful"] == true) {
       _applyL1DataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == 7 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
+        _response["bSuccessful"] == true) {
       MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
       setState(() {
         bool bFound = false;
@@ -170,10 +173,10 @@ class CreateContestState extends State<CreateContest> {
         context: context,
         builder: (BuildContext context) {
           return JoinContest(
+            l1Data: _l1Data,
             myTeams: _myTeams,
             onCreateTeam: _onCreateTeam,
             createContestPayload: payload,
-            matchId: _l1Data.league.rounds[0].matches[0].id,
           );
         },
       );

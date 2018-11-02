@@ -19,6 +19,7 @@ import 'package:playfantasy/commonwidgets/prizestructure.dart';
 const double TEAM_LOGO_HEIGHT = 24.0;
 
 class MyContestStatusTab extends StatefulWidget {
+  final int fantasyType;
   final int leagueStatus;
   final List<League> leagues;
   final Function onContestClick;
@@ -26,13 +27,15 @@ class MyContestStatusTab extends StatefulWidget {
   final Map<int, List<MyTeam>> mapContestTeams;
   final Map<String, List<Contest>> mapMyContests;
 
-  MyContestStatusTab(
-      {this.leagues,
-      this.scaffoldKey,
-      this.mapMyContests,
-      this.mapContestTeams,
-      this.onContestClick,
-      this.leagueStatus});
+  MyContestStatusTab({
+    this.leagues,
+    this.scaffoldKey,
+    this.fantasyType,
+    this.leagueStatus,
+    this.mapMyContests,
+    this.onContestClick,
+    this.mapContestTeams,
+  });
 
   @override
   _MyContestStatusTabState createState() => _MyContestStatusTabState();
@@ -45,6 +48,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
   List<MyTeam> _myTeams;
   bool bShowJoinContest = false;
   Map<String, dynamic> l1DataObj = {};
+  Map<String, List<Contest>> myContests;
 
   @override
   initState() {
@@ -52,10 +56,30 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     sockets.register(_onWsMsg);
   }
 
+  filterMyContests() {
+    Map<String, List<Contest>> mapContests = {};
+    widget.mapMyContests.forEach((String key, List<Contest> contests) {
+      contests.forEach((Contest contest) {
+        if ((widget.fantasyType == 1 &&
+                (contest.inningsId == null || contest.inningsId == 0) ||
+            (widget.fantasyType == 2 &&
+                (contest.inningsId != null && contest.inningsId > 0)))) {
+          if (mapContests[key] == null) {
+            mapContests[key] = [];
+          }
+          mapContests[key].add(contest);
+        }
+      });
+    });
+
+    return mapContests;
+  }
+
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.GET_ALL_L1 &&
+        _response["bSuccessful"] == true) {
       _l1Data = L1.fromJson(_response["data"]["l1"]);
       _myTeams = (_response["data"]["myteams"] as List)
           .map((i) => MyTeam.fromJson(i))
@@ -82,7 +106,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
             ? strings.get("NO_RUNNING_CONTEST")
             : strings.get("NO_UPCOMING_CONTEST");
 
-    return widget.mapMyContests.keys.length == 0
+    return myContests.keys.length == 0
         ? Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -101,10 +125,10 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
             ),
           )
         : ListView.builder(
-            itemCount: widget.mapMyContests.keys.length,
+            itemCount: myContests.keys.length,
             itemBuilder: (context, index) {
-              List<Contest> _leagueContests = widget
-                  .mapMyContests[widget.mapMyContests.keys.elementAt(index)];
+              List<Contest> _leagueContests =
+                  myContests[myContests.keys.elementAt(index)];
               League _league = _getLeague(_leagueContests[0].leagueId);
               return _league == null
                   ? Container()
@@ -223,7 +247,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
   }
 
   _createL1WSObject(Contest contest) {
-    l1DataObj["iType"] = 5;
+    l1DataObj["iType"] = RequestType.GET_ALL_L1;
     l1DataObj["sportsId"] = 1;
     l1DataObj["bResAvail"] = true;
     l1DataObj["id"] = contest.leagueId;
@@ -237,10 +261,10 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
         context: context,
         builder: (BuildContext context) {
           return JoinContest(
+            l1Data: _l1Data,
             contest: contest,
             myTeams: _myTeams,
             onCreateTeam: _onCreateTeam,
-            matchId: _l1Data.league.rounds[0].matches[0].id,
             onError: onJoinContestError,
           );
         },
@@ -427,6 +451,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
 
   @override
   Widget build(BuildContext context) {
+    myContests = filterMyContests();
     return Container(
       child: Center(
         child: _getMyContestCards(),

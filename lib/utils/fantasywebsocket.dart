@@ -7,6 +7,24 @@ import 'package:web_socket_channel/io.dart';
 
 FantasyWebSocket sockets = new FantasyWebSocket();
 
+class RequestType {
+  RequestType._internal();
+
+  factory RequestType() => RequestType._internal();
+
+  static const GET_ALL_SERIES = 1;
+  static const LOBBY_REFRESH_DATA = 2;
+  static const GET_L1_DATA = 3;
+  static const L1_DATA_REFRESHED = 4;
+  static const GET_ALL_L1 = 5;
+  static const JOIN_COUNT_CHNAGE = 6;
+  static const MY_TEAMS_ADDED = 7;
+  static const MY_TEAM_MODIFIED = 8;
+  static const REQ_REG_DEREG_MY_CONTEST = 9;
+  static const REQ_L1_INNINGS_ALL_DATA = 10;
+  static const REQ_L1_INNINGS_DATA = 11;
+}
+
 class FantasyWebSocket {
   static IOWebSocketChannel _channel;
   static ObserverList<Function> _listeners = new ObserverList<Function>();

@@ -157,7 +157,7 @@ class FanTeamRule {
       playersTotal: json["playersTotal"],
       credits: json["credits"],
       captainMult: json["captainMult"],
-      vcMult: json["vcMult"],
+      vcMult: (json["vcMult"]).toDouble(),
       styles: (json["styles"] as List)
           .map((i) => PlayingStyle.fromJson(i))
           .toList(),
@@ -305,6 +305,7 @@ class Contest {
   int endTime;
   int status;
   int visibilityId;
+  int realTeamId;
   String visibilityInfo;
   String contestJoinCode;
   int joined;
@@ -337,6 +338,7 @@ class Contest {
     this.visibilityInfo,
     this.contestJoinCode,
     this.joined,
+    this.realTeamId,
     this.prizeDetails,
     this.brand,
     this.milestones,
@@ -365,6 +367,7 @@ class Contest {
       startTime: json["startTime"],
       endTime: json["endTime"],
       status: json["status"],
+      realTeamId: json["realTeamId"],
       visibilityId: json["visibilityId"],
       visibilityInfo: json["visibilityInfo"],
       contestJoinCode: json["contestJoinCode"],

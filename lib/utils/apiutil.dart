@@ -4,6 +4,8 @@ class ApiUtil {
   static const SHARED_PREFERENCE_SPORT_SELECTION = "fantasy_sport_selection";
   static const WS_SHARED_PREFERENCE_KEY = "ws_fantasy_cookie";
   static const LANGUAGE_TABLE = "fantasy_language_table";
+  static const KEY_INIT_DATA = "fantasy_init_data";
+
   static const WEBSOCKET_URL = "wss://lobby-stg.playfantasy.com/path?pid=";
   static const UPDATE_LANGUAGE_TABLE =
       BASE_API_URL + "v2/lobby/updatestringtable";
@@ -25,6 +27,7 @@ class ApiUtil {
   static const FORGOT_PASSWORD = BASE_API_URL + "ups/forgotPassword";
   static const RESET_PASSWORD =
       BASE_API_URL + "v2/ups/user/forgotPassword/resetpassword";
+  static const INIT_DATA = BASE_API_URL + "v2/lobby/initData";
 
   static const RECOMMENDED_PRIZE_STRUCTURE =
       BASE_API_URL + "lobby/contest/prizestructure/suggestion/";

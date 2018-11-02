@@ -36,7 +36,8 @@ class MyTeamsState extends State<MyTeams> {
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        _response["bSuccessful"] == true) {
       MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
       int i = 0;
       for (MyTeam _team in _myTeams) {

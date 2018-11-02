@@ -76,7 +76,7 @@ class _ViewTeamState extends State<ViewTeam> {
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == 8 && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.MY_TEAM_MODIFIED && _response["bSuccessful"] == true) {
       MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
 
       if (widget.team.id == teamUpdated.id) {

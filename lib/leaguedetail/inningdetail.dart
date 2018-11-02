@@ -1,97 +1,204 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/l1.dart';
+
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/lobby/addcash.dart';
+import 'package:playfantasy/modal/l1.dart' as L1;
+import 'package:playfantasy/lobby/mycontest.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/lobby/createcontest.dart';
+import 'package:playfantasy/leaguedetail/myteams.dart';
+import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/leaguedetail/contests.dart';
+import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/commonwidgets/statedob.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
-import 'package:playfantasy/leaguedetail/createteam.dart';
-import 'package:playfantasy/leaguedetail/contestcard.dart';
-import 'package:playfantasy/commonwidgets/joincontest.dart';
-import 'package:playfantasy/contestdetail/contestdetail.dart';
-import 'package:playfantasy/commonwidgets/prizestructure.dart';
 
-class Contests extends StatefulWidget {
-  final L1 l1Data;
+class InningDetails extends StatefulWidget {
+  final L1.Team team;
   final League league;
-  final List<MyTeam> myTeams;
-  final GlobalKey<ScaffoldState> scaffoldKey;
-  final Map<int, List<MyTeam>> mapContestTeams;
+  final List<League> leagues;
+  final Function onSportChange;
 
-  Contests({
-    this.league,
-    this.l1Data,
-    this.myTeams,
-    this.scaffoldKey,
-    this.mapContestTeams,
-  });
+  InningDetails({this.league, this.onSportChange, this.leagues, this.team});
 
   @override
-  State<StatefulWidget> createState() => ContestsState();
+  InningDetailsState createState() => InningDetailsState();
 }
 
-class ContestsState extends State<Contests> {
-  L1 _l1Data;
+class InningDetailsState extends State<InningDetails> {
   String cookie;
+  int _sportType;
+  L1.L1 inningsData;
   List<MyTeam> _myTeams;
-  List<Contest> _contests = [];
-
-  Contest _curContest;
-  bool bShowJoinContest = false;
-  bool bWaitingForTeamCreation = false;
+  Map<String, dynamic> inningsDataObj = {};
+  Map<int, List<MyTeam>> _mapContestTeams = {};
+  Map<String, List<Contest>> _mapMyContests = {};
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _l1Data = widget.l1Data;
-    _myTeams = widget.myTeams;
-    _contests = widget.l1Data.contests;
     sockets.register(_onWsMsg);
+
+    _getInningsData();
+  }
+
+  _getInningsData() async {
+    await _getSportsType();
+
+    inningsDataObj["sportsId"] = _sportType;
+    inningsDataObj["teamId"] = widget.team.id;
+    inningsDataObj["id"] = widget.league.leagueId;
+    inningsDataObj["inningsId"] = widget.team.inningsId;
+    inningsDataObj["iType"] = RequestType.REQ_L1_INNINGS_ALL_DATA;
+
+    _getMyContests();
+    sockets.sendMessage(inningsDataObj);
+  }
+
+  _getSportsType() async {
+    Future<dynamic> futureSportType =
+        SharedPrefHelper.internal().getSportsType();
+    await futureSportType.then((value) {
+      if (value != null) {
+        _sportType = int.parse(value);
+      }
+    });
+  }
+
+  _getMyContests() async {
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
+
+    return new http.Client().get(
+      ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+      headers: {'Content-type': 'application/json', "cookie": cookie},
+    ).then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> response = json.decode(res.body);
+        setState(() {
+          _mapMyContests = MyContest.fromJson(response).leagues;
+          _getMyContestMyTeams(_mapMyContests);
+        });
+      }
+    });
+  }
+
+  _getMyContestMyTeams(Map<String, List<Contest>> _mapMyContests) async {
+    List<int> _contestIds = [];
+    List<Contest> _contests = _mapMyContests[widget.league.leagueId.toString()];
+    if (_contests != null) {
+      for (Contest contest in _contests) {
+        _contestIds.add(contest.id);
+      }
+
+      if (cookie == null) {
+        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+        await futureCookie.then((value) {
+          cookie = value;
+        });
+      }
+
+      return new http.Client()
+          .post(
+        ApiUtil.GET_MY_CONTEST_MY_TEAMS,
+        headers: {'Content-type': 'application/json', "cookie": cookie},
+        body: json.encoder.convert(_contestIds),
+      )
+          .then((http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<int, List<MyTeam>> _mapContestMyTeams = {};
+          Map<String, dynamic> response = json.decode(res.body);
+          response.forEach((String key, dynamic value) {
+            List<MyTeam> _myTeams =
+                (value as List).map((i) => MyTeam.fromJson(i)).toList();
+            _mapContestMyTeams[int.parse(key)] = _myTeams;
+          });
+
+          setState(() {
+            _mapContestTeams = _mapContestMyTeams;
+          });
+        }
+      });
+    }
   }
 
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
+    if (_response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA &&
         _response["bSuccessful"] == true) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
       setState(() {
-        bool bFound = false;
-        for (MyTeam _myTeam in _myTeams) {
-          if (_myTeam.id == teamAdded.id) {
-            bFound = true;
-          }
-        }
-        if (!bFound) {
-          _myTeams.add(teamAdded);
-        }
-        if (bShowJoinContest) {
-          onJoinContest(_curContest);
-        }
-        bWaitingForTeamCreation = false;
+        inningsData = L1.L1.fromJson(_response["data"]["l1"]);
+        _myTeams = (_response["data"]["myteams"] as List)
+            .map((i) => MyTeam.fromJson(i))
+            .toList();
       });
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _updateJoinCount(_response["data"]);
     } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
         _response["bSuccessful"] == true) {
       _applyL1DataUpdate(_response["diffData"]["ld"]);
+    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        _response["bSuccessful"] == true) {
+      _updateJoinCount(_response["data"]);
+      _updateContestTeams(_response["data"]);
+    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
+        _response["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+      bool bFound = false;
+      for (MyTeam _myTeam in _myTeams) {
+        if (_myTeam.id == teamAdded.id) {
+          bFound = true;
+        }
+      }
+      if (!bFound) {
+        setState(() {
+          _myTeams.add(teamAdded);
+        });
+      }
+    } else if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        _response["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+      int i = 0;
+      for (MyTeam _team in _myTeams) {
+        if (_team.id == teamUpdated.id) {
+          setState(() {
+            _myTeams[i] = teamUpdated;
+          });
+        }
+        i++;
+      }
     }
   }
 
   _updateJoinCount(Map<String, dynamic> _data) {
-    for (Contest _contest in _contests) {
+    for (Contest _contest in inningsData.contests) {
       if (_contest.id == _data["cId"]) {
         setState(() {
           _contest.joined = _data["iJC"];
         });
       }
     }
+  }
+
+  _updateContestTeams(Map<String, dynamic> _data) {
+    Map<String, dynamic> _mapContestTeamsUpdate = _data["teamsByContest"];
+    _mapContestTeamsUpdate.forEach((String key, dynamic _contestTeams) {
+      List<MyTeam> _teams = (_mapContestTeamsUpdate[key] as List)
+          .map((i) => MyTeam.fromJson(i))
+          .toList();
+      setState(() {
+        _mapContestTeams[int.parse(key)] = _teams;
+      });
+    });
   }
 
   _applyL1DataUpdate(Map<String, dynamic> _data) {
@@ -101,17 +208,18 @@ class ContestsState extends State<Contests> {
       setState(() {
         for (Contest _contest in _addedContests) {
           bool bFound = false;
-          for (Contest _curContest in _l1Data.contests) {
+          for (Contest _curContest in inningsData.contests) {
             if (_curContest.id == _contest.id) {
               bFound = true;
             }
           }
-          if (!bFound && _l1Data.league.id == _contest.leagueId) {
-            _l1Data.contests.add(_contest);
+          if (!bFound && inningsData.league.id == _contest.leagueId) {
+            inningsData.contests.add(_contest);
           }
         }
       });
     }
+
     if (_data["lstRemoved"] != null && _data["lstRemoved"].length > 0) {
       List<int> _removedContestIndexes = [];
       List<Contest> _lstRemovedContests = (_data["lstRemoved"] as List)
@@ -119,7 +227,7 @@ class ContestsState extends State<Contests> {
           .toList();
       for (Contest _removedContest in _lstRemovedContests) {
         int index = 0;
-        for (Contest _contest in _l1Data.contests) {
+        for (Contest _contest in inningsData.contests) {
           if (_removedContest.id == _contest.id) {
             _removedContestIndexes.add(index);
           }
@@ -128,14 +236,15 @@ class ContestsState extends State<Contests> {
       }
       setState(() {
         for (int i = _removedContestIndexes.length - 1; i >= 0; i--) {
-          _l1Data.contests.removeAt(_removedContestIndexes[i]);
+          inningsData.contests.removeAt(_removedContestIndexes[i]);
         }
       });
     }
+
     if (_data["lstModified"] != null && _data["lstModified"].length >= 1) {
       List<dynamic> _modifiedContests = _data["lstModified"];
       for (Map<String, dynamic> _changedContest in _modifiedContests) {
-        for (Contest _contest in _l1Data.contests) {
+        for (Contest _contest in inningsData.contests) {
           if (_contest.id == _changedContest["id"]) {
             setState(() {
               if (_changedContest["name"] != null &&
@@ -263,181 +372,7 @@ class ContestsState extends State<Contests> {
     }
   }
 
-  _onContestClick(Contest contest, League league) {
-    Navigator.of(context).push(
-      new MaterialPageRoute(
-        builder: (context) => ContestDetail(
-              contest: contest,
-              league: league,
-              l1Data: _l1Data,
-              myTeams: _myTeams,
-              mapContestTeams: widget.mapContestTeams != null
-                  ? widget.mapContestTeams[contest.id]
-                  : null,
-            ),
-      ),
-    );
-  }
-
-  onJoinContest(Contest contest) async {
-    bShowJoinContest = false;
-    if (_myTeams.length > 0) {
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinContest(
-            l1Data: _l1Data,
-            contest: contest,
-            myTeams: _myTeams,
-            onCreateTeam: _onCreateTeam,
-            onError: onJoinContestError,
-          );
-        },
-      );
-
-      if (result != null) {
-        widget.scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(strings.get("ALERT").toUpperCase()),
-            content: Text(
-              strings.get("CREATE_TEAM_WARNING"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  strings.get("CANCEL").toUpperCase(),
-                ),
-              ),
-              FlatButton(
-                onPressed: () {
-                  _onCreateTeam(context, contest);
-                },
-                child: Text(strings.get("CREATE").toUpperCase()),
-              )
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  _showJoinContestError({String title, String message}) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  void _onCreateTeam(BuildContext context, Contest contest) async {
-    final curContest = contest;
-
-    bWaitingForTeamCreation = true;
-    Navigator.of(context).pop();
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: _l1Data,
-            ),
-      ),
-    );
-
-    if (result != null) {
-      if (curContest != null) {
-        if (bWaitingForTeamCreation) {
-          _curContest = curContest;
-          bShowJoinContest = true;
-        } else {
-          onJoinContest(curContest);
-        }
-      }
-      widget.scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(result),
-        ),
-      );
-      Navigator.of(context).pop();
-    }
-    bWaitingForTeamCreation = false;
-  }
-
-  void _showPrizeStructure(Contest contest) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PrizeStructure(
-          contest: contest,
-        );
-      },
-    );
-  }
-
-  onStateDobUpdate(String msg) {
-    widget.scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(msg)));
-  }
-
-  _showAddCashConfirmation(Contest contest) {
-    final curContest = contest;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            strings.get("INSUFFICIENT_FUND").toUpperCase(),
-          ),
-          content: Text(
-            strings.get("INSUFFICIENT_FUND_MSG"),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("CANCEL").toUpperCase(),
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _launchDepositJourneyForJoinContest(curContest);
-              },
-              child: Text(
-                strings.get("DEPOSIT").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  _launchDepositJourneyForJoinContest(Contest contest) async {
-    final curContest = contest;
+  _launchAddCash() async {
     if (cookie == null) {
       Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
       await futureCookie.then((value) {
@@ -447,92 +382,103 @@ class ContestsState extends State<Contests> {
       });
     }
 
-    final result = await Navigator.of(context).push(new MaterialPageRoute(
+    Navigator.of(context).push(new MaterialPageRoute(
         builder: (context) => AddCash(
               cookie: cookie,
             ),
         fullscreenDialog: true));
-    if (result == true) {
-      onJoinContest(curContest);
-    }
   }
 
-  onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
-    JoinContestError error;
-    if (errorResponse["error"] == true) {
-      error = JoinContestError([errorResponse["resultCode"]]);
-    } else {
-      error = JoinContestError(errorResponse["reasons"]);
+  _onNavigationSelectionChange(BuildContext context, int index) async {
+    var result;
+    switch (index) {
+      case 1:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => MyTeams(
+                  league: widget.league,
+                  l1Data: inningsData,
+                  myTeams: _myTeams,
+                )));
+        break;
+      case 2:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => MyContests(
+                leagues: widget.leagues,
+                onSportChange: widget.onSportChange,
+              ),
+        ));
+        break;
+      case 3:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CreateContest(
+                league: widget.league,
+                l1data: inningsData,
+                myTeams: _myTeams,
+              ),
+        ));
+        break;
+      case 4:
+        _launchAddCash();
+        break;
     }
-
-    Navigator.of(context).pop();
-    if (error.isBlockedUser()) {
-      _showJoinContestError(
-        title: error.getTitle(),
-        message: error.getErrorMessage(),
+    if (result != null) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(result),
+        ),
       );
-    } else {
-      int errorCode = error.getErrorCode();
-      switch (errorCode) {
-        case 3:
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return StateDob();
-            },
-          );
-          break;
-        case 12:
-          _showAddCashConfirmation(contest);
-          break;
-        case 6:
-          _showJoinContestError(
-            message: strings.get("ALERT"),
-            title: strings.get("NOT_VERIFIED"),
-          );
-          break;
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: widget.l1Data.contests.length == 0
-          ? Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Center(
-                child: Text(
-                  strings.get("CONTESTS_NOT_AVAILABLE"),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).errorColor,
-                    fontSize:
-                        Theme.of(context).primaryTextTheme.headline.fontSize,
-                  ),
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(widget.team.name + " " + "inning"),
+            actions: <Widget>[
+              Tooltip(
+                message: strings.get("CONTEST_FILTER"),
+                child: IconButton(
+                  icon: Icon(Icons.filter_list),
+                  onPressed: () {
+                    // _showFilterDialog();
+                  },
                 ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: _contests.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                  child: ContestCard(
-                    l1Data: widget.l1Data,
-                    league: widget.league,
-                    contest: _contests[index],
-                    onClick: _onContestClick,
-                    onJoin: onJoinContest,
-                    onPrizeStructure: _showPrizeStructure,
-                    myJoinedTeams: widget.mapContestTeams != null
-                        ? widget.mapContestTeams[_contests[index].id]
-                        : null,
+              )
+            ],
+          ),
+          body: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: LeagueCard(
+                      widget.league,
+                      clickable: false,
+                    ),
                   ),
-                );
-              },
-            ),
+                ],
+              ),
+              Expanded(
+                child: inningsData == null
+                    ? Container()
+                    : Contests(
+                        l1Data: inningsData,
+                        myTeams: _myTeams,
+                        league: widget.league,
+                        scaffoldKey: _scaffoldKey,
+                        mapContestTeams: _mapContestTeams,
+                      ),
+              ),
+            ],
+          ),
+          bottomNavigationBar:
+              LobbyBottomNavigation(_onNavigationSelectionChange, 1),
+        ),
+      ],
     );
   }
 

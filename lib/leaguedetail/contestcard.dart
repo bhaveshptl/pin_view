@@ -16,14 +16,15 @@ class ContestCard extends StatelessWidget {
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
-  ContestCard(
-      {this.l1Data,
-      this.contest,
-      this.onClick,
-      this.onJoin,
-      this.league,
-      this.onPrizeStructure,
-      this.myJoinedTeams});
+  ContestCard({
+    this.l1Data,
+    this.onJoin,
+    this.league,
+    this.contest,
+    this.onClick,
+    this.myJoinedTeams,
+    this.onPrizeStructure,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +66,9 @@ class ContestCard extends StatelessWidget {
                           ),
               ),
               Banner(
-                textStyle: TextStyle(fontSize: 10.0),
                 message: contest.brand["info"],
                 location: BannerLocation.topStart,
+                textStyle: TextStyle(fontSize: 10.0),
               ),
             ],
           ),

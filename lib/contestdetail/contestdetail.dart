@@ -31,12 +31,13 @@ class ContestDetail extends StatefulWidget {
   final L1 l1Data;
   final List<MyTeam> myTeams;
 
-  ContestDetail(
-      {this.league,
-      this.l1Data,
-      this.contest,
-      this.myTeams,
-      this.mapContestTeams});
+  ContestDetail({
+    this.league,
+    this.l1Data,
+    this.contest,
+    this.myTeams,
+    this.mapContestTeams,
+  });
 
   @override
   State<StatefulWidget> createState() => ContestDetailState();
@@ -75,7 +76,7 @@ class ContestDetailState extends State<ContestDetail> {
   _createAndReqL1WS() async {
     await _getSportsType();
 
-    l1UpdatePackate["iType"] = 5;
+    l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
     l1UpdatePackate["bResAvail"] = true;
     l1UpdatePackate["sportsId"] = _sportType;
     l1UpdatePackate["id"] = widget.league.leagueId;
@@ -105,7 +106,8 @@ class ContestDetailState extends State<ContestDetail> {
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == 5 && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.GET_ALL_L1 &&
+        _response["bSuccessful"] == true) {
       setState(() {
         _l1Data = L1.fromJson(_response["data"]["l1"]);
         _myTeams = (_response["data"]["myteams"] as List)
@@ -113,9 +115,11 @@ class ContestDetailState extends State<ContestDetail> {
             .toList();
         _teamsDataSource.updateMyAllTeams(_myTeams);
       });
-    } else if (_response["iType"] == 4 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
+        _response["bSuccessful"] == true) {
       _applyL1DataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == 7 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
+        _response["bSuccessful"] == true) {
       MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
       setState(() {
         bool bFound = false;
@@ -133,7 +137,8 @@ class ContestDetailState extends State<ContestDetail> {
         }
         bWaitingForTeamCreation = false;
       });
-    } else if (_response["iType"] == 6 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        _response["bSuccessful"] == true) {
       _updateJoinCount(_response["data"]);
       _updateContestTeams(_response["data"]);
     }
@@ -204,7 +209,7 @@ class ContestDetailState extends State<ContestDetail> {
             contest: contest,
             myTeams: _myTeams,
             onCreateTeam: _onCreateTeam,
-            matchId: _l1Data.league.rounds[0].matches[0].id,
+            l1Data: _l1Data,
             onError: _onJoinContestError,
           );
         },
@@ -459,60 +464,13 @@ class ContestDetailState extends State<ContestDetail> {
   }
 
   _shareContestDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          children: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Clipboard.setData(
-                  ClipboardData(text: widget.contest.contestJoinCode),
-                );
-                _scaffoldKey.currentState.showSnackBar(
-                  SnackBar(
-                    content: Text(strings.get("CONTEST_COPIED")),
-                  ),
-                );
-                Navigator.of(context).pop();
-              },
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(right: 16.0),
-                    child: Icon(Icons.content_copy),
-                  ),
-                  Text(
-                    strings.get("COPY_CONTEST_CODE").toUpperCase(),
-                  ),
-                ],
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                String contestVisibility =
-                    widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
-                String contestCode = widget.contest.contestJoinCode;
-                String inviteMsg =
-                    "PLAY FANTASY - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code $contestCode and join us.";
+    String contestVisibility =
+        widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
+    String contestCode = widget.contest.contestJoinCode;
+    String inviteMsg =
+        "PLAY FANTASY - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code $contestCode and join us.";
 
-                Navigator.of(context).pop();
-                Share.share(inviteMsg);
-              },
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(right: 16.0),
-                    child: Icon(Icons.share),
-                  ),
-                  Text("SHARE NOW"),
-                ],
-              ),
-            )
-          ],
-        );
-      },
-    );
+    Share.share(inviteMsg);
   }
 
   _getContestTeams(int offset) async {
@@ -681,7 +639,7 @@ class ContestDetailState extends State<ContestDetail> {
                                                     .primaryColorDark,
                                                 fontSize: Theme.of(context)
                                                     .primaryTextTheme
-                                                    .display1
+                                                    .headline
                                                     .fontSize),
                                           ),
                                         ],

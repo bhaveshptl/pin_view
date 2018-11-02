@@ -9,7 +9,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class JoinContest extends StatefulWidget {
-  final int matchId;
+  final L1 l1Data;
   final Contest contest;
   final Function onError;
   final List<MyTeam> myTeams;
@@ -17,7 +17,7 @@ class JoinContest extends StatefulWidget {
   final Map<String, dynamic> createContestPayload;
 
   JoinContest({
-    this.matchId,
+    this.l1Data,
     this.contest,
     this.myTeams,
     this.onError,
@@ -56,15 +56,17 @@ class JoinContestState extends State<JoinContest> {
         ApiUtil.JOIN_CONTEST,
         headers: {'Content-type': 'application/json', "cookie": cookie},
         body: json.encoder.convert({
-          "contestId": widget.contest.id,
+          "sportsId": 1,
           "teamId": _selectedTeamId,
-          "matchId": widget.matchId,
-          "prizeType": widget.contest.prizeType,
-          "contestCode": widget.contest.contestJoinCode,
           "context": {"channel_id": 3},
+          "contestId": widget.contest.id,
           "leagueId": widget.contest.leagueId,
           "entryFee": widget.contest.entryFee,
-          "sportsId": 1
+          "prizeType": widget.contest.prizeType,
+          "realTeamId": widget.contest.realTeamId,
+          "inningsId": widget.l1Data.league.inningsId,
+          "contestCode": widget.contest.contestJoinCode,
+          "matchId": widget.l1Data.league.rounds[0].matches[0].id,
         }),
       )
           .then(
@@ -223,7 +225,6 @@ class JoinContestState extends State<JoinContest> {
         listTeams.add(
           DropdownMenuItem(
             child: Container(
-              width: 110.0,
               child: Text(
                 team.name,
                 overflow: TextOverflow.ellipsis,
@@ -281,13 +282,23 @@ class JoinContestState extends State<JoinContest> {
                     Row(
                       children: <Widget>[
                         Text(
-                          strings.get("CASH").toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          strings.get("CASH").toUpperCase() + " ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .body2
+                                .fontSize,
+                          ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                              strings.rupee + _cashBalance.toStringAsFixed(2)),
+                        Text(
+                          strings.rupee + _cashBalance.toStringAsFixed(2),
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .caption
+                                .fontSize,
+                          ),
                         ),
                       ],
                     ),
@@ -298,13 +309,23 @@ class JoinContestState extends State<JoinContest> {
                     Row(
                       children: <Widget>[
                         Text(
-                          strings.get("BONUS").toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          strings.get("BONUS").toUpperCase() + " ",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .body2
+                                .fontSize,
+                          ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                              strings.rupee + _bonusBalance.toStringAsFixed(2)),
+                        Text(
+                          strings.rupee + _bonusBalance.toStringAsFixed(2),
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .caption
+                                .fontSize,
+                          ),
                         ),
                       ],
                     )
@@ -321,7 +342,11 @@ class JoinContestState extends State<JoinContest> {
                   flex: 3,
                   child: Text(
                     strings.get("ENTRY_FEE"),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize:
+                          Theme.of(context).primaryTextTheme.body2.fontSize,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -336,6 +361,10 @@ class JoinContestState extends State<JoinContest> {
                                 .toStringAsFixed(2)
                             : widget.contest.entryFee.toStringAsFixed(2),
                         textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).primaryTextTheme.body2.fontSize,
+                        ),
                       ),
                     ],
                   ),
@@ -351,7 +380,11 @@ class JoinContestState extends State<JoinContest> {
                   flex: 3,
                   child: Text(
                     "- " + strings.get("BONUS_USABLE"),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize:
+                          Theme.of(context).primaryTextTheme.body2.fontSize,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -363,6 +396,10 @@ class JoinContestState extends State<JoinContest> {
                       Text(
                         usableBonus.toStringAsFixed(2),
                         textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize:
+                              Theme.of(context).primaryTextTheme.body2.fontSize,
+                        ),
                       ),
                     ],
                   ),
@@ -379,7 +416,10 @@ class JoinContestState extends State<JoinContest> {
                 flex: 3,
                 child: Text(
                   strings.get("CASH_TO_PAY"),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
+                  ),
                 ),
               ),
               Expanded(
@@ -394,7 +434,11 @@ class JoinContestState extends State<JoinContest> {
                                   : widget.contest.entryFee) -
                               usableBonus)
                           .toStringAsFixed(2),
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize:
+                            Theme.of(context).primaryTextTheme.body2.fontSize,
+                      ),
                       textAlign: TextAlign.right,
                     ),
                   ],
@@ -406,31 +450,29 @@ class JoinContestState extends State<JoinContest> {
             color: Colors.black12,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Text(
-                  strings.get("SELECT_TEAM"),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                strings.get("TEAM"),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    DropdownButton(
-                      value: _selectedTeamId,
-                      isDense: false,
-                      items: _getTeamList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedTeamId = value;
-                        });
-                      },
-                    )
-                  ],
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  DropdownButton(
+                    value: _selectedTeamId,
+                    isDense: false,
+                    items: _getTeamList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedTeamId = value;
+                      });
+                    },
+                  )
+                ],
               ),
             ],
           ),

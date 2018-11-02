@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
@@ -43,6 +44,8 @@ class LobbyState extends State<Lobby> {
       if (value != null) {
         int _sport = int.parse(value);
         _onSportSelectionChaged(_sport);
+      } else {
+        SharedPrefHelper().saveSportsType(_sportType.toString());
       }
     });
   }
@@ -77,8 +80,10 @@ class LobbyState extends State<Lobby> {
     setState(() {
       switch (index) {
         case 1:
-          Navigator.of(context).push(
-              new MaterialPageRoute(builder: (context) => SearchContest(leagues: _leagues,)));
+          Navigator.of(context).push(new MaterialPageRoute(
+              builder: (context) => SearchContest(
+                    leagues: _leagues,
+                  )));
           break;
         case 2:
           Navigator.of(context).push(
@@ -104,24 +109,38 @@ class LobbyState extends State<Lobby> {
   Future<bool> _onWillPop() {
     return showDialog(
       context: context,
-      builder: (context) => new AlertDialog(
-            title: new Text(strings.get("APP_CLOSE_TITLE")),
-            content: new Text(strings.get("DO_U_W_EXIT")),
+      builder: (context) => AlertDialog(
+            title: Text(strings.get("APP_CLOSE_TITLE")),
+            content: Text(strings.get("DO_U_W_EXIT")),
             actions: <Widget>[
-              new FlatButton(
+              FlatButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: new Text(
+                child: Text(
                   strings.get("NO").toUpperCase(),
                 ),
               ),
-              new FlatButton(
+              FlatButton(
                 onPressed: () => exit(0),
-                child: new Text(
+                child: Text(
                   strings.get("YES").toUpperCase(),
                 ),
               ),
             ],
           ),
+    );
+  }
+
+  launchHelp() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => WebviewScaffold(
+                url: "https://www.playfantasy.com/assets/help.html?cache=" +
+                    DateTime.now().millisecondsSinceEpoch.toString(),
+                appBar: AppBar(
+                  title: Text("HELP"),
+                ),
+              ),
+          fullscreenDialog: true),
     );
   }
 
@@ -181,7 +200,9 @@ class LobbyState extends State<Lobby> {
                 IconButton(
                   icon: Icon(Icons.help_outline),
                   tooltip: strings.get("HOW_TO_PLAY"),
-                  onPressed: () {},
+                  onPressed: () {
+                    launchHelp();
+                  },
                 )
               ],
             ),

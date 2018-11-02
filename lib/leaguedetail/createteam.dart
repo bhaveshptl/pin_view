@@ -701,11 +701,15 @@ class CreateTeamState extends State<CreateTeam> {
       "matchId": widget.league.matchId,
       "leagueId": widget.l1Data.league.id,
       "seriesId": widget.league.series.id,
-      "captain": _captain.id,
-      "viceCaptain": _vCaptain.id,
+      "captain": _captain == null ? -1 : _captain.id,
+      "viceCaptain": _vCaptain == null ? -1 : _vCaptain.id,
       "players": _selectedPlayers,
       "name": "",
     };
+
+    if (widget.l1Data.league.inningsId != null) {
+      team["inningsId"] = widget.l1Data.league.inningsId;
+    }
 
     if (widget.mode == TeamCreationMode.EDIT_TEAM) {
       team["fanTeamId"] = widget.selectedTeam.id;

@@ -82,7 +82,10 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     textColor: Colors.white70,
                     padding: EdgeInsets.all(0.0),
                     onPressed: () {
-                      if (_captain == null || _vCaptain == null) {
+                      if ((widget.fanTeamRules.captainMult != 0 &&
+                              _captain == null) ||
+                          (widget.fanTeamRules.vcMult != 0.0 &&
+                              _vCaptain == null)) {
                         _showErrorMessage(
                           strings.get("CAPTAIN_VCAPTAIN_SELECTION"),
                         );
@@ -131,17 +134,19 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          strings.get("V_CAPTAIN") +
-                              " (" +
-                              widget.fanTeamRules.vcMult.toString() +
-                              "X)",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
+                      widget.fanTeamRules.vcMult != 0.0
+                          ? Expanded(
+                              flex: 3,
+                              child: Text(
+                                strings.get("V_CAPTAIN").toUpperCase() +
+                                    " (" +
+                                    widget.fanTeamRules.vcMult.toString() +
+                                    "X)",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),
@@ -162,7 +167,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                         child: Row(
                           children: <Widget>[
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: CircleAvatar(
                                 minRadius: 20.0,
                                 backgroundColor: Colors.black12,
@@ -180,11 +185,11 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                               ),
                             ),
                             Expanded(
-                              flex: 8,
+                              flex: 9,
                               child: Text(_player.name),
                             ),
                             Expanded(
-                              flex: 2,
+                              flex: 3,
                               child: Checkbox(
                                 value: _captain == null
                                     ? false
@@ -201,24 +206,26 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                 },
                               ),
                             ),
-                            Expanded(
-                              flex: 2,
-                              child: Checkbox(
-                                value: _vCaptain == null
-                                    ? false
-                                    : _vCaptain.id == _player.id,
-                                onChanged: (bool value) {
-                                  setState(() {
-                                    if (_vCaptain == _player) {
-                                      _vCaptain = null;
-                                    } else if (!(_captain != null &&
-                                        _captain.id == _player.id)) {
-                                      _vCaptain = _player;
-                                    }
-                                  });
-                                },
-                              ),
-                            )
+                            widget.fanTeamRules.vcMult != 0.0
+                                ? Expanded(
+                                    flex: 3,
+                                    child: Checkbox(
+                                      value: _vCaptain == null
+                                          ? false
+                                          : _vCaptain.id == _player.id,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          if (_vCaptain == _player) {
+                                            _vCaptain = null;
+                                          } else if (!(_captain != null &&
+                                              _captain.id == _player.id)) {
+                                            _vCaptain = _player;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  )
+                                : Container(),
                           ],
                         ),
                       );

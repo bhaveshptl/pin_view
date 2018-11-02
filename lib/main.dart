@@ -14,6 +14,8 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
 
 String cookie;
+bool bAskToChooseLanguage = false;
+Map<String, dynamic> initData = {};
 AuthCheck authCheck = new AuthCheck();
 
 setWSCookie() async {
@@ -33,12 +35,26 @@ setWSCookie() async {
   });
 }
 
+getInitData() async {
+  await http.Client().get(
+    ApiUtil.INIT_DATA,
+    headers: {'Content-type': 'application/json', "cookie": cookie},
+  ).then((http.Response res) {
+    if (res.statusCode >= 200 && res.statusCode <= 299) {
+      initData = json.decode(res.body);
+      SharedPrefHelper()
+          .saveToSharedPref(ApiUtil.KEY_INIT_DATA, json.encode(initData));
+    }
+  });
+}
+
 updateStringTable() async {
   String table;
   await SharedPrefHelper().getLanguageTable().then((value) {
     table = value;
   });
 
+  bAskToChooseLanguage = table == null ? true : false;
   Map<String, dynamic> stringTable = json.decode(table == null ? "{}" : table);
 
   await http.Client()
@@ -47,7 +63,7 @@ updateStringTable() async {
     headers: {'Content-type': 'application/json', "cookie": cookie},
     body: json.encode({
       "version": stringTable["version"],
-      "language": 1,
+      "language": stringTable["language"] == null ? 1 : stringTable["language"],
     }),
   )
       .then((http.Response res) {
@@ -68,6 +84,11 @@ updateStringTable() async {
           table: stringTable["table"],
         );
       }
+    } else {
+      strings.set(
+        language: stringTable["language"],
+        table: stringTable["table"],
+      );
     }
   });
 }
@@ -76,19 +97,27 @@ updateStringTable() async {
 /// Bootstraping APP.
 ///
 void main() async {
+  Widget _homePage;
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
-  Widget _homePage = LandingPage();
 
   bool _result = await authCheck.checkStatus();
   if (_result) {
     await setWSCookie();
     _homePage = new Lobby();
   }
+  await getInitData();
   await updateStringTable();
+
+  if (!_result) {
+    _homePage = LandingPage(
+      chooseLanguage: bAskToChooseLanguage,
+      languages: initData["languages"],
+    );
+  }
 
   // FlutterWebviewPlugin().launch(ApiUtil.BASE_URL, hidden: true);
 

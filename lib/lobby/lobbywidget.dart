@@ -32,7 +32,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   Map<String, dynamic> lobbyUpdatePackate = {};
 
   _createLobbyObject() {
-    lobbyUpdatePackate["iType"] = 1;
+    lobbyUpdatePackate["iType"] = RequestType.GET_ALL_SERIES;
     registeredSportType = widget.sportType;
     lobbyUpdatePackate["sportsId"] = widget.sportType;
   }
@@ -48,7 +48,8 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     if (_response["bReady"] == 1) {
       sockets.sendMessage(lobbyUpdatePackate);
       widget.showLoader(true);
-    } else if (_response["iType"] == 1 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.GET_ALL_SERIES &&
+        _response["bSuccessful"] == true) {
       List<League> _leagues = [];
       List<dynamic> _mapLeagues = json.decode(_response["data"]);
 
@@ -61,7 +62,8 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       }
       _seperateLeaguesByRunningStatus(_leagues);
       widget.showLoader(false);
-    } else if (_response["iType"] == 2 && _response["bSuccessful"] == true) {
+    } else if (_response["iType"] == RequestType.LOBBY_REFRESH_DATA &&
+        _response["bSuccessful"] == true) {
       if (_response["data"]["bDataModified"] == true &&
           (_response["data"]["lstAdded"] as List).length > 0) {
         List<League> _addedLeagues = (_response["data"]["lstAdded"] as List)
