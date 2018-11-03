@@ -69,7 +69,7 @@ class LobbyState extends State<Lobby> {
       });
     }
 
-    Navigator.of(context).push(new MaterialPageRoute(
+    Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => AddCash(
               cookie: cookie,
             ),
@@ -80,14 +80,14 @@ class LobbyState extends State<Lobby> {
     setState(() {
       switch (index) {
         case 1:
-          Navigator.of(context).push(new MaterialPageRoute(
+          Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => SearchContest(
                     leagues: _leagues,
                   )));
           break;
         case 2:
           Navigator.of(context).push(
-            new MaterialPageRoute(
+            MaterialPageRoute(
               builder: (context) => MyContests(
                     leagues: _leagues,
                     onSportChange: _onSportSelectionChaged,
@@ -97,7 +97,7 @@ class LobbyState extends State<Lobby> {
           break;
         case 3:
           Navigator.of(context)
-              .push(new MaterialPageRoute(builder: (context) => EarnCash()));
+              .push(MaterialPageRoute(builder: (context) => EarnCash()));
           break;
         case 4:
           _launchAddCash();
