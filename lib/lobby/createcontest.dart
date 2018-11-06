@@ -34,6 +34,7 @@ class CreateContestState extends State<CreateContest> {
   double _totalPrize = 0.0;
   int _numberOfParticipants;
   bool _bIsMultyEntry = false;
+  bool _bAllowMultiEntryChange = false;
 
   bool bShowJoinContest = false;
   bool bWaitingForTeamCreation = false;
@@ -79,6 +80,16 @@ class CreateContestState extends State<CreateContest> {
       if (_participantsController.text != "" &&
           _numberOfParticipants != int.parse(_participantsController.text)) {
         _numberOfParticipants = int.parse(_participantsController.text);
+        if (_numberOfParticipants <= 5) {
+          setState(() {
+            _bIsMultyEntry = false;
+            _bAllowMultiEntryChange = false;
+          });
+        } else {
+          setState(() {
+            _bAllowMultiEntryChange = true;
+          });
+        }
         if ((_entryFee != null && _entryFee > 0 && _entryFee < 10000) &&
             (_numberOfParticipants > 1 && _numberOfParticipants < 100)) {
           _updateSuggestedPrizeStructure();
@@ -167,6 +178,9 @@ class CreateContestState extends State<CreateContest> {
         "teamsAllowed": _bIsMultyEntry ? 6 : 1,
         "totalPrizeAmount": getTotalPrizeAmount(prizeStructure),
         "prizeStructure": getPrizeList(prizeStructure),
+        "context": {
+          "channel_id": 3,
+        }
       };
 
       final result = await showDialog(
@@ -289,6 +303,9 @@ class CreateContestState extends State<CreateContest> {
 
   _onCustomPrizeStructure(final List<PrizeStructure> _prizeStructure) {
     prizeStructure = _prizeStructure;
+    setState(() {
+      _numberOfPrize = prizeStructure.length;
+    });
   }
 
   _onEditPrize() async {
@@ -322,6 +339,12 @@ class CreateContestState extends State<CreateContest> {
       return false;
     }
     return int.parse(s, onError: (e) => null) != null;
+  }
+
+  @override
+  void dispose() {
+    sockets.unRegister(_onWsMsg);
+    super.dispose();
   }
 
   @override
@@ -449,11 +472,13 @@ class CreateContestState extends State<CreateContest> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Switch(
-                          onChanged: (bool value) {
-                            setState(() {
-                              _bIsMultyEntry = value;
-                            });
-                          },
+                          onChanged: _bAllowMultiEntryChange
+                              ? (bool value) {
+                                  setState(() {
+                                    _bIsMultyEntry = value;
+                                  });
+                                }
+                              : null,
                           value: _bIsMultyEntry,
                         ),
                       ],

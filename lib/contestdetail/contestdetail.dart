@@ -64,6 +64,9 @@ class ContestDetailState extends State<ContestDetail> {
     sockets.register(_onWsMsg);
 
     _createAndReqL1WS();
+    if (widget.mapContestTeams == null) {
+      _getContestMyTeams();
+    }
     _mapContestTeams =
         widget.mapContestTeams == null ? [] : widget.mapContestTeams;
     _teamsDataSource = TeamsDataSource(widget.league, widget.contest,
@@ -76,10 +79,18 @@ class ContestDetailState extends State<ContestDetail> {
   _createAndReqL1WS() async {
     await _getSportsType();
 
-    l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
-    l1UpdatePackate["bResAvail"] = true;
-    l1UpdatePackate["sportsId"] = _sportType;
-    l1UpdatePackate["id"] = widget.league.leagueId;
+    if (widget.contest != null && widget.contest.realTeamId != null) {
+      l1UpdatePackate["sportsId"] = _sportType;
+      l1UpdatePackate["id"] = widget.contest.leagueId;
+      l1UpdatePackate["teamId"] = widget.contest.realTeamId;
+      l1UpdatePackate["inningsId"] = widget.contest.inningsId;
+      l1UpdatePackate["iType"] = RequestType.REQ_L1_INNINGS_ALL_DATA;
+    } else {
+      l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
+      l1UpdatePackate["bResAvail"] = true;
+      l1UpdatePackate["sportsId"] = _sportType;
+      l1UpdatePackate["id"] = widget.league.leagueId;
+    }
 
     if (widget.myTeams == null || widget.l1Data == null) {
       _getL1Data();
@@ -103,10 +114,46 @@ class ContestDetailState extends State<ContestDetail> {
     });
   }
 
+  _getContestMyTeams() async {
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
+
+    return new http.Client()
+        .post(
+      ApiUtil.GET_MY_CONTEST_MY_TEAMS,
+      headers: {'Content-type': 'application/json', "cookie": cookie},
+      body: json.encode([widget.contest.id]),
+    )
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<int, List<MyTeam>> _mapContestMyTeams = {};
+        Map<String, dynamic> response = json.decode(res.body);
+        response.forEach((String key, dynamic value) {
+          List<MyTeam> _myTeams =
+              (value as List).map((i) => MyTeam.fromJson(i)).toList();
+          _mapContestMyTeams[int.parse(key)] = _myTeams;
+        });
+
+        setState(() {
+          _mapContestTeams = _mapContestMyTeams[widget.contest.id] == null
+              ? []
+              : _mapContestMyTeams[widget.contest.id];
+          _teamsDataSource.updateMyContestTeam(
+              widget.contest, _mapContestTeams);
+        });
+      }
+    });
+  }
+
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == RequestType.GET_ALL_L1 &&
+    if ((_response["iType"] == RequestType.GET_ALL_L1 ||
+            _response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
         _response["bSuccessful"] == true) {
       setState(() {
         _l1Data = L1.fromJson(_response["data"]["l1"]);
@@ -304,7 +351,7 @@ class ContestDetailState extends State<ContestDetail> {
 
   void _onViewTeam(MyTeam _team) {
     Navigator.of(context).push(
-      new MaterialPageRoute(
+      MaterialPageRoute(
           builder: (context) => ViewTeam(
                 team: _team,
                 l1Data: _l1Data,
@@ -453,11 +500,14 @@ class ContestDetailState extends State<ContestDetail> {
       });
     }
 
-    final result = await Navigator.of(context).push(new MaterialPageRoute(
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
         builder: (context) => AddCash(
               cookie: cookie,
             ),
-        fullscreenDialog: true));
+        fullscreenDialog: true,
+      ),
+    );
     if (result == true) {
       _onJoinContest(curContest);
     }
@@ -1054,6 +1104,10 @@ class TeamsDataSource extends DataTableSource {
   updateMyContestTeam(Contest contest, List<MyTeam> _myContestTeams) {
     this.size = contest.joined + _myContestTeams.length;
     myContestTeams = _myContestTeams;
+
+    for (int i = 0; i < myContestTeams.length; i++) {
+      _teams[i] = myContestTeams[i];
+    }
 
     setUniqueTeams();
     this.notifyListeners();

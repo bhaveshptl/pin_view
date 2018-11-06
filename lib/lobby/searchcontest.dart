@@ -64,7 +64,7 @@ class SearchContestState extends State<SearchContest> {
               );
             } else {
               Navigator.of(context).push(
-                new MaterialPageRoute(
+                MaterialPageRoute(
                   builder: (context) => ContestDetail(
                         contest: contest,
                         league: league,

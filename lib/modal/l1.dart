@@ -133,31 +133,31 @@ class Series {
 }
 
 class FanTeamRule {
+  final int credits;
+  final double vcMult;
+  final int captainMult;
+  final int playersTotal;
   final int playersForeign;
   final int playersPerTeam;
-  final int playersTotal;
-  final int credits;
-  final int captainMult;
-  final double vcMult;
   final List<PlayingStyle> styles;
   FanTeamRule({
-    this.playersForeign,
-    this.playersPerTeam,
-    this.playersTotal,
-    this.credits,
-    this.captainMult,
     this.vcMult,
     this.styles,
+    this.credits,
+    this.captainMult,
+    this.playersTotal,
+    this.playersForeign,
+    this.playersPerTeam,
   });
 
   factory FanTeamRule.fromJson(Map<String, dynamic> json) {
     return FanTeamRule(
-      playersForeign: json["playersForeign"],
-      playersPerTeam: json["playersPerTeam"],
-      playersTotal: json["playersTotal"],
       credits: json["credits"],
       captainMult: json["captainMult"],
+      playersTotal: json["playersTotal"],
       vcMult: (json["vcMult"]).toDouble(),
+      playersForeign: json["playersForeign"],
+      playersPerTeam: json["playersPerTeam"],
       styles: (json["styles"] as List)
           .map((i) => PlayingStyle.fromJson(i))
           .toList(),

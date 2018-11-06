@@ -19,6 +19,7 @@ import 'package:playfantasy/commonwidgets/prizestructure.dart';
 const double TEAM_LOGO_HEIGHT = 24.0;
 
 class MyContestStatusTab extends StatefulWidget {
+  final int sportsType;
   final int fantasyType;
   final int leagueStatus;
   final List<League> leagues;
@@ -29,6 +30,7 @@ class MyContestStatusTab extends StatefulWidget {
 
   MyContestStatusTab({
     this.leagues,
+    this.sportsType,
     this.scaffoldKey,
     this.fantasyType,
     this.leagueStatus,
@@ -78,7 +80,8 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == RequestType.GET_ALL_L1 &&
+    if ((_response["iType"] == RequestType.GET_ALL_L1 ||
+            _response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
         _response["bSuccessful"] == true) {
       _l1Data = L1.fromJson(_response["data"]["l1"]);
       _myTeams = (_response["data"]["myteams"] as List)
@@ -247,10 +250,18 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
   }
 
   _createL1WSObject(Contest contest) {
-    l1DataObj["iType"] = RequestType.GET_ALL_L1;
-    l1DataObj["sportsId"] = 1;
-    l1DataObj["bResAvail"] = true;
-    l1DataObj["id"] = contest.leagueId;
+    if (contest != null && contest.realTeamId != null) {
+      l1DataObj["id"] = contest.leagueId;
+      l1DataObj["teamId"] = contest.realTeamId;
+      l1DataObj["sportsId"] = widget.sportsType;
+      l1DataObj["inningsId"] = contest.inningsId;
+      l1DataObj["iType"] = RequestType.REQ_L1_INNINGS_ALL_DATA;
+    } else {
+      l1DataObj["iType"] = RequestType.GET_ALL_L1;
+      l1DataObj["bResAvail"] = true;
+      l1DataObj["id"] = contest.leagueId;
+      l1DataObj["sportsId"] = widget.sportsType;
+    }
   }
 
   joinContest(Contest contest) async {
@@ -401,11 +412,14 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
       });
     }
 
-    final result = await Navigator.of(context).push(new MaterialPageRoute(
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
         builder: (context) => AddCash(
               cookie: cookie,
             ),
-        fullscreenDialog: true));
+        fullscreenDialog: true,
+      ),
+    );
     if (result == true) {
       _onJoinContest(curContest);
     }

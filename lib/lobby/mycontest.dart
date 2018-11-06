@@ -345,8 +345,9 @@ class MyContestsState extends State<MyContests>
     tabs = {
       1: [
         MyContestStatusTab(
-          leagues: _leagues,
           fantasyType: 1,
+          leagues: _leagues,
+          sportsType: _sportType,
           scaffoldKey: _scaffoldKey,
           onContestClick: _onContestClick,
           mapContestTeams: _mapContestTeams,
@@ -354,8 +355,9 @@ class MyContestsState extends State<MyContests>
           leagueStatus: LeagueStatus.UPCOMING,
         ),
         MyContestStatusTab(
-          leagues: _leagues,
           fantasyType: 1,
+          leagues: _leagues,
+          sportsType: _sportType,
           scaffoldKey: _scaffoldKey,
           mapMyContests: _mapLiveContest,
           onContestClick: _onContestClick,
@@ -363,8 +365,9 @@ class MyContestsState extends State<MyContests>
           leagueStatus: LeagueStatus.LIVE,
         ),
         MyContestStatusTab(
-          leagues: _leagues,
           fantasyType: 1,
+          leagues: _leagues,
+          sportsType: _sportType,
           scaffoldKey: _scaffoldKey,
           onContestClick: _onContestClick,
           mapMyContests: _mapResultContest,
@@ -374,8 +377,9 @@ class MyContestsState extends State<MyContests>
       ],
       2: [
         MyContestStatusTab(
-          leagues: _leagues,
           fantasyType: 2,
+          leagues: _leagues,
+          sportsType: _sportType,
           scaffoldKey: _scaffoldKey,
           onContestClick: _onContestClick,
           mapContestTeams: _mapContestTeams,
@@ -383,8 +387,9 @@ class MyContestsState extends State<MyContests>
           leagueStatus: LeagueStatus.UPCOMING,
         ),
         MyContestStatusTab(
-          leagues: _leagues,
           fantasyType: 2,
+          leagues: _leagues,
+          sportsType: _sportType,
           scaffoldKey: _scaffoldKey,
           mapMyContests: _mapLiveContest,
           onContestClick: _onContestClick,
@@ -392,8 +397,9 @@ class MyContestsState extends State<MyContests>
           leagueStatus: LeagueStatus.LIVE,
         ),
         MyContestStatusTab(
-          leagues: _leagues,
           fantasyType: 2,
+          leagues: _leagues,
+          sportsType: _sportType,
           scaffoldKey: _scaffoldKey,
           onContestClick: _onContestClick,
           mapMyContests: _mapResultContest,
@@ -455,7 +461,7 @@ class MyContestsState extends State<MyContests>
 
   _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
-      new MaterialPageRoute(
+      MaterialPageRoute(
         builder: (context) => ContestDetail(
               league: league,
               contest: contest,

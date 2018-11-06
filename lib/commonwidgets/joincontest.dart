@@ -55,7 +55,7 @@ class JoinContestState extends State<JoinContest> {
           .post(
         ApiUtil.JOIN_CONTEST,
         headers: {'Content-type': 'application/json', "cookie": cookie},
-        body: json.encoder.convert({
+        body: json.encode({
           "sportsId": 1,
           "teamId": _selectedTeamId,
           "context": {"channel_id": 3},
@@ -63,8 +63,9 @@ class JoinContestState extends State<JoinContest> {
           "leagueId": widget.contest.leagueId,
           "entryFee": widget.contest.entryFee,
           "prizeType": widget.contest.prizeType,
+          "inningsId": widget.contest.inningsId,
           "realTeamId": widget.contest.realTeamId,
-          "inningsId": widget.l1Data.league.inningsId,
+          "visibilityId": widget.contest.visibilityId,
           "contestCode": widget.contest.contestJoinCode,
           "matchId": widget.l1Data.league.rounds[0].matches[0].id,
         }),

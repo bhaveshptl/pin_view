@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:playfantasy/lobby/earncash.dart';
 
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/profilepages/myaccount.dart';
+import 'package:playfantasy/profilepages/myprofile.dart';
+import 'package:playfantasy/profilepages/partner.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -47,6 +50,14 @@ class AppDrawerState extends State<AppDrawer> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => Verification(),
+        ),
+      );
+    }
+
+    _onMyProfile() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MyProfile(),
         ),
       );
     }
@@ -98,7 +109,7 @@ class AppDrawerState extends State<AppDrawer> {
           break;
       }
       Navigator.of(context).push(
-        new MaterialPageRoute(
+        MaterialPageRoute(
             builder: (context) => WebviewScaffold(
                   url: url,
                   appBar: AppBar(
@@ -111,9 +122,25 @@ class AppDrawerState extends State<AppDrawer> {
 
     _showEarnCash() {
       Navigator.of(context).push(
-        new MaterialPageRoute(
+        MaterialPageRoute(
           builder: (context) => EarnCash(),
           fullscreenDialog: true,
+        ),
+      );
+    }
+
+    _showMyAccount() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MyAccount(),
+        ),
+      );
+    }
+
+    _showPartnerPage() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Partner(),
         ),
       );
     }
@@ -121,7 +148,7 @@ class AppDrawerState extends State<AppDrawer> {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          new DrawerHeader(
+          DrawerHeader(
             child: Stack(
               children: <Widget>[
                 Column(
@@ -168,12 +195,14 @@ class AppDrawerState extends State<AppDrawer> {
             title: Text('MY PROFILE'),
             onTap: () {
               Navigator.pop(context);
+              _onMyProfile();
             },
           ),
           ListTile(
             title: Text('MY ACCOUNT'),
             onTap: () {
               Navigator.pop(context);
+              _showMyAccount();
             },
           ),
           ListTile(
@@ -199,6 +228,7 @@ class AppDrawerState extends State<AppDrawer> {
             title: Text('BECOME A PARTNER'),
             onTap: () {
               Navigator.pop(context);
+              _showPartnerPage();
             },
           ),
           ListTile(

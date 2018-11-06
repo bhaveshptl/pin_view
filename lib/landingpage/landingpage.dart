@@ -121,7 +121,7 @@ class LandingPageState extends State<LandingPage> {
 
   _launchSignup(BuildContext context) {
     Navigator.of(context).push(
-      new MaterialPageRoute(
+      MaterialPageRoute(
         builder: (context) => Signup(),
         fullscreenDialog: true,
       ),
@@ -129,7 +129,7 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
-    return new http.Client()
+    return http.Client()
         .post(
       ApiUtil.LOGIN_URL,
       headers: {'Content-type': 'application/json'},

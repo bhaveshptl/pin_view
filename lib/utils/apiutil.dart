@@ -55,5 +55,11 @@ class ApiUtil {
   static const GET_TEAM_INFO = BASE_API_URL + "lobby/contest/";
   static const SEARCH_CONTEST = BASE_API_URL + "lobby/contest/private";
 
+  static const UPDATE_USER_PROFILE = BASE_API_URL + "ups/user";
+  static const GET_USER_PROFILE = BASE_API_URL + "v2/ups/user/info";
+  static const CHANGE_PASSWORD = BASE_API_URL + "ups/user/changePassword";
   static const GET_REFERRAL_CODE = BASE_API_URL + "ups/user/referdetails";
+  static const CHANGE_TEAM_NAME = BASE_API_URL + "ups/user/updateUserName";
+  static const GET_ACCOUNT_DETAILS = BASE_API_URL + "account/overview";
+  static const PARTNER_REQUEST = BASE_API_URL + "ups/partner-request";
 }

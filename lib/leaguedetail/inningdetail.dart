@@ -382,11 +382,14 @@ class InningDetailsState extends State<InningDetails> {
       });
     }
 
-    Navigator.of(context).push(new MaterialPageRoute(
+    Navigator.of(context).push(
+      MaterialPageRoute(
         builder: (context) => AddCash(
               cookie: cookie,
             ),
-        fullscreenDialog: true));
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) async {

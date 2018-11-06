@@ -26,7 +26,7 @@ class Innings extends StatelessWidget {
 
   showInningDetails(BuildContext context, L1.Team team) async {
     Navigator.of(context).push(
-      new MaterialPageRoute(
+      MaterialPageRoute(
         builder: (context) => InningDetails(
               team: team,
               league: league,

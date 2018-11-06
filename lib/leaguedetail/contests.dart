@@ -265,7 +265,7 @@ class ContestsState extends State<Contests> {
 
   _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
-      new MaterialPageRoute(
+      MaterialPageRoute(
         builder: (context) => ContestDetail(
               contest: contest,
               league: league,
@@ -447,11 +447,14 @@ class ContestsState extends State<Contests> {
       });
     }
 
-    final result = await Navigator.of(context).push(new MaterialPageRoute(
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
         builder: (context) => AddCash(
               cookie: cookie,
             ),
-        fullscreenDialog: true));
+        fullscreenDialog: true,
+      ),
+    );
     if (result == true) {
       onJoinContest(curContest);
     }
