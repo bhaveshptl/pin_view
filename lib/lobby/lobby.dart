@@ -1,16 +1,16 @@
-import 'dart:convert';
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
@@ -89,10 +89,7 @@ class LobbyState extends State<Lobby> {
     }
 
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => AddCash(
-              cookie: cookie,
-            ),
-        fullscreenDialog: true));
+        builder: (context) => AddCash(), fullscreenDialog: true));
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) {

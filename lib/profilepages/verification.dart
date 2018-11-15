@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -50,7 +49,6 @@ class VerificationState extends State<Verification> {
   @override
   void initState() {
     super.initState();
-    FlutterWebviewPlugin().close();
     _getVerificationStatus();
     _setAddressList();
   }
@@ -962,7 +960,6 @@ class VerificationState extends State<Verification> {
 
   @override
   void dispose() {
-    FlutterWebviewPlugin().launch(ApiUtil.BASE_URL, hidden: true);
     super.dispose();
   }
 }

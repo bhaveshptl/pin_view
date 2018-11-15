@@ -52,8 +52,9 @@ class SearchContestState extends State<SearchContest> {
           .then(
         (http.Response res) {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
-            Contest contest = Contest.fromJson(json.decode(res.body)[0]);
-            League league = _getLeague(contest.leagueId);
+            Map<String, dynamic> response = json.decode(res.body);
+            Contest contest = Contest.fromJson(response["contest"]);
+            League league = League.fromJson(response["league"]);
             if (league == null) {
               _scaffoldKey.currentState.showSnackBar(
                 SnackBar(

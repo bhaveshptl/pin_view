@@ -415,9 +415,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
 
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddCash(
-              cookie: cookie,
-            ),
+        builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),
     );

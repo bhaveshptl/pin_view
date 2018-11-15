@@ -515,9 +515,7 @@ class ContestDetailState extends State<ContestDetail> {
 
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddCash(
-              cookie: cookie,
-            ),
+        builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),
     );
@@ -1076,6 +1074,9 @@ class ContestDetailState extends State<ContestDetail> {
                                         _mapContestTeams.length))
                                 : rowsPerPage,
                             onPageChanged: (int firstVisibleIndex) {
+                              if (firstVisibleIndex == 0) {
+                                _getContestMyTeams();
+                              }
                               _getContestTeams(firstVisibleIndex);
                             },
                             columns: _getDataTableHeader(),

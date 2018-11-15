@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/lobby/earncash.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/lobby/earncash.dart';
+import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/profilepages/partner.dart';
 import 'package:playfantasy/profilepages/myaccount.dart';
 import 'package:playfantasy/profilepages/myprofile.dart';
-import 'package:playfantasy/profilepages/partner.dart';
-import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/profilepages/verification.dart';
 

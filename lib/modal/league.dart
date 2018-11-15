@@ -21,16 +21,20 @@ class League {
       this.teamB});
 
   factory League.fromJson(Map<String, dynamic> json) {
-    return League(
-        matchId: json['matchId'],
-        matchName: json['matchName'],
-        status: json['status'],
-        leagueId: json['leagueId'],
-        matchStartTime: json['matchStartTime'],
-        matchEndTime: json['matchEndTime'],
-        series: Series.fromJson(json['series']),
-        teamA: Team.fromJson(json['teamA']),
-        teamB: Team.fromJson(json['teamB']));
+    if (json == null) {
+      return League();
+    } else {
+      return League(
+          matchId: json['matchId'],
+          matchName: json['matchName'],
+          status: json['status'],
+          leagueId: json['leagueId'],
+          matchStartTime: json['matchStartTime'],
+          matchEndTime: json['matchEndTime'],
+          series: Series.fromJson(json['series']),
+          teamA: Team.fromJson(json['teamA']),
+          teamB: Team.fromJson(json['teamB']));
+    }
   }
 }
 

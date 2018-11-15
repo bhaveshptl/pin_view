@@ -437,9 +437,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddCash(
-              cookie: cookie,
-            ),
+        builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),
     );

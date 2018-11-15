@@ -384,9 +384,7 @@ class InningDetailsState extends State<InningDetails> {
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddCash(
-              cookie: cookie,
-            ),
+        builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),
     );

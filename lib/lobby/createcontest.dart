@@ -292,9 +292,7 @@ class CreateContestState extends State<CreateContest> {
 
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddCash(
-              cookie: cookie,
-            ),
+        builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),
     );
