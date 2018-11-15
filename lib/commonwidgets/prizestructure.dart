@@ -67,8 +67,20 @@ class PrizeStructureState extends State<PrizeStructure> {
                   Text(
                     _prize["rank"],
                   ),
-                  Text(
-                    strings.rupee + _prize["amount"].toStringAsFixed(2),
+                  Row(
+                    children: <Widget>[
+                      widget.contest.prizeType == 1
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Text(strings.rupee),
+                      Text(
+                        _prize["amount"].toStringAsFixed(2),
+                      )
+                    ],
                   )
                 ],
               ),
@@ -90,20 +102,38 @@ class PrizeStructureState extends State<PrizeStructure> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
-                child: Text(
-                  strings.get("TOTAL_WINNINGS") +
-                      " " +
-                      strings.rupee +
-                      widget.contest.prizeDetails[0]["totalPrizeAmount"]
-                          .toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Theme.of(context).primaryColorDark,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.headline.fontSize),
-                ),
+              Text(
+                strings.get("TOTAL_WINNINGS") + " ",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Theme.of(context).primaryColorDark,
+                    fontSize:
+                        Theme.of(context).primaryTextTheme.headline.fontSize),
+              ),
+              widget.contest.prizeType == 1
+                  ? Image.asset(
+                      strings.chips,
+                      width: 16.0,
+                      height: 12.0,
+                      fit: BoxFit.contain,
+                    )
+                  : Text(
+                      strings.rupee,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Theme.of(context).primaryColorDark,
+                          fontSize: Theme.of(context)
+                              .primaryTextTheme
+                              .headline
+                              .fontSize),
+                    ),
+              Text(
+                widget.contest.prizeDetails[0]["totalPrizeAmount"].toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Theme.of(context).primaryColorDark,
+                    fontSize:
+                        Theme.of(context).primaryTextTheme.headline.fontSize),
               ),
             ],
           ),

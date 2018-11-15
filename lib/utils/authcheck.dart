@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -18,6 +19,9 @@ class AuthCheck {
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
+        SharedPrefHelper.internal().saveToSharedPref(
+            ApiUtil.SHARED_PREFERENCE_USER_KEY,
+            json.encode(json.decode(res.body)["user"]));
         return true;
       } else {
         return false;

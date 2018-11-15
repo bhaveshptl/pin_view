@@ -6,12 +6,18 @@ import 'package:playfantasy/modal/prizestructure.dart';
 
 class CreatePrizeStructure extends StatefulWidget {
   final Function onClose;
+  final int participants;
   final double totalPrize;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final List<PrizeStructure> suggestedPrizes;
 
-  CreatePrizeStructure(
-      {this.suggestedPrizes, this.totalPrize, this.onClose, this.scaffoldKey});
+  CreatePrizeStructure({
+    this.onClose,
+    this.totalPrize,
+    this.scaffoldKey,
+    this.participants,
+    this.suggestedPrizes,
+  });
 
   @override
   State<StatefulWidget> createState() => CreatePrizeStructureState();
@@ -50,14 +56,33 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
   }
 
   String validatePrizeDistribution() {
+    double prevAmount;
+    bool bAmountErrorFound = false;
+    bool bIncrementalError = false;
     double totalDistribution = 0.0;
     _winningsController.forEach((TextEditingController _textController) {
-      totalDistribution += double.parse(_textController.text);
+      double amount =
+          double.parse(_textController.text == "" ? "0" : _textController.text);
+      if (amount == 0.0) {
+        bAmountErrorFound = true;
+      }
+      if (prevAmount != null && prevAmount < amount) {
+        bIncrementalError = true;
+      }
+      totalDistribution += amount;
+      prevAmount = amount;
     });
     if (!(totalDistribution > 99.90 && totalDistribution <= 100.0)) {
       return strings.get("AMOUNT_SHOULD_DISTRIBUTED");
+    } else if (bIncrementalError) {
+      return strings.get("INCREMENTAL_ERROR");
+    } else if (bAmountErrorFound) {
+      return strings.get("AMOUNT_SHOULD_NOT_ZERO");
+    } else if (widget.participants < _winningsController.length) {
+      return strings.get("TOTAL_PRICE_DISTRIBUTION_ERROR");
+    } else {
+      return "";
     }
-    return "";
   }
 
   @override

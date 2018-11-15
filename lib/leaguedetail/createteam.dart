@@ -31,6 +31,7 @@ class CreateTeam extends StatefulWidget {
 }
 
 class CreateTeamState extends State<CreateTeam> {
+  int _sportType = 1;
   double _usedCredits = 0.0;
   int _selectedPlayersCount = 0;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -47,6 +48,7 @@ class CreateTeamState extends State<CreateTeam> {
   void initState() {
     super.initState();
     _addPlayerTeamId();
+    _getSportsType();
 
     _selectedPlayers =
         widget.selectedTeam != null ? widget.selectedTeam.players : [];
@@ -60,6 +62,18 @@ class CreateTeamState extends State<CreateTeam> {
         widget.mode == TeamCreationMode.EDIT_TEAM) {
       _editOrCloneTeam();
     }
+  }
+
+  _getSportsType() async {
+    Future<dynamic> futureSportType =
+        SharedPrefHelper.internal().getSportsType();
+    await futureSportType.then((value) {
+      if (value != null) {
+        setState(() {
+          _sportType = int.parse(value);
+        });
+      }
+    });
   }
 
   _addPlayerTeamId() {
@@ -301,19 +315,19 @@ class CreateTeamState extends State<CreateTeam> {
   /// Use this method when user click on choose captain/next.
   ///
   bool _isValidTeam() {
+    if (_selectedPlayers.length != _fanTeamRules.playersTotal) {
+      _showErrorMessage(
+        strings.get("DREAM_TEAM_MSG").replaceAll(
+              "\$count",
+              (_fanTeamRules.playersTotal - _selectedPlayers.length).toString(),
+            ),
+      );
+      return false;
+    }
     if (!isPlayerStyleCriteriaMatch()) {
       return false;
     }
     if (_getForeignPlayerCount() > _fanTeamRules.playersForeign) {
-      return false;
-    }
-    if (_selectedPlayers.length != _fanTeamRules.playersTotal) {
-      _showErrorMessage(
-        strings.get("DREAM_TEAM_MSG").replaceAll(
-              "count",
-              (_fanTeamRules.playersTotal - _selectedPlayers.length).toString(),
-            ),
-      );
       return false;
     }
     return true;
@@ -342,26 +356,26 @@ class CreateTeamState extends State<CreateTeam> {
       int playingStyleCount = _getSelectedPlayerCountForStyle(style);
       if (!(playingStyleCount >= style.rule[0] &&
           playingStyleCount <= style.rule[1])) {
-        if (playingStyleCount > style.rule[1]) {
-          _showErrorMessage(
-            strings
-                .get("STYLE_MAX_COUNT")
-                .replaceAll(
-                  "\$count",
-                  style.rule[1].toString(),
-                )
-                .replaceAll(
-                  "\$style",
-                  style.label.toLowerCase(),
-                ),
-          );
-        } else if (playingStyleCount < style.rule[0]) {
+        if (playingStyleCount < style.rule[0]) {
           _showErrorMessage(
             strings
                 .get("STYLE_MIN_COUNT")
                 .replaceAll(
                   "\$count",
                   style.rule[0].toString(),
+                )
+                .replaceAll(
+                  "\$style",
+                  style.label.toLowerCase(),
+                ),
+          );
+        } else if (playingStyleCount > style.rule[1]) {
+          _showErrorMessage(
+            strings
+                .get("STYLE_MAX_COUNT")
+                .replaceAll(
+                  "\$count",
+                  style.rule[1].toString(),
                 )
                 .replaceAll(
                   "\$style",
@@ -427,8 +441,24 @@ class CreateTeamState extends State<CreateTeam> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Expanded(
-                                child: Icon(Icons.home),
+                              Container(
+                                height: 24.0,
+                                width: 24.0,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                        ('images/' +
+                                                style.label +
+                                                " " +
+                                                _sportType.toString() +
+                                                ".png")
+                                            .toLowerCase()
+                                            .replaceAll(" ", "-"),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),

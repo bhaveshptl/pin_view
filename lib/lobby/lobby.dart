@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/league.dart';
@@ -8,6 +10,7 @@ import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
@@ -24,6 +27,7 @@ class LobbyState extends State<Lobby> {
   int _sportType = 1;
   List<League> _leagues;
   bool _bShowLoader = false;
+  List<String> _carousel = [];
 
   _showLoader(bool bShow) {
     setState(() {
@@ -34,7 +38,22 @@ class LobbyState extends State<Lobby> {
   @override
   initState() {
     super.initState();
+
+    _getInitData();
     _getSportsType();
+  }
+
+  _getInitData() async {
+    Future<dynamic> futureInitData =
+        SharedPrefHelper().getFromSharedPref(ApiUtil.KEY_INIT_DATA);
+    await futureInitData.then((onValue) {
+      setState(() {
+        _carousel =
+            (json.decode(onValue)["carousel"] as List).map((dynamic value) {
+          return value.toString();
+        }).toList();
+      });
+    });
   }
 
   _getSportsType() async {
@@ -152,7 +171,7 @@ class LobbyState extends State<Lobby> {
         children: <Widget>[
           Scaffold(
             appBar: AppBar(
-              elevation: 0.0,
+              // elevation: 0.0,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -207,13 +226,38 @@ class LobbyState extends State<Lobby> {
               ],
             ),
             drawer: AppDrawer(),
-            body: LobbyWidget(
-              sportType: _sportType,
-              showLoader: _showLoader,
-              onLeagues: (value) {
-                _leagues = value;
-              },
-              onSportChange: _onSportSelectionChaged,
+            body: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        height: 102.0,
+                        child: Carousel(
+                          indicatorBgPadding: 4.0,
+                          boxFit: BoxFit.contain,
+                          dotSize: 4.0,
+                          dotIncreaseSize: 2.0,
+                          autoplayDuration: Duration(seconds: 10),
+                          images: _carousel.map((String url) {
+                            return NetworkImage(url);
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: LobbyWidget(
+                    sportType: _sportType,
+                    showLoader: _showLoader,
+                    onLeagues: (value) {
+                      _leagues = value;
+                    },
+                    onSportChange: _onSportSelectionChaged,
+                  ),
+                ),
+              ],
             ),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),

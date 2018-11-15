@@ -296,7 +296,7 @@ class Contest {
   int prizeType;
   int entryFee;
   int minUsers;
-  int serviceFee;
+  double serviceFee;
   int teamsAllowed;
   int leagueId;
   int releaseTime;
@@ -359,7 +359,7 @@ class Contest {
       prizeType: json["prizeType"],
       entryFee: json["entryFee"],
       minUsers: json["minUsers"],
-      serviceFee: json["serviceFee"],
+      serviceFee: (json["serviceFee"]).toDouble(),
       teamsAllowed: json["teamsAllowed"],
       leagueId: json["leagueId"],
       releaseTime: json["releaseTime"],

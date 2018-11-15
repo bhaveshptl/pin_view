@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class LiveContest extends StatelessWidget {
+  final League league;
   final Contest contest;
+  final bool isMyContest;
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
-  LiveContest({this.contest, this.myJoinedTeams, this.onPrizeStructure});
+  LiveContest({
+    this.league,
+    this.contest,
+    this.myJoinedTeams,
+    this.onPrizeStructure,
+    this.isMyContest = false,
+  });
 
   MyTeam _getMyBestTeam() {
     if (myJoinedTeams != null) {
@@ -25,6 +34,7 @@ class LiveContest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MyTeam _myBestTeam = _getMyBestTeam();
+    bool bMyContest = isMyContest == null ? false : isMyContest;
 
     return Column(
       children: <Widget>[
@@ -45,6 +55,25 @@ class LiveContest extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
+                (bMyContest && contest.inningsId != 0 && league != null)
+                    ? (league.teamA.inningsId == contest.inningsId
+                        ? Container(
+                            padding: EdgeInsets.symmetric(horizontal: 4.0),
+                            color: Colors.redAccent,
+                            child: Text(
+                              league.teamA.name,
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          )
+                        : Container(
+                            padding: EdgeInsets.symmetric(horizontal: 4.0),
+                            color: Colors.redAccent,
+                            child: Text(
+                              league.teamB.name,
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          ))
+                    : Container(),
                 Padding(
                   padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
                   child: Text(
@@ -54,7 +83,7 @@ class LiveContest extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
         Divider(
@@ -70,17 +99,39 @@ class LiveContest extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       Expanded(
-                        child: Text(
-                          strings.rupee +
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            contest.prizeType == 1
+                                ? Image.asset(
+                                    strings.chips,
+                                    width: 12.0,
+                                    height: 12.0,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Text(
+                                    strings.rupee,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color:
+                                            Theme.of(context).primaryColorDark,
+                                        fontSize: Theme.of(context)
+                                            .primaryTextTheme
+                                            .headline
+                                            .fontSize),
+                                  ),
+                            Text(
                               contest.prizeDetails[0]["totalPrizeAmount"]
                                   .toString(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColorDark,
-                              fontSize: Theme.of(context)
-                                  .primaryTextTheme
-                                  .headline
-                                  .fontSize),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColorDark,
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .headline
+                                      .fontSize),
+                            ),
+                          ],
                         ),
                       ),
                       Container(
@@ -163,9 +214,25 @@ class LiveContest extends StatelessWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
+                                contest.prizeType == 1
+                                    ? Image.asset(
+                                        strings.chips,
+                                        width: 12.0,
+                                        height: 12.0,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : Text(
+                                        strings.rupee,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .primaryColorDark,
+                                            fontSize: Theme.of(context)
+                                                .primaryTextTheme
+                                                .title
+                                                .fontSize),
+                                      ),
                                 Text(
-                                  "₹" + contest.entryFee.toString(),
-                                  textAlign: TextAlign.center,
+                                  contest.entryFee.toString(),
                                   style: TextStyle(
                                       color: Theme.of(context).primaryColorDark,
                                       fontSize: Theme.of(context)

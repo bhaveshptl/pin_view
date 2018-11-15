@@ -10,6 +10,7 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;
+  final int sportsType;
   final Contest contest;
   final Function onError;
   final List<MyTeam> myTeams;
@@ -21,6 +22,7 @@ class JoinContest extends StatefulWidget {
     this.contest,
     this.myTeams,
     this.onError,
+    this.sportsType,
     this.onCreateTeam,
     this.createContestPayload,
   });
@@ -56,9 +58,9 @@ class JoinContestState extends State<JoinContest> {
         ApiUtil.JOIN_CONTEST,
         headers: {'Content-type': 'application/json', "cookie": cookie},
         body: json.encode({
-          "sportsId": 1,
           "teamId": _selectedTeamId,
           "context": {"channel_id": 3},
+          "sportsId": widget.sportsType,
           "contestId": widget.contest.id,
           "leagueId": widget.contest.leagueId,
           "entryFee": widget.contest.entryFee,
@@ -338,37 +340,42 @@ class JoinContestState extends State<JoinContest> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    strings.get("ENTRY_FEE"),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.body2.fontSize,
-                    ),
+                Text(
+                  strings.get("ENTRY_FEE"),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(strings.rupee),
-                      Text(
-                        widget.contest == null
-                            ? widget.createContestPayload["entryFee"]
-                                .toStringAsFixed(2)
-                            : widget.contest.entryFee.toStringAsFixed(2),
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).primaryTextTheme.body2.fontSize,
-                        ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    (widget.contest == null &&
+                                widget.createContestPayload["prizeType"] ==
+                                    1) ||
+                            (widget.contest != null &&
+                                widget.contest.prizeType == 1)
+                        ? Image.asset(
+                            strings.chips,
+                            width: 16.0,
+                            height: 12.0,
+                            fit: BoxFit.contain,
+                          )
+                        : Text(strings.rupee),
+                    Text(
+                      widget.contest == null
+                          ? widget.createContestPayload["entryFee"]
+                              .toStringAsFixed(2)
+                          : widget.contest.entryFee.toStringAsFixed(2),
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontSize:
+                            Theme.of(context).primaryTextTheme.body2.fontSize,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -376,33 +383,19 @@ class JoinContestState extends State<JoinContest> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    "- " + strings.get("BONUS_USABLE"),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.body2.fontSize,
-                    ),
+                Text(
+                  "- " + strings.get("BONUS_USABLE"),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(strings.rupee),
-                      Text(
-                        usableBonus.toStringAsFixed(2),
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize:
-                              Theme.of(context).primaryTextTheme.body2.fontSize,
-                        ),
-                      ),
-                    ],
+                Text(
+                  strings.rupee + usableBonus.toStringAsFixed(2),
+                  style: TextStyle(
+                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                   ),
                 ),
               ],
@@ -412,38 +405,43 @@ class JoinContestState extends State<JoinContest> {
             color: Colors.black12,
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Expanded(
-                flex: 3,
-                child: Text(
-                  strings.get("CASH_TO_PAY"),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                  ),
+              Text(
+                strings.get("CASH_TO_PAY"),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Text(strings.rupee),
-                    Text(
-                      ((widget.contest == null
-                                  ? widget.createContestPayload["entryFee"]
-                                  : widget.contest.entryFee) -
-                              usableBonus)
-                          .toStringAsFixed(2),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.body2.fontSize,
-                      ),
-                      textAlign: TextAlign.right,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  (widget.contest == null &&
+                              widget.createContestPayload["prizeType"] == 1) ||
+                          (widget.contest != null &&
+                              widget.contest.prizeType == 1)
+                      ? Image.asset(
+                          strings.chips,
+                          width: 16.0,
+                          height: 12.0,
+                          fit: BoxFit.contain,
+                        )
+                      : Text(strings.rupee),
+                  Text(
+                    ((widget.contest == null
+                                ? widget.createContestPayload["entryFee"]
+                                : widget.contest.entryFee) -
+                            usableBonus)
+                        .toStringAsFixed(2),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize:
+                          Theme.of(context).primaryTextTheme.body2.fontSize,
                     ),
-                  ],
-                ),
+                    textAlign: TextAlign.right,
+                  ),
+                ],
               ),
             ],
           ),

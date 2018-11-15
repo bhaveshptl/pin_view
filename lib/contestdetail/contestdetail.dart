@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
@@ -49,6 +48,7 @@ class ContestDetailState extends State<ContestDetail> {
   int _sportType = 1;
   List<MyTeam> _myTeams;
   int _curPageOffset = 0;
+  String _downloadTeamURL;
   final int rowsPerPage = 10;
   TeamsDataSource _teamsDataSource;
   List<MyTeam> _mapContestTeams = [];
@@ -74,6 +74,17 @@ class ContestDetailState extends State<ContestDetail> {
     _teamsDataSource.setMyContestTeams(widget.contest, _mapContestTeams);
     _teamsDataSource.changeLeagueStatus(widget.league.status);
     _getContestTeams(0);
+    _getInitData();
+  }
+
+  _getInitData() async {
+    Future<dynamic> futureInitData =
+        SharedPrefHelper().getFromSharedPref(ApiUtil.KEY_INIT_DATA);
+    await futureInitData.then((onValue) {
+      setState(() {
+        _downloadTeamURL = json.decode(onValue)["downloadUrl"];
+      });
+    });
   }
 
   _createAndReqL1WS() async {
@@ -248,11 +259,13 @@ class ContestDetailState extends State<ContestDetail> {
   }
 
   _onJoinContest(Contest contest) async {
+    bShowJoinContest = false;
     if (_myTeams != null && _myTeams.length > 0) {
       final result = await showDialog(
         context: context,
         builder: (BuildContext context) {
           return JoinContest(
+            sportsType: _sportType,
             contest: contest,
             myTeams: _myTeams,
             onCreateTeam: _onCreateTeam,
@@ -305,9 +318,9 @@ class ContestDetailState extends State<ContestDetail> {
           return SwitchTeam(
             myTeams: _myTeams,
             oldTeam: _team,
-            l1Data: widget.l1Data,
+            l1Data: _l1Data,
             contest: widget.contest,
-            contestMyTeams: widget.mapContestTeams,
+            contestMyTeams: _mapContestTeams,
           );
         },
       );
@@ -563,6 +576,10 @@ class ContestDetailState extends State<ContestDetail> {
     );
   }
 
+  // onDownload() async {
+  //   final tasks = await FlutterDownloader.loadTasks();
+  // }
+
   List<DataColumn> _getDataTableHeader() {
     double width = MediaQuery.of(context).size.width - 20.0;
     List<DataColumn> _header = [
@@ -673,17 +690,32 @@ class ContestDetailState extends State<ContestDetail> {
                                     Container(
                                       child: Row(
                                         children: <Widget>[
+                                          widget.contest.prizeType == 1
+                                              ? Image.asset(
+                                                  strings.chips,
+                                                  width: 12.0,
+                                                  height: 12.0,
+                                                  fit: BoxFit.contain,
+                                                )
+                                              : Text(
+                                                  strings.rupee,
+                                                  style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .primaryColorDark,
+                                                      fontSize:
+                                                          Theme.of(context)
+                                                              .primaryTextTheme
+                                                              .headline
+                                                              .fontSize),
+                                                ),
                                           Text(
-                                            "₹" +
-                                                (widget.contest.prizeDetails !=
-                                                        null
-                                                    ? widget
-                                                        .contest
-                                                        .prizeDetails[0]
-                                                            ["totalPrizeAmount"]
-                                                        .toString()
-                                                    : 0.toString()),
-                                            textAlign: TextAlign.left,
+                                            (widget.contest.prizeDetails != null
+                                                ? widget
+                                                    .contest
+                                                    .prizeDetails[0]
+                                                        ["totalPrizeAmount"]
+                                                    .toString()
+                                                : 0.toString()),
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .primaryColorDark,
@@ -772,21 +804,34 @@ class ContestDetailState extends State<ContestDetail> {
                                               _mapContestTeams != null &&
                                                       _mapContestTeams.length >
                                                           0
-                                                  ? Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 8.0),
-                                                      child: Icon(
-                                                        Icons.add,
-                                                        color: Colors.white70,
-                                                        size: 20.0,
-                                                      ),
+                                                  ? Icon(
+                                                      Icons.add,
+                                                      color: Colors.white70,
+                                                      size: 20.0,
                                                     )
                                                   : Container(),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(right: 2.0),
+                                                child: widget.contest
+                                                            .prizeType ==
+                                                        1
+                                                    ? Image.asset(
+                                                        strings.chips,
+                                                        width: 12.0,
+                                                        height: 12.0,
+                                                        fit: BoxFit.contain,
+                                                      )
+                                                    : Text(
+                                                        strings.rupee,
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white70),
+                                                      ),
+                                              ),
                                               Text(
-                                                strings.rupee +
-                                                    widget.contest.entryFee
-                                                        .toString(),
+                                                widget.contest.entryFee
+                                                    .toString(),
                                                 style: TextStyle(
                                                     color: Colors.white70),
                                               ),
@@ -1016,7 +1061,9 @@ class ContestDetailState extends State<ContestDetail> {
                                 ),
                                 IconButton(
                                   icon: Icon(Icons.file_download),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    // onDownload();
+                                  },
                                 )
                               ],
                             ),

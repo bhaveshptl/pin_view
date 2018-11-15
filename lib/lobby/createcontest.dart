@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/statedob.dart';
+import 'package:playfantasy/lobby/addcash.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/modal/prizestructure.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
@@ -62,6 +65,7 @@ class CreateContestState extends State<CreateContest> {
     _l1Data = widget.l1data;
     _myTeams = widget.myTeams;
     allowedContestType = _l1Data.league.allowedContestTypes;
+    _prizeType = allowedContestType.indexOf(2) == -1 ? 1 : 2;
 
     _entryFeeController.addListener(() {
       if (_entryFeeController.text != "" &&
@@ -168,19 +172,18 @@ class CreateContestState extends State<CreateContest> {
   _onCreateContest() async {
     if (_formKey.currentState.validate()) {
       Map<String, dynamic> payload = {
-        "entryFee": _entryFee,
         "fanTeamId": 0,
-        "inningsId": _l1Data.league.inningsId,
-        "leagueId": _l1Data.league.id,
-        "name": _nameController.text,
+        "entryFee": _entryFee,
         "prizeType": _prizeType,
+        "name": _nameController.text == ""
+            ? "private contest"
+            : _nameController.text,
         "size": _numberOfParticipants,
+        "leagueId": _l1Data.league.id,
+        "inningsId": _l1Data.league.inningsId,
         "teamsAllowed": _bIsMultyEntry ? 6 : 1,
-        "totalPrizeAmount": getTotalPrizeAmount(prizeStructure),
         "prizeStructure": getPrizeList(prizeStructure),
-        "context": {
-          "channel_id": 3,
-        }
+        "totalPrizeAmount": getTotalPrizeAmount(prizeStructure),
       };
 
       final result = await showDialog(
@@ -189,6 +192,7 @@ class CreateContestState extends State<CreateContest> {
           return JoinContest(
             l1Data: _l1Data,
             myTeams: _myTeams,
+            onError: onJoinContestError,
             onCreateTeam: _onCreateTeam,
             createContestPayload: payload,
           );
@@ -199,6 +203,126 @@ class CreateContestState extends State<CreateContest> {
         Navigator.of(context).pop(result);
       }
     }
+  }
+
+  onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
+    JoinContestError error;
+    if (errorResponse["error"] == true) {
+      error = JoinContestError([errorResponse["resultCode"]]);
+    } else {
+      error = JoinContestError(errorResponse["reasons"]);
+    }
+
+    Navigator.of(context).pop();
+    if (error.isBlockedUser()) {
+      _showJoinContestError(
+        title: error.getTitle(),
+        message: error.getErrorMessage(),
+      );
+    } else {
+      int errorCode = error.getErrorCode();
+      switch (errorCode) {
+        case 3:
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return StateDob();
+            },
+          );
+          break;
+        case 12:
+          _showAddCashConfirmation(contest);
+          break;
+        case 6:
+          _showJoinContestError(
+            message: strings.get("ALERT"),
+            title: strings.get("NOT_VERIFIED"),
+          );
+          break;
+      }
+    }
+  }
+
+  _showAddCashConfirmation(Contest contest) {
+    final curContest = contest;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            strings.get("INSUFFICIENT_FUND").toUpperCase(),
+          ),
+          content: Text(
+            strings.get("INSUFFICIENT_FUND_MSG"),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                strings.get("CANCEL").toUpperCase(),
+              ),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _launchDepositJourneyForJoinContest(curContest);
+              },
+              child: Text(
+                strings.get("DEPOSIT").toUpperCase(),
+              ),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  _launchDepositJourneyForJoinContest(Contest contest) async {
+    final curContest = contest;
+    if (cookie == null) {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        setState(() {
+          cookie = value;
+        });
+      });
+    }
+
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddCash(
+              cookie: cookie,
+            ),
+        fullscreenDialog: true,
+      ),
+    );
+    if (result == true) {
+      _onCreateContest();
+    }
+  }
+
+  _showJoinContestError({String title, String message}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
+            )
+          ],
+        );
+      },
+    );
   }
 
   void _onCreateTeam(BuildContext context, Contest contest,
@@ -323,12 +447,13 @@ class CreateContestState extends State<CreateContest> {
         ),
         height: 550.0,
         child: CreatePrizeStructure(
-          suggestedPrizes: prizeStructure,
-          scaffoldKey: _scaffoldKey,
           totalPrize: _totalPrize,
+          scaffoldKey: _scaffoldKey,
+          suggestedPrizes: prizeStructure,
           onClose: (List<PrizeStructure> prizeStructure) {
             _onCustomPrizeStructure(prizeStructure);
           },
+          participants: int.parse(_participantsController.text),
         ),
       );
     });
@@ -402,8 +527,7 @@ class CreateContestState extends State<CreateContest> {
                         Expanded(
                           flex: 4,
                           child: ContestTypeRadio(
-                            defaultValue:
-                                allowedContestType.indexOf(2) == -1 ? 1 : 2,
+                            defaultValue: _prizeType,
                             allowedContestType: allowedContestType,
                             onValueChanged: (int value) {
                               _prizeType = value;
@@ -455,6 +579,8 @@ class CreateContestState extends State<CreateContest> {
                               noOfParticipants <= 1 ||
                               noOfParticipants > 100) {
                             return strings.get("PARTICIPANTS_LIMIT");
+                          } else if (_entryFee > _totalPrize) {
+                            return strings.get("HIGHER_ENTRY_FEE");
                           }
                         } else {
                           return strings.get("PARTICIPANTS_NUMBER_ERROR");
@@ -509,11 +635,12 @@ class CreateContestState extends State<CreateContest> {
                                           child: Text(
                                             strings.get("TOTAL_PRIZE"),
                                             style: TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .subhead
-                                                    .fontSize),
+                                              color: Colors.white70,
+                                              fontSize: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .fontSize,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -528,7 +655,7 @@ class CreateContestState extends State<CreateContest> {
                                           padding: const EdgeInsets.all(8.0),
                                           child: Text(strings.rupee +
                                               " " +
-                                              _totalPrize.toString()),
+                                              _totalPrize.toStringAsFixed(2)),
                                         ),
                                       ),
                                     ],

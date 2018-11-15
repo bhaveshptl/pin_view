@@ -54,6 +54,16 @@ class ChooseCaptainState extends State<ChooseCaptain> {
     );
   }
 
+  _getPlayerStyle(Player player) {
+    PlayingStyle _style;
+    widget.fanTeamRules.styles.forEach((PlayingStyle style) {
+      if (player.playingStyleId == style.id) {
+        _style = style;        
+      }
+    });
+    return _style;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -161,6 +171,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     itemCount: widget.selectedPlayers.length,
                     itemBuilder: (context, index) {
                       final _player = widget.selectedPlayers[index];
+                      final style = _getPlayerStyle(_player);
 
                       return Padding(
                         padding: EdgeInsets.only(bottom: 8.0),
@@ -186,7 +197,32 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                             ),
                             Expanded(
                               flex: 9,
-                              child: Text(_player.name),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(_player.name),
+                                  Container(
+                                    height: 18.0,
+                                    width: 18.0,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                            ('images/' +
+                                                    style.label +
+                                                    " " +
+                                                    _player.sportsId
+                                                        .toString() +
+                                                    ".png")
+                                                .toLowerCase()
+                                                .replaceAll(" ", "-"),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Expanded(
                               flex: 3,

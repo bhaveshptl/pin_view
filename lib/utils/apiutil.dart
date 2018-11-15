@@ -18,7 +18,7 @@ class ApiUtil {
   static const LOGIN_URL = BASE_API_URL + "ups/login";
   static const LOGOUT_URL = BASE_API_URL + "ups/logout";
   static const GET_COOKIE_URL = BASE_API_URL + "lobby/getcookie";
-  static const AUTH_CHECK_URL = BASE_API_URL + "ups/login/status";
+  static const AUTH_CHECK_URL = BASE_API_URL + "v2/ups/login/status";
   static const GOOGLE_LOGIN_URL =
       BASE_API_URL + "ups/socialLogin/withcontext/google/native";
   static const FACEBOOK_LOGIN_URL =

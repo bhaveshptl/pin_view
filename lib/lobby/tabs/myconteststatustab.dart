@@ -217,6 +217,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
             Expanded(
               child: ContestCard(
                 league: _league,
+                isMyContest: true,
                 contest: _contest,
                 onJoin: _onJoinContest,
                 onClick: widget.onContestClick,

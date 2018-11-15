@@ -39,7 +39,9 @@ class PartnerState extends State<Partner> {
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         _showMessage("We will get back to you very soon...!");
-      } else {}
+      } else {
+        _showMessage("Unable to process request. Please try again...!");
+      }
     });
   }
 

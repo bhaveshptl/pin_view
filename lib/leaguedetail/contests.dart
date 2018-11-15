@@ -42,7 +42,9 @@ class ContestsState extends State<Contests> {
   List<Contest> _contests = [];
 
   Contest _curContest;
+  bool bCashContestsAvailable;
   bool bShowJoinContest = false;
+  bool bPractiseContestsAvailable;
   bool bWaitingForTeamCreation = false;
 
   @override
@@ -50,8 +52,58 @@ class ContestsState extends State<Contests> {
     super.initState();
     _l1Data = widget.l1Data;
     _myTeams = widget.myTeams;
-    _contests = widget.l1Data.contests;
+    setContestsByCategory(widget.l1Data.contests);
     sockets.register(_onWsMsg);
+  }
+
+  setContestsByCategory(List<Contest> contests) {
+    List<Contest> sortedContests = [];
+    List<Contest> normalContests = [];
+    List<Contest> recommendedContests = [];
+    try {
+      contests.forEach((Contest contest) {
+        if (contest.recommended) {
+          recommendedContests.add(contest);
+        } else {
+          normalContests.add(contest);
+        }
+      });
+
+      normalContests.sort((a, b) {
+        return a.size == b.size ? a.entryFee - b.entryFee : a.size - b.size;
+      });
+
+      recommendedContests.sort((a, b) {
+        return a.prizeDetails[0]["totalPrizeAmount"] ==
+                b.prizeDetails[0]["totalPrizeAmount"]
+            ? a.entryFee - b.entryFee
+            : b.prizeDetails[0]["totalPrizeAmount"] -
+                a.prizeDetails[0]["totalPrizeAmount"];
+      });
+      sortedContests.addAll(recommendedContests);
+      sortedContests.addAll(normalContests);
+
+      List<Contest> cashContests = [];
+      List<Contest> practiseContests = [];
+      sortedContests.forEach((Contest contest) {
+        if (contest.prizeType == 1) {
+          practiseContests.add(contest);
+        } else {
+          cashContests.add(contest);
+        }
+      });
+
+      _contests = [];
+      _contests.add(Contest());
+      _contests.addAll(cashContests);
+      _contests.add(Contest());
+      _contests.addAll(practiseContests);
+
+      bCashContestsAvailable = cashContests.length > 1;
+      bPractiseContestsAvailable = practiseContests.length > 1;
+    } on Exception {
+      _contests = contests;
+    }
   }
 
   _onWsMsg(onData) {
@@ -98,18 +150,19 @@ class ContestsState extends State<Contests> {
     if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
       List<Contest> _addedContests =
           (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
-      setState(() {
-        for (Contest _contest in _addedContests) {
-          bool bFound = false;
-          for (Contest _curContest in _l1Data.contests) {
-            if (_curContest.id == _contest.id) {
-              bFound = true;
-            }
-          }
-          if (!bFound && _l1Data.league.id == _contest.leagueId) {
-            _l1Data.contests.add(_contest);
+      for (Contest _contest in _addedContests) {
+        bool bFound = false;
+        for (Contest _curContest in _l1Data.contests) {
+          if (_curContest.id == _contest.id) {
+            bFound = true;
           }
         }
+        if (!bFound && _l1Data.league.id == _contest.leagueId) {
+          _l1Data.contests.add(_contest);
+        }
+      }
+      setState(() {
+        setContestsByCategory(_l1Data.contests);
       });
     }
     if (_data["lstRemoved"] != null && _data["lstRemoved"].length > 0) {
@@ -126,10 +179,11 @@ class ContestsState extends State<Contests> {
           index++;
         }
       }
+      for (int i = _removedContestIndexes.length - 1; i >= 0; i--) {
+        _l1Data.contests.removeAt(_removedContestIndexes[i]);
+      }
       setState(() {
-        for (int i = _removedContestIndexes.length - 1; i >= 0; i--) {
-          _l1Data.contests.removeAt(_removedContestIndexes[i]);
-        }
+        setContestsByCategory(_l1Data.contests);
       });
     }
     if (_data["lstModified"] != null && _data["lstModified"].length >= 1) {
@@ -460,7 +514,8 @@ class ContestsState extends State<Contests> {
     }
   }
 
-  onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
+  onJoinContestError(
+      Contest contest, Map<String, dynamic> errorResponse) async {
     JoinContestError error;
     if (errorResponse["error"] == true) {
       error = JoinContestError([errorResponse["resultCode"]]);
@@ -520,20 +575,71 @@ class ContestsState extends State<Contests> {
           : ListView.builder(
               itemCount: _contests.length,
               itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                  child: ContestCard(
-                    l1Data: widget.l1Data,
-                    league: widget.league,
-                    contest: _contests[index],
-                    onClick: _onContestClick,
-                    onJoin: onJoinContest,
-                    onPrizeStructure: _showPrizeStructure,
-                    myJoinedTeams: widget.mapContestTeams != null
-                        ? widget.mapContestTeams[_contests[index].id]
-                        : null,
-                  ),
-                );
+                if (index == 0 || _contests[index].id == null) {
+                  return Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 4.0),
+                              color: Colors.black12,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    index == 0 ? "CASH" : "PRACTISE",
+                                    style: TextStyle(
+                                        color: Colors.black38,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .fontSize),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            (index == 0 && !bCashContestsAvailable) ||
+                                    (index != 0 &&
+                                        _contests[index].id == null &&
+                                        !bPractiseContestsAvailable)
+                                ? Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "Contests not available",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.redAccent,
+                                          fontSize: Theme.of(context)
+                                              .primaryTextTheme
+                                              .subhead
+                                              .fontSize),
+                                    ),
+                                  )
+                                : Container(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Padding(
+                    padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: ContestCard(
+                      l1Data: widget.l1Data,
+                      league: widget.league,
+                      onJoin: onJoinContest,
+                      onClick: _onContestClick,
+                      contest: _contests[index],
+                      onPrizeStructure: _showPrizeStructure,
+                      myJoinedTeams: widget.mapContestTeams != null
+                          ? widget.mapContestTeams[_contests[index].id]
+                          : null,
+                    ),
+                  );
+                }
               },
             ),
     );

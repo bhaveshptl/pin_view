@@ -165,6 +165,18 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
           break;
       }
     }
+    _liveLeagues.sort((a, b) {
+      return b.matchStartTime - a.matchStartTime;
+    });
+
+    _upcomingLeagues.sort((a, b) {
+      return a.matchStartTime - b.matchStartTime;
+    });
+
+    _completedLeagues.sort((a, b) {
+      return b.matchEndTime - a.matchEndTime;
+    });
+
     setState(() {
       _allLeagues = leagues;
       liveLeagues = _liveLeagues;

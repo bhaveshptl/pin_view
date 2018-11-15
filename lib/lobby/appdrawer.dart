@@ -21,24 +21,60 @@ class AppDrawer extends StatefulWidget {
 
 class AppDrawerState extends State<AppDrawer> {
   User _user;
-  @override
-  Widget build(BuildContext context) {
-    String userInfo;
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    futureCookie.then((value) {
-      cookie = value;
-    });
+  String cookie;
+  bool bIsUserVerified = false;
 
+  @override
+  void initState() {
+    super.initState();
+
+    getUserInfo();
+    getTempUserObject();
+  }
+
+  getUserInfo() async {
+    if (cookie == null || cookie == "") {
+      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
+      await futureCookie.then((value) {
+        cookie = value;
+      });
+    }
+
+    http.Client().get(
+      ApiUtil.AUTH_CHECK_URL,
+      headers: {
+        'Content-type': 'application/json',
+        "cookie": cookie,
+      },
+    ).then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> user = json.decode(res.body)["user"];
+        SharedPrefHelper.internal().saveToSharedPref(
+            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
+        setState(() {
+          _user = User.fromJson(user);
+        });
+      }
+    });
+  }
+
+  getTempUserObject() async {
     Future<dynamic> futureUserInfo = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY);
     futureUserInfo.then((value) {
-      userInfo = json.decode(value);
       setState(() {
-        _user = User.fromJson(json.decode(userInfo));
+        _user = User.fromJson(json.decode(value));
+        bIsUserVerified =
+            _user.verificationStatus.addressVerification == "VERIFIED" &&
+                _user.verificationStatus.panVerification == "VERIFIED" &&
+                _user.verificationStatus.mobileVerification &&
+                _user.verificationStatus.emailVerification;
       });
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     _doLogout() {
       new http.Client().get(
         ApiUtil.LOGOUT_URL,
@@ -149,41 +185,72 @@ class AppDrawerState extends State<AppDrawer> {
       child: ListView(
         children: <Widget>[
           DrawerHeader(
-            child: Stack(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Column(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        RaisedButton(
-                          color: Theme.of(context).primaryColor,
-                          onPressed: () {
-                            Navigator.pop(context);
-                            _onVerify();
-                          },
-                          child: Text(
-                            strings.get("VERIFY").toUpperCase(),
-                            style: TextStyle(
-                              color: Colors.white54,
+                    CircleAvatar(
+                      maxRadius: 32.0,
+                      backgroundColor: Colors.black12,
+                      child: Icon(
+                        Icons.person,
+                        size: 48.0,
+                      ),
+                    ),
+                    bIsUserVerified
+                        ? Container()
+                        : RaisedButton(
+                            color: Theme.of(context).primaryColor,
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _onVerify();
+                            },
+                            child: Text(
+                              strings.get("VERIFY").toUpperCase(),
+                              style: TextStyle(
+                                color: Colors.white54,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                      child: Text(
+                Padding(
+                  padding: EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
                         _user == null ? "" : _user.loginName,
                         style: TextStyle(
                             color: Theme.of(context).primaryColorLight),
                       ),
-                    ),
-                  ],
+                      Text(
+                        strings.rupee +
+                            (_user == null
+                                ? "0.0"
+                                : (_user.withdrawable +
+                                        _user.nonWithdrawable +
+                                        _user.depositBucket)
+                                    .toStringAsFixed(2)),
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorLight),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 4.0),
+                  child: Row(
+                    children: <Widget>[
+                      Text(
+                        _user == null ? "" : _user.emailId,
+                        style: TextStyle(
+                            color: Theme.of(context).primaryColorLight),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

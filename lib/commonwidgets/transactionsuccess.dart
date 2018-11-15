@@ -28,7 +28,7 @@ class TransactionSuccess extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   new TextSpan(
-                    text: "₹" + transactionResult["amount"],
+                    text: strings.rupee + transactionResult["amount"],
                     style: new TextStyle(color: Colors.black54),
                   ),
                 ],
@@ -46,7 +46,7 @@ class TransactionSuccess extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   new TextSpan(
-                    text: "₹" +
+                    text: strings.rupee +
                         (double.tryParse(transactionResult["withdrawable"]) +
                                 double.tryParse(
                                     transactionResult["nonWithdrawable"]) +

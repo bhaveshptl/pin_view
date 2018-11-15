@@ -15,15 +15,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: "^0.11.3+17"
-  shared_preferences: ^0.4.2
-  google_sign_in: ^3.1.2    
   share: ^0.5.3
-  flutter_webview_plugin: ^0.2.1+2
-  flutter_facebook_login: ^1.1.1
-  web_socket_channel: ^1.0.9  
-  cached_network_image: "^0.4.2"
+  http: "^0.12.0"
   image_picker: ^0.4.10
+  carousel_pro: ^0.0.13
+  google_sign_in: ^3.1.2    
+  shared_preferences: ^0.4.2
+  web_socket_channel: ^1.0.9  
+  cached_network_image: ^0.5.0
+  flutter_facebook_login: ^1.1.1
+  flutter_webview_plugin: ^0.2.1+2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -49,6 +50,11 @@ flutter:
   assets:
     - images/landingPageBG.jpg
     - images/fantasy-logo.png
+    - images/wicket-keeper-1.png
+    - images/batsman-1.png
+    - images/bowler-1.png
+    - images/all-rounder-1.png
+    - images/chips.png
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 

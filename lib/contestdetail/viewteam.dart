@@ -28,6 +28,8 @@ class ViewTeam extends StatefulWidget {
 }
 
 class _ViewTeamState extends State<ViewTeam> {
+  int _sportsType;
+  FanTeamRule _fanTeamRules;
   MyTeam _myTeamWithPlayers = MyTeam.fromJson({});
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -36,6 +38,9 @@ class _ViewTeamState extends State<ViewTeam> {
     super.initState();
     sockets.register(_onWsMsg);
     _getTeamPlayers();
+
+    _fanTeamRules = widget.l1Data.league.fanTeamRules;
+    _sportsType = widget.l1Data.league.rounds[0].matches[0].sportType;
   }
 
   _getTeamPlayers() async {
@@ -76,7 +81,8 @@ class _ViewTeamState extends State<ViewTeam> {
   _onWsMsg(onData) {
     Map<String, dynamic> _response = json.decode(onData);
 
-    if (_response["iType"] == RequestType.MY_TEAM_MODIFIED && _response["bSuccessful"] == true) {
+    if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        _response["bSuccessful"] == true) {
       MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
 
       if (widget.team.id == teamUpdated.id) {
@@ -124,6 +130,18 @@ class _ViewTeamState extends State<ViewTeam> {
       _scaffoldKey.currentState
           .showSnackBar(SnackBar(content: Text("$result")));
     }
+  }
+
+  _getPlayerStyle(Player player) {
+    PlayingStyle _style;
+    _fanTeamRules.styles.forEach((PlayingStyle style) {
+      if (player.playingStyleId == style.id ||
+          player.playingStyleDesc.toLowerCase().replaceAll(" ", "") ==
+              style.label.toLowerCase().replaceAll(" ", "")) {
+        _style = style;
+      }
+    });
+    return _style;
   }
 
   @override
@@ -197,6 +215,7 @@ class _ViewTeamState extends State<ViewTeam> {
                       itemCount: _myTeamWithPlayers.players.length,
                       itemBuilder: (context, index) {
                         final _player = _myTeamWithPlayers.players[index];
+                        final style = _getPlayerStyle(_player);
 
                         return Padding(
                           padding: EdgeInsets.only(bottom: 8.0),
@@ -227,21 +246,64 @@ class _ViewTeamState extends State<ViewTeam> {
                                       MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
                                     Text(_player.name),
-                                    _myTeamWithPlayers.captain == _player.id
-                                        ? Text(
-                                            "2X",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          )
-                                        : _myTeamWithPlayers.viceCaptain ==
-                                                _player.id
-                                            ? Text(
-                                                "1.5X",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              )
-                                            : Container(),
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 8.0),
+                                            child: _myTeamWithPlayers.captain ==
+                                                    _player.id
+                                                ? Text(
+                                                    _fanTeamRules.captainMult
+                                                            .toString() +
+                                                        "X",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  )
+                                                : _myTeamWithPlayers
+                                                            .viceCaptain ==
+                                                        _player.id
+                                                    ? Text(
+                                                        _fanTeamRules.vcMult
+                                                                .toString() +
+                                                            "X",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )
+                                                    : Container(),
+                                          ),
+                                          style == null
+                                              ? Container()
+                                              : Container(
+                                                  height: 18.0,
+                                                  width: 18.0,
+                                                  child: DecoratedBox(
+                                                    decoration: BoxDecoration(
+                                                      image: DecorationImage(
+                                                        image: AssetImage(
+                                                          ('images/' +
+                                                                  style.label +
+                                                                  " " +
+                                                                  _sportsType
+                                                                      .toString() +
+                                                                  ".png")
+                                                              .toLowerCase()
+                                                              .replaceAll(
+                                                                  " ", "-"),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -344,10 +406,7 @@ class _ViewTeamState extends State<ViewTeam> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        "WINNINGS - " +
-                            strings.rupee +
-                            _myTeamWithPlayers.prize.toString(),
-                        textAlign: TextAlign.center,
+                        "WINNINGS - ",
                         style: TextStyle(
                             color: Colors.white54,
                             fontSize: Theme.of(context)
@@ -355,6 +414,31 @@ class _ViewTeamState extends State<ViewTeam> {
                                 .title
                                 .fontSize),
                       ),
+                      widget.contest.prizeType == 1
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Text(
+                              strings.rupee,
+                              style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .fontSize),
+                            ),
+                      Text(
+                        _myTeamWithPlayers.prize.toString(),
+                        style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .title
+                                .fontSize),
+                      )
                     ],
                   ),
                 )

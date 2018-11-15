@@ -7,6 +7,7 @@ class StringTable {
   static Map<String, dynamic> _table;
   int language;
   String rupee = "₹";
+  String chips = "images/chips.png";
 
   String get(String title) {
     return _table[title] == null ? "" : _table[title];

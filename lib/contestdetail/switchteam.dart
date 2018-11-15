@@ -41,12 +41,14 @@ class SwitchTeamState extends State<SwitchTeam> {
     }
 
     Map<String, dynamic> payload = {
-      "leagueId": widget.l1Data.league.id,
-      "inningsId": widget.l1Data.league.inningsId,
+      "leagueId": widget.contest.leagueId,
+      "inningsId": widget.contest.inningsId,
       "contestId": widget.contest.id,
       "oldTeamId": widget.oldTeam.id,
       "newTeamId": _selectedTeamId.toString(),
-      "matchId": widget.l1Data.league.rounds[0].matches[0].id,
+      "matchId": widget.l1Data == null
+          ? null
+          : widget.l1Data.league.rounds[0].matches[0].id,
       "channelId": 3,
     };
 

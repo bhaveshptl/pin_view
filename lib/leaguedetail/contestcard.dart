@@ -13,6 +13,7 @@ class ContestCard extends StatelessWidget {
   final Contest contest;
   final Function onJoin;
   final Function onClick;
+  final bool isMyContest;
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
@@ -22,6 +23,7 @@ class ContestCard extends StatelessWidget {
     this.league,
     this.contest,
     this.onClick,
+    this.isMyContest,
     this.myJoinedTeams,
     this.onPrizeStructure,
   });
@@ -47,29 +49,39 @@ class ContestCard extends StatelessWidget {
                         (l1Data == null &&
                             league.status == LeagueStatus.UPCOMING)
                     ? UpcomingContest(
+                        league: league,
                         onJoin: onJoin,
                         contest: contest,
+                        isMyContest: isMyContest,
                         myJoinedTeams: myJoinedTeams,
                         onPrizeStructure: onPrizeStructure,
                       )
                     : (l1Data != null &&
-                            l1Data.league.status == LeagueStatus.LIVE)
+                                l1Data.league.status == LeagueStatus.LIVE) ||
+                            (l1Data == null &&
+                                league.status == LeagueStatus.LIVE)
                         ? LiveContest(
+                            league: league,
                             contest: contest,
+                            isMyContest: isMyContest,
                             myJoinedTeams: myJoinedTeams,
                             onPrizeStructure: onPrizeStructure,
                           )
                         : ResultContest(
+                            league: league,
                             contest: contest,
+                            isMyContest: isMyContest,
                             myJoinedTeams: myJoinedTeams,
                             onPrizeStructure: onPrizeStructure,
                           ),
               ),
-              Banner(
-                message: contest.brand["info"],
-                location: BannerLocation.topStart,
-                textStyle: TextStyle(fontSize: 10.0),
-              ),
+              contest.recommended
+                  ? Banner(
+                      message: contest.brand["info"],
+                      location: BannerLocation.topStart,
+                      textStyle: TextStyle(fontSize: 10.0),
+                    )
+                  : Container(),
             ],
           ),
         ),

@@ -34,8 +34,8 @@ class AuthResult {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       SharedPrefHelper.internal()
           .saveCookieToStorage(response.headers["set-cookie"]);
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(response.body));
+      SharedPrefHelper.internal()
+          .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY, response.body);
       await setWSCookie();
       Navigator.of(scaffoldKey.currentContext).pushReplacementNamed("/lobby");
       done();
