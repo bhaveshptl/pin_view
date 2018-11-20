@@ -22,7 +22,7 @@ dependencies:
   google_sign_in: ^3.1.2    
   shared_preferences: ^0.4.2
   web_socket_channel: ^1.0.9  
-  cached_network_image: ^0.5.0
+  cached_network_image: ^0.5.0  
   flutter_facebook_login: ^1.1.1
   flutter_webview_plugin: ^0.2.1+2
 
@@ -55,6 +55,7 @@ flutter:
     - images/bowler-1.png
     - images/all-rounder-1.png
     - images/chips.png
+    - images/paytm.png
   #  - images/a_dot_burr.jpeg
   #  - images/a_dot_ham.jpeg
 

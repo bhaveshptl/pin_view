@@ -99,8 +99,8 @@ class ContestsState extends State<Contests> {
       _contests.add(Contest());
       _contests.addAll(practiseContests);
 
-      bCashContestsAvailable = cashContests.length > 1;
-      bPractiseContestsAvailable = practiseContests.length > 1;
+      bCashContestsAvailable = cashContests.length > 0;
+      bPractiseContestsAvailable = practiseContests.length > 0;
     } on Exception {
       _contests = contests;
     }

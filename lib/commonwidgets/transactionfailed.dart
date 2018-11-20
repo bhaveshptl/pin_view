@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class TransactionFailed extends StatelessWidget {
-  final Map<String, String> transactionResult;
+  final Map<String, dynamic> transactionResult;
   final Function _actionConfirm;
   final Function _actionReject;
 

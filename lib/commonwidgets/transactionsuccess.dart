@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class TransactionSuccess extends StatelessWidget {
-  final Map<String, String> transactionResult;
+  final Map<String, dynamic> transactionResult;
   final Function _actionConfirm;
 
   TransactionSuccess(this.transactionResult, this._actionConfirm);

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
+import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
@@ -23,7 +25,6 @@ class Lobby extends StatefulWidget {
 }
 
 class LobbyState extends State<Lobby> {
-  String cookie;
   int _sportType = 1;
   List<League> _leagues;
   bool _bShowLoader = false;
@@ -79,17 +80,38 @@ class LobbyState extends State<Lobby> {
   }
 
   _launchAddCash() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddCash(),
+      ),
+    );
+    if (result != null) {
+      _showTransactionResult(json.decode(result));
     }
+  }
 
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => AddCash(), fullscreenDialog: true));
+  _showTransactionResult(Map<String, dynamic> transactionResult) {
+    if (transactionResult["authStatus"] == "Authorised") {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TransactionSuccess(transactionResult, () {
+            Navigator.of(context).pop();
+          });
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TransactionFailed(transactionResult, () {
+            Navigator.of(context).pop();
+          }, () {
+            Navigator.of(context).pop();
+          });
+        },
+      );
+    }
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) {

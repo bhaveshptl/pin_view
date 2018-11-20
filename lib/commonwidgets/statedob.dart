@@ -158,25 +158,20 @@ class StateDobState extends State<StateDob> {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    strings.get("STATE"),
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                Text(
+                  strings.get("STATE"),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: DropdownButton(
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedState = value;
-                      });
-                    },
-                    items: _getStateListItems(context),
-                    value: _selectedState,
-                  ),
+                DropdownButton(
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedState = value;
+                    });
+                  },
+                  items: _getStateListItems(context),
+                  value: _selectedState,
                 )
               ],
             ),

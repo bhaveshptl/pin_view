@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/lobby/withdraw.dart';
 
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -173,6 +174,14 @@ class AppDrawerState extends State<AppDrawer> {
       );
     }
 
+    _showWithdraw() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Withdraw(),
+        ),
+      );
+    }
+
     _showPartnerPage() {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -245,7 +254,9 @@ class AppDrawerState extends State<AppDrawer> {
                   child: Row(
                     children: <Widget>[
                       Text(
-                        _user == null ? "" : _user.emailId,
+                        _user == null || _user.emailId == null
+                            ? ""
+                            : _user.emailId,
                         style: TextStyle(
                             color: Theme.of(context).primaryColorLight),
                       ),
@@ -276,6 +287,7 @@ class AppDrawerState extends State<AppDrawer> {
             title: Text('WITHDRAW CASH'),
             onTap: () {
               Navigator.pop(context);
+              _showWithdraw();
             },
           ),
           ListTile(

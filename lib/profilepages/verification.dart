@@ -12,6 +12,9 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class Verification extends StatefulWidget {
+  final bool forWithdraw;
+  Verification({this.forWithdraw});
+
   @override
   State<StatefulWidget> createState() => VerificationState();
 }
@@ -950,6 +953,17 @@ class VerificationState extends State<Verification> {
                     ),
                   ),
                 ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: widget.forWithdraw != null &&
+                          widget.forWithdraw == true
+                      ? Text(
+                          "Please complete mobile and KYC verification to withdraw money.")
+                      : Container(),
+                )
               ],
             )
           ],

@@ -13,6 +13,7 @@ class ApiUtil {
   static const BASE_URL = "https://stg.playfantasy.com";
   static const PAYMENT_BASE_URL = BASE_URL;
   static const DEPOSIT_URL = PAYMENT_BASE_URL + "/deposit";
+  static const COOKIE_PAGE = BASE_URL + "/assets/cookie.html";
 
   static const BASE_API_URL = BASE_URL + "/api/";
   static const LOGIN_URL = BASE_API_URL + "ups/login";
@@ -62,4 +63,13 @@ class ApiUtil {
   static const CHANGE_TEAM_NAME = BASE_API_URL + "ups/user/updateUserName";
   static const GET_ACCOUNT_DETAILS = BASE_API_URL + "account/overview";
   static const PARTNER_REQUEST = BASE_API_URL + "ups/partner-request";
+  static const DEPOSIT_INFO = BASE_API_URL + "payment/player/deposit/v2";
+  static const PAYMENT_MODE =
+      BASE_API_URL + "payment/player/deposit/proceed/v2";
+  static const INIT_PAYMENT = BASE_API_URL + "payment/player/deposit/init-pay?";
+
+  static const AUTH_WITHDRAW = BASE_API_URL + "v2/ups/user/authWithdraw";
+  static const WITHDRAW = BASE_API_URL + "ups/user/withdraw";
+  static const WITHDRAW_HISTORY = BASE_API_URL + "ups/user/withdraw/list";
+  static const CANCEL_WITHDRAW = BASE_API_URL + "ups/user/withdraw/cancel/";
 }
