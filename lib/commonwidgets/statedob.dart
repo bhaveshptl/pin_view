@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/stateinfo.dart';
@@ -37,11 +38,11 @@ class StateDobState extends State<StateDob> {
 
       return new http.Client()
           .put(
-        ApiUtil.UPDATE_DOB_STATE,
+        BaseUrl.apiUrl + ApiUtil.UPDATE_DOB_STATE,
         headers: {
           'Content-type': 'application/json',
           "cookie": cookie,
-          "channelId": "3"
+          "channelId": AppConfig.of(context).channelId
         },
         body: json.encode({"dob": getDate(), "state": _selectedState}),
       )
@@ -83,11 +84,11 @@ class StateDobState extends State<StateDob> {
     });
 
     return new http.Client().get(
-      ApiUtil.STATE_LIST,
+      BaseUrl.apiUrl + ApiUtil.STATE_LIST,
       headers: {
         'Content-type': 'application/json',
         "cookie": cookie,
-        "channelId": "3"
+        "channelId": AppConfig.of(context).channelId
       },
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 300) {

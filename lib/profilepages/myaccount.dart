@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/account.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -31,7 +32,7 @@ class MyAccountState extends State<MyAccount> {
     }
 
     http.Client().get(
-      ApiUtil.GET_ACCOUNT_DETAILS,
+      BaseUrl.apiUrl + ApiUtil.GET_ACCOUNT_DETAILS,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {

@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/paymentmode.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -58,7 +60,7 @@ class AddCashState extends State<AddCash> {
     }
 
     await http.Client().get(
-      ApiUtil.DEPOSIT_INFO,
+      BaseUrl.apiUrl + ApiUtil.DEPOSIT_INFO,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {
@@ -514,25 +516,15 @@ class AddCashState extends State<AddCash> {
   }
 
   validatePromo(int amount) async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client()
-        .post(ApiUtil.PAYMENT_MODE,
-            headers: {
-              'Content-type': 'application/json',
-              "cookie": cookie,
-            },
-            body: json.encode({
-              "amount": amount,
-              "promoCode": promoController.text,
-              "transaction_amount_in_paise": amount * 100,
-            }))
-        .then(
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PAYMENT_MODE));
+    req.body = json.encode({
+      "amount": amount,
+      "channelId": AppConfig.of(context).channelId,
+      "promoCode": promoController.text,
+      "transaction_amount_in_paise": amount * 100,
+    });
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           initPayment(json.decode(res.body), amount);
@@ -585,7 +577,7 @@ class AddCashState extends State<AddCash> {
     Map<String, dynamic> paymentModeDetails =
         depositData.chooseAmountData.lastPaymentArray[0];
     Map<String, dynamic> payload = {
-      "channelId": 3,
+      "channelId": AppConfig.of(context).channelId,
       "orderId": null,
       "promoCode": "",
       "depositAmount": amount,
@@ -628,7 +620,7 @@ class AddCashState extends State<AddCash> {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => InitPay(
-              url: ApiUtil.INIT_PAYMENT + querParamString,
+              url: BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString,
             ),
       ),
     );

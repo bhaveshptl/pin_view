@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/commonwidgets/statedob.dart';
-import 'package:playfantasy/lobby/addcash.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/modal/prizestructure.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/commonwidgets/statedob.dart';
+import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
@@ -383,7 +384,8 @@ class CreateContestState extends State<CreateContest> {
     }
 
     http.Client().get(
-      ApiUtil.RECOMMENDED_PRIZE_STRUCTURE +
+      BaseUrl.apiUrl +
+          ApiUtil.RECOMMENDED_PRIZE_STRUCTURE +
           _numberOfParticipants.toString() +
           "/" +
           _entryFee.toString(),

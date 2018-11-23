@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/profile.dart';
@@ -48,7 +49,7 @@ class MyProfileState extends State<MyProfile> {
     }
 
     http.Client().get(
-      ApiUtil.GET_USER_PROFILE,
+      BaseUrl.apiUrl + ApiUtil.GET_USER_PROFILE,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {
@@ -168,7 +169,7 @@ class MyProfileState extends State<MyProfile> {
   _changeTeamName() {
     http.Client()
         .put(
-      ApiUtil.CHANGE_TEAM_NAME,
+      BaseUrl.apiUrl + ApiUtil.CHANGE_TEAM_NAME,
       headers: {'Content-type': 'application/json', "cookie": cookie},
       body: json.encode({
         "username": _teamNameController.text,
@@ -408,7 +409,7 @@ class MyProfileState extends State<MyProfile> {
   onSaveProfile() {
     http.Client()
         .put(
-      ApiUtil.UPDATE_USER_PROFILE,
+      BaseUrl.apiUrl + ApiUtil.UPDATE_USER_PROFILE,
       headers: {'Content-type': 'application/json', "cookie": cookie},
       body: json.encode(getUserProfileObject()),
     )

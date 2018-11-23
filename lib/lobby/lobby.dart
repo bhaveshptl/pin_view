@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
+import 'package:playfantasy/commonwidgets/update.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
@@ -20,6 +23,16 @@ import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class Lobby extends StatefulWidget {
+  final String appUrl;
+  final bool isForceUpdate;
+  final bool updateAvailable;
+
+  Lobby({
+    this.appUrl,
+    this.updateAvailable,
+    this.isForceUpdate,
+  });
+
   @override
   State<StatefulWidget> createState() => LobbyState();
 }
@@ -29,6 +42,7 @@ class LobbyState extends State<Lobby> {
   List<League> _leagues;
   bool _bShowLoader = false;
   List<String> _carousel = [];
+  bool bUpdateAppConfirmationShown = false;
 
   _showLoader(bool bShow) {
     setState(() {
@@ -42,6 +56,19 @@ class LobbyState extends State<Lobby> {
 
     _getInitData();
     _getSportsType();
+  }
+
+  _showUpdatingAppDialog(String url) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DownloadAPK(
+          url: url,
+          isForceUpdate: widget.isForceUpdate,
+        );
+      },
+      barrierDismissible: !widget.isForceUpdate,
+    );
   }
 
   _getInitData() async {
@@ -171,19 +198,29 @@ class LobbyState extends State<Lobby> {
   launchHelp() {
     Navigator.of(context).push(
       MaterialPageRoute(
-          builder: (context) => WebviewScaffold(
-                url: "https://www.playfantasy.com/assets/help.html?cache=" +
-                    DateTime.now().millisecondsSinceEpoch.toString(),
-                appBar: AppBar(
-                  title: Text("HELP"),
-                ),
+        builder: (context) => WebviewScaffold(
+              url: "https://www.playfantasy.com/assets/help.html?cache=" +
+                  DateTime.now().millisecondsSinceEpoch.toString(),
+              appBar: AppBar(
+                title: Text("HELP"),
               ),
-          fullscreenDialog: true),
+            ),
+        fullscreenDialog: true,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.updateAvailable != null &&
+        widget.updateAvailable &&
+        !bUpdateAppConfirmationShown) {
+      bUpdateAppConfirmationShown = true;
+      Timer(Duration(seconds: 1), () {
+        _showUpdatingAppDialog(widget.appUrl);
+      });
+    }
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Stack(
@@ -274,6 +311,7 @@ class LobbyState extends State<Lobby> {
                       _leagues = value;
                     },
                     onSportChange: _onSportSelectionChaged,
+                    websocketUrl: AppConfig.of(context).websocketUrl,
                   ),
                 ),
               ],

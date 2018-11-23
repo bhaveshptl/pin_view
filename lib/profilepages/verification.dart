@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -44,6 +46,7 @@ class VerificationState extends State<Verification> {
   String _selectedAddressDocType = "";
 
   final formKey = new GlobalKey<FormState>();
+  final scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final TextEditingController _otpController = new TextEditingController();
   final TextEditingController _emailController = new TextEditingController();
@@ -65,7 +68,7 @@ class VerificationState extends State<Verification> {
     }
 
     return new http.Client().get(
-      ApiUtil.KYC_DOC_LIST,
+      BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -113,7 +116,7 @@ class VerificationState extends State<Verification> {
     });
 
     return new http.Client().get(
-      ApiUtil.VERIFICATION_STATUS,
+      BaseUrl.apiUrl + ApiUtil.VERIFICATION_STATUS,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -201,25 +204,14 @@ class VerificationState extends State<Verification> {
       _emailVerificationError = null;
     });
 
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client()
-        .post(
-      ApiUtil.SEND_VERIFICATION_MAIL,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-      body: json.encoder.convert({
-        "email": _emailController.text.toString(),
-        "isChanged": email.toString() != _emailController.text.toString(),
-      }),
-    )
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_VERIFICATION_MAIL));
+    req.body = json.encode({
+      "email": _emailController.text.toString(),
+      "isChanged": email.toString() != _emailController.text.toString(),
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         setState(() {
@@ -239,25 +231,14 @@ class VerificationState extends State<Verification> {
       _mobileVerificationError = null;
     });
 
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client()
-        .post(
-      ApiUtil.SEND_OTP,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-      body: json.encoder.convert({
-        "phone": _mobileController.text.toString(),
-        "isChanged": mobile.toString() != _mobileController.text.toString(),
-      }),
-    )
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_OTP));
+    req.body = json.encode({
+      "phone": _mobileController.text.toString(),
+      "isChanged": mobile.toString() != _mobileController.text.toString(),
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         setState(() {
@@ -273,17 +254,13 @@ class VerificationState extends State<Verification> {
   }
 
   _verifyOTP() {
-    return new http.Client()
-        .post(
-      ApiUtil.VERIFY_OTP,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-      body: json.encoder.convert({
-        "otp": _otpController.text.toString(),
-      }),
-    )
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VERIFY_OTP));
+    req.body = json.encode({
+      "otp": _otpController.text.toString(),
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         setState(() {
@@ -333,7 +310,8 @@ class VerificationState extends State<Verification> {
       }
 
       // string to uri
-      var uri = Uri.parse(ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
+      var uri = Uri.parse(
+          BaseUrl.apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
 
       // get length for http post
       var panLength = await _panImage.length();
@@ -390,6 +368,7 @@ class VerificationState extends State<Verification> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text(
           strings.get("ACCOUNT_VERIFICATION"),

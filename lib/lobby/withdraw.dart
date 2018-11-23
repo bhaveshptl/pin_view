@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/withdraw.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/withdrawhistory.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
@@ -72,7 +74,7 @@ class WithdrawState extends State<Withdraw> {
     }
 
     return new http.Client().get(
-      ApiUtil.KYC_DOC_LIST,
+      BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -94,7 +96,7 @@ class WithdrawState extends State<Withdraw> {
     }
 
     http.Client().get(
-      ApiUtil.AUTH_WITHDRAW,
+      BaseUrl.apiUrl + ApiUtil.AUTH_WITHDRAW,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {
@@ -633,7 +635,8 @@ class WithdrawState extends State<Withdraw> {
       }
 
       // string to uri
-      var uri = Uri.parse(ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
+      var uri = Uri.parse(
+          BaseUrl.apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
 
       // get length for http post
       var panLength = await _panImage.length();
@@ -692,25 +695,14 @@ class WithdrawState extends State<Withdraw> {
       _mobileVerificationError = null;
     });
 
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client()
-        .post(
-      ApiUtil.SEND_OTP,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-      body: json.encoder.convert({
-        "phone": _mobileController.text.toString(),
-        "isChanged": mobile.toString() != _mobileController.text.toString(),
-      }),
-    )
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_OTP));
+    req.body = json.encode({
+      "phone": _mobileController.text.toString(),
+      "isChanged": mobile.toString() != _mobileController.text.toString(),
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         setState(() {
@@ -726,17 +718,13 @@ class WithdrawState extends State<Withdraw> {
   }
 
   _verifyOTP() {
-    return new http.Client()
-        .post(
-      ApiUtil.VERIFY_OTP,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-      body: json.encoder.convert({
-        "otp": _otpController.text.toString(),
-      }),
-    )
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VERIFY_OTP));
+    req.body = json.encode({
+      "otp": _otpController.text.toString(),
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         authenticateWithdraw();
@@ -808,31 +796,20 @@ class WithdrawState extends State<Withdraw> {
 
   makeWithdrawRequest(BuildContext context,
       {int withdrawType, int amount}) async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client()
-        .post(ApiUtil.WITHDRAW,
-            headers: {
-              'Content-type': 'application/json',
-              "cookie": cookie,
-            },
-            body: json.encode({
-              "amount": amount,
-              "bankDetails": {
-                "account_number": accountNumberController.text,
-                "ifsc_code": acIFSCCodeController.text,
-              },
-              "hasBankDetails": (_withdrawData.accountNumber != null &&
-                  _withdrawData.accountNumber != null &&
-                  _withdrawData.ifscCode != null),
-              "withdraw_type": 1,
-            }))
-        .then(
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.WITHDRAW));
+    req.body = json.encode({
+      "amount": amount,
+      "bankDetails": {
+        "account_number": accountNumberController.text,
+        "ifsc_code": acIFSCCodeController.text,
+      },
+      "hasBankDetails": (_withdrawData.accountNumber != null &&
+          _withdrawData.accountNumber != null &&
+          _withdrawData.ifscCode != null),
+      "withdraw_type": 1,
+    });
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           _scaffoldKey.currentState.showSnackBar(

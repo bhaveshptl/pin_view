@@ -3,21 +3,32 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:playfantasy/commonwidgets/chooselanguage.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:playfantasy/commonwidgets/update.dart';
 
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/chooselanguage.dart';
 import 'package:playfantasy/commonwidgets/forgotpassword.dart';
 
 class LandingPage extends StatefulWidget {
+  final String appUrl;
+  final bool isForceUpdate;
   final bool chooseLanguage;
+  final bool updateAvailable;
   final List<dynamic> languages;
 
-  LandingPage({this.chooseLanguage, this.languages});
+  LandingPage({
+    this.appUrl,
+    this.languages,
+    this.isForceUpdate,
+    this.chooseLanguage,
+    this.updateAvailable,
+  });
 
   @override
   State<StatefulWidget> createState() => new LandingPageState();
@@ -28,6 +39,7 @@ class LandingPageState extends State<LandingPage> {
   String _password;
   bool _obscureText = true;
   List<dynamic> _languages;
+  bool bUpdateAppConfirmationShown = false;
 
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -49,6 +61,19 @@ class LandingPageState extends State<LandingPage> {
     } else {
       _languages = widget.languages;
     }
+  }
+
+  _showUpdatingAppDialog(String url) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DownloadAPK(
+          url: url,
+          isForceUpdate: widget.isForceUpdate,
+        );
+      },
+      barrierDismissible: !widget.isForceUpdate,
+    );
   }
 
   _showChooseLanguage() {
@@ -84,21 +109,12 @@ class LandingPageState extends State<LandingPage> {
   }
 
   updateStringTable(Map<String, dynamic> language) async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.UPDATE_LANGUAGE_TABLE));
+    req.body = json.encode({
+      "language": int.parse(language["id"]),
     });
-
-    await http.Client()
-        .post(
-      ApiUtil.UPDATE_LANGUAGE_TABLE,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encode({
-        "language": int.parse(language["id"]),
-      }),
-    )
-        .then(
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
@@ -129,15 +145,14 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
-    return http.Client()
-        .post(
-      ApiUtil.LOGIN_URL,
-      headers: {'Content-type': 'application/json'},
-      body: json.encoder.convert({
-        "context": {"channel_id": 3},
-        "value": {"auth_attribute": _authName, "password": _password}
-      }),
-    )
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
+    req.body = json.encode({
+      "context": {"channel_id": HttpManager.channelId},
+      "value": {"auth_attribute": _authName, "password": _password}
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(() {});
@@ -189,20 +204,18 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
-    http.Client()
-        .post(
-      authFor == 1
-          ? ApiUtil.GOOGLE_LOGIN_URL
-          : (authFor == 2
-              ? ApiUtil.FACEBOOK_LOGIN_URL
-              : ApiUtil.GOOGLE_LOGIN_URL),
-      headers: {'Content-type': 'application/json'},
-      body: json.encode({
-        "context": {"channel_id": 3},
-        "accessToken": token
-      }),
-    )
-        .then((http.Response res) {
+    http.Request req = http.Request(
+        "POST",
+        Uri.parse(authFor == 1
+            ? BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL
+            : (authFor == 2
+                ? BaseUrl.apiUrl + ApiUtil.FACEBOOK_LOGIN_URL
+                : BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL)));
+    req.body = json.encode({
+      "context": {"channel_id": HttpManager.channelId},
+      "accessToken": token
+    });
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
@@ -231,6 +244,15 @@ class LandingPageState extends State<LandingPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.updateAvailable != null &&
+        widget.updateAvailable &&
+        !bUpdateAppConfirmationShown) {
+      bUpdateAppConfirmationShown = true;
+      Timer(Duration(seconds: 1), () {
+        _showUpdatingAppDialog(widget.appUrl);
+      });
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       body: Stack(

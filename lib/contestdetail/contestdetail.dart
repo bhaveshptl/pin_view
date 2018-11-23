@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -126,19 +128,11 @@ class ContestDetailState extends State<ContestDetail> {
   }
 
   _getContestMyTeams() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client()
-        .post(
-      ApiUtil.GET_MY_CONTEST_MY_TEAMS,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encode([widget.contest.id]),
-    )
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode([widget.contest.id]);
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<int, List<MyTeam>> _mapContestMyTeams = {};
@@ -551,7 +545,8 @@ class ContestDetailState extends State<ContestDetail> {
     }
 
     return new http.Client().get(
-      ApiUtil.GET_CONTEST_TEAMS +
+      BaseUrl.apiUrl +
+          ApiUtil.GET_CONTEST_TEAMS +
           widget.contest.id.toString() +
           "/teams/" +
           teamListOffset.toString() +

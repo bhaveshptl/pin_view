@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -52,7 +53,8 @@ class _ViewTeamState extends State<ViewTeam> {
     });
 
     http.Client().get(
-      ApiUtil.GET_TEAM_INFO +
+      BaseUrl.apiUrl +
+          ApiUtil.GET_TEAM_INFO +
           widget.contest.id.toString() +
           "/teams/" +
           widget.team.id.toString(),

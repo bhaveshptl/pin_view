@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -33,13 +35,6 @@ class SwitchTeamState extends State<SwitchTeam> {
   List<MyTeam> _myUniqueTeams = [];
 
   _switchTeam(BuildContext context) async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
     Map<String, dynamic> payload = {
       "leagueId": widget.contest.leagueId,
       "inningsId": widget.contest.inningsId,
@@ -49,16 +44,13 @@ class SwitchTeamState extends State<SwitchTeam> {
       "matchId": widget.l1Data == null
           ? null
           : widget.l1Data.league.rounds[0].matches[0].id,
-      "channelId": 3,
+      "channelId": AppConfig.of(context).channelId,
     };
 
-    await http.Client()
-        .post(
-      ApiUtil.SWITCH_CONTEST_TEAM,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encode(payload),
-    )
-        .then(
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SWITCH_CONTEST_TEAM));
+    req.body = json.encode(payload);
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);

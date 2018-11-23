@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/modal/createteamresponse.dart';
@@ -763,22 +765,11 @@ class CreateTeamState extends State<CreateTeam> {
   }
 
   void createTeam(Map<String, dynamic> team) async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
-
-    return new http.Client()
-        .post(
-      ApiUtil.CREATE_TEAM,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-        "channelId": "3"
-      },
-      body: json.encoder.convert(team),
-    )
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CREATE_TEAM));
+    req.body = json.encode(team);
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 300) {
         CreateTeamResponse response =
@@ -801,11 +792,11 @@ class CreateTeamState extends State<CreateTeam> {
 
     return new http.Client()
         .put(
-      ApiUtil.EDIT_TEAM + widget.selectedTeam.id.toString(),
+      BaseUrl.apiUrl + ApiUtil.EDIT_TEAM + widget.selectedTeam.id.toString(),
       headers: {
         'Content-type': 'application/json',
         "cookie": cookie,
-        "channelId": "3"
+        "channelId": AppConfig.of(context).channelId
       },
       body: json.encoder.convert(team),
     )

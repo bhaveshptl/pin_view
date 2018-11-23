@@ -3,7 +3,9 @@ import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class AuthResult {
@@ -12,16 +14,11 @@ class AuthResult {
   AuthResult(this.response, this.scaffoldKey);
 
   setWSCookie() async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
-
-    return new http.Client()
-        .post(ApiUtil.GET_COOKIE_URL,
-            headers: {'Content-type': 'application/json', "cookie": cookie},
-            body: json.encoder.convert({}))
+    Request req =
+        Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_COOKIE_URL));
+    req.body = json.encode({});
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         SharedPrefHelper()

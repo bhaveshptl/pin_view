@@ -6,3 +6,5 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 -dontwarn com.google.common.**
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn androidx.work.impl.**

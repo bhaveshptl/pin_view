@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 FantasyWebSocket sockets = new FantasyWebSocket();
 
@@ -26,18 +26,20 @@ class RequestType {
 }
 
 class FantasyWebSocket {
+  String _url;
   static IOWebSocketChannel _channel;
   static ObserverList<Function> _listeners = new ObserverList<Function>();
 
   FantasyWebSocket._internal();
   factory FantasyWebSocket() => FantasyWebSocket._internal();
 
-  connect() async {
+  connect(String url) async {
+    _url = url;
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getWSCookie();
 
     await futureCookie.then((value) {
       if (value != null) {
-        _channel = IOWebSocketChannel.connect(ApiUtil.WEBSOCKET_URL + value);
+        _channel = IOWebSocketChannel.connect(_url + value);
         _listenWSMsg();
       }
     });

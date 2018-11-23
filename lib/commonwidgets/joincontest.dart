@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -46,33 +48,23 @@ class JoinContestState extends State<JoinContest> {
         widget.contest,
       );
     } else {
-      if (cookie == null || cookie == "") {
-        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-        await futureCookie.then((value) {
-          cookie = value;
-        });
-      }
-
-      await http.Client()
-          .post(
-        ApiUtil.JOIN_CONTEST,
-        headers: {'Content-type': 'application/json', "cookie": cookie},
-        body: json.encode({
-          "teamId": _selectedTeamId,
-          "context": {"channel_id": 3},
-          "sportsId": widget.sportsType,
-          "contestId": widget.contest.id,
-          "leagueId": widget.contest.leagueId,
-          "entryFee": widget.contest.entryFee,
-          "prizeType": widget.contest.prizeType,
-          "inningsId": widget.contest.inningsId,
-          "realTeamId": widget.contest.realTeamId,
-          "visibilityId": widget.contest.visibilityId,
-          "contestCode": widget.contest.contestJoinCode,
-          "matchId": widget.l1Data.league.rounds[0].matches[0].id,
-        }),
-      )
-          .then(
+      http.Request req = http.Request(
+          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.JOIN_CONTEST));
+      req.body = json.encode({
+        "teamId": _selectedTeamId,
+        "context": {"channel_id": HttpManager.channelId},
+        "sportsId": widget.sportsType,
+        "contestId": widget.contest.id,
+        "leagueId": widget.contest.leagueId,
+        "entryFee": widget.contest.entryFee,
+        "prizeType": widget.contest.prizeType,
+        "inningsId": widget.contest.inningsId,
+        "realTeamId": widget.contest.realTeamId,
+        "visibilityId": widget.contest.visibilityId,
+        "contestCode": widget.contest.contestJoinCode,
+        "matchId": widget.l1Data.league.rounds[0].matches[0].id,
+      });
+      await HttpManager(http.Client()).sendRequest(req).then(
         (http.Response res) {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
@@ -97,23 +89,13 @@ class JoinContestState extends State<JoinContest> {
       widget.onCreateTeam(context, widget.contest,
           createContestPayload: widget.createContestPayload);
     } else {
-      if (cookie == null || cookie == "") {
-        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-        await futureCookie.then((value) {
-          cookie = value;
-        });
-      }
-
       Map<String, dynamic> payload = widget.createContestPayload;
       payload["fanTeamId"] = _selectedTeamId;
 
-      await http.Client()
-          .post(
-        ApiUtil.CREATE_AND_JOIN_CONTEST,
-        headers: {'Content-type': 'application/json', "cookie": cookie},
-        body: json.encode(payload),
-      )
-          .then(
+      http.Request req = http.Request(
+          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
+      req.body = json.encode(payload);
+      await HttpManager(http.Client()).sendRequest(req).then(
         (http.Response res) {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
@@ -156,20 +138,10 @@ class JoinContestState extends State<JoinContest> {
   }
 
   getMyContestTeams() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client()
-        .post(
-      ApiUtil.GET_MY_CONTEST_MY_TEAMS,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encoder.convert([widget.contest.id]),
-    )
-        .then(
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode([widget.contest.id]);
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
@@ -188,25 +160,15 @@ class JoinContestState extends State<JoinContest> {
   }
 
   _getUserBalance() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client()
-        .post(
-      ApiUtil.USER_BALANCE,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encode({
-        "contestId": widget.contest == null ? "" : widget.contest.id,
-        "leagueId": widget.contest == null
-            ? widget.createContestPayload["leagueId"]
-            : widget.contest.leagueId
-      }),
-    )
-        .then(
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.USER_BALANCE));
+    req.body = json.encode({
+      "contestId": widget.contest == null ? "" : widget.contest.id,
+      "leagueId": widget.contest == null
+          ? widget.createContestPayload["leagueId"]
+          : widget.contest.leagueId
+    });
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);

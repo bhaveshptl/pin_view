@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:playfantasy/appconfig.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ class EarnCashState extends State<EarnCash> {
     }
 
     await http.Client().get(
-      ApiUtil.GET_REFERRAL_CODE,
+      BaseUrl.apiUrl + ApiUtil.GET_REFERRAL_CODE,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then(
       (http.Response res) {

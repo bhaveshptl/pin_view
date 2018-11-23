@@ -17,6 +17,19 @@ allprojects {
         google()
         jcenter()
     }
+
+    configurations.all {
+        exclude group: 'com.google.guava', module: 'failureaccess'
+
+        resolutionStrategy {
+            eachDependency { details ->
+                if('guava' == details.requested.name) {
+                    details.useVersion '27.0-android'
+                }
+            }
+            force "android.arch.lifecycle:runtime:1.1.1"
+        }
+    }
 }
 
 rootProject.buildDir = '../build'

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class Signup extends StatefulWidget {
@@ -39,16 +41,13 @@ class SignupState extends State<Signup> {
     _payload["password"] = _password;
     _payload["context"] = {
       "refCode": _referralCodeController.text,
-      "channel_id": 3,
+      "channel_id": HttpManager.channelId,
     };
 
-    return http.Client()
-        .post(
-      ApiUtil.SIGN_UP,
-      headers: {'Content-type': 'application/json'},
-      body: json.encode(_payload),
-    )
-        .then((http.Response res) {
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SIGN_UP));
+    req.body = json.encode(_payload);
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(() {});
       } else {
@@ -120,20 +119,19 @@ class SignupState extends State<Signup> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
-    http.Client()
-        .post(
-      authFor == 1
-          ? ApiUtil.GOOGLE_LOGIN_URL
-          : (authFor == 2
-              ? ApiUtil.FACEBOOK_LOGIN_URL
-              : ApiUtil.GOOGLE_LOGIN_URL),
-      headers: {'Content-type': 'application/json'},
-      body: json.encode({
-        "context": {"channel_id": 3},
-        "accessToken": token
-      }),
-    )
-        .then((http.Response res) {
+    http.Request req = http.Request(
+        "POST",
+        Uri.parse(BaseUrl.apiUrl +
+            (authFor == 1
+                ? ApiUtil.GOOGLE_LOGIN_URL
+                : (authFor == 2
+                    ? ApiUtil.FACEBOOK_LOGIN_URL
+                    : ApiUtil.GOOGLE_LOGIN_URL))));
+    req.body = json.encode({
+      "context": {"channel_id": HttpManager.channelId},
+      "accessToken": token
+    });
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},

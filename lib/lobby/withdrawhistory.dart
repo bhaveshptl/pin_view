@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
@@ -31,7 +33,7 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
     }
 
     await http.Client().get(
-      ApiUtil.WITHDRAW_HISTORY,
+      BaseUrl.apiUrl + ApiUtil.WITHDRAW_HISTORY,
       headers: {
         'Content-type': 'application/json',
         "cookie": cookie,
@@ -48,23 +50,13 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
   }
 
   onCancelTransaction(Map<String, dynamic> transaction) async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client()
-        .post(
-      ApiUtil.CANCEL_WITHDRAW + transaction["id"].toString(),
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-      body: json.encode({}),
-    )
-        .then(
+    http.Request req = http.Request(
+        "POST",
+        Uri.parse(BaseUrl.apiUrl +
+            ApiUtil.CANCEL_WITHDRAW +
+            transaction["id"].toString()));
+    req.body = json.encode({});
+    await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> cancelledTransaction = json.decode(res.body);

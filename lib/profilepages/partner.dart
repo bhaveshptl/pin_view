@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 
 class Partner extends StatefulWidget {
   @override
@@ -17,25 +17,14 @@ class PartnerState extends State<Partner> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   submitForm() async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PARTNER_REQUEST));
+    req.body = json.encode({
+      "email": _emailController.text,
+      "mobile": _mobileController.text,
     });
-
-    return new http.Client()
-        .post(
-      ApiUtil.PARTNER_REQUEST,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-        "channelId": "3",
-      },
-      body: json.encode({
-        "email": _emailController.text,
-        "mobile": _mobileController.text,
-      }),
-    )
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         _showMessage("We will get back to you very soon...!");

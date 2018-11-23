@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/leaguedetail/innings.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 
@@ -11,6 +12,7 @@ import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
@@ -373,7 +375,7 @@ class LeagueDetailState extends State<LeagueDetail>
     }
 
     return new http.Client().get(
-      ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+      BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -394,19 +396,11 @@ class LeagueDetailState extends State<LeagueDetail>
         _contestIds.add(contest.id);
       }
 
-      if (cookie == null) {
-        Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-        await futureCookie.then((value) {
-          cookie = value;
-        });
-      }
-
-      return new http.Client()
-          .post(
-        ApiUtil.GET_MY_CONTEST_MY_TEAMS,
-        headers: {'Content-type': 'application/json', "cookie": cookie},
-        body: json.encoder.convert(_contestIds),
-      )
+      http.Request req = http.Request(
+          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+      req.body = json.encode(_contestIds);
+      return HttpManager(http.Client())
+          .sendRequest(req)
           .then((http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<int, List<MyTeam>> _mapContestMyTeams = {};

@@ -7,7 +7,7 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class AuthCheck {
   AuthCheck();
-  Future<bool> checkStatus() async {
+  Future<bool> checkStatus(String apiUrl) async {
     String cookie;
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
     await futureCookie.then((value) {
@@ -15,7 +15,7 @@ class AuthCheck {
     });
 
     return new http.Client().get(
-      ApiUtil.AUTH_CHECK_URL,
+      apiUrl + ApiUtil.AUTH_CHECK_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {

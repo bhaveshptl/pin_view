@@ -10,13 +10,16 @@ class LobbyWidget extends StatefulWidget {
   final int sportType;
   final Function onLeagues;
   final Function showLoader;
+  final String websocketUrl;
   final Function onSportChange;
 
-  LobbyWidget(
-      {this.sportType = 1,
-      this.showLoader,
-      this.onLeagues,
-      this.onSportChange});
+  LobbyWidget({
+    this.sportType = 1,
+    this.showLoader,
+    this.onLeagues,
+    this.websocketUrl,
+    this.onSportChange,
+  });
 
   @override
   State<StatefulWidget> createState() => LobbyWidgetState();
@@ -31,6 +34,13 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   List<League> completedLeagues = [];
   Map<String, dynamic> lobbyUpdatePackate = {};
 
+  @override
+  void initState() {
+    super.initState();
+    _createLobbyObject();
+    _createWSConnection();
+  }
+
   _createLobbyObject() {
     lobbyUpdatePackate["iType"] = RequestType.GET_ALL_SERIES;
     registeredSportType = widget.sportType;
@@ -38,7 +48,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   }
 
   _createWSConnection() {
-    sockets.connect();
+    sockets.connect(widget.websocketUrl);
     sockets.register(_onWsMsg);
   }
 
@@ -139,13 +149,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       index++;
     }
     return -1;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _createLobbyObject();
-    _createWSConnection();
   }
 
   _seperateLeaguesByRunningStatus(List<League> leagues) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -53,16 +54,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   _requestOTP() async {
     _authName = _authNameController.text;
-    http.Client()
-        .post(
-      ApiUtil.FORGOT_PASSWORD,
-      headers: {'Content-type': 'application/json'},
-      body: json.encode({
-        "username": _authName,
-        "isEmail": _authName.indexOf("@") != -1,
-      }),
-    )
-        .then((http.Response res) {
+
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.FORGOT_PASSWORD));
+    req.body = json.encode({
+      "username": _authName,
+      "isEmail": _authName.indexOf("@") != -1,
+    });
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         _otpCookie = res.headers["set-cookie"];
         setState(() {
@@ -117,13 +116,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   _submitNewPassword() async {
     http.Client()
         .post(
-      ApiUtil.RESET_PASSWORD,
+      BaseUrl.apiUrl + ApiUtil.RESET_PASSWORD,
       headers: {'Content-type': 'application/json', "cookie": _otpCookie},
       body: json.encode({
         "username": _authName,
         "otp": _otpController.text,
         "password": _newPasswordController.text,
-        "context": {"source": "", "channel_id": "3"}
+        "context": {
+          "source": "",
+          "channel_id": HttpManager.channelId,
+        }
       }),
     )
         .then((http.Response res) {

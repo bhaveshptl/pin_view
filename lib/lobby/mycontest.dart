@@ -3,10 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -290,7 +292,7 @@ class MyContestsState extends State<MyContests>
     }
 
     return new http.Client().get(
-      ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+      BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -419,19 +421,11 @@ class MyContestsState extends State<MyContests>
       }
     });
 
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client()
-        .post(
-      ApiUtil.GET_MY_CONTEST_MY_TEAMS,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encoder.convert(_contestIds),
-    )
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode(_contestIds);
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<int, List<MyTeam>> _mapContestMyTeams = {};

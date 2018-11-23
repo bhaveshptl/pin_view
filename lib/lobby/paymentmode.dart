@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -33,7 +34,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     super.initState();
     setPaymentModeList();
     flutterWebviewPlugin.launch(
-      ApiUtil.COOKIE_PAGE,
+      BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
     );
   }
@@ -160,7 +161,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   onPaySecurely(Map<String, dynamic> paymentModeDetails, String type) async {
     String querParamString = '';
     Map<String, dynamic> payload = {
-      "channelId": 3,
+      "channelId": AppConfig.of(context).channelId,
       "orderId": null,
       "paymentType": type,
       "promoCode": widget.promoCode,
@@ -209,7 +210,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       index++;
     });
 
-    initPayment(ApiUtil.INIT_PAYMENT + querParamString);
+    initPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
   }
 
   initPayment(String url) async {
