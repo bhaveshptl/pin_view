@@ -5,6 +5,7 @@ import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/stateinfo.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
@@ -77,20 +78,13 @@ class StateDobState extends State<StateDob> {
   }
 
   _getStateList() async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
-
-    return new http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.STATE_LIST,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-        "channelId": AppConfig.of(context).channelId
-      },
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(BaseUrl.apiUrl + ApiUtil.STATE_LIST),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 300) {
         setState(() {
           _lstState = (json.decode(res.body) as List)

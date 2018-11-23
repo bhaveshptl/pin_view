@@ -8,6 +8,7 @@ import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/modal/prizestructure.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
@@ -374,23 +375,17 @@ class CreateContestState extends State<CreateContest> {
   }
 
   _updateSuggestedPrizeStructure() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
-    }
-
-    http.Client().get(
-      BaseUrl.apiUrl +
-          ApiUtil.RECOMMENDED_PRIZE_STRUCTURE +
-          _numberOfParticipants.toString() +
-          "/" +
-          _entryFee.toString(),
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then(
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl +
+            ApiUtil.RECOMMENDED_PRIZE_STRUCTURE +
+            _numberOfParticipants.toString() +
+            "/" +
+            _entryFee.toString(),
+      ),
+    );
+    HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           List<PrizeStructureRange> prizeStructureRange =

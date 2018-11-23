@@ -25,20 +25,13 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
   }
 
   getRecentWithdraws() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.WITHDRAW_HISTORY,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-    ).then(
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.WITHDRAW_HISTORY,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           setState(() {

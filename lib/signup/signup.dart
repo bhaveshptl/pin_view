@@ -120,13 +120,15 @@ class SignupState extends State<Signup> {
 
   _sendTokenToAuthenticate(String token, int authFor) async {
     http.Request req = http.Request(
-        "POST",
-        Uri.parse(BaseUrl.apiUrl +
-            (authFor == 1
-                ? ApiUtil.GOOGLE_LOGIN_URL
-                : (authFor == 2
-                    ? ApiUtil.FACEBOOK_LOGIN_URL
-                    : ApiUtil.GOOGLE_LOGIN_URL))));
+      "POST",
+      Uri.parse(
+        authFor == 1
+            ? ApiUtil.GOOGLE_LOGIN_URL
+            : (authFor == 2
+                ? ApiUtil.FACEBOOK_LOGIN_URL
+                : ApiUtil.GOOGLE_LOGIN_URL),
+      ),
+    );
     req.body = json.encode({
       "context": {"channel_id": HttpManager.channelId},
       "accessToken": token

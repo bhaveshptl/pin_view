@@ -66,17 +66,15 @@ class WithdrawState extends State<Withdraw> {
   }
 
   _setAddressList() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         List<dynamic> response = json.decode(res.body);
         setState(() {
@@ -88,17 +86,13 @@ class WithdrawState extends State<Withdraw> {
   }
 
   authenticateWithdraw() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.AUTH_WITHDRAW,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then(
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.AUTH_WITHDRAW,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);

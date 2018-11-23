@@ -6,6 +6,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/profile.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/changepassword.dart';
@@ -41,17 +42,13 @@ class MyProfileState extends State<MyProfile> {
   }
 
   _getProfileData() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.GET_USER_PROFILE,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then(
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.GET_USER_PROFILE,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);

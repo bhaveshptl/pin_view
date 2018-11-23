@@ -38,20 +38,13 @@ class AppDrawerState extends State<AppDrawer> {
   }
 
   getUserInfo() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.AUTH_CHECK_URL,
-      headers: {
-        'Content-type': 'application/json',
-        "cookie": cookie,
-      },
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.AUTH_CHECK_URL,
+      ),
+    );
+    HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> user = json.decode(res.body)["user"];
         SharedPrefHelper.internal().saveToSharedPref(
@@ -79,7 +72,7 @@ class AppDrawerState extends State<AppDrawer> {
   }
 
   _doLogout() {
-    new http.Client().get(
+    http.Client().get(
       BaseUrl.apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {});

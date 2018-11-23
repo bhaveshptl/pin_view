@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -30,17 +31,13 @@ class EarnCashState extends State<EarnCash> {
   }
 
   getReferralCode() async {
-    if (cookie == null || cookie == "") {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    await http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.GET_REFERRAL_CODE,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then(
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.GET_REFERRAL_CODE,
+      ),
+    );
+    HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);

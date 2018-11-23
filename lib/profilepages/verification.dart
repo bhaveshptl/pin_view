@@ -60,17 +60,15 @@ class VerificationState extends State<Verification> {
   }
 
   _setAddressList() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         List<dynamic> response = json.decode(res.body);
         setState(() {
@@ -109,16 +107,15 @@ class VerificationState extends State<Verification> {
   }
 
   _getVerificationStatus() async {
-    String cookie;
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
-
-    return new http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.VERIFICATION_STATUS,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.VERIFICATION_STATUS,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
         setState(() {

@@ -8,6 +8,7 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -45,21 +46,17 @@ class _ViewTeamState extends State<ViewTeam> {
   }
 
   _getTeamPlayers() async {
-    String cookie;
-
-    Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-    await futureCookie.then((value) {
-      cookie = value;
-    });
-
-    http.Client().get(
-      BaseUrl.apiUrl +
-          ApiUtil.GET_TEAM_INFO +
-          widget.contest.id.toString() +
-          "/teams/" +
-          widget.team.id.toString(),
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl +
+            ApiUtil.GET_TEAM_INFO +
+            widget.contest.id.toString() +
+            "/teams/" +
+            widget.team.id.toString(),
+      ),
+    );
+    HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> respose = json.decode(res.body);
         setState(() {

@@ -367,17 +367,13 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _getMyContests() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+      ),
+    );
+    HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
         setState(() {

@@ -537,25 +537,21 @@ class ContestDetailState extends State<ContestDetail> {
       teamListOffset = offset - _mapContestTeams.length;
     }
 
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        cookie = value;
-      });
-    }
-
-    return new http.Client().get(
-      BaseUrl.apiUrl +
-          ApiUtil.GET_CONTEST_TEAMS +
-          widget.contest.id.toString() +
-          "/teams/" +
-          teamListOffset.toString() +
-          "/" +
-          (offset == 0
-              ? (rowsPerPage - _mapContestTeams.length).toString()
-              : rowsPerPage.toString()),
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then(
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl +
+            ApiUtil.GET_CONTEST_TEAMS +
+            widget.contest.id.toString() +
+            "/teams/" +
+            teamListOffset.toString() +
+            "/" +
+            (offset == 0
+                ? (rowsPerPage - _mapContestTeams.length).toString()
+                : rowsPerPage.toString()),
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           List<dynamic> response = json.decode(res.body);
