@@ -18,6 +18,7 @@ class ApiUtil {
   static const SHARED_PREFERENCE_KEY = "fantasy_cookie";
   static const SHARED_PREFERENCE_USER_KEY = "fantasy_user";
   static const SHARED_PREFERENCE_SPORT_SELECTION = "fantasy_sport_selection";
+  static const SHARED_PREFERENCE_FIREBASE_TOKEN = "deviceId";
   static const WS_SHARED_PREFERENCE_KEY = "ws_fantasy_cookie";
   static const LANGUAGE_TABLE = "fantasy_language_table";
   static const KEY_INIT_DATA = "fantasy_init_data";

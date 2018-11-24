@@ -16,11 +16,14 @@ import 'package:playfantasy/commonwidgets/chooselanguage.dart';
 import 'package:playfantasy/commonwidgets/forgotpassword.dart';
 
 class LandingPage extends StatefulWidget {
+  
+  
   final String appUrl;
   final bool isForceUpdate;
   final bool chooseLanguage;
   final bool updateAvailable;
   final List<dynamic> languages;
+  
 
   LandingPage({
     this.appUrl,
@@ -37,6 +40,7 @@ class LandingPage extends StatefulWidget {
 class LandingPageState extends State<LandingPage> {
   String _authName;
   String _password;
+  String _deviceId;
   bool _obscureText = true;
   List<dynamic> _languages;
   bool bUpdateAppConfirmationShown = false;
@@ -61,6 +65,12 @@ class LandingPageState extends State<LandingPage> {
     } else {
       _languages = widget.languages;
     }
+
+    Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
+    firebasedeviceid.then((value) {
+      _deviceId = value;
+    });
   }
 
   _showUpdatingAppDialog(String url) {
@@ -148,7 +158,16 @@ class LandingPageState extends State<LandingPage> {
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
     req.body = json.encode({
-      "context": {"channel_id": HttpManager.channelId},
+      "context": {
+      "channel_id": HttpManager.channelId, 
+      "deviceId": _deviceId,
+      "uid":"",
+      "model":"",
+      "platformType":"",
+      "manufacturer":"",
+      "googleaddid":"",
+      "serial":""
+      },
       "value": {"auth_attribute": _authName, "password": _password}
     });
     return HttpManager(http.Client())
@@ -212,7 +231,7 @@ class LandingPageState extends State<LandingPage> {
                 ? BaseUrl.apiUrl + ApiUtil.FACEBOOK_LOGIN_URL
                 : BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL)));
     req.body = json.encode({
-      "context": {"channel_id": HttpManager.channelId},
+      "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
       "accessToken": token
     });
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {

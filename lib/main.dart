@@ -143,6 +143,8 @@ initFirebaseConfiguration() async {
     print("Token is .........................");
     print(token);
     print(token);
+    SharedPrefHelper.internal()
+        .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, token);
   });
 
   _firebaseMessaging.configure(
@@ -156,6 +158,8 @@ initFirebaseConfiguration() async {
       print('on launch $message');
     },
   );
+
+  _firebaseMessaging.subscribeToTopic('news');
 }
 
 ///
