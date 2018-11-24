@@ -156,6 +156,7 @@ initFirebaseConfiguration() async {
     },
   );
 
+_firebaseMessaging.subscribeToTopic('TopicToListen');
   // await _firebaseMessaging.requestNotificationPermissions(
   //     const IosNotificationSettings(sound: true, badge: true, alert: true));
 }
