@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:playfantasy/appconfig.dart';
-
+import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -18,12 +18,23 @@ class Signup extends StatefulWidget {
 class SignupState extends State<Signup> {
   String _authName;
   String _password;
+  String _deviceId;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
 
   final formKey = new GlobalKey<FormState>();
   final TextEditingController _referralCodeController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
+    firebasedeviceid.then((value) {
+      _deviceId = value;
+    });
+  }
 
   _showReferralInput() {
     setState(() {
@@ -42,6 +53,7 @@ class SignupState extends State<Signup> {
     _payload["context"] = {
       "refCode": _referralCodeController.text,
       "channel_id": HttpManager.channelId,
+      "deviceId": _deviceId
     };
 
     http.Request req =
@@ -130,7 +142,7 @@ class SignupState extends State<Signup> {
       ),
     );
     req.body = json.encode({
-      "context": {"channel_id": HttpManager.channelId},
+      "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
       "accessToken": token
     });
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {

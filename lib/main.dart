@@ -142,6 +142,8 @@ initFirebaseConfiguration() async {
     print("Token is .........................");
     print(token);
     print(token);
+    SharedPrefHelper.internal().saveToSharedPref(
+            ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, token);
   });
 
   _firebaseMessaging.configure(
@@ -168,7 +170,7 @@ _firebaseMessaging.subscribeToTopic('TopicToListen');
 ///
 void main() async {
   await preloadData();
-   await initFirebaseConfiguration();
+  await initFirebaseConfiguration();
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
