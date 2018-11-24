@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authcheck.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -27,6 +28,7 @@ Map<String, dynamic> initData = {};
 
 const apiBaseUrl = "https://stg.playfantasy.com";
 const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
+String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
 
 setWSCookie() async {
   Request req = Request("POST", Uri.parse(apiBaseUrl + ApiUtil.GET_COOKIE_URL));
@@ -51,6 +53,7 @@ getInitData() async {
       apkUrl = initData["updateUrl"];
       bUpdateAvailable = initData["update"];
       bIsForceUpdate = initData["isForceUpdate"];
+      analyticsUrl = initData["analyticsURL"];
       SharedPrefHelper()
           .saveToSharedPref(ApiUtil.KEY_INIT_DATA, json.encode(initData));
     }
@@ -133,8 +136,6 @@ preloadData() async {
   BaseUrl().setWebSocketUrl(websocketUrl);
 }
 
-
-
 initFirebaseConfiguration() async {
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
 
@@ -155,19 +156,16 @@ initFirebaseConfiguration() async {
       print('on launch $message');
     },
   );
-
-  // await _firebaseMessaging.requestNotificationPermissions(
-  //     const IosNotificationSettings(sound: true, badge: true, alert: true));
 }
-
-
 
 ///
 /// Bootstraping APP.
 ///
 void main() async {
   await preloadData();
-   await initFirebaseConfiguration();
+  await initFirebaseConfiguration();
+  AnalyticsManager()
+      .init(url: analyticsUrl, duration: initData["analyticsSendInterval"]);
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
