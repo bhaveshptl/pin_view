@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 
@@ -132,11 +133,41 @@ preloadData() async {
   BaseUrl().setWebSocketUrl(websocketUrl);
 }
 
+
+
+initFirebaseConfiguration() async {
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+
+  await _firebaseMessaging.getToken().then((token) {
+    print("Token is .........................");
+    print(token);
+    print(token);
+  });
+
+  _firebaseMessaging.configure(
+    onMessage: (Map<String, dynamic> message) {
+      print('on message $message');
+    },
+    onResume: (Map<String, dynamic> message) {
+      print('on resume $message');
+    },
+    onLaunch: (Map<String, dynamic> message) {
+      print('on launch $message');
+    },
+  );
+
+  // await _firebaseMessaging.requestNotificationPermissions(
+  //     const IosNotificationSettings(sound: true, badge: true, alert: true));
+}
+
+
+
 ///
 /// Bootstraping APP.
 ///
 void main() async {
   await preloadData();
+   await initFirebaseConfiguration();
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(

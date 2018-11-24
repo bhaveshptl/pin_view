@@ -28,6 +28,7 @@ dependencies:
   cached_network_image: ^0.5.0  
   flutter_facebook_login: ^1.1.1
   flutter_webview_plugin: ^0.2.1+2
+  firebase_messaging: ^2.1.0
   android_intent:
     git: 
       url: git://github.com/bhaveshptl/plugins.git
