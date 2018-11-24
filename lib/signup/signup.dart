@@ -53,7 +53,13 @@ class SignupState extends State<Signup> {
     _payload["context"] = {
       "refCode": _referralCodeController.text,
       "channel_id": HttpManager.channelId,
-      "deviceId": _deviceId
+      "deviceId": _deviceId,
+      "uid":"",
+      "model":"",
+      "platformType":"",
+      "manufacturer":"",
+      "googleaddid":"",
+      "serial":""
     };
 
     http.Request req =

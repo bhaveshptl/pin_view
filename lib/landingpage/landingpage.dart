@@ -158,7 +158,16 @@ class LandingPageState extends State<LandingPage> {
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
     req.body = json.encode({
-      "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
+      "context": {
+      "channel_id": HttpManager.channelId, 
+      "deviceId": _deviceId,
+      "uid":"",
+      "model":"",
+      "platformType":"",
+      "manufacturer":"",
+      "googleaddid":"",
+      "serial":""
+      },
       "value": {"auth_attribute": _authName, "password": _password}
     });
     return HttpManager(http.Client())
