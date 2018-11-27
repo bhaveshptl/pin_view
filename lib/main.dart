@@ -163,7 +163,7 @@ initFirebaseConfiguration() async {
 }
 
 
-initFirebaseDeepLink(){
+
   Future<void> _retrieveDynamicLink() async {
     final PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.retrieveDynamicLink();
@@ -180,14 +180,14 @@ print(deepLink);
      
     }
   }
-}
+
 ///
 /// Bootstraping APP.
 ///
 void main() async {
   await preloadData();
   await initFirebaseConfiguration();
-  await initFirebaseDeepLink();
+  await _retrieveDynamicLink();
   AnalyticsManager()
       .init(url: analyticsUrl, duration: initData["analyticsSendInterval"]);
 
