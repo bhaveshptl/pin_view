@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
@@ -162,12 +162,32 @@ initFirebaseConfiguration() async {
   _firebaseMessaging.subscribeToTopic('news');
 }
 
+
+initFirebaseDeepLink(){
+  Future<void> _retrieveDynamicLink() async {
+    final PendingDynamicLinkData data =
+        await FirebaseDynamicLinks.instance.retrieveDynamicLink();
+    final Uri deepLink = data?.link;
+
+print("Deeplink>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+print("Deeplink>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+print(deepLink);
+print(deepLink);
+print(deepLink);
+print(deepLink);
+print(deepLink);
+    if (deepLink != null) {
+     
+    }
+  }
+}
 ///
 /// Bootstraping APP.
 ///
 void main() async {
   await preloadData();
   await initFirebaseConfiguration();
+  await initFirebaseDeepLink();
   AnalyticsManager()
       .init(url: analyticsUrl, duration: initData["analyticsSendInterval"]);
 
