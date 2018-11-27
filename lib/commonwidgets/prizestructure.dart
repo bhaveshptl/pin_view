@@ -1,58 +1,28 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class PrizeStructure extends StatefulWidget {
   final Contest contest;
+  final List<dynamic> prizeStructure;
 
-  PrizeStructure({this.contest});
+  PrizeStructure({
+    this.contest,
+    this.prizeStructure,
+  });
 
   @override
   PrizeStructureState createState() => PrizeStructureState();
 }
 
 class PrizeStructureState extends State<PrizeStructure> {
-  String cookie;
-  List<dynamic> _prizeStructure = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _getPrizeStructure();
-  }
-
-  _getPrizeStructure() async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(BaseUrl.apiUrl +
-          ApiUtil.GET_PRIZESTRUCTURE +
-          widget.contest.id.toString() +
-          "/prizestructure"),
-    );
-    return HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          setState(() {
-            _prizeStructure = json.decode(res.body);
-          });
-        }
-      },
-    );
-  }
-
   List<Widget> _getPrizeList() {
     List<Widget> _prizeRows = [];
-    if (_prizeStructure.length == 0) {
+    if (widget.prizeStructure.length == 0) {
       _prizeRows.add(Container());
     } else {
-      for (dynamic _prize in _prizeStructure) {
+      for (dynamic _prize in widget.prizeStructure) {
         _prizeRows.add(
           Container(
             child: Padding(

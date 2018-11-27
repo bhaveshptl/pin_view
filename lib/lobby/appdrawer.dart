@@ -293,197 +293,202 @@ class AppDrawerState extends State<AppDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: <Widget>[
-          DrawerHeader(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    CircleAvatar(
-                      maxRadius: 32.0,
-                      backgroundColor: Colors.black12,
-                      child: Icon(
-                        Icons.person,
-                        size: 48.0,
-                      ),
-                    ),
-                    bIsUserVerified
-                        ? Container()
-                        : RaisedButton(
-                            color: Theme.of(context).primaryColor,
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _onVerify();
-                            },
-                            child: Text(
-                              strings.get("VERIFY").toUpperCase(),
-                              style: TextStyle(
-                                color: Colors.white54,
-                              ),
-                            ),
-                          ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: Row(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Profile"),
+      ),
+      body: Container(
+        child: ListView(
+          children: <Widget>[
+            DrawerHeader(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
-                        _user == null ? "" : _user.loginName,
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorLight),
+                      CircleAvatar(
+                        maxRadius: 32.0,
+                        backgroundColor: Colors.black12,
+                        child: Icon(
+                          Icons.person,
+                          size: 48.0,
+                        ),
                       ),
-                      Text(
-                        strings.rupee +
-                            (_user == null
-                                ? "0.0"
-                                : (_user.withdrawable +
-                                        _user.nonWithdrawable +
-                                        _user.depositBucket)
-                                    .toStringAsFixed(2)),
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorLight),
-                      ),
+                      bIsUserVerified
+                          ? Container()
+                          : RaisedButton(
+                              color: Theme.of(context).primaryColor,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _onVerify();
+                              },
+                              child: Text(
+                                strings.get("VERIFY").toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            ),
                     ],
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 4.0),
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        _user == null || _user.emailId == null
-                            ? ""
-                            : _user.emailId,
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorLight),
-                      ),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          _user == null ? "" : _user.loginName,
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColorLight),
+                        ),
+                        Text(
+                          strings.rupee +
+                              (_user == null
+                                  ? "0.0"
+                                  : (_user.withdrawable +
+                                          _user.nonWithdrawable +
+                                          _user.depositBucket)
+                                      .toStringAsFixed(2)),
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColorLight),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.only(top: 4.0),
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          _user == null || _user.emailId == null
+                              ? ""
+                              : _user.emailId,
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColorLight),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColorDark,
+              ),
             ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColorDark,
+            ListTile(
+              title: Text('MY PROFILE'),
+              onTap: () {
+                Navigator.pop(context);
+                _onMyProfile();
+              },
             ),
-          ),
-          ListTile(
-            title: Text('MY PROFILE'),
-            onTap: () {
-              Navigator.pop(context);
-              _onMyProfile();
-            },
-          ),
-          ListTile(
-            title: Text('MY ACCOUNT'),
-            onTap: () {
-              Navigator.pop(context);
-              _showMyAccount();
-            },
-          ),
-          ListTile(
-            title: Text('WITHDRAW CASH'),
-            onTap: () {
-              Navigator.pop(context);
-              _showWithdraw();
-            },
-          ),
-          ListTile(
-            title: Text('ADD CASH'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: Text('EARN CASH'),
-            onTap: () {
-              Navigator.pop(context);
-              _showEarnCash();
-            },
-          ),
-          ListTile(
-            title: Text('BECOME A PARTNER'),
-            onTap: () {
-              Navigator.pop(context);
-              _showPartnerPage();
-            },
-          ),
-          ListTile(
-            title: Text('SCORING SYSTEM'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("SCORING");
-            },
-          ),
-          ListTile(
-            title: Text('CHECK FOR UPDATE'),
-            onTap: () {
-              _performUpdateCheck();
-            },
-          ),
-          ListTile(
-            title: Text('HELP'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("HELP");
-            },
-          ),
-          ListTile(
-            title: Text('SUPPORT'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: Text('FORUM'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("FORUM");
-            },
-          ),
-          ListTile(
-            title: Text('BLOG'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("BLOG");
-            },
-          ),
-          ListTile(
-            title: Text('ABOUT US'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("ABOUT_US");
-            },
-          ),
-          ListTile(
-            title: Text('TERMS AND CONDITION'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("T&C");
-            },
-          ),
-          ListTile(
-            title: Text('PRIVACY POLICY'),
-            onTap: () {
-              Navigator.pop(context);
-              _launchStaticPage("PRIVACY");
-            },
-          ),
-          ListTile(
-            title: Text('LOG OUT'),
-            onTap: () async {
-              _doLogout();
-              Navigator.pop(context);
-              SharedPrefHelper.internal().removeCookie();
-              Navigator.of(context).pushReplacementNamed("/landingpage");
-            },
-          ),
-        ],
+            ListTile(
+              title: Text('MY ACCOUNT'),
+              onTap: () {
+                Navigator.pop(context);
+                _showMyAccount();
+              },
+            ),
+            ListTile(
+              title: Text('WITHDRAW CASH'),
+              onTap: () {
+                Navigator.pop(context);
+                _showWithdraw();
+              },
+            ),
+            ListTile(
+              title: Text('ADD CASH'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('EARN CASH'),
+              onTap: () {
+                Navigator.pop(context);
+                _showEarnCash();
+              },
+            ),
+            ListTile(
+              title: Text('BECOME A PARTNER'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPartnerPage();
+              },
+            ),
+            ListTile(
+              title: Text('SCORING SYSTEM'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("SCORING");
+              },
+            ),
+            ListTile(
+              title: Text('CHECK FOR UPDATE'),
+              onTap: () {
+                _performUpdateCheck();
+              },
+            ),
+            ListTile(
+              title: Text('HELP'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("HELP");
+              },
+            ),
+            ListTile(
+              title: Text('SUPPORT'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text('FORUM'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("FORUM");
+              },
+            ),
+            ListTile(
+              title: Text('BLOG'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("BLOG");
+              },
+            ),
+            ListTile(
+              title: Text('ABOUT US'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("ABOUT_US");
+              },
+            ),
+            ListTile(
+              title: Text('TERMS AND CONDITION'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("T&C");
+              },
+            ),
+            ListTile(
+              title: Text('PRIVACY POLICY'),
+              onTap: () {
+                Navigator.pop(context);
+                _launchStaticPage("PRIVACY");
+              },
+            ),
+            ListTile(
+              title: Text('LOG OUT'),
+              onTap: () async {
+                _doLogout();
+                Navigator.pop(context);
+                SharedPrefHelper.internal().removeCookie();
+                Navigator.of(context).pushReplacementNamed("/landingpage");
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

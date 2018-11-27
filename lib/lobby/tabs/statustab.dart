@@ -11,11 +11,12 @@ class StatusTab extends StatelessWidget {
   final List<League> allLeagues;
   final List<League> statusLeagues;
 
-  StatusTab(
-      {this.statusLeagues,
-      this.leagueStatus,
-      this.onSportChange,
-      this.allLeagues});
+  StatusTab({
+    this.statusLeagues,
+    this.leagueStatus,
+    this.onSportChange,
+    this.allLeagues,
+  });
 
   onLeagueSelect(BuildContext context, League league) {
     MaterialPageRoute route = MaterialPageRoute(

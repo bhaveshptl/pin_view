@@ -2,25 +2,24 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:carousel_pro/carousel_pro.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
-import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
-import 'package:playfantasy/commonwidgets/update.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
+import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
@@ -37,25 +36,38 @@ class Lobby extends StatefulWidget {
   State<StatefulWidget> createState() => LobbyState();
 }
 
-class LobbyState extends State<Lobby> {
+class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   int _sportType = 1;
   List<League> _leagues;
-  bool _bShowLoader = false;
+  TabController _controller;
+  // bool _bShowLoader = false;
   List<String> _carousel = [];
   bool bUpdateAppConfirmationShown = false;
+  Map<String, int> _mapSportTypes;
+  List<String> _sports;
 
-  _showLoader(bool bShow) {
-    setState(() {
-      _bShowLoader = bShow;
-    });
-  }
+  // _showLoader(bool bShow) {
+  //   setState(() {
+  //     _bShowLoader = bShow;
+  //   });
+  // }
 
   @override
   initState() {
     super.initState();
-
+    _controller = TabController(vsync: this, length: 3);
     _getInitData();
     _getSportsType();
+    _controller.addListener(() {
+      setState(() {
+        _sportType = _controller.index + 1;
+      });
+    });
+    _mapSportTypes = {
+      "CRICKET": 1,
+      "FOOTBALL": 2,
+      "KABADDI": 3,
+    };
   }
 
   _showUpdatingAppDialog(String url) {
@@ -75,9 +87,9 @@ class LobbyState extends State<Lobby> {
     Future<dynamic> futureInitData =
         SharedPrefHelper().getFromSharedPref(ApiUtil.KEY_INIT_DATA);
     await futureInitData.then((onValue) {
+      final initData = json.decode(onValue);
       setState(() {
-        _carousel =
-            (json.decode(onValue)["carousel"] as List).map((dynamic value) {
+        _carousel = (initData["carousel"] as List).map((dynamic value) {
           return value.toString();
         }).toList();
       });
@@ -103,17 +115,6 @@ class LobbyState extends State<Lobby> {
         _sportType = _sport;
       });
       SharedPrefHelper().saveSportsType(_sportType.toString());
-    }
-  }
-
-  _launchAddCash() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => AddCash(),
-      ),
-    );
-    if (result != null) {
-      _showTransactionResult(json.decode(result));
     }
   }
 
@@ -145,10 +146,13 @@ class LobbyState extends State<Lobby> {
     setState(() {
       switch (index) {
         case 1:
-          Navigator.of(context).push(MaterialPageRoute(
+          Navigator.of(context).push(
+            MaterialPageRoute(
               builder: (context) => SearchContest(
                     leagues: _leagues,
-                  )));
+                  ),
+            ),
+          );
           break;
         case 2:
           Navigator.of(context).push(
@@ -161,14 +165,25 @@ class LobbyState extends State<Lobby> {
           );
           break;
         case 3:
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => EarnCash()));
-          break;
-        case 4:
-          _launchAddCash();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => AppDrawer(),
+            ),
+          );
           break;
       }
     });
+  }
+
+  _launchAddCash() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddCash(),
+      ),
+    );
+    if (result != null) {
+      _showTransactionResult(json.decode(result));
+    }
   }
 
   Future<bool> _onWillPop() {
@@ -212,6 +227,9 @@ class LobbyState extends State<Lobby> {
 
   @override
   Widget build(BuildContext context) {
+    if (sockets.isConnected() == false) {
+      sockets.connect(AppConfig.of(context).websocketUrl);
+    }
     if (widget.updateAvailable != null &&
         widget.updateAvailable &&
         !bUpdateAppConfirmationShown) {
@@ -227,107 +245,107 @@ class LobbyState extends State<Lobby> {
         children: <Widget>[
           Scaffold(
             appBar: AppBar(
-              // elevation: 0.0,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  DropdownButton(
-                    style: TextStyle(
-                        color: Colors.black45,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.title.fontSize),
-                    onChanged: (value) {
-                      _onSportSelectionChaged(value);
-                    },
-                    value: _sportType,
-                    items: [
-                      DropdownMenuItem(
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(strings.get("CRICKET").toUpperCase()),
-                        ),
-                        value: 1,
+              elevation: 3.0,
+              title: Container(
+                height: kToolbarHeight,
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Image.asset(
+                        "images/smart11.png",
+                        width: 48.0,
                       ),
-                      DropdownMenuItem(
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(strings.get("FOOTBALL").toUpperCase()),
-                        ),
-                        value: 2,
-                      ),
-                      DropdownMenuItem(
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 8.0, right: 24.0),
-                          child: Text(
-                            strings.get("KABADDI").toUpperCase(),
+                    ),
+                    Text("PLAY FANTASY"),
+                  ],
+                ),
+              ),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(122.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 8.0, right: 8.0),
+                            child: Container(
+                              height: 76.0,
+                              child: CarouselSlider(
+                                items: _carousel.map<Widget>((String img) {
+                                  return Container(
+                                      height: 102.0,
+                                      margin: EdgeInsets.only(
+                                          right: 5.0, left: 5.0),
+                                      child: Stack(
+                                        children: <Widget>[
+                                          ClipRRect(
+                                              clipBehavior: Clip.hardEdge,
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(8.0),
+                                              ),
+                                              child: Image.network(
+                                                img,
+                                                fit: BoxFit.contain,
+                                                width: 1000.0,
+                                              )),
+                                        ],
+                                      ));
+                                }).toList(),
+                                autoPlay: true,
+                                reverse: false,
+                              ),
+                            ),
                           ),
                         ),
-                        value: 3,
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.help_outline),
-                  tooltip: strings.get("HOW_TO_PLAY"),
-                  onPressed: () {
-                    launchHelp();
-                  },
-                )
-              ],
-            ),
-            drawer: AppDrawer(),
-            body: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        height: 102.0,
-                        child: Carousel(
-                          indicatorBgPadding: 4.0,
-                          boxFit: BoxFit.contain,
-                          dotSize: 4.0,
-                          dotIncreaseSize: 2.0,
-                          autoplayDuration: Duration(seconds: 10),
-                          images: _carousel.map((String url) {
-                            return NetworkImage(url);
-                          }).toList(),
-                        ),
+                      ],
+                    ),
+                    Container(
+                      height: 48.0,
+                      child: TabBar(
+                        controller: _controller,
+                        isScrollable: true,
+                        indicator: UnderlineTabIndicator(),
+                        tabs: _mapSportTypes.keys.map<Tab>((page) {
+                          return Tab(text: page);
+                        }).toList(),
                       ),
                     ),
                   ],
                 ),
-                Expanded(
-                  child: LobbyWidget(
-                    sportType: _sportType,
-                    showLoader: _showLoader,
-                    onLeagues: (value) {
-                      _leagues = value;
-                    },
-                    onSportChange: _onSportSelectionChaged,
-                    websocketUrl: AppConfig.of(context).websocketUrl,
-                  ),
-                ),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.account_balance_wallet),
+                  onPressed: () {
+                    _launchAddCash();
+                  },
+                )
               ],
+            ),
+            body: TabBarView(
+              controller: _controller,
+              children: _mapSportTypes.keys.map<Widget>((page) {
+                return Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: LobbyWidget(
+                        sportType: _mapSportTypes[page],
+                        onLeagues: (value) {
+                          _leagues = value;
+                        },
+                        onSportChange: _onSportSelectionChaged,
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
             ),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),
-          _bShowLoader
-              ? Center(
-                  child: Container(
-                    color: Colors.black54,
-                    child: Loader(),
-                    constraints: BoxConstraints.expand(),
-                  ),
-                )
-              : Container(),
         ],
       ),
     );

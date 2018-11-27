@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/initpay.dart';
+import 'package:playfantasy/modal/analytics.dart';
 
 import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/paymentmode.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 bool bShowAppBar = true;
 Map<String, String> depositResponse;
@@ -35,6 +36,7 @@ class AddCashState extends State<AddCash> {
   void initState() {
     super.initState();
     _getDepositInfo();
+    AnalyticsManager().addEvent(Event());
     customAmountController.addListener(() {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"

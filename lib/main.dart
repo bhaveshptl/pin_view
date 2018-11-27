@@ -20,15 +20,15 @@ import 'package:playfantasy/landingpage/landingpage.dart';
 String apkUrl;
 String cookie;
 Widget _homePage;
-String channelId = "3";
+String channelId = "9";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
 Map<String, dynamic> initData = {};
 
-const apiBaseUrl = "https://stg.playfantasy.com";
-const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
-String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
+const apiBaseUrl = "https://www.playfantasy.com";
+const websocketUrl = "wss://lobby-www.playfantasy.com/path?pid=";
+String analyticsUrl = "https://analytics.playfantasy.com/click/track";
 
 setWSCookie() async {
   Request req = Request("POST", Uri.parse(apiBaseUrl + ApiUtil.GET_COOKIE_URL));
@@ -180,6 +180,12 @@ void main() async {
     child: MaterialApp(
       home: _homePage,
       routes: FantasyRoutes().getRoutes(),
+      theme: ThemeData(
+        primaryColor: Color.fromARGB(255, 207, 34, 40),
+        accentColor: Color.fromARGB(255, 197, 34, 40),
+        primaryColorDark: Color.fromARGB(255, 227, 34, 40),
+        primaryColorLight: Color.fromARGB(255, 197, 34, 40),
+      ),
     ),
   );
 

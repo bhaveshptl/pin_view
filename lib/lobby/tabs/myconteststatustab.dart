@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
@@ -232,13 +235,33 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     return _cards;
   }
 
-  void _showPrizeStructure(Contest contest) {
+  void _showPrizeStructure(Contest contest) async {
+    List<dynamic> prizeStructure = await _getPrizeStructure(contest);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return PrizeStructure(
           contest: contest,
+          prizeStructure: prizeStructure,
         );
+      },
+    );
+  }
+
+  _getPrizeStructure(Contest contest) async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(BaseUrl.apiUrl +
+          ApiUtil.GET_PRIZESTRUCTURE +
+          contest.id.toString() +
+          "/prizestructure"),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          return json.decode(res.body);
+        }
       },
     );
   }

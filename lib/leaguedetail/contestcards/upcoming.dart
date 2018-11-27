@@ -32,17 +32,20 @@ class UpcomingContest extends StatelessWidget {
       children: <Widget>[
         Stack(
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-                  child: Text(
-                    contest.name,
-                    textAlign: TextAlign.center,
+            Container(
+              color: Colors.black12,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
+                    child: Text(
+                      contest.name,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -78,10 +81,6 @@ class UpcomingContest extends StatelessWidget {
             )
           ],
         ),
-        Divider(
-          height: 2.0,
-          color: Colors.black12,
-        ),
         Row(
           children: <Widget>[
             Expanded(
@@ -91,46 +90,65 @@ class UpcomingContest extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        child: Column(
                           children: <Widget>[
-                            contest.prizeType == 1
-                                ? Image.asset(
-                                    strings.chips,
-                                    width: 16.0,
-                                    height: 12.0,
-                                    fit: BoxFit.contain,
-                                  )
-                                : Text(
-                                    strings.rupee,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color:
-                                            Theme.of(context).primaryColorDark,
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .headline
-                                            .fontSize),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Prize".toUpperCase(),
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .fontSize,
                                   ),
-                            Text(
-                              contest.prizeDetails[0]["totalPrizeAmount"]
-                                  .toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColorDark,
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .headline
-                                      .fontSize),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                contest.prizeType == 1
+                                    ? Image.asset(
+                                        strings.chips,
+                                        width: 16.0,
+                                        height: 12.0,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : Text(
+                                        strings.rupee,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .primaryColorDark,
+                                            fontSize: Theme.of(context)
+                                                .primaryTextTheme
+                                                .headline
+                                                .fontSize),
+                                      ),
+                                Text(
+                                  contest.prizeDetails[0]["totalPrizeAmount"]
+                                      .toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColorDark,
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .headline
+                                          .fontSize),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
-                      Container(
-                        height: 20.0,
-                        width: 1.0,
-                        color: Colors.black12,
-                      ),
+                      // Container(
+                      //   height: 20.0,
+                      //   width: 1.0,
+                      //   color: Colors.black12,
+                      // ),
                       Expanded(
                         child: Tooltip(
                           message: strings.get("NO_OF_WINNERS"),
@@ -181,6 +199,27 @@ class UpcomingContest extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10.0, 0.0, 16.0, 4.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: contest.joined,
+                          child: Container(
+                            height: 4.0,
+                            color: Colors.green,
+                          ),
+                        ),
+                        Expanded(
+                          flex: contest.size - contest.joined,
+                          child: Container(
+                            height: 4.0,
+                            color: Colors.black12,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                   Container(
                     child: Padding(
                       padding: EdgeInsets.only(left: 10.0, bottom: 5.0),
@@ -209,37 +248,17 @@ class UpcomingContest extends StatelessWidget {
                                   ),
                                 )
                               : Container(),
-                          contest.teamsAllowed > 1
-                              ? Tooltip(
-                                  message: strings
-                                      .get("PARTICIPATE_WITH")
-                                      .replaceAll(
-                                        "count",
-                                        contest.teamsAllowed.toString(),
-                                      ),
-                                  child: CircleAvatar(
-                                    backgroundColor: Colors.redAccent,
-                                    maxRadius: 10.0,
-                                    child: Text(
-                                      "M",
-                                      style: TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: Theme.of(context)
-                                              .primaryTextTheme
-                                              .caption
-                                              .fontSize),
-                                    ),
-                                  ),
-                                )
-                              : Container(),
                           Expanded(
-                            child: Text(
-                              contest.joined.toString() +
-                                  "/" +
-                                  contest.size.toString() +
-                                  " " +
-                                  strings.get("JOINED").toLowerCase(),
-                              textAlign: TextAlign.center,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 16.0),
+                              child: Text(
+                                contest.joined.toString() +
+                                    "/" +
+                                    contest.size.toString() +
+                                    " " +
+                                    strings.get("JOINED").toLowerCase(),
+                                textAlign: TextAlign.right,
+                              ),
                             ),
                           )
                         ],
@@ -248,11 +267,6 @@ class UpcomingContest extends StatelessWidget {
                   )
                 ],
               ),
-            ),
-            Container(
-              height: 40.0,
-              width: 1.0,
-              color: Colors.black12,
             ),
             Expanded(
               flex: 1,
@@ -263,21 +277,25 @@ class UpcomingContest extends StatelessWidget {
                     message: "Join contest with ₹" +
                         contest.entryFee.toString() +
                         " entry fee.",
-                    child: RaisedButton(
+                    child: OutlineButton(
                       onPressed: () {
                         if (!bIsContestFull && onJoin != null) {
                           onJoin(contest);
                         }
                       },
-                      color: bIsContestFull
-                          ? Theme.of(context).disabledColor
-                          : Theme.of(context).primaryColorDark,
+                      borderSide: BorderSide(
+                        color: bIsContestFull
+                            ? Theme.of(context).disabledColor
+                            : Theme.of(context).primaryColorDark,
+                      ),
+                      padding: EdgeInsets.all(0.0),
+                      textColor: Theme.of(context).primaryColorDark,
                       child: Row(
                         children: <Widget>[
                           myJoinedTeams != null && myJoinedTeams.length > 0
                               ? Icon(
                                   Icons.add,
-                                  color: Colors.white70,
+                                  color: Theme.of(context).primaryColorDark,
                                   size: 20.0,
                                 )
                               : Container(),
@@ -295,12 +313,25 @@ class UpcomingContest extends StatelessWidget {
                                       )
                                     : Text(
                                         strings.rupee,
-                                        style: TextStyle(color: Colors.white70),
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .primaryColorDark,
+                                          fontSize: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .fontSize,
+                                        ),
                                       ),
                               ),
                               Text(
                                 contest.entryFee.toString(),
-                                style: TextStyle(color: Colors.white70),
+                                style: TextStyle(
+                                  color: Theme.of(context).primaryColorDark,
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .fontSize,
+                                ),
                               ),
                             ],
                           ),

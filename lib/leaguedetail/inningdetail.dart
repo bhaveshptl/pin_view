@@ -383,23 +383,18 @@ class InningDetailsState extends State<InningDetails> {
   _onNavigationSelectionChange(BuildContext context, int index) async {
     var result;
     switch (index) {
-      case 1:
-        result = await Navigator.of(context).push(MaterialPageRoute(
+      case 0:
+        result = await Navigator.of(context).push(
+          MaterialPageRoute(
             builder: (context) => MyTeams(
                   league: widget.league,
                   l1Data: inningsData,
                   myTeams: _myTeams,
-                )));
+                ),
+          ),
+        );
         break;
-      case 2:
-        result = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => MyContests(
-                leagues: widget.leagues,
-                onSportChange: widget.onSportChange,
-              ),
-        ));
-        break;
-      case 3:
+      case 1:
         result = await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => CreateContest(
                 league: widget.league,
@@ -408,7 +403,17 @@ class InningDetailsState extends State<InningDetails> {
               ),
         ));
         break;
-      case 4:
+      case 2:
+        result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => MyContests(
+                  leagues: widget.leagues,
+                  onSportChange: widget.onSportChange,
+                ),
+          ),
+        );
+        break;
+      case 3:
         _launchAddCash();
         break;
     }

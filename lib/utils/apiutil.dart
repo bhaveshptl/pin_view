@@ -16,6 +16,7 @@ class BaseUrl {
 
 class ApiUtil {
   static const SHARED_PREFERENCE_KEY = "fantasy_cookie";
+  static const ANALYTICS_COOKIE = "fantasy_analytics_cookie";
   static const SHARED_PREFERENCE_USER_KEY = "fantasy_user";
   static const SHARED_PREFERENCE_SPORT_SELECTION = "fantasy_sport_selection";
   static const SHARED_PREFERENCE_FIREBASE_TOKEN = "deviceId";

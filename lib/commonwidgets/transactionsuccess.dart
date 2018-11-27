@@ -7,6 +7,13 @@ class TransactionSuccess extends StatelessWidget {
 
   TransactionSuccess(this.transactionResult, this._actionConfirm);
 
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+    return int.parse(s, onError: (e) => null) != null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -47,11 +54,18 @@ class TransactionSuccess extends StatelessWidget {
                   ),
                   new TextSpan(
                     text: strings.rupee +
-                        (double.tryParse(transactionResult["withdrawable"]) +
-                                double.tryParse(
-                                    transactionResult["nonWithdrawable"]) +
-                                double.tryParse(
-                                    transactionResult["depositBucket"]))
+                        ((isNumeric(transactionResult["withdrawable"])
+                                    ? double.tryParse(
+                                        transactionResult["withdrawable"])
+                                    : 0.0) +
+                                (isNumeric(transactionResult["nonWithdrawable"])
+                                    ? double.tryParse(
+                                        transactionResult["nonWithdrawable"])
+                                    : 0.0) +
+                                (isNumeric(transactionResult["depositBucket"])
+                                    ? double.tryParse(
+                                        transactionResult["depositBucket"])
+                                    : 0.0))
                             .toStringAsFixed(2),
                     style: new TextStyle(color: Colors.black54),
                   ),

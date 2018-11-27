@@ -998,7 +998,7 @@ class ContestDetailState extends State<ContestDetail> {
                             ),
                           ),
                           Expanded(
-                            flex: widget.contest.size,
+                            flex: widget.contest.size - widget.contest.joined,
                             child: Container(
                               height: 4.0,
                               color: Colors.black12,
@@ -1089,16 +1089,35 @@ class ContestDetailState extends State<ContestDetail> {
     super.dispose();
   }
 
-  void _showPrizeStructure() {
+  void _showPrizeStructure() async {
+    List<dynamic> prizeStructure = await _getPrizeStructure(widget.contest);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return PrizeStructure(
           contest: widget.contest,
+          prizeStructure: prizeStructure,
         );
       },
     );
   }
+}
+
+_getPrizeStructure(Contest contest) async {
+  http.Request req = http.Request(
+    "GET",
+    Uri.parse(BaseUrl.apiUrl +
+        ApiUtil.GET_PRIZESTRUCTURE +
+        contest.id.toString() +
+        "/prizestructure"),
+  );
+  return HttpManager(http.Client()).sendRequest(req).then(
+    (http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        return json.decode(res.body);
+      }
+    },
+  );
 }
 
 class TeamsDataSource extends DataTableSource {

@@ -476,6 +476,8 @@ class MyContestsState extends State<MyContests>
                 1: Text(strings.get("LIVE").toUpperCase()),
                 2: Text(strings.get("RESULT").toUpperCase()),
               },
+              borderColor: Theme.of(context).primaryColorDark,
+              selectedColor: Theme.of(context).primaryColorLight,
               onValueChanged: (int newValue) {
                 setState(() {
                   selectedSegment = newValue;

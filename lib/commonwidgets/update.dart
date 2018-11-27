@@ -34,7 +34,7 @@ class DownloadAPKState extends State<DownloadAPK> {
 
   checkForPermission() async {
     List<Permissions> permissions =
-        await Permission.getPermissionStatus([PermissionName.Storage]);
+        await Permission.getPermissionStatus([PermissionName.WriteStorage]);
     setState(() {
       permissionStatus = permissions[0].permissionStatus;
     });
@@ -47,7 +47,7 @@ class DownloadAPKState extends State<DownloadAPK> {
 
   askForPermission() async {
     final result =
-        await Permission.requestSinglePermission(PermissionName.Storage);
+        await Permission.requestSinglePermission(PermissionName.WriteStorage);
     if (result != null) {
       setState(() {
         permissionStatus = result;

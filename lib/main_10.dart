@@ -18,7 +18,7 @@ import 'package:playfantasy/landingpage/landingpage.dart';
 String apkUrl;
 String cookie;
 Widget _homePage;
-String channelId = "9";
+String channelId = "10";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;

@@ -1,8 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 import 'package:web_socket_channel/io.dart';
+
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 FantasyWebSocket sockets = new FantasyWebSocket();
@@ -27,6 +26,7 @@ class RequestType {
 
 class FantasyWebSocket {
   String _url;
+  static bool _isConnected = false;
   static IOWebSocketChannel _channel;
   static ObserverList<Function> _listeners = new ObserverList<Function>();
 
@@ -39,10 +39,20 @@ class FantasyWebSocket {
 
     await futureCookie.then((value) {
       if (value != null) {
-        _channel = IOWebSocketChannel.connect(_url + value);
+        _channel = IOWebSocketChannel.connect(
+          _url + value,
+          pingInterval: Duration(
+            seconds: 2,
+          ),
+        );
+        _isConnected = true;
         _listenWSMsg();
       }
     });
+  }
+
+  bool isConnected() {
+    return _isConnected;
   }
 
   _listenWSMsg() {
@@ -51,9 +61,13 @@ class FantasyWebSocket {
         (onData) {
           onMsg(onData);
         },
-        onError: (error, StackTrace stackTrace) {},
+        onError: (error, StackTrace stackTrace) {
+          connect(this._url);
+        },
         onDone: () {
-          print("object");
+          _isConnected = false;
+          _channel.sink.close();
+          connect(this._url);
         },
       );
     }

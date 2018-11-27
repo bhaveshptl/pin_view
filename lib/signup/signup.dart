@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:platform/platform.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -43,6 +45,8 @@ class SignupState extends State<Signup> {
   }
 
   _doSignUp() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
       _payload["phone"] = _authName;
@@ -50,17 +54,20 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
     }
     _payload["password"] = _password;
-    _payload["context"] = {
-      "refCode": _referralCodeController.text,
-      "channel_id": HttpManager.channelId,
-      "deviceId": _deviceId,
-      "uid":"",
-      "model":"",
-      "platformType":"",
-      "manufacturer":"",
-      "googleaddid":"",
-      "serial":""
-    };
+    if (Theme.of(context).platform == TargetPlatform.android) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      _payload["context"] = {
+        "refCode": _referralCodeController.text,
+        "channel_id": HttpManager.channelId,
+        "deviceId": _deviceId,
+        "uid": "",
+        "model": androidInfo.model,
+        "platformType": androidInfo.version.baseOS,
+        "manufacturer": androidInfo.manufacturer,
+        "googleaddid": "",
+        "serial": androidInfo.hardware
+      };
+    }
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SIGN_UP));
