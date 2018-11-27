@@ -142,7 +142,6 @@ initFirebaseConfiguration() async {
   await _firebaseMessaging.getToken().then((token) {
     print("Token is .........................");
     print(token);
-    print(token);
     SharedPrefHelper.internal()
         .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, token);
   });
@@ -162,20 +161,10 @@ initFirebaseConfiguration() async {
   _firebaseMessaging.subscribeToTopic('news');
 }
 
-
-
   Future<void> _retrieveDynamicLink() async {
     final PendingDynamicLinkData data =
         await FirebaseDynamicLinks.instance.retrieveDynamicLink();
     final Uri deepLink = data?.link;
-
-print("Deeplink>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-print("Deeplink>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-print(deepLink);
-print(deepLink);
-print(deepLink);
-print(deepLink);
-print(deepLink);
     if (deepLink != null) {
      
     }
