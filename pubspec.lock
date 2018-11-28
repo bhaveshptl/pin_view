@@ -31,13 +31,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.5.1"
-  carousel_pro:
+  carousel_slider:
     dependency: "direct main"
     description:
-      name: carousel_pro
+      name: carousel_slider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.13"
+    version: "0.0.7"
   charcode:
     dependency: transitive
     description:
@@ -73,6 +73,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
+  device_info:
+    dependency: "direct main"
+    description:
+      name: device_info
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
+  firebase_dynamic_links:
+    dependency: "direct main"
+    description:
+      name: firebase_dynamic_links
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0+1"
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -184,9 +198,11 @@ packages:
   permission:
     dependency: "direct main"
     description:
-      name: permission
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: cf1033c0723bf580238b14c9720ef3e41d771a4f
+      url: "git://github.com/bhaveshptl/permission.git"
+    source: git
     version: "0.1.0"
   platform:
     dependency: transitive
@@ -300,4 +316,4 @@ packages:
     version: "1.0.9"
 sdks:
   dart: ">=2.0.0 <3.0.0"
-  flutter: ">=0.1.4 <2.0.0"
+  flutter: ">=0.2.4 <2.0.0"
