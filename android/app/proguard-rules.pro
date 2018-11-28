@@ -8,3 +8,5 @@
 -dontwarn com.google.common.**
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn androidx.work.impl.**
+-dontwarn io.branch.referral.**
+-dontwarn io.branch.indexing.**
