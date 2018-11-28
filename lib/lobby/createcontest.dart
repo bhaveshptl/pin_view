@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/contestdetail/contestdetail.dart';
 
 import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/lobby/addcash.dart';
@@ -97,7 +97,7 @@ class CreateContestState extends State<CreateContest> {
           });
         }
         if ((_entryFee != null && _entryFee > 0 && _entryFee < 10000) &&
-            (_numberOfParticipants > 1 && _numberOfParticipants < 100)) {
+            (_numberOfParticipants > 1 && _numberOfParticipants <= 100)) {
           _updateSuggestedPrizeStructure();
         }
       }
@@ -202,7 +202,18 @@ class CreateContestState extends State<CreateContest> {
       );
 
       if (result != null) {
-        Navigator.of(context).pop(result);
+        Map<String, dynamic> response = json.decode(result);
+        Contest contest = Contest.fromJson(response["contest"]);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ContestDetail(
+                  contest: contest,
+                  l1Data: _l1Data,
+                  myTeams: _myTeams,
+                  league: widget.league,
+                ),
+          ),
+        );
       }
     }
   }

@@ -63,7 +63,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         ExpansionPanel(
           isExpanded: _selectedItemIndex == i,
           headerBuilder: (context, isExpanded) {
-            return Padding(
+            return FlatButton(
+              onPressed: () {
+                setState(() {
+                  if (_selectedItemIndex == index) {
+                    _selectedItemIndex = -1;
+                  } else {
+                    _selectedItemIndex = index;
+                  }
+                });
+              },
               padding: EdgeInsets.only(left: 16.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

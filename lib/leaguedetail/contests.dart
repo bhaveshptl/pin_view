@@ -45,9 +45,7 @@ class ContestsState extends State<Contests> {
   List<Contest> _contests = [];
 
   Contest _curContest;
-  bool bCashContestsAvailable;
   bool bShowJoinContest = false;
-  bool bPractiseContestsAvailable;
   bool bWaitingForTeamCreation = false;
 
   @override
@@ -60,50 +58,39 @@ class ContestsState extends State<Contests> {
   }
 
   setContestsByCategory(List<Contest> contests) {
-    List<Contest> sortedContests = [];
-    List<Contest> normalContests = [];
-    List<Contest> recommendedContests = [];
     try {
-      contests.forEach((Contest contest) {
-        if (contest.recommended) {
-          recommendedContests.add(contest);
-        } else {
-          normalContests.add(contest);
-        }
-      });
+      contests.sort(
+        (Contest a, Contest b) {
+          if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
+            return (a.prizeDetails[0]["totalPrizeAmount"] ==
+                    b.prizeDetails[0]["totalPrizeAmount"]
+                ? a.entryFee - b.entryFee
+                : b.prizeDetails[0]["totalPrizeAmount"] -
+                    a.prizeDetails[0]["totalPrizeAmount"]);
+          } else {
+            return (a.brand["info"] as String)
+                .compareTo(b.brand["info"] as String);
+          }
+        },
+      );
 
-      normalContests.sort((a, b) {
-        return a.size == b.size ? a.entryFee - b.entryFee : a.size - b.size;
-      });
-
-      recommendedContests.sort((a, b) {
-        return a.prizeDetails[0]["totalPrizeAmount"] ==
-                b.prizeDetails[0]["totalPrizeAmount"]
-            ? a.entryFee - b.entryFee
-            : b.prizeDetails[0]["totalPrizeAmount"] -
-                a.prizeDetails[0]["totalPrizeAmount"];
-      });
-      sortedContests.addAll(recommendedContests);
-      sortedContests.addAll(normalContests);
-
-      List<Contest> cashContests = [];
+      List<Contest> cashRecomendedContests = [];
+      List<Contest> cashNonRecomendedContests = [];
       List<Contest> practiseContests = [];
-      sortedContests.forEach((Contest contest) {
+      contests.forEach((Contest contest) {
         if (contest.prizeType == 1) {
           practiseContests.add(contest);
+        } else if (contest.recommended) {
+          cashRecomendedContests.add(contest);
         } else {
-          cashContests.add(contest);
+          cashNonRecomendedContests.add(contest);
         }
       });
 
       _contests = [];
-      _contests.add(Contest());
-      _contests.addAll(cashContests);
-      _contests.add(Contest());
+      _contests.addAll(cashRecomendedContests);
+      _contests.addAll(cashNonRecomendedContests);
       _contests.addAll(practiseContests);
-
-      bCashContestsAvailable = cashContests.length > 0;
-      bPractiseContestsAvailable = practiseContests.length > 0;
     } on Exception {
       _contests = contests;
     }
@@ -575,7 +562,7 @@ class ContestsState extends State<Contests> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.only(top: 8.0),
       child: widget.l1Data.contests.length == 0
           ? Padding(
@@ -594,78 +581,48 @@ class ContestsState extends State<Contests> {
             )
           : ListView.builder(
               itemCount: _contests.length,
+              padding: EdgeInsets.only(bottom: 16.0),
               itemBuilder: (context, index) {
-                if (index == 0 || _contests[index].id == null) {
-                  return Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4.0),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 4.0),
-                                  color: Colors.black38,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        index == 0 ? "CASH" : "PRACTISE",
-                                        style: TextStyle(
-                                            color: Colors.white70,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: Theme.of(context)
-                                                .primaryTextTheme
-                                                .title
-                                                .fontSize),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            (index == 0 && !bCashContestsAvailable) ||
-                                    (index != 0 &&
-                                        _contests[index].id == null &&
-                                        !bPractiseContestsAvailable)
-                                ? Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "Contests not available",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.redAccent,
-                                          fontSize: Theme.of(context)
-                                              .primaryTextTheme
-                                              .subhead
-                                              .fontSize),
-                                    ),
+                bool bShowBrandInfo = index > 0
+                    ? !((_contests[index - 1]).brand["info"] ==
+                        _contests[index].brand["info"])
+                    : true;
+                bool bShowBottomBorder = index == _contests.length - 1
+                    ? true
+                    : !((_contests[index + 1]).brand["info"] ==
+                        _contests[index].brand["info"]);
+                return Padding(
+                  padding: bShowBrandInfo
+                      ? EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0)
+                      : EdgeInsets.only(right: 8.0, left: 8.0, top: 0.3),
+                  child: ContestCard(
+                    radius: !bShowBottomBorder && !bShowBrandInfo
+                        ? BorderRadius.all(Radius.circular(0.0))
+                        : (bShowBottomBorder
+                            ? BorderRadius.only(
+                                bottomLeft: Radius.circular(5.0),
+                                bottomRight: Radius.circular(5.0),
+                              )
+                            : (bShowBrandInfo
+                                ? BorderRadius.only(
+                                    topLeft: Radius.circular(5.0),
+                                    topRight: Radius.circular(5.0),
                                   )
-                                : Container(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Padding(
-                    padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                    child: ContestCard(
-                      l1Data: widget.l1Data,
-                      league: widget.league,
-                      onJoin: onJoinContest,
-                      onClick: _onContestClick,
-                      contest: _contests[index],
-                      onPrizeStructure: _showPrizeStructure,
-                      myJoinedTeams: widget.mapContestTeams != null
-                          ? widget.mapContestTeams[_contests[index].id]
-                          : null,
-                    ),
-                  );
-                }
+                                : BorderRadius.all(
+                                    Radius.circular(0.0),
+                                  ))),
+                    l1Data: widget.l1Data,
+                    league: widget.league,
+                    onJoin: onJoinContest,
+                    onClick: _onContestClick,
+                    contest: _contests[index],
+                    bShowBrandInfo: bShowBrandInfo,
+                    onPrizeStructure: _showPrizeStructure,
+                    myJoinedTeams: widget.mapContestTeams != null
+                        ? widget.mapContestTeams[_contests[index].id]
+                        : null,
+                  ),
+                );
               },
             ),
     );

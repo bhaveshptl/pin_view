@@ -41,9 +41,6 @@ class FantasyWebSocket {
       if (value != null) {
         _channel = IOWebSocketChannel.connect(
           _url + value,
-          pingInterval: Duration(
-            seconds: 2,
-          ),
         );
         _isConnected = true;
         _listenWSMsg();
@@ -66,8 +63,8 @@ class FantasyWebSocket {
         },
         onDone: () {
           _isConnected = false;
-          _channel.sink.close();
-          connect(this._url);
+          // _channel.sink.close();
+          // connect(this._url);
         },
       );
     }

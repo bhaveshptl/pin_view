@@ -268,12 +268,25 @@ class MyTeamsState extends State<MyTeams> {
     );
   }
 
+  _getPlayerStyle(Player player) {
+    PlayingStyle _style;
+    widget.l1Data.league.fanTeamRules.styles.forEach((PlayingStyle style) {
+      if (player.playingStyleId == style.id ||
+          player.playingStyleDesc.toLowerCase().replaceAll(" ", "") ==
+              style.label.toLowerCase().replaceAll(" ", "")) {
+        _style = style;
+      }
+    });
+    return _style;
+  }
+
   Widget _getExpansionBody(MyTeam myTeam) {
     List<ListTile> items = [];
     Player captain = getPlayer(myTeam.captain, myTeam);
     Player vCaptain = getPlayer(myTeam.viceCaptain, myTeam);
 
     for (Player player in myTeam.players) {
+      final style = _getPlayerStyle(player);
       items.add(
         ListTile(
           leading: Container(
@@ -288,8 +301,11 @@ class MyTeamsState extends State<MyTeams> {
                           child: CachedNetworkImage(
                             imageUrl: player.jerseyUrl,
                             placeholder: Container(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.0,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
                               ),
                               width: TEAM_LOGO_HEIGHT,
                               height: TEAM_LOGO_HEIGHT,
@@ -313,6 +329,27 @@ class MyTeamsState extends State<MyTeams> {
                                       .toString() +
                                   "X")
                               : Container()),
+                      style == null
+                          ? Container()
+                          : Container(
+                              height: 18.0,
+                              width: 18.0,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                      ('images/' +
+                                              style.label +
+                                              " " +
+                                              player.sportsId.toString() +
+                                              ".png")
+                                          .toLowerCase()
+                                          .replaceAll(" ", "-"),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                     ],
                   ),
                 ),

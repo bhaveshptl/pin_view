@@ -48,7 +48,7 @@ class ApiUtil {
   static const GET_MY_CONTEST_MY_TEAMS = "/api/lobby/user/contest/teams";
   static const JOIN_CONTEST = "/api/v2/lobby/joincontest";
   static const SWITCH_CONTEST_TEAM = "/api/lobby/contest/switch";
-  static const CREATE_AND_JOIN_CONTEST = "/api/lobby/contest";
+  static const CREATE_AND_JOIN_CONTEST = "/api/v2/lobby/contest";
   static const STATE_LIST = "/api/verify/states-list";
   static const UPDATE_DOB_STATE = "/api/ups/user/updateUser";
   static const VERIFICATION_STATUS = "/api/ups/user/verify";

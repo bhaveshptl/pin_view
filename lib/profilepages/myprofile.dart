@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/profile.dart';
@@ -20,6 +19,7 @@ class MyProfileState extends State<MyProfile> {
   String cookie;
   int _gender = -1;
   bool bIsDatePicked = false;
+  bool bIsInfoUpdated = false;
   Profile _userProfile = Profile();
   Map<String, dynamic> _selectedState;
   static int currentYear = DateTime.now().year;
@@ -246,6 +246,7 @@ class MyProfileState extends State<MyProfile> {
               child: Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
+                bIsInfoUpdated = true;
               },
             ),
           ],
@@ -266,6 +267,7 @@ class MyProfileState extends State<MyProfile> {
                   onPressed: () {
                     setState(() {
                       _gender = 1;
+                      bIsInfoUpdated = true;
                     });
                     Navigator.of(context).pop();
                   },
@@ -286,6 +288,7 @@ class MyProfileState extends State<MyProfile> {
                   onPressed: () {
                     setState(() {
                       _gender = 2;
+                      bIsInfoUpdated = true;
                     });
                     Navigator.of(context).pop();
                   },
@@ -318,6 +321,7 @@ class MyProfileState extends State<MyProfile> {
           onPressed: () {
             setState(() {
               _selectedState = _userProfile.states[i];
+              bIsInfoUpdated = true;
             });
             Navigator.of(context).pop();
           },
@@ -396,7 +400,7 @@ class MyProfileState extends State<MyProfile> {
         "phone": _phoneController.text != "" ? _phoneController.text : null,
         "gender": _gender == -1 ? null : _gender == 1 ? "Male" : "Female",
         "dob": bIsDatePicked ? getDate() : null,
-        "state": _selectedState["code"],
+        "state": _selectedState == null ? "" : _selectedState["code"],
       },
     };
 
@@ -404,16 +408,22 @@ class MyProfileState extends State<MyProfile> {
   }
 
   onSaveProfile() {
-    http.Client()
-        .put(
-      BaseUrl.apiUrl + ApiUtil.UPDATE_USER_PROFILE,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encode(getUserProfileObject()),
-    )
+    http.Request req = http.Request(
+      "PUT",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.UPDATE_USER_PROFILE,
+      ),
+    );
+    req.body = json.encode(getUserProfileObject());
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         _updateProfileObject(json.decode(res.body));
         _showMessage("Profile updated successfully.");
+        setState(() {
+          bIsInfoUpdated = false;
+        });
       } else if (res.statusCode == 400) {
         Map<String, dynamic> response = json.decode(res.body);
         if (response["error"] != null) {
@@ -693,12 +703,15 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _fNameController,
-                              "First name",
-                            );
-                          },
+                          onPressed: _userProfile.fname == null ||
+                                  _userProfile.fname == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _fNameController,
+                                    "First name",
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -750,12 +763,15 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _lNameController,
-                              "Last name",
-                            );
-                          },
+                          onPressed: _userProfile.lname == null ||
+                                  _userProfile.lname == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _lNameController,
+                                    "Last name",
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -807,9 +823,12 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            showSelectionGenderPopup();
-                          },
+                          onPressed: _userProfile.gender == null ||
+                                  _userProfile.gender == ""
+                              ? () {
+                                  showSelectionGenderPopup();
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -951,13 +970,16 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _phoneController,
-                              "Phone number",
-                              keyboardType: TextInputType.phone,
-                            );
-                          },
+                          onPressed: _userProfile.mobile == null ||
+                                  _userProfile.mobile == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _phoneController,
+                                    "Phone number",
+                                    keyboardType: TextInputType.phone,
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1009,13 +1031,16 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _emailController,
-                              "Email address",
-                              keyboardType: TextInputType.emailAddress,
-                            );
-                          },
+                          onPressed: _userProfile.email == null ||
+                                  _userProfile.email == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _emailController,
+                                    "Email address",
+                                    keyboardType: TextInputType.emailAddress,
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1098,12 +1123,15 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _streetController,
-                              "Area & street",
-                            );
-                          },
+                          onPressed: _userProfile.address1 == null ||
+                                  _userProfile.address1 == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _streetController,
+                                    "Area & street",
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1155,12 +1183,15 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _landmarkController,
-                              "Landmark",
-                            );
-                          },
+                          onPressed: _userProfile.address2 == null ||
+                                  _userProfile.address2 == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _landmarkController,
+                                    "Landmark",
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1212,13 +1243,16 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _pincodeController,
-                              "Pincode",
-                              keyboardType: TextInputType.number,
-                            );
-                          },
+                          onPressed: _userProfile.pincode == null ||
+                                  _userProfile.pincode == 0
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _pincodeController,
+                                    "Pincode",
+                                    keyboardType: TextInputType.number,
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1270,12 +1304,15 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showChangeValueDialog(
-                              _cityController,
-                              "City",
-                            );
-                          },
+                          onPressed: _userProfile.city == null ||
+                                  _userProfile.city == ""
+                              ? () {
+                                  _showChangeValueDialog(
+                                    _cityController,
+                                    "City",
+                                  );
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1327,9 +1364,12 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            _showStateSelection();
-                          },
+                          onPressed: _userProfile.state == null ||
+                                  _userProfile.state == ""
+                              ? () {
+                                  _showStateSelection();
+                                }
+                              : null,
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1377,12 +1417,20 @@ class MyProfileState extends State<MyProfile> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          onSaveProfile();
-        },
-        child: Icon(Icons.save),
-      ),
+      floatingActionButton: bIsInfoUpdated
+          ? FloatingActionButton(
+              onPressed: () {
+                onSaveProfile();
+              },
+              child: Text(
+                "SAVE",
+                style: Theme.of(context)
+                    .primaryTextTheme
+                    .button
+                    .copyWith(color: Colors.white70),
+              ),
+            )
+          : null,
     );
   }
 }

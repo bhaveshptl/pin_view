@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/leaguedetail/innings.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/lobby/searchcontest.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -15,8 +13,9 @@ import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/leaguedetail/innings.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
+import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
@@ -47,13 +46,13 @@ class LeagueDetailState extends State<LeagueDetail>
 
   TabController tabController;
 
-  bool _bShowLoader = false;
+  // bool _bShowLoader = false;
 
-  _showLoader(bool bShow) {
-    setState(() {
-      _bShowLoader = bShow;
-    });
-  }
+  // _showLoader(bool bShow) {
+  //   setState(() {
+  //     _bShowLoader = bShow;
+  //   });
+  // }
 
   @override
   initState() {
@@ -69,7 +68,7 @@ class LeagueDetailState extends State<LeagueDetail>
     Map<String, dynamic> _response = json.decode(onData);
 
     if (_response["bReady"] == 1) {
-      _showLoader(true);
+      // _showLoader(true);
       _getL1Data();
     } else if (_response["iType"] == RequestType.GET_ALL_L1 &&
         _response["bSuccessful"] == true) {
@@ -79,7 +78,7 @@ class LeagueDetailState extends State<LeagueDetail>
             .map((i) => MyTeam.fromJson(i))
             .toList();
       });
-      _showLoader(false);
+      // _showLoader(false);
     } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
         _response["bSuccessful"] == true) {
       _applyL1DataUpdate(_response["diffData"]["ld"]);
@@ -352,7 +351,7 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _getL1Data() {
-    _showLoader(true);
+    // _showLoader(true);
     sockets.sendMessage(l1UpdatePackate);
   }
 
@@ -439,15 +438,17 @@ class LeagueDetailState extends State<LeagueDetail>
       case 0:
         result = await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => MyTeams(
-                  league: widget.league,
-                  l1Data: l1Data,
-                  myTeams: _myTeams,
+            builder: (context) => MyContests(
+                  leagues: widget.leagues,
+                  onSportChange: widget.onSportChange,
                 ),
           ),
         );
         break;
       case 1:
+        _launchAddCash();
+        break;
+      case 2:
         result = await Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => CreateContest(
                 league: widget.league,
@@ -456,18 +457,16 @@ class LeagueDetailState extends State<LeagueDetail>
               ),
         ));
         break;
-      case 2:
+      case 3:
         result = await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => MyContests(
-                  leagues: widget.leagues,
-                  onSportChange: widget.onSportChange,
+            builder: (context) => MyTeams(
+                  league: widget.league,
+                  l1Data: l1Data,
+                  myTeams: _myTeams,
                 ),
           ),
         );
-        break;
-      case 3:
-        _launchAddCash();
         break;
     }
     if (result != null) {
@@ -512,10 +511,20 @@ class LeagueDetailState extends State<LeagueDetail>
               onPressed: () {
                 Navigator.of(context).pop();
               },
-            )
+            ),
           ],
         );
       },
+    );
+  }
+
+  _onSearchContest() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SearchContest(
+              leagues: widget.leagues,
+            ),
+      ),
     );
   }
 
@@ -537,6 +546,15 @@ class LeagueDetailState extends State<LeagueDetail>
               Tooltip(
                 message: strings.get("CONTEST_FILTER"),
                 child: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    _onSearchContest();
+                  },
+                ),
+              ),
+              Tooltip(
+                message: strings.get("CONTEST_FILTER"),
+                child: IconButton(
                   icon: Icon(Icons.filter_list),
                   onPressed: () {
                     _showFilterDialog();
@@ -545,87 +563,111 @@ class LeagueDetailState extends State<LeagueDetail>
               )
             ],
           ),
-          body: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: LeagueCard(
-                      widget.league,
-                      clickable: false,
-                      tabBar: TabBar(
-                        labelColor: Colors.black87,
-                        unselectedLabelColor: Colors.black38,
-                        controller: tabController,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicator: UnderlineTabIndicator(
-                          borderSide: BorderSide(
-                            color: Theme.of(context).primaryColorDark,
+          body: Container(
+            color: Color.fromARGB(255, 237, 237, 237),
+            // decoration: BoxDecoration(
+            //   // image: DecorationImage(
+            //   //   image: AssetImage("images/1.png"),
+            //   // ),
+            //   gradient: LinearGradient(
+            //     colors: [
+            //       Color.fromARGB(255, 2, 80, 197),
+            //       Color.fromARGB(255, 212, 63, 141)
+            //     ],
+            //     begin: Alignment.topLeft,
+            //     end: Alignment.bottomRight,
+            //     // stops: [0.5, 1.0],
+            //   ),
+            //   // backgroundBlendMode: BlendMode.overlay,
+            // ),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: LeagueCard(
+                        widget.league,
+                        clickable: false,
+                        tabBar: TabBar(
+                          labelColor: Colors.black87,
+                          unselectedLabelColor: Colors.black38,
+                          controller: tabController,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: UnderlineTabIndicator(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).primaryColorDark,
+                            ),
+                            insets: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
                           ),
-                          insets: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                          tabs: [
+                            Container(
+                              height: 24.0,
+                              child: Tab(
+                                text: "MATCH",
+                              ),
+                            ),
+                            Container(
+                              height: 24.0,
+                              child: Tab(
+                                text: "INNINGS",
+                              ),
+                            ),
+                          ],
                         ),
-                        tabs: [
-                          Container(
-                            height: 24.0,
-                            child: Tab(
-                              text: "MATCH",
-                            ),
-                          ),
-                          Container(
-                            height: 24.0,
-                            child: Tab(
-                              text: "INNINGS",
-                            ),
-                          ),
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(
+                  height: 2.0,
+                ),
+                Expanded(
+                  child: Container(
+                    child: Scaffold(
+                      backgroundColor: Colors.transparent,
+                      body: TabBarView(
+                        controller: tabController,
+                        children: <Widget>[
+                          l1Data == null
+                              ? Container()
+                              : Contests(
+                                  l1Data: l1Data,
+                                  myTeams: _myTeams,
+                                  league: widget.league,
+                                  scaffoldKey: _scaffoldKey,
+                                  mapContestTeams: _mapContestTeams,
+                                ),
+                          l1Data == null
+                              ? Container()
+                              : Innings(
+                                  l1Data: l1Data,
+                                  myTeams: _myTeams,
+                                  league: widget.league,
+                                  leagues: widget.leagues,
+                                  scaffoldKey: _scaffoldKey,
+                                  mapContestTeams: _mapContestTeams,
+                                  onSportChange: widget.onSportChange,
+                                ),
                         ],
                       ),
                     ),
                   ),
-                ],
-              ),
-              Expanded(
-                child: Scaffold(
-                  body: TabBarView(
-                    controller: tabController,
-                    children: <Widget>[
-                      l1Data == null
-                          ? Container()
-                          : Contests(
-                              l1Data: l1Data,
-                              myTeams: _myTeams,
-                              league: widget.league,
-                              scaffoldKey: _scaffoldKey,
-                              mapContestTeams: _mapContestTeams,
-                            ),
-                      l1Data == null
-                          ? Container()
-                          : Innings(
-                              l1Data: l1Data,
-                              myTeams: _myTeams,
-                              league: widget.league,
-                              leagues: widget.leagues,
-                              scaffoldKey: _scaffoldKey,
-                              mapContestTeams: _mapContestTeams,
-                              onSportChange: widget.onSportChange,
-                            ),
-                    ],
-                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           bottomNavigationBar:
               LobbyBottomNavigation(_onNavigationSelectionChange, 1),
         ),
-        _bShowLoader
-            ? Center(
-                child: Container(
-                  color: Colors.black54,
-                  child: Loader(),
-                  constraints: BoxConstraints.expand(),
-                ),
-              )
-            : Container(),
+        // _bShowLoader
+        //     ? Center(
+        //         child: Container(
+        //           color: Colors.black54,
+        //           child: Loader(),
+        //           constraints: BoxConstraints.expand(),
+        //         ),
+        //       )
+        //     : Container(),
       ],
     );
   }

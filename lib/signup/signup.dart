@@ -147,11 +147,12 @@ class SignupState extends State<Signup> {
     http.Request req = http.Request(
       "POST",
       Uri.parse(
-        authFor == 1
-            ? ApiUtil.GOOGLE_LOGIN_URL
-            : (authFor == 2
-                ? ApiUtil.FACEBOOK_LOGIN_URL
-                : ApiUtil.GOOGLE_LOGIN_URL),
+        BaseUrl.apiUrl +
+            (authFor == 1
+                ? ApiUtil.GOOGLE_LOGIN_URL
+                : (authFor == 2
+                    ? ApiUtil.FACEBOOK_LOGIN_URL
+                    : ApiUtil.GOOGLE_LOGIN_URL)),
       ),
     );
     req.body = json.encode({

@@ -85,7 +85,7 @@ class StateDobState extends State<StateDob> {
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
-      if (res.statusCode >= 200 && res.statusCode <= 300) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
         setState(() {
           _lstState = (json.decode(res.body) as List)
               .map((i) => StateInfo.fromJson(i))
