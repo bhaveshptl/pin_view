@@ -39,14 +39,17 @@ class SignupState extends State<Signup> {
       _deviceId = value;
     });
 
-
     _getBranchRefCode().then((String refcode){
 print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 print(refcode);
 _pfRefCode=refcode;
+  setState(() {
+      _referralCodeController.text=_pfRefCode;
+    });
 
   });
+
   }
 
   _showReferralInput() {
