@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;
@@ -100,7 +98,7 @@ class JoinContestState extends State<JoinContest> {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["error"] == false) {
-              Navigator.of(context).pop(response["message"]);
+              Navigator.of(context).pop(res.body);
             } else if (response["error"] == true) {
               Navigator.of(context).pop(response["message"]);
             }
@@ -348,7 +346,7 @@ class JoinContestState extends State<JoinContest> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  "- " + strings.get("BONUS_USABLE"),
+                  strings.get("BONUS_USABLE"),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,

@@ -24,9 +24,10 @@ bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
 Map<String, dynamic> initData = {};
-const apiBaseUrl = "https://www.playfantasy.com";
-const websocketUrl = "wss://lobby-www.playfantasy.com/path?pid=";
-String analyticsUrl = "https://analytics.playfantasy.com/click/track";
+
+const apiBaseUrl = "https://stg.playfantasy.com";
+const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
+String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
 
 setWSCookie() async {
   Request req = Request("POST", Uri.parse(apiBaseUrl + ApiUtil.GET_COOKIE_URL));

@@ -20,82 +20,68 @@ class LobbyBottomNavigation extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       items: [
         BottomNavigationBarItem(
-          icon: Icon(
-            Icons.home,
-            color: Theme.of(context).primaryColor,
+          icon: Image.asset(
+            "images/mycontests_icon3.png",
+            height: 24.0,
           ),
           title: Text(
-            _screenIndex == 0
-                ? strings.get("ALL_SERIES").toUpperCase()
-                : strings.get("MY_TEAMS").toUpperCase(),
+            strings.get("MY_CONTESTS"),
             textAlign: TextAlign.center,
             maxLines: 2,
             style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: Theme.of(context).primaryTextTheme.caption.fontSize),
+                color: Colors.black87,
+                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
           ),
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            _screenIndex == 0 ? Icons.search : Icons.add_circle,
-            color: Theme.of(context).primaryColor,
+            Icons.account_balance_wallet,
+            color: Colors.black87,
           ),
           title: Text(
-            _screenIndex == 0
-                ? strings.get("CONTEST_CODE").toUpperCase()
-                : strings.get("CREATE_CONTEST").toUpperCase(),
+            strings.get("ADD_CASH"),
             textAlign: TextAlign.center,
             maxLines: 2,
             style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: Theme.of(context).primaryTextTheme.caption.fontSize),
+                color: Colors.black87,
+                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
+          ),
+        ),
+        BottomNavigationBarItem(
+          icon: _screenIndex == 1
+              ? Icon(
+                  Icons.add_circle,
+                  color: Colors.black87,
+                )
+              : Image.asset(
+                  "images/earncash.png",
+                  height: 24.0,
+                ),
+          title: Text(
+            _screenIndex == 0 ? strings.get("EARN_CASH") : "Create contest",
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            style: TextStyle(
+                color: Colors.black87,
+                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
           ),
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            Icons.person,
-            color: Theme.of(context).primaryColor,
-          ),
-          title: Text(
-            strings.get("MY_CONTESTS").toUpperCase(),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: Theme.of(context).primaryTextTheme.caption.fontSize),
-          ),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(
-            Icons.group_work,
-            color: Theme.of(context).primaryColor,
+            _screenIndex == 0 ? Icons.account_circle : Icons.people,
+            color: Colors.black87,
           ),
           title: Text(
             _screenIndex == 0
-                ? strings.get("EARN_CASH").toUpperCase()
-                : strings.get("CREATE_CONTEST").toUpperCase(),
+                ? strings.get("PROFILE")
+                : strings.get("MY_TEAMS"),
             textAlign: TextAlign.center,
             maxLines: 2,
             style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: Theme.of(context).primaryTextTheme.caption.fontSize),
+                color: Colors.black87,
+                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
           ),
         ),
-        // BottomNavigationBarItem(
-        //   icon: Icon(
-        //     Icons.attach_money,
-        //     color: Theme.of(context).primaryColor,
-        //   ),
-        //   title: Text(
-        //     strings.get("ADD_CASH").toUpperCase(),
-        //     textAlign: TextAlign.center,
-        //     maxLines: 2,
-        //     style: TextStyle(
-        //         color: Theme.of(context).primaryColor,
-        //         fontSize:
-        //             Theme.of(context).primaryTextTheme.caption.fontSize),
-        //   ),
-        // ),
       ],
     );
   }

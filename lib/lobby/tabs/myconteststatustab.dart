@@ -219,9 +219,11 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
           children: <Widget>[
             Expanded(
               child: ContestCard(
+                margin: EdgeInsets.all(8.0),
                 league: _league,
                 isMyContest: true,
                 contest: _contest,
+                bShowBrandInfo: true,
                 onJoin: _onJoinContest,
                 onClick: widget.onContestClick,
                 onPrizeStructure: _showPrizeStructure,

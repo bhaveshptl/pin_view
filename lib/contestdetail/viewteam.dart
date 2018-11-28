@@ -228,8 +228,11 @@ class _ViewTeamState extends State<ViewTeam> {
                                   child: CachedNetworkImage(
                                     imageUrl: _player.jerseyUrl,
                                     placeholder: Container(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.0,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.0,
+                                        ),
                                       ),
                                       width: TEAM_LOGO_HEIGHT,
                                       height: TEAM_LOGO_HEIGHT,

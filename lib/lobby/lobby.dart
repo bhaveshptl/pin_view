@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/lobby/earncash.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/addcash.dart';
@@ -12,11 +13,10 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
@@ -40,17 +40,9 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   int _sportType = 1;
   List<League> _leagues;
   TabController _controller;
-  // bool _bShowLoader = false;
   List<String> _carousel = [];
-  bool bUpdateAppConfirmationShown = false;
   Map<String, int> _mapSportTypes;
-  List<String> _sports;
-
-  // _showLoader(bool bShow) {
-  //   setState(() {
-  //     _bShowLoader = bShow;
-  //   });
-  // }
+  bool bUpdateAppConfirmationShown = false;
 
   @override
   initState() {
@@ -145,22 +137,23 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   _onNavigationSelectionChange(BuildContext context, int index) {
     setState(() {
       switch (index) {
-        case 1:
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => SearchContest(
-                    leagues: _leagues,
-                  ),
-            ),
-          );
-          break;
-        case 2:
+        case 0:
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => MyContests(
                     leagues: _leagues,
                     onSportChange: _onSportSelectionChaged,
                   ),
+            ),
+          );
+          break;
+        case 1:
+          _launchAddCash();
+          break;
+        case 2:
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EarnCash(),
             ),
           );
           break;

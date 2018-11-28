@@ -116,7 +116,10 @@ class WithdrawState extends State<Withdraw> {
                     context: _scaffoldKey.currentContext,
                     builder: (BuildContext context) {
                       return StateDob(
-                        onSuccess: () {
+                        onSuccess: (String msg) {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(msg),
+                          ));
                           authenticateWithdraw();
                         },
                       );
@@ -368,10 +371,10 @@ class WithdrawState extends State<Withdraw> {
         return FlatButton(
           onPressed: () {
             setState(() {
-              if (_selectedItemIndex == 0) {
+              if (_selectedItemIndex == 1) {
                 _selectedItemIndex = -1;
               } else {
-                _selectedItemIndex = 0;
+                _selectedItemIndex = 1;
               }
             });
           },
@@ -621,7 +624,7 @@ class WithdrawState extends State<Withdraw> {
         _bShowImageUploadError = true;
       });
     } else {
-      if (cookie == null) {
+      if (cookie == null || cookie == "") {
         Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
         await futureCookie.then((value) {
           cookie = value;

@@ -38,6 +38,8 @@ class StatusTab extends StatelessWidget {
 
     if (statusLeagues.length > 0) {
       return ListView.builder(
+        physics: ClampingScrollPhysics(),
+        shrinkWrap: true,
         itemCount: statusLeagues.length,
         itemBuilder: (context, index) {
           return LeagueCard(

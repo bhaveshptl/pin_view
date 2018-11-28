@@ -16,14 +16,11 @@ import 'package:playfantasy/commonwidgets/chooselanguage.dart';
 import 'package:playfantasy/commonwidgets/forgotpassword.dart';
 
 class LandingPage extends StatefulWidget {
-  
-  
   final String appUrl;
   final bool isForceUpdate;
   final bool chooseLanguage;
   final bool updateAvailable;
   final List<dynamic> languages;
-  
 
   LandingPage({
     this.appUrl,
@@ -51,6 +48,7 @@ class LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
+    SharedPrefHelper().removeCookie();
     if (widget.chooseLanguage != null && widget.chooseLanguage) {
       _showChooseLanguage();
     }
@@ -159,14 +157,14 @@ class LandingPageState extends State<LandingPage> {
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
     req.body = json.encode({
       "context": {
-      "channel_id": HttpManager.channelId, 
-      "deviceId": _deviceId,
-      "uid":"",
-      "model":"",
-      "platformType":"",
-      "manufacturer":"",
-      "googleaddid":"",
-      "serial":""
+        "channel_id": HttpManager.channelId,
+        "deviceId": _deviceId,
+        "uid": "",
+        "model": "",
+        "platformType": "",
+        "manufacturer": "",
+        "googleaddid": "",
+        "serial": ""
       },
       "value": {"auth_attribute": _authName, "password": _password}
     });
@@ -223,18 +221,34 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
-    http.Request req = http.Request(
-        "POST",
-        Uri.parse(authFor == 1
-            ? BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL
-            : (authFor == 2
-                ? BaseUrl.apiUrl + ApiUtil.FACEBOOK_LOGIN_URL
-                : BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL)));
-    req.body = json.encode({
-      "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
-      "accessToken": token
-    });
-    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+    http.Client()
+        .post(
+      BaseUrl.apiUrl +
+          (authFor == 1
+              ? ApiUtil.GOOGLE_LOGIN_URL
+              : (authFor == 2
+                  ? ApiUtil.FACEBOOK_LOGIN_URL
+                  : ApiUtil.GOOGLE_LOGIN_URL)),
+      headers: {'Content-type': 'application/json'},
+      body: json.encode({
+        "context": {"channel_id": 3},
+        "accessToken": token
+      }),
+    )
+        // http.Request req = http.Request(
+        //     "POST",
+        //     Uri.parse(authFor == 1
+        //         ? BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL
+        //         : (authFor == 2
+        //             ? BaseUrl.apiUrl + ApiUtil.FACEBOOK_LOGIN_URL
+        //             : BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL)));
+        // req.body = json.encode({
+        //   "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
+        //   "accessToken": token
+        // });
+        // print(BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL);
+        // await HttpManager(http.Client()).sendRequest(req)
+        .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},

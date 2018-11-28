@@ -14,6 +14,9 @@ class ContestCard extends StatelessWidget {
   final Function onJoin;
   final Function onClick;
   final bool isMyContest;
+  final bool bShowBrandInfo;
+  final EdgeInsetsGeometry margin;
+  final BorderRadiusGeometry radius;
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
@@ -21,69 +24,60 @@ class ContestCard extends StatelessWidget {
     this.l1Data,
     this.onJoin,
     this.league,
+    this.radius,
     this.contest,
     this.onClick,
+    this.margin,
     this.isMyContest,
     this.myJoinedTeams,
     this.onPrizeStructure,
+    this.bShowBrandInfo = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
       message: contest.id.toString() + " - " + contest.name,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 4.0),
-        child: Card(
-          elevation: 3.0,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          child: Stack(
-            children: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  onClick(contest, league);
-                },
-                padding: EdgeInsets.all(0.0),
-                child: (l1Data != null &&
-                            l1Data.league.status == LeagueStatus.UPCOMING) ||
-                        (l1Data == null &&
-                            league.status == LeagueStatus.UPCOMING)
-                    ? UpcomingContest(
-                        league: league,
-                        onJoin: onJoin,
-                        contest: contest,
-                        isMyContest: isMyContest,
-                        myJoinedTeams: myJoinedTeams,
-                        onPrizeStructure: onPrizeStructure,
-                      )
-                    : (l1Data != null &&
-                                l1Data.league.status == LeagueStatus.LIVE) ||
-                            (l1Data == null &&
-                                league.status == LeagueStatus.LIVE)
-                        ? LiveContest(
-                            league: league,
-                            contest: contest,
-                            isMyContest: isMyContest,
-                            myJoinedTeams: myJoinedTeams,
-                            onPrizeStructure: onPrizeStructure,
-                          )
-                        : ResultContest(
-                            league: league,
-                            contest: contest,
-                            isMyContest: isMyContest,
-                            myJoinedTeams: myJoinedTeams,
-                            onPrizeStructure: onPrizeStructure,
-                          ),
-              ),
-              contest.recommended
-                  ? Banner(
-                      message: contest.brand["info"],
-                      location: BannerLocation.topStart,
-                      textStyle: TextStyle(fontSize: 10.0),
+      child: Card(
+        elevation: 3.0,
+        shape: radius != null
+            ? RoundedRectangleBorder(borderRadius: radius)
+            : null,
+        margin: margin == null ? EdgeInsets.all(0.0) : margin,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        child: FlatButton(
+          onPressed: () {
+            onClick(contest, league);
+          },
+          padding: EdgeInsets.all(8.0),
+          child: (l1Data != null &&
+                      l1Data.league.status == LeagueStatus.UPCOMING) ||
+                  (l1Data == null && league.status == LeagueStatus.UPCOMING)
+              ? UpcomingContest(
+                  league: league,
+                  onJoin: onJoin,
+                  contest: contest,
+                  isMyContest: isMyContest,
+                  myJoinedTeams: myJoinedTeams,
+                  bShowBrandInfo: bShowBrandInfo,
+                  onPrizeStructure: onPrizeStructure,
+                )
+              : (l1Data != null && l1Data.league.status == LeagueStatus.LIVE) ||
+                      (l1Data == null && league.status == LeagueStatus.LIVE)
+                  ? LiveContest(
+                      league: league,
+                      contest: contest,
+                      isMyContest: isMyContest,
+                      myJoinedTeams: myJoinedTeams,
+                      onPrizeStructure: onPrizeStructure,
                     )
-                  : Container(),
-            ],
-          ),
+                  : ResultContest(
+                      league: league,
+                      contest: contest,
+                      isMyContest: isMyContest,
+                      myJoinedTeams: myJoinedTeams,
+                      onPrizeStructure: onPrizeStructure,
+                    ),
         ),
       ),
     );

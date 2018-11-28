@@ -2,9 +2,9 @@ import 'package:http/http.dart' as http;
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class HttpManager extends http.BaseClient {
-  String cookie;
-  final http.Client _inner;
+  static String cookie;
   static String channelId;
+  final http.Client _inner;
 
   HttpManager(this._inner);
 

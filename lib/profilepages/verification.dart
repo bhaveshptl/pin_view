@@ -535,7 +535,7 @@ class VerificationState extends State<Verification> {
                                     if (_selectedItemIndex == 0) {
                                       _selectedItemIndex = -1;
                                     } else {
-                                      _selectedItemIndex = 0;
+                                      _selectedItemIndex = 1;
                                     }
                                   });
                                 },
@@ -697,7 +697,7 @@ class VerificationState extends State<Verification> {
                                     if (_selectedItemIndex == 0) {
                                       _selectedItemIndex = -1;
                                     } else {
-                                      _selectedItemIndex = 0;
+                                      _selectedItemIndex = 2;
                                     }
                                   });
                                 },
