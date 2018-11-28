@@ -25,7 +25,8 @@ class SignupState extends State<Signup> {
   String _pfRefCode;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
-  static const branch_io_platform = const MethodChannel('com.algorin.pf.branch');
+  static const branch_io_platform =
+      const MethodChannel('com.algorin.pf.branch');
   final formKey = new GlobalKey<FormState>();
   final TextEditingController _referralCodeController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -39,43 +40,32 @@ class SignupState extends State<Signup> {
       _deviceId = value;
     });
 
-    _getBranchRefCode().then((String refcode){
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-print(refcode);
-_pfRefCode=refcode;
-  setState(() {
-      _referralCodeController.text=_pfRefCode;
+    _getBranchRefCode().then((String refcode) {
+      print(
+          "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<PF REF CODE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+      print(refcode);
+      _pfRefCode = refcode;
+      setState(() {
+        _referralCodeController.text = _pfRefCode;
+      });
     });
-
-  });
-
   }
 
   _showReferralInput() {
-
-    print("..<..<..<..<>>>>>>>>>>>>>>>>>>>>");
-    print("Show ref code called");
-    print(_pfRefCode);
     setState(() {
       _bShowReferralInput = !_bShowReferralInput;
     });
   }
 
-
-Future<String> _getBranchRefCode() async {
-  String value;
-  try {
-    value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-  } catch (e) {
-    print(e);
+  Future<String> _getBranchRefCode() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getBranchRefCode');
+    } catch (e) {
+      print(e);
+    }
+    return value;
   }
-   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  print(value);
-  return value;
-}
-
 
   _doSignUp() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();

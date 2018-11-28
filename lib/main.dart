@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
@@ -25,7 +24,6 @@ bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
 Map<String, dynamic> initData = {};
-const branch_io_platform = const MethodChannel('com.algorin.pf.branch');
 const apiBaseUrl = "https://www.playfantasy.com";
 const websocketUrl = "wss://lobby-www.playfantasy.com/path?pid=";
 String analyticsUrl = "https://analytics.playfantasy.com/click/track";
@@ -138,7 +136,6 @@ preloadData() async {
 
 initFirebaseConfiguration() async {
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-
   await _firebaseMessaging.getToken().then((token) {
     print("Token is .........................");
     print(token);
@@ -161,25 +158,7 @@ initFirebaseConfiguration() async {
   _firebaseMessaging.subscribeToTopic('news');
 }
 
-Future<void> _retrieveDynamicLink() async {
-  final PendingDynamicLinkData data =
-      await FirebaseDynamicLinks.instance.retrieveDynamicLink();
-  final Uri deepLink = data?.link;
-  if (deepLink != null) {}
-}
 
-Future<String> _getBranchRefCode() async {
-  String value;
-  try {
-    value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-  } catch (e) {
-    print(e);
-  }
-   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  print(value);
-  return value;
-}
 
 ///
 /// Bootstraping APP.
@@ -187,13 +166,7 @@ Future<String> _getBranchRefCode() async {
 void main() async {
   await preloadData();
   await initFirebaseConfiguration();
-  await _retrieveDynamicLink();
 
-  _getBranchRefCode().then((String refcode){
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-print(refcode);
-  });
   AnalyticsManager()
       .init(url: analyticsUrl, duration: initData["analyticsSendInterval"]);
 
