@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:platform/platform.dart';
@@ -21,9 +22,10 @@ class SignupState extends State<Signup> {
   String _authName;
   String _password;
   String _deviceId;
+  String _pfRefCode;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
-
+  static const branch_io_platform = const MethodChannel('com.algorin.pf.branch');
   final formKey = new GlobalKey<FormState>();
   final TextEditingController _referralCodeController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -36,13 +38,41 @@ class SignupState extends State<Signup> {
     firebasedeviceid.then((value) {
       _deviceId = value;
     });
+
+
+    _getBranchRefCode().then((String refcode){
+print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST 2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+print(refcode);
+_pfRefCode=refcode;
+
+  });
   }
 
   _showReferralInput() {
+
+    print("..<..<..<..<>>>>>>>>>>>>>>>>>>>>");
+    print("Show ref code called");
+    print(_pfRefCode);
     setState(() {
       _bShowReferralInput = !_bShowReferralInput;
     });
   }
+
+
+Future<String> _getBranchRefCode() async {
+  String value;
+  try {
+    value = await branch_io_platform.invokeMethod('_getBranchRefCode');
+  } catch (e) {
+    print(e);
+  }
+   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+   print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<REF CODE TEST>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+  print(value);
+  return value;
+}
+
 
   _doSignUp() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
