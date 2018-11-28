@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -232,8 +235,34 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     );
 
     if (result != null) {
-      Navigator.of(context).pop(result);
+      Map<String, dynamic> response = json.decode(result);
+      if ((response["authStatus"] as String).toLowerCase() ==
+          "Declined".toLowerCase()) {
+        _showTransactionFailed(response);
+      } else {
+        Navigator.of(context).pop(result);
+      }
     }
+  }
+
+  _showTransactionFailed(Map<String, dynamic> transactionResult) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TransactionFailed(transactionResult, () {
+          Navigator.of(context).pop();
+        }, () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop(json.encode(transactionResult));
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    flutterWebviewPlugin.dispose();
+    super.dispose();
   }
 
   @override

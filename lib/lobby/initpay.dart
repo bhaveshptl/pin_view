@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -31,8 +30,7 @@ class InitPayState extends State<InitPay> {
     flutterWebviewPlugin.onStateChanged.listen(
       (WebViewStateChanged state) {
         Uri uri = Uri.dataFromString(state.url);
-        if (uri.path.indexOf(BaseUrl.apiUrl + "/lobby") !=
-                -1 &&
+        if (uri.path.indexOf(BaseUrl.apiUrl + ApiUtil.PAYMENT_SUCCESS) != -1 &&
             uri.hasQuery) {
           if (depositResponse == null) {
             depositResponse = uri.queryParameters;

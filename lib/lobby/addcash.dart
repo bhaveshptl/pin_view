@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/initpay.dart';
@@ -25,6 +26,7 @@ class AddCashState extends State<AddCash> {
   Deposit depositData;
   int customAmountBonus = 0;
   bool bShowPromoInput = false;
+  FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController promoController = TextEditingController();
@@ -51,6 +53,13 @@ class AddCashState extends State<AddCash> {
         }
       });
     });
+  }
+
+  initWebview() {
+    flutterWebviewPlugin.launch(
+      BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
+      hidden: true,
+    );
   }
 
   _getDepositInfo() async {
@@ -539,6 +548,7 @@ class AddCashState extends State<AddCash> {
         ),
       );
     } else {
+      flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ChoosePaymentMode(
@@ -552,6 +562,8 @@ class AddCashState extends State<AddCash> {
       );
       if (result != null) {
         Navigator.of(context).pop(result);
+      } else {
+        initWebview();
       }
     }
   }
@@ -579,7 +591,7 @@ class AddCashState extends State<AddCash> {
       "orderId": null,
       "promoCode": "",
       "depositAmount": amount,
-      "paymentOption": paymentModeDetails["name"],
+      "paymentOption": paymentModeDetails["paymentOption"],
       "paymentType": paymentModeDetails["paymentType"],
       "gateway": paymentModeDetails["gateway"],
       "gatewayName": paymentModeDetails["gateway"],
@@ -652,6 +664,14 @@ class AddCashState extends State<AddCash> {
     } else {
       onProceed(amount: customAmount);
     }
+  }
+
+  @override
+  void dispose() {
+    if (flutterWebviewPlugin != null) {
+      flutterWebviewPlugin.dispose();
+    }
+    super.dispose();
   }
 
   @override

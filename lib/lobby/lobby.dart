@@ -120,17 +120,6 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
           });
         },
       );
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TransactionFailed(transactionResult, () {
-            Navigator.of(context).pop();
-          }, () {
-            Navigator.of(context).pop();
-          });
-        },
-      );
     }
   }
 

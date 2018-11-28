@@ -82,4 +82,5 @@ class ApiUtil {
   static const CANCEL_WITHDRAW = "/api/ups/user/withdraw/cancel/";
 
   static const CHECK_APP_UPDATE = "/api/v2/lobby/update";
+  static const PAYMENT_SUCCESS = "/assets/payment-response.html";
 }

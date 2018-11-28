@@ -28,9 +28,9 @@ class LobbyBottomNavigation extends StatelessWidget {
             strings.get("MY_CONTESTS"),
             textAlign: TextAlign.center,
             maxLines: 2,
-            style: TextStyle(
-                color: Colors.black87,
-                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
+            style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                  color: Colors.black87,
+                ),
           ),
         ),
         BottomNavigationBarItem(
@@ -42,9 +42,9 @@ class LobbyBottomNavigation extends StatelessWidget {
             strings.get("ADD_CASH"),
             textAlign: TextAlign.center,
             maxLines: 2,
-            style: TextStyle(
-                color: Colors.black87,
-                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
+            style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                  color: Colors.black87,
+                ),
           ),
         ),
         BottomNavigationBarItem(
@@ -61,9 +61,9 @@ class LobbyBottomNavigation extends StatelessWidget {
             _screenIndex == 0 ? strings.get("EARN_CASH") : "Create contest",
             textAlign: TextAlign.center,
             maxLines: 2,
-            style: TextStyle(
-                color: Colors.black87,
-                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
+            style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                  color: Colors.black87,
+                ),
           ),
         ),
         BottomNavigationBarItem(
@@ -77,9 +77,9 @@ class LobbyBottomNavigation extends StatelessWidget {
                 : strings.get("MY_TEAMS"),
             textAlign: TextAlign.center,
             maxLines: 2,
-            style: TextStyle(
-                color: Colors.black87,
-                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize),
+            style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                  color: Colors.black87,
+                ),
           ),
         ),
       ],
