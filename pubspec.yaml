@@ -20,7 +20,7 @@ dependencies:
   device_info: ^0.3.0
   package_info: ^0.3.2
   image_picker: ^0.4.10  
-  google_sign_in: ^3.1.2   
+  google_sign_in: ^3.2.4
   carousel_slider: ^0.0.7 
   shared_preferences: ^0.4.2
   web_socket_channel: ^1.0.9
