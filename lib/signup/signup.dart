@@ -23,6 +23,8 @@ class SignupState extends State<Signup> {
   String _password;
   String _deviceId;
   String _pfRefCode;
+  String _installReferring_link;
+  String _installAndroid_link;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
   static const branch_io_platform =
@@ -40,20 +42,24 @@ class SignupState extends State<Signup> {
       _deviceId = value;
     });
 
+    _initBranchStuff();
+  }
+
+/////////////////////
+  ///Branch///////////
+///////////////////
+
+  _initBranchStuff() {
     _getBranchRefCode().then((String refcode) {
-      print(
-          "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<PF REF CODE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-      print(refcode);
       _pfRefCode = refcode;
       setState(() {
         _referralCodeController.text = _pfRefCode;
       });
     });
-  }
 
-  _showReferralInput() {
-    setState(() {
-      _bShowReferralInput = !_bShowReferralInput;
+    _getInstallReferringLink().then((String installReferring_link) {
+      print(installReferring_link);
+      _installReferring_link=installReferring_link;
     });
   }
 
@@ -65,6 +71,25 @@ class SignupState extends State<Signup> {
       print(e);
     }
     return value;
+  }
+
+  Future<String> _getInstallReferringLink() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
+      print(value);
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+
+
+
+  _showReferralInput() {
+    setState(() {
+      _bShowReferralInput = !_bShowReferralInput;
+    });
   }
 
   _doSignUp() async {
@@ -88,7 +113,7 @@ class SignupState extends State<Signup> {
         "platformType": androidInfo.version.baseOS,
         "manufacturer": androidInfo.manufacturer,
         "googleaddid": "",
-        "serial": androidInfo.hardware
+        "serial": androidInfo.hardware,
       };
     }
 

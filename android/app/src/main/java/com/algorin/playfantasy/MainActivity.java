@@ -9,6 +9,9 @@ import com.algorin.playfantasy.services.MyHelperClass;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import io.flutter.app.FlutterActivity;
@@ -29,6 +32,10 @@ public class MainActivity extends FlutterActivity {
         if(methodCall.method.equals("_getBranchRefCode")){
           String pfRefCode=getRefCodeUsingBranch();
           result.success(pfRefCode);
+        }
+        if(methodCall.method.equals("_getInstallReferringLink")){
+            String installReferring_link= getInstallReferringLink();
+            result.success(installReferring_link);
         }
       }
     });
@@ -60,7 +67,7 @@ public class MainActivity extends FlutterActivity {
     }
 
   }
-
+/*Bracnch Io related code*/
   public String getRefCodeUsingBranch() {
     String refCodeFromBranch = "";
     String refCodeFromBranchTrail1 = "";
@@ -86,5 +93,49 @@ public class MainActivity extends FlutterActivity {
     }
     return refCodeFromBranch;
   }
+
+
+  public Map<String, String> getBranchQueryParms() {
+    myHeperClass = new MyHelperClass();
+    Map<String, String> branchQueryParms = new HashMap<String, String>();
+    JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+    String installReferring_link = "";
+    String installAndroid_link="";
+
+    try {
+      installReferring_link = (String) installParams.get("~referring_link");
+      branchQueryParms.put("installReferring_link", installReferring_link);
+      System.out.println("installReferring_link"+installReferring_link);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    try {
+      installAndroid_link=(String) installParams.get("$android_url");
+      branchQueryParms.put("installAndroid_link", installAndroid_link);
+      System.out.println("installAndroid_link"+installAndroid_link);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    return branchQueryParms;
+  }
+
+  public String getInstallReferringLink(){
+      String installReferring_link = "";
+      JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+      try {
+          installReferring_link = (String) installParams.get("~referring_link");
+
+          System.out.println("installReferring_link"+installReferring_link);
+      } catch (Exception e) {
+          System.out.println(e);
+      }
+
+      return installReferring_link;
+  }
+
+
+
+
+
 
 }
