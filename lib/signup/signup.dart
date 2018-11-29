@@ -183,7 +183,7 @@ class SignupState extends State<Signup> {
     );
   }
 
-  _doFacebookLogin(BuildContext context) async {
+_doFacebookLogin(BuildContext context) async {
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.nativeWithFallback;
     var result = await facebookLogin
@@ -201,22 +201,23 @@ class SignupState extends State<Signup> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
-    http.Request req = http.Request(
-      "POST",
-      Uri.parse(
-        BaseUrl.apiUrl +
-            (authFor == 1
-                ? ApiUtil.GOOGLE_LOGIN_URL
-                : (authFor == 2
-                    ? ApiUtil.FACEBOOK_LOGIN_URL
-                    : ApiUtil.GOOGLE_LOGIN_URL)),
-      ),
-    );
-    req.body = json.encode({
-      "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
-      "accessToken": token
-    });
-    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+    http.Client()
+        .post(
+      BaseUrl.apiUrl +
+          (authFor == 1
+              ? ApiUtil.GOOGLE_LOGIN_URL
+              : (authFor == 2
+                  ? ApiUtil.FACEBOOK_LOGIN_URL
+                  : ApiUtil.GOOGLE_LOGIN_URL)),
+      headers: {'Content-type': 'application/json'},
+      body: json.encode({
+        "context": {
+          "channel_id": HttpManager.channelId,
+        },
+        "accessToken": token
+      }),
+    )
+        .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},

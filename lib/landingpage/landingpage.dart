@@ -230,23 +230,12 @@ class LandingPageState extends State<LandingPage> {
                   : ApiUtil.GOOGLE_LOGIN_URL)),
       headers: {'Content-type': 'application/json'},
       body: json.encode({
-        "context": {"channel_id": 3},
+        "context": {
+          "channel_id": HttpManager.channelId,
+        },
         "accessToken": token
       }),
     )
-        // http.Request req = http.Request(
-        //     "POST",
-        //     Uri.parse(authFor == 1
-        //         ? BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL
-        //         : (authFor == 2
-        //             ? BaseUrl.apiUrl + ApiUtil.FACEBOOK_LOGIN_URL
-        //             : BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL)));
-        // req.body = json.encode({
-        //   "context": {"channel_id": HttpManager.channelId, "deviceId": _deviceId},
-        //   "accessToken": token
-        // });
-        // print(BaseUrl.apiUrl + ApiUtil.GOOGLE_LOGIN_URL);
-        // await HttpManager(http.Client()).sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
