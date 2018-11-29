@@ -8,7 +8,6 @@ import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class SwitchTeam extends StatefulWidget {
   final L1 l1Data;

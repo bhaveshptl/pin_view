@@ -170,7 +170,6 @@ class DownloadAPKState extends State<DownloadAPK> {
                   onPressed: bIsAPKInstallationAvailable
                       ? () {
                           installAPK();
-                          Navigator.of(context).pop();
                         }
                       : null,
                 )

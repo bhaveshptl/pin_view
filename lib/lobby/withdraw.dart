@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/withdraw.dart';
@@ -108,6 +107,10 @@ class WithdrawState extends State<Withdraw> {
           if (response["error"].length > 0) {
             JoinContestError error = JoinContestError(response["error"]);
             if (error.isBlockedUser()) {
+              _showJoinContestError(
+                title: error.getTitle(),
+                message: error.getErrorMessage(),
+              );
             } else {
               int errorCode = error.getErrorCode();
               switch (errorCode) {
@@ -146,6 +149,29 @@ class WithdrawState extends State<Withdraw> {
             }
           }
         }
+      },
+    );
+  }
+
+  _showJoinContestError({String title, String message}) {
+    showDialog(
+      context: _scaffoldKey.currentContext,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
+            )
+          ],
+        );
       },
     );
   }
@@ -1018,11 +1044,13 @@ class WithdrawState extends State<Withdraw> {
                                                             } else if (amount >
                                                                 _withdrawData
                                                                     .withdrawableAmount) {
-                                                              return "You can not withdraw more than available withdraw amount(" +
+                                                              return "You can not withdraw more than " +
+                                                                  strings
+                                                                      .rupee +
                                                                   _withdrawData
                                                                       .withdrawableAmount
                                                                       .toString() +
-                                                                  ")";
+                                                                  ".";
                                                             } else if (amount >
                                                                 _withdrawData
                                                                     .paytmMaxWithdraw) {

@@ -181,8 +181,8 @@ class ContestDetailState extends State<ContestDetail> {
         }
         if (!bFound) {
           _myTeams.add(teamAdded);
-          _teamsDataSource.updateMyAllTeams(_myTeams);
         }
+        _teamsDataSource.updateMyAllTeams(_myTeams);
         if (bShowJoinContest) {
           _onJoinContest(widget.contest);
         }

@@ -213,7 +213,7 @@ class Player {
   final int countryId;
   final String countryName;
   final dynamic seriesScore;
-  final int score;
+  final double score;
   final double credit;
   String jerseyUrl;
   int teamId;
@@ -244,8 +244,8 @@ class Player {
       countryId: json["countryId"],
       countryName: json["countryName"],
       seriesScore: json["seriesScore"],
-      score: json["score"],
-      credit: (json["credit"]).toDouble(),
+      score: json["score"] == null ? 0.0 : (json["score"]).toDouble(),
+      credit: json["credit"] == null ? 0.0 : (json["credit"]).toDouble(),
       jerseyUrl: json["jerseyUrl"],
       teamId: json["teamId"],
     );

@@ -6,7 +6,7 @@ class MyTeam {
   final int captain;
   final double prize;
   final int rank;
-  final int score;
+  final double score;
   final int innings;
   final int matchId;
   final String name;
@@ -52,7 +52,7 @@ class MyTeam {
       viceCaptain: json["viceCaptain"],
       prize: json["prize"] == null ? 0.0 : (json["prize"]).toDouble(),
       rank: json["rank"] == null ? 0 : json["rank"],
-      score: json["score"] == null ? 0 : json["score"],
+      score: json["score"] == null ? 0.0 : (json["score"]).toDouble(),
       innings: json["innings"] == null ? 0 : json["innings"],
     );
   }
