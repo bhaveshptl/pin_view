@@ -157,6 +157,8 @@ initFirebaseConfiguration() async {
   );
 
   _firebaseMessaging.subscribeToTopic('news');
+  _firebaseMessaging.subscribeToTopic('channelId_'+channelId+'_news');
+
 }
 
 
