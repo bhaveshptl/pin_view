@@ -23,9 +23,6 @@ public class MainActivity extends FlutterActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     GeneratedPluginRegistrant.registerWith(this);
-
-
-
     new MethodChannel(getFlutterView(),BRANCH_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
       @Override
       public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
@@ -45,36 +42,24 @@ public class MainActivity extends FlutterActivity {
   public void onStart() {
     super.onStart();
     final Intent intent = getIntent();
-    Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
-      @Override
-      public void onInitFinished(JSONObject referringParams, BranchError error) {
-        if (error == null) {
-          Log.i("BRANCH SDK", referringParams.toString());
-        } else {
-          Log.i("BRANCH SDK", error.getMessage());
+    try{
+      Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+        @Override
+        public void onInitFinished(JSONObject referringParams, BranchError error) {
+          if (error == null) {
+            Log.i("BRANCH SDK", referringParams.toString());
+          } else {
+            Log.i("BRANCH SDK", error.getMessage());
+          }
         }
-      }
-    },intent.getData(), this);
-    if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-      Toast.makeText(this, intent.getData().toString(),Toast.LENGTH_LONG);
-      Log.w("Message",intent.getData().toString());
-      Log.w("Message",intent.getData().toString());
+      },intent.getData(), this);
 
     }
-    Toast.makeText(this, "Null", Toast.LENGTH_LONG);
-    // latest
-    JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
+    catch(Exception e){
 
-// first
-    JSONObject installParams = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams2 = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams3 = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams4 = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams6 = Branch.getInstance().getFirstReferringParams();
+    }
+
   }
-
-
-
 
   public String getRefCodeUsingBranch() {
     String refCodeFromBranch = "";
@@ -99,12 +84,6 @@ public class MainActivity extends FlutterActivity {
     } else {
       refCodeFromBranch = refCodeFromBranchTrail2;
     }
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
     return refCodeFromBranch;
   }
 
