@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
@@ -138,7 +137,6 @@ preloadData() async {
 
 initFirebaseConfiguration() async {
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-
   await _firebaseMessaging.getToken().then((token) {
     print("Token is .........................");
     print(token);
@@ -161,14 +159,7 @@ initFirebaseConfiguration() async {
   _firebaseMessaging.subscribeToTopic('news');
 }
 
-  Future<void> _retrieveDynamicLink() async {
-    final PendingDynamicLinkData data =
-        await FirebaseDynamicLinks.instance.retrieveDynamicLink();
-    final Uri deepLink = data?.link;
-    if (deepLink != null) {
-     
-    }
-  }
+
 
 ///
 /// Bootstraping APP.
@@ -176,7 +167,7 @@ initFirebaseConfiguration() async {
 void main() async {
   await preloadData();
   await initFirebaseConfiguration();
-  await _retrieveDynamicLink();
+
   AnalyticsManager()
       .init(url: analyticsUrl, duration: initData["analyticsSendInterval"]);
 
