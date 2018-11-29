@@ -3,7 +3,6 @@ import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -30,6 +29,7 @@ class AuthResult {
 
   processResult(Function done) async {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
+      HttpManager.cookie = null;
       SharedPrefHelper.internal()
           .saveCookieToStorage(response.headers["set-cookie"]);
       SharedPrefHelper.internal()

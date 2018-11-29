@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
-const double TEAM_LOGO_HEIGHT = 24.0;
+const double TEAM_LOGO_HEIGHT = 18.0;
 
 class ChooseCaptain extends StatefulWidget {
   final FanTeamRule fanTeamRules;
@@ -58,7 +58,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
     PlayingStyle _style;
     widget.fanTeamRules.styles.forEach((PlayingStyle style) {
       if (player.playingStyleId == style.id) {
-        _style = style;        
+        _style = style;
       }
     });
     return _style;
@@ -88,7 +88,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                 Padding(
                   padding: const EdgeInsets.only(right: 8.0),
                   child: RaisedButton(
-                    color: Colors.teal,
+                    color: Theme.of(context).primaryColor,
                     textColor: Colors.white70,
                     padding: EdgeInsets.all(0.0),
                     onPressed: () {
@@ -134,26 +134,50 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                         ),
                       ),
                       Expanded(
+                        flex: 2,
+                        child: Text(
+                          "Series Score",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Expanded(
                         flex: 3,
                         child: Text(
-                          strings.get("CAPTAIN").toUpperCase() +
+                          strings.get("CAPTAIN") +
                               " (" +
                               widget.fanTeamRules.captainMult.toString() +
                               "X)",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight
+                                      .bold), //TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       widget.fanTeamRules.vcMult != 0.0
                           ? Expanded(
                               flex: 3,
                               child: Text(
-                                strings.get("V_CAPTAIN").toUpperCase() +
+                                "V.Captain" +
                                     " (" +
                                     widget.fanTeamRules.vcMult.toString() +
                                     "X)",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .caption
+                                    .copyWith(
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.bold),
                               ),
                             )
                           : Container(),
@@ -173,14 +197,15 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                       final _player = widget.selectedPlayers[index];
                       final style = _getPlayerStyle(_player);
 
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 8.0),
+                      return Container(
+                        padding: EdgeInsets.all(4.0),
+                        height: 40.0,
                         child: Row(
                           children: <Widget>[
                             Expanded(
                               flex: 3,
                               child: CircleAvatar(
-                                minRadius: 20.0,
+                                minRadius: 16.0,
                                 backgroundColor: Colors.black12,
                                 child: CachedNetworkImage(
                                   imageUrl: _player.jerseyUrl,
@@ -198,12 +223,14 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                             Expanded(
                               flex: 9,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   Text(_player.name),
                                   Container(
                                     height: 18.0,
-                                    width: 18.0,
+                                    width: 26.0,
+                                    padding: EdgeInsets.only(right: 8.0),
                                     child: DecoratedBox(
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
@@ -213,6 +240,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                                     " " +
                                                     _player.sportsId
                                                         .toString() +
+                                                    "-blue" +
                                                     ".png")
                                                 .toLowerCase()
                                                 .replaceAll(" ", "-"),
@@ -222,6 +250,13 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                     ),
                                   ),
                                 ],
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                _player.seriesScore.toString(),
+                                textAlign: TextAlign.center,
                               ),
                             ),
                             Expanded(

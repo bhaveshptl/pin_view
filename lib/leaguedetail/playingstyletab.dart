@@ -8,12 +8,22 @@ const double TEAM_LOGO_HEIGHT = 24.0;
 
 class PlayingStyleTab extends StatelessWidget {
   final L1 l1Data;
+  final Function onSort;
+  final String sortedBy;
   final PlayingStyle style;
+  final List<Player> allPlayers;
   final Function onPlayerSelect;
   final List<Player> selectedPlayers;
 
-  PlayingStyleTab(
-      {this.style, this.l1Data, this.onPlayerSelect, this.selectedPlayers});
+  PlayingStyleTab({
+    this.style,
+    this.l1Data,
+    this.onSort,
+    this.sortedBy,
+    this.allPlayers,
+    this.onPlayerSelect,
+    this.selectedPlayers,
+  });
 
   int _getPlayerIndex(Player _player) {
     int selectedPlayerIndex = -1;
@@ -34,18 +44,9 @@ class PlayingStyleTab extends StatelessWidget {
   }
 
   Widget _playerListView() {
-    List<Player> teamAPlayers =
-        l1Data.league.rounds[0].matches[0].teamA.players;
-    List<Player> teamBPlayers =
-        l1Data.league.rounds[0].matches[0].teamB.players;
     List<Player> tabPlayers = [];
 
-    for (Player player in teamAPlayers) {
-      if (player.playingStyleId == style.id) {
-        tabPlayers.add(player);
-      }
-    }
-    for (Player player in teamBPlayers) {
+    for (Player player in allPlayers) {
       if (player.playingStyleId == style.id) {
         tabPlayers.add(player);
       }
@@ -54,45 +55,117 @@ class PlayingStyleTab extends StatelessWidget {
     return Container(
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 3,
-                        child: Text(""),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 3,
+                      child: Container(
+                        height: 28.0,
                       ),
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          strings.get("NAME").toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      flex: 9,
+                      child: InkWell(
+                        onTap: () {
+                          if (onSort != null) {
+                            onSort("NAME");
+                          }
+                        },
+                        child: Container(
+                          height: 28.0,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                strings.get("NAME").toUpperCase(),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: sortedBy == "NAME"
+                                    ? Icon(
+                                        Icons.sort,
+                                        size: 16.0,
+                                      )
+                                    : Container(),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          strings.get("SERIES_SCORE"),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: InkWell(
+                        onTap: () {
+                          if (onSort != null) {
+                            onSort("SCORE");
+                          }
+                        },
+                        child: Container(
+                          height: 28.0,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                width: 50.0,
+                                child: Text(
+                                  strings.get("SERIES_SCORE"),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              sortedBy == "SCORE"
+                                  ? Icon(
+                                      Icons.sort,
+                                      size: 16.0,
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          strings.get("CREDITS").toUpperCase(),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: InkWell(
+                        onTap: () {
+                          if (onSort != null) {
+                            onSort("CREDITS");
+                          }
+                        },
+                        child: Container(
+                          height: 28.0,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  strings.get("CREDITS"),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              sortedBy == "CREDITS"
+                                  ? Icon(
+                                      Icons.sort,
+                                      size: 16.0,
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           Expanded(
             child: ListView.builder(
@@ -138,14 +211,14 @@ class PlayingStyleTab extends StatelessWidget {
                         child: Text(_player.name),
                       ),
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: Text(
                           _player.seriesScore.toString(),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: Text(
                           _player.credit.toString(),
                           textAlign: TextAlign.center,

@@ -14,6 +14,7 @@ class Profile {
   String address2;
   bool hasPassword;
   List<dynamic> states;
+  bool mobileVerification;
   bool isUserNameChangeAllowed;
 
   Profile({
@@ -32,6 +33,7 @@ class Profile {
     this.address2,
     this.balance = 0.0,
     this.hasPassword = false,
+    this.mobileVerification = false,
     this.isUserNameChangeAllowed = false,
   });
 
@@ -52,6 +54,7 @@ class Profile {
       address2: json["address2"],
       hasPassword: json["hasPassword"],
       balance: (json["balance"]).toDouble(),
+      mobileVerification: json["mobileVerification"],
       isUserNameChangeAllowed: json["isUserNameChangeAllowed"],
     );
   }

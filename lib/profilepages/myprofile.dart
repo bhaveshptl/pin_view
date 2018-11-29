@@ -909,7 +909,9 @@ class MyProfileState extends State<MyProfile> {
                                           ? "None"
                                           : (bIsDatePicked
                                               ? getDate()
-                                              : "None"),
+                                              : _userProfile.dob == null
+                                                  ? "None"
+                                                  : _userProfile.dob),
                                       style: TextStyle(
                                           fontSize: Theme.of(context)
                                               .primaryTextTheme
@@ -970,8 +972,8 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: _userProfile.mobile == null ||
-                                  _userProfile.mobile == ""
+                          onPressed: _userProfile.mobileVerification == null ||
+                                  _userProfile.mobileVerification == false
                               ? () {
                                   _showChangeValueDialog(
                                     _phoneController,

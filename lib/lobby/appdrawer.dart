@@ -10,6 +10,7 @@ import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/withdraw.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/profilepages/partner.dart';
@@ -72,6 +73,7 @@ class AppDrawerState extends State<AppDrawer> {
   }
 
   _doLogout() {
+    sockets.reset();
     http.Client().get(
       BaseUrl.apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
@@ -337,12 +339,16 @@ class AppDrawerState extends State<AppDrawer> {
                                   Row(
                                     children: <Widget>[
                                       Text(
-                                        (_user == null || (_user.emailId == null &&
-                                                _user.mobile == null)
+                                        (_user == null ||
+                                                (_user.emailId == null &&
+                                                    _user.mobile == null &&
+                                                    _user.loginName == null)
                                             ? ""
-                                            : (_user.mobile == null
-                                                ? _user.emailId
-                                                : _user.mobile)),
+                                            : (_user.loginName != null
+                                                ? _user.loginName
+                                                : (_user.mobile == null
+                                                    ? _user.emailId
+                                                    : _user.mobile))),
                                         style: Theme.of(context)
                                             .primaryTextTheme
                                             .title
@@ -678,7 +684,6 @@ class AppDrawerState extends State<AppDrawer> {
                     title: Text('Log Out'),
                     onTap: () async {
                       _doLogout();
-                      HttpManager.cookie = null;
                       SharedPrefHelper.internal().removeCookie();
                       Navigator.pop(context);
                       Navigator.of(context)

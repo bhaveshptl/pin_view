@@ -7,7 +7,7 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.1+1
+version: 1.11+1
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -66,6 +66,10 @@ flutter:
     - images/batsman-1.png
     - images/bowler-1.png
     - images/all-rounder-1.png
+    - images/wicket-keeper-1-blue.png
+    - images/batsman-1-blue.png
+    - images/bowler-1-blue.png
+    - images/all-rounder-1-blue.png
     - images/chips.png
     - images/paytm.png
     - images/smart11.png

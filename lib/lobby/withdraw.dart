@@ -130,6 +130,18 @@ class WithdrawState extends State<Withdraw> {
                   _setAddressList();
                   _setVerificationStatus(Withhdraw.fromJson(response["data"]));
                   break;
+                case -1:
+                  _setAddressList();
+                  Map<String, dynamic> response = json.decode(res.body);
+                  setState(() {
+                    _withdrawData = Withhdraw.fromJson(response["data"]);
+                    _bIsMobileVerified = _withdrawData.mobileVerification;
+                    _bIsKYCVerified =
+                        _withdrawData.panVerification == "VERIFIED" &&
+                            _withdrawData.addressVerification == "VERIFIED";
+                    initFormInputs();
+                  });
+                  break;
               }
             }
           }

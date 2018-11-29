@@ -32,7 +32,8 @@ class CreateTeam extends StatefulWidget {
   State<StatefulWidget> createState() => CreateTeamState();
 }
 
-class CreateTeamState extends State<CreateTeam> {
+class CreateTeamState extends State<CreateTeam>
+    with SingleTickerProviderStateMixin {
   int _sportType = 1;
   double _usedCredits = 0.0;
   int _selectedPlayersCount = 0;
@@ -40,8 +41,13 @@ class CreateTeamState extends State<CreateTeam> {
 
   Player _captain;
   Player _vCaptain;
+  String _sortedBy;
+  List<Player> allPlayers;
+  Widget floatButtonWidget;
   String _avgCredits = "0";
   FanTeamRule _fanTeamRules;
+  bool showNextButton = true;
+  TabController tabController;
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
   Map<int, List<Player>> _selectedPlayersByStyleId = {};
@@ -64,6 +70,30 @@ class CreateTeamState extends State<CreateTeam> {
         widget.mode == TeamCreationMode.EDIT_TEAM) {
       _editOrCloneTeam();
     }
+
+    List<Player> teamAPlayers =
+        widget.l1Data.league.rounds[0].matches[0].teamA.players;
+    List<Player> teamBPlayers =
+        widget.l1Data.league.rounds[0].matches[0].teamB.players;
+
+    allPlayers = [];
+    allPlayers.addAll(teamAPlayers);
+    allPlayers.addAll(teamBPlayers);
+
+    onSort("NAME");
+
+    tabController =
+        TabController(length: _fanTeamRules.styles.length, vsync: this);
+    tabController.addListener(() {
+      bool bShowNext =
+          tabController.index == tabController.length - 1 ? false : true;
+      if (bShowNext != showNextButton) {
+        setState(() {
+          showNextButton = bShowNext;
+        });
+      }
+    });
+    floatButtonWidget = Icon(Icons.navigate_next);
   }
 
   _getSportsType() async {
@@ -439,6 +469,7 @@ class CreateTeamState extends State<CreateTeam> {
                   child: Stack(
                     children: <Widget>[
                       Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -478,6 +509,13 @@ class CreateTeamState extends State<CreateTeam> {
                                           : style.rule[0].toString() +
                                               "-" +
                                               style.rule[1].toString()),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                               ),
                             ],
@@ -491,27 +529,30 @@ class CreateTeamState extends State<CreateTeam> {
                             children: <Widget>[
                               CircleAvatar(
                                 maxRadius: 8.0,
-                                backgroundColor:
-                                    Theme.of(context).primaryColorDark,
+                                backgroundColor: Colors.white,
                                 child:
                                     _selectedPlayersByStyleId[style.id] == null
                                         ? Text(
                                             0.toString(),
-                                            style: TextStyle(
-                                                fontSize: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .caption
-                                                    .fontSize),
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .caption
+                                                .copyWith(
+                                                    color: Theme.of(context)
+                                                        .primaryColor
+                                                        .withAlpha(200)),
                                           )
                                         : Text(
                                             _selectedPlayersByStyleId[style.id]
                                                 .length
                                                 .toString(),
-                                            style: TextStyle(
-                                                fontSize: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .caption
-                                                    .fontSize),
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .caption
+                                                .copyWith(
+                                                    color: Theme.of(context)
+                                                        .primaryColor
+                                                        .withAlpha(200)),
                                           ),
                               ),
                             ],
@@ -529,9 +570,12 @@ class CreateTeamState extends State<CreateTeam> {
     }
 
     return Container(
-      color: Colors.black12,
+      color: Theme.of(context).primaryColor,
       child: TabBar(
         tabs: tabs,
+        indicatorWeight: 4.0,
+        controller: tabController,
+        indicatorColor: Colors.white,
         labelColor: Theme.of(context).primaryColorDark,
         unselectedLabelColor: Theme.of(context).primaryColorDark,
       ),
@@ -544,13 +588,49 @@ class CreateTeamState extends State<CreateTeam> {
       tabsBody.add(
         PlayingStyleTab(
           style: style,
+          onSort: onSort,
+          sortedBy: _sortedBy,
           l1Data: widget.l1Data,
+          allPlayers: allPlayers,
           onPlayerSelect: _selectPlayer,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
         ),
       );
     }
     return tabsBody;
+  }
+
+  onSort(String type) {
+    if (_sortedBy == type) {
+      setState(() {
+        allPlayers = allPlayers.reversed.toList();
+      });
+    } else {
+      switch (type) {
+        case "NAME":
+          setState(() {
+            allPlayers.sort((a, b) {
+              return a.name.compareTo(b.name);
+            });
+          });
+          break;
+        case "SCORE":
+          setState(() {
+            allPlayers.sort((a, b) {
+              return a.seriesScore - b.seriesScore;
+            });
+          });
+          break;
+        case "CREDITS":
+          setState(() {
+            allPlayers.sort((a, b) {
+              return ((a.credit - b.credit) * 100).toInt();
+            });
+          });
+          break;
+      }
+    }
+    _sortedBy = type;
   }
 
   ///
@@ -646,7 +726,9 @@ class CreateTeamState extends State<CreateTeam> {
                           Padding(
                             padding: EdgeInsets.only(top: 2.0),
                             child: Text(
-                              _usedCredits.toString() +
+                              (widget.l1Data.league.fanTeamRules.credits -
+                                          _usedCredits)
+                                      .toStringAsFixed(2) +
                                   "/" +
                                   (widget.l1Data != null
                                       ? widget
@@ -702,25 +784,35 @@ class CreateTeamState extends State<CreateTeam> {
             ),
           ),
           Expanded(
-            child: DefaultTabController(
-              length: 4,
-              child: Scaffold(
-                body: TabBarView(
-                  children: _getTabsBodyBasedOnPlayingStyle(),
-                ),
-                bottomNavigationBar: _createTabsBasedOnPlayingStyle(),
-                floatingActionButton: FloatingActionButton(
-                  tooltip: strings.get("CHOOSE_CAPTAIN"),
-                  child: Icon(Icons.navigate_next),
-                  onPressed: () {
-                    if (_isValidTeam()) {
-                      _showChooseCaptain();
-                    }
-                  },
-                ),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endFloat,
+            child: Scaffold(
+              body: TabBarView(
+                controller: tabController,
+                children: _getTabsBodyBasedOnPlayingStyle(),
               ),
+              bottomNavigationBar: _createTabsBasedOnPlayingStyle(),
+              floatingActionButton: Container(
+                child: showNextButton
+                    ? FloatingActionButton(
+                        child: Icon(Icons.navigate_next),
+                        onPressed: () {
+                          tabController.index++;
+                        },
+                      )
+                    : FloatingActionButton.extended(
+                        label: Text("Choose Captain"),
+                        icon: Icon(
+                          Icons.save,
+                          size: 0.0,
+                        ),
+                        onPressed: () {
+                          if (_isValidTeam()) {
+                            _showChooseCaptain();
+                          }
+                        },
+                      ),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endFloat,
             ),
           ),
         ],

@@ -18,7 +18,6 @@ import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 
 class Lobby extends StatefulWidget {
@@ -255,30 +254,34 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                             padding: EdgeInsets.only(left: 8.0, right: 8.0),
                             child: Container(
                               height: 76.0,
-                              child: CarouselSlider(
-                                items: _carousel.map<Widget>((String img) {
-                                  return Container(
-                                      height: 102.0,
-                                      margin: EdgeInsets.only(
-                                          right: 5.0, left: 5.0),
-                                      child: Stack(
-                                        children: <Widget>[
-                                          ClipRRect(
-                                              clipBehavior: Clip.hardEdge,
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(8.0),
-                                              ),
-                                              child: Image.network(
-                                                img,
-                                                fit: BoxFit.contain,
-                                                width: 1000.0,
-                                              )),
-                                        ],
-                                      ));
-                                }).toList(),
-                                autoPlay: true,
-                                reverse: false,
-                              ),
+                              child: _carousel.length > 0
+                                  ? CarouselSlider(
+                                      items:
+                                          _carousel.map<Widget>((String img) {
+                                        return Container(
+                                            height: 102.0,
+                                            margin: EdgeInsets.only(
+                                                right: 5.0, left: 5.0),
+                                            child: Stack(
+                                              children: <Widget>[
+                                                ClipRRect(
+                                                    clipBehavior: Clip.hardEdge,
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(8.0),
+                                                    ),
+                                                    child: Image.network(
+                                                      img,
+                                                      fit: BoxFit.contain,
+                                                      width: 1000.0,
+                                                    )),
+                                              ],
+                                            ));
+                                      }).toList(),
+                                      autoPlay: true,
+                                      reverse: false,
+                                    )
+                                  : Container(),
                             ),
                           ),
                         ),

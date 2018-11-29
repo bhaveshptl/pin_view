@@ -48,7 +48,6 @@ class LandingPageState extends State<LandingPage> {
   @override
   void initState() {
     super.initState();
-    SharedPrefHelper().removeCookie();
     if (widget.chooseLanguage != null && widget.chooseLanguage) {
       _showChooseLanguage();
     }
