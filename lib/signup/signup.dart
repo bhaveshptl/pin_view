@@ -23,6 +23,8 @@ class SignupState extends State<Signup> {
   String _password;
   String _deviceId;
   String _pfRefCode;
+  String _installReferring_link = "";
+  String _installAndroid_link;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
   static const branch_io_platform =
@@ -40,20 +42,25 @@ class SignupState extends State<Signup> {
       _deviceId = value;
     });
 
+    _initBranchStuff();
+  }
+
+/////////////////////
+  ///Branch///////////
+///////////////////
+
+  _initBranchStuff() {
     _getBranchRefCode().then((String refcode) {
-      print(
-          "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<PF REF CODE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-      print(refcode);
       _pfRefCode = refcode;
       setState(() {
         _referralCodeController.text = _pfRefCode;
       });
     });
-  }
 
-  _showReferralInput() {
-    setState(() {
-      _bShowReferralInput = !_bShowReferralInput;
+    _getInstallReferringLink().then((String installReferring_link) {
+      setState(() {
+        _installReferring_link = installReferring_link;
+      });
     });
   }
 
@@ -67,6 +74,22 @@ class SignupState extends State<Signup> {
     return value;
   }
 
+  Future<String> _getInstallReferringLink() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+
+  _showReferralInput() {
+    setState(() {
+      _bShowReferralInput = !_bShowReferralInput;
+    });
+  }
+
   _doSignUp() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
@@ -77,6 +100,7 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
     }
     _payload["password"] = _password;
+
     if (Theme.of(context).platform == TargetPlatform.android) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       _payload["context"] = {
@@ -88,8 +112,18 @@ class SignupState extends State<Signup> {
         "platformType": androidInfo.version.baseOS,
         "manufacturer": androidInfo.manufacturer,
         "googleaddid": "",
-        "serial": androidInfo.hardware
+        "serial": androidInfo.hardware,
       };
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
     }
 
     http.Request req =

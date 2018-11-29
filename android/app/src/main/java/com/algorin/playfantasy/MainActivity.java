@@ -9,6 +9,9 @@ import com.algorin.playfantasy.services.MyHelperClass;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
 import io.flutter.app.FlutterActivity;
@@ -23,15 +26,16 @@ public class MainActivity extends FlutterActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     GeneratedPluginRegistrant.registerWith(this);
-
-
-
     new MethodChannel(getFlutterView(),BRANCH_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
       @Override
       public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         if(methodCall.method.equals("_getBranchRefCode")){
           String pfRefCode=getRefCodeUsingBranch();
           result.success(pfRefCode);
+        }
+        if(methodCall.method.equals("_getInstallReferringLink")){
+            String installReferring_link= getInstallReferringLink();
+            result.success(installReferring_link);
         }
       }
     });
@@ -45,37 +49,25 @@ public class MainActivity extends FlutterActivity {
   public void onStart() {
     super.onStart();
     final Intent intent = getIntent();
-    Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
-      @Override
-      public void onInitFinished(JSONObject referringParams, BranchError error) {
-        if (error == null) {
-          Log.i("BRANCH SDK", referringParams.toString());
-        } else {
-          Log.i("BRANCH SDK", error.getMessage());
+    try{
+      Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+        @Override
+        public void onInitFinished(JSONObject referringParams, BranchError error) {
+          if (error == null) {
+            Log.i("BRANCH SDK", referringParams.toString());
+          } else {
+            Log.i("BRANCH SDK", error.getMessage());
+          }
         }
-      }
-    },intent.getData(), this);
-    if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-      Toast.makeText(this, intent.getData().toString(),Toast.LENGTH_LONG);
-      Log.w("Message",intent.getData().toString());
-      Log.w("Message",intent.getData().toString());
+      },intent.getData(), this);
 
     }
-    Toast.makeText(this, "Null", Toast.LENGTH_LONG);
-    // latest
-    JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
+    catch(Exception e){
 
-// first
-    JSONObject installParams = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams2 = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams3 = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams4 = Branch.getInstance().getFirstReferringParams();
-    JSONObject installParams6 = Branch.getInstance().getFirstReferringParams();
+    }
+
   }
-
-
-
-
+/*Bracnch Io related code*/
   public String getRefCodeUsingBranch() {
     String refCodeFromBranch = "";
     String refCodeFromBranchTrail1 = "";
@@ -99,13 +91,51 @@ public class MainActivity extends FlutterActivity {
     } else {
       refCodeFromBranch = refCodeFromBranchTrail2;
     }
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
-    System.out.println(refCodeFromBranch);
     return refCodeFromBranch;
   }
+
+
+  public Map<String, String> getBranchQueryParms() {
+    myHeperClass = new MyHelperClass();
+    Map<String, String> branchQueryParms = new HashMap<String, String>();
+    JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+    String installReferring_link = "";
+    String installAndroid_link="";
+
+    try {
+      installReferring_link = (String) installParams.get("~referring_link");
+      branchQueryParms.put("installReferring_link", installReferring_link);
+      System.out.println("installReferring_link"+installReferring_link);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    try {
+      installAndroid_link=(String) installParams.get("$android_url");
+      branchQueryParms.put("installAndroid_link", installAndroid_link);
+      System.out.println("installAndroid_link"+installAndroid_link);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    return branchQueryParms;
+  }
+
+  public String getInstallReferringLink(){
+      String installReferring_link = "";
+      JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+      try {
+          installReferring_link = (String) installParams.get("~referring_link");
+
+          System.out.println("installReferring_link"+installReferring_link);
+      } catch (Exception e) {
+          System.out.println(e);
+      }
+
+      return installReferring_link;
+  }
+
+
+
+
+
 
 }
