@@ -23,7 +23,7 @@ class SignupState extends State<Signup> {
   String _password;
   String _deviceId;
   String _pfRefCode;
-  String _installReferring_link;
+  String _installReferring_link = "";
   String _installAndroid_link;
   bool _obscureText = true;
   bool _bShowReferralInput = false;
@@ -58,8 +58,9 @@ class SignupState extends State<Signup> {
     });
 
     _getInstallReferringLink().then((String installReferring_link) {
-      print(installReferring_link);
-      _installReferring_link=installReferring_link;
+      setState(() {
+        _installReferring_link = installReferring_link;
+      });
     });
   }
 
@@ -77,14 +78,11 @@ class SignupState extends State<Signup> {
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-      print(value);
     } catch (e) {
       print(e);
     }
     return value;
   }
-
-
 
   _showReferralInput() {
     setState(() {
@@ -102,6 +100,7 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
     }
     _payload["password"] = _password;
+
     if (Theme.of(context).platform == TargetPlatform.android) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       _payload["context"] = {
@@ -115,6 +114,16 @@ class SignupState extends State<Signup> {
         "googleaddid": "",
         "serial": androidInfo.hardware,
       };
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
     }
 
     http.Request req =
