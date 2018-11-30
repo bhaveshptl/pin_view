@@ -14,6 +14,7 @@ import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/profilepages/partner.dart';
+import 'package:playfantasy/profilepages/contactus.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/profilepages/myaccount.dart';
 import 'package:playfantasy/profilepages/myprofile.dart';
@@ -182,6 +183,14 @@ class AppDrawerState extends State<AppDrawer> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => Partner(),
+      ),
+    );
+  }
+
+  _showContactUsPage(){
+     Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ContactUs(),
       ),
     );
   }
@@ -618,6 +627,7 @@ class AppDrawerState extends State<AppDrawer> {
                     title: Text('Contact Us'),
                     onTap: () {
                       Navigator.pop(context);
+                      _showContactUsPage();
                     },
                   ),
                 ],
