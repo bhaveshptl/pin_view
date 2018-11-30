@@ -16,12 +16,44 @@ class ContactUsState extends State<ContactUs> {
   final TextEditingController _mobileController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+    _getFormDetails();
+  }
+
+  _getFormDetails() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.CONTACTUS_FORM,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          print(res.body);
+          // setState(() {
+          //   accountDetails = Account.fromJson(json.decode(res.body));
+          // });
+        } else if (res.statusCode == 401) {
+          Map<String, dynamic> response = json.decode(res.body);
+          if (response["error"]["reasons"].length > 0) {}
+        }
+      },
+    );
+  }
+
   submitForm() async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PARTNER_REQUEST));
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CONTACTUS_SUBMIT));
     req.body = json.encode({
-      "email": _emailController.text,
-      "mobile": _mobileController.text,
+      "category": "",
+      "subCategory": "",
+      "comments": "",
+      "toEmail": "support@playfantasy.com",
+      "fromEmail": "",
+      "phone": ""
     });
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -65,7 +97,164 @@ class ContactUsState extends State<ContactUs> {
         title: Text("Contact Us"),
       ),
       body: SingleChildScrollView(
-      )
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              labelText: "Email ID",
+                              icon: const Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: const Icon(Icons.email),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Please enter email address.";
+                              } else if (!validateEmail(value)) {
+                                return "Please enter valid email address.";
+                              }
+                            },
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: _mobileController,
+                            decoration: InputDecoration(
+                              labelText: "Mobile Number",
+                              icon: const Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: const Icon(Icons.phone),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Please enter mobile number.";
+                              } else if (!isNumeric(value) ||
+                                  value.length != 10) {
+                                return "Please enter valid mobile number.";
+                              }
+                            },
+                            keyboardType: TextInputType.phone,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: _mobileController,
+                            decoration: InputDecoration(
+                              labelText: "Category",
+                              icon: const Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: const Icon(Icons.phone),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Please enter mobile number.";
+                              } else if (!isNumeric(value) ||
+                                  value.length != 10) {
+                                return "Please enter valid mobile number.";
+                              }
+                            },
+                            keyboardType: TextInputType.phone,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: _mobileController,
+                            decoration: InputDecoration(
+                              labelText: "Sub Category",
+                              icon: const Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: const Icon(Icons.phone),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Please enter mobile number.";
+                              } else if (!isNumeric(value) ||
+                                  value.length != 10) {
+                                return "Please enter valid mobile number.";
+                              }
+                            },
+                            keyboardType: TextInputType.phone,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            controller: _mobileController,
+                            decoration: InputDecoration(
+                              labelText: "Description",
+                              icon: const Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: const Icon(Icons.phone),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Please explain your issue!";
+                              } 
+                              
+                            },
+                            keyboardType: TextInputType.phone,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: RaisedButton(
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          submitForm();
+                        }
+                      },
+                      color: Theme.of(context).primaryColorDark,
+                      textColor: Colors.white70,
+                      child: Text("SUBMIT"),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
