@@ -19,8 +19,9 @@ class ContactUsState extends State<ContactUs> {
   String phoneNumber = "";
   List<dynamic> categories = [];
   List<DropdownMenuItem<String>> categoriesList = [];
-
+  String selectedcCategorie = null;
   List<String> test = ["item1", "item2", "item3", "item4"];
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +51,15 @@ class ContactUsState extends State<ContactUs> {
             _mobileController.text = phoneNumber;
           });
 
+          categoriesList = [];
+
+          
+          categoriesList = test
+              .map(((val) => new DropdownMenuItem(
+                    child: new Text(val),
+                    value: val,
+                  )))
+              .toList();
           print(emailId);
           print(phoneNumber);
           print(categories[1]);
@@ -59,11 +69,6 @@ class ContactUsState extends State<ContactUs> {
         }
       },
     );
-    categoriesList = [];
-    categoriesList = test.map(((val) => new DropdownMenuItem(
-          child: new Text(val),
-          value: val,
-        ))).toList();
   }
 
   submitForm() async {
@@ -176,11 +181,18 @@ class ContactUsState extends State<ContactUs> {
                         ),
                       ],
                     ),
-                    Row(
-                      children: <Widget>[
-                        DropdownButton(items:categoriesList,onChanged:null ,)
-                        ],
-                    ),
+                    Row(children: <Widget>[
+                      new DropdownButton<String>(
+                          items: categoriesList,
+                          hint: Text("Select"),
+                          value: selectedcCategorie,
+                          elevation: 16,
+                          iconSize: 60.0,
+                          onChanged: (newVal) {
+                            selectedcCategorie = newVal;
+                            this.setState(() {});
+                          })
+                    ]),
                     Row(
                       children: <Widget>[
                         Expanded(
