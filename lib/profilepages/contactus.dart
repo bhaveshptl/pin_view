@@ -15,7 +15,12 @@ class ContactUsState extends State<ContactUs> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String emailId = "";
+  String phoneNumber = "";
+  List<dynamic> categories = [];
+  List<DropdownMenuItem<String>> categoriesList = [];
 
+  List<String> test = ["item1", "item2", "item3", "item4"];
   @override
   void initState() {
     super.initState();
@@ -32,16 +37,33 @@ class ContactUsState extends State<ContactUs> {
     return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
-          print(res.body);
+          Map<String, dynamic> response = json.decode(res.body);
+
           // setState(() {
           //   accountDetails = Account.fromJson(json.decode(res.body));
           // });
+          setState(() {
+            emailId = response['email'];
+            phoneNumber = response['mobile'];
+            categories = response['categories'];
+            _emailController.text = emailId;
+            _mobileController.text = phoneNumber;
+          });
+
+          print(emailId);
+          print(phoneNumber);
+          print(categories[1]);
         } else if (res.statusCode == 401) {
           Map<String, dynamic> response = json.decode(res.body);
           if (response["error"]["reasons"].length > 0) {}
         }
       },
     );
+    categoriesList = [];
+    categoriesList = test.map(((val) => new DropdownMenuItem(
+          child: new Text(val),
+          value: val,
+        ))).toList();
   }
 
   submitForm() async {
@@ -156,30 +178,9 @@ class ContactUsState extends State<ContactUs> {
                     ),
                     Row(
                       children: <Widget>[
-                        Expanded(
-                          child: TextFormField(
-                            controller: _mobileController,
-                            decoration: InputDecoration(
-                              labelText: "Category",
-                              icon: const Padding(
-                                padding: const EdgeInsets.only(top: 15.0),
-                                child: const Icon(Icons.phone),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return "Please enter mobile number.";
-                              } else if (!isNumeric(value) ||
-                                  value.length != 10) {
-                                return "Please enter valid mobile number.";
-                              }
-                            },
-                            keyboardType: TextInputType.phone,
-                          ),
-                        ),
-                      ],
+                        DropdownButton(items:categoriesList,onChanged:null ,)
+                        ],
                     ),
-
                     Row(
                       children: <Widget>[
                         Expanded(
@@ -205,7 +206,6 @@ class ContactUsState extends State<ContactUs> {
                         ),
                       ],
                     ),
-
                     Row(
                       children: <Widget>[
                         Expanded(
@@ -221,8 +221,7 @@ class ContactUsState extends State<ContactUs> {
                             validator: (value) {
                               if (value.isEmpty) {
                                 return "Please explain your issue!";
-                              } 
-                              
+                              }
                             },
                             keyboardType: TextInputType.phone,
                           ),
