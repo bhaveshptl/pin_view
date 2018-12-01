@@ -23,6 +23,7 @@ class ContactUsState extends State<ContactUs> {
   List<DropdownMenuItem<String>> categoriesList = [];
   List<DropdownMenuItem<String>> subCategoriesList = [];
   String selectedCategorie = null;
+  String selectedCategorieIndex = null;
   String selectedSubCategory = null;
   bool showSubCategory = false;
 
@@ -67,14 +68,16 @@ class ContactUsState extends State<ContactUs> {
   }
 
   setSubCategoriesListData(index) {
-    Map<String, dynamic> selectedCategoryData = categoriesData[index];
+    Map<String, dynamic> selectedCategoryData =
+        categoriesData[int.parse(index)];
+    selectedCategorie = selectedCategoryData["id"];
     List<dynamic> subCategoryData = selectedCategoryData["subcategories"];
     subCategoriesList = [];
     for (var i = 0; i < subCategoryData.length; i++) {
       Map<String, dynamic> data = subCategoryData[i];
       subCategoriesList.add(new DropdownMenuItem(
         child: new Text(data["id"]),
-        value: i.toString(),
+        value: data["id"],
       ));
     }
   }
@@ -83,8 +86,8 @@ class ContactUsState extends State<ContactUs> {
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CONTACTUS_SUBMIT));
     req.body = json.encode({
-      "category": "",
-      "subCategory": "",
+      "category": selectedCategorie,
+      "subCategory": selectedSubCategory,
       "comments": _description.text,
       "toEmail": "support@playfantasy.com",
       "fromEmail": _emailController.text,
@@ -186,12 +189,12 @@ class ContactUsState extends State<ContactUs> {
                       new DropdownButton<String>(
                           items: categoriesList,
                           hint: Text("Select category"),
-                          value: selectedCategorie,
+                          value: selectedCategorieIndex,
                           elevation: 16,
                           iconSize: 60.0,
                           onChanged: (newVal) {
-                            selectedCategorie = newVal;
-                            setSubCategoriesListData(1);
+                            selectedCategorieIndex = newVal;
+                            setSubCategoriesListData(selectedCategorieIndex);
                             this.setState(() {
                               showSubCategory = true;
                             });
