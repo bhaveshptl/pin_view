@@ -68,12 +68,13 @@ class ApiUtil {
   static const UPDATE_USER_PROFILE = "/api/ups/user";
   static const GET_USER_PROFILE = "/api/v2/ups/user/info";
   static const CHANGE_PASSWORD = "/api/ups/user/changePassword";
-  static const GET_REFERRAL_CODE = "/api/ups/user/referdetails";
+  static const GET_REFERRAL_CODE = "/api/v2/ups/user/referdetails";
   static const CHANGE_TEAM_NAME = "/api/ups/user/updateUserName";
   static const GET_ACCOUNT_DETAILS = "/api/account/overview";
   static const PARTNER_REQUEST = "/api/ups/partner-request";
-  static const DEPOSIT_INFO = "/api/payment/player/deposit/v2";
+  static const DEPOSIT_INFO = "/api/v2/payment/player/deposit/v2";
   static const PAYMENT_MODE = "/api/payment/player/deposit/proceed/v2";
+  static const VALIDATE_PROMO = "/api/v2/payment/player/deposit/validate/promo";
   static const INIT_PAYMENT = "/api/payment/player/deposit/init-pay?";
 
   static const AUTH_WITHDRAW = "/api/v2/ups/user/authWithdraw";

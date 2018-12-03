@@ -125,22 +125,31 @@ class MyProfileState extends State<MyProfile> {
                   ),
                 ],
               ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextFormField(
-                      controller: _teamNameController,
-                      decoration: InputDecoration(
-                        labelText: "Team name",
+              Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextFormField(
+                        controller: _teamNameController,
+                        decoration: InputDecoration(
+                          labelText: "Team name",
+                          contentPadding: EdgeInsets.all(8.0),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black38,
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return "Please enter team name.";
+                          }
+                        },
                       ),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Please enter team name.";
-                        }
-                      },
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               )
             ],
           ),
@@ -164,19 +173,23 @@ class MyProfileState extends State<MyProfile> {
   }
 
   _changeTeamName() {
-    http.Client()
-        .put(
-      BaseUrl.apiUrl + ApiUtil.CHANGE_TEAM_NAME,
-      headers: {'Content-type': 'application/json', "cookie": cookie},
-      body: json.encode({
-        "username": _teamNameController.text,
-      }),
-    )
+    http.Request req = http.Request(
+      "PUT",
+      Uri.parse(
+        BaseUrl.apiUrl + ApiUtil.CHANGE_TEAM_NAME,
+      ),
+    );
+    req.body = json.encode({
+      "username": _teamNameController.text,
+    });
+    return HttpManager(http.Client())
+        .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         _showMessage("Team name changed successfully.");
+        _userProfile.isUserNameChangeAllowed = false;
         Navigator.of(context).pop();
-      } else if (res.statusCode == 400) {
+      } else if (res.statusCode >= 400 && res.statusCode <= 499) {
         Map<String, dynamic> response = json.decode(res.body);
         if (response["error"] != null) {
           Navigator.of(context).pop();
@@ -205,34 +218,53 @@ class MyProfileState extends State<MyProfile> {
   }
 
   _showChangeValueDialog(TextEditingController _controller, String label,
-      {TextInputType keyboardType = TextInputType.text}) {
+      {TextInputType keyboardType = TextInputType.text, int maxLength}) async {
+    final _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Enter " + label),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextFormField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        labelText: label,
-                      ),
-                      keyboardType: keyboardType,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return "Please enter " + label + ".";
-                        }
-                      },
-                    ),
-                  )
-                ],
-              )
-            ],
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 16.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextFormField(
+                          controller: _controller,
+                          decoration: InputDecoration(
+                            labelText: label,
+                            contentPadding: EdgeInsets.all(8.0),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          keyboardType: keyboardType,
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return "Please enter " + label + ".";
+                            } else if (maxLength != null &&
+                                value.length > maxLength) {
+                              return "Maximum " +
+                                  maxLength.toString() +
+                                  " characters allowed for " +
+                                  label;
+                            }
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
           actions: <Widget>[
             FlatButton(
@@ -245,8 +277,10 @@ class MyProfileState extends State<MyProfile> {
             FlatButton(
               child: Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
-                bIsInfoUpdated = true;
+                if (_formKey.currentState.validate()) {
+                  Navigator.of(context).pop();
+                  bIsInfoUpdated = true;
+                }
               },
             ),
           ],
@@ -1033,8 +1067,8 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: _userProfile.email == null ||
-                                  _userProfile.email == ""
+                          onPressed: _userProfile.emailVerification == null ||
+                                  _userProfile.emailVerification == false
                               ? () {
                                   _showChangeValueDialog(
                                     _emailController,
@@ -1252,6 +1286,7 @@ class MyProfileState extends State<MyProfile> {
                                     _pincodeController,
                                     "Pincode",
                                     keyboardType: TextInputType.number,
+                                    maxLength: 6,
                                   );
                                 }
                               : null,

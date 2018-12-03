@@ -572,7 +572,8 @@ class WithdrawState extends State<Withdraw> {
                                 child: Text(
                                   "Upload both sides of aadhaar card or any other address proof where your name, date of birth & address is clearly visible.",
                                   style: TextStyle(
-                                      color: Theme.of(context).indicatorColor),
+                                    color: Theme.of(context).indicatorColor,
+                                  ),
                                 ),
                               ),
                             ],
@@ -842,7 +843,7 @@ class WithdrawState extends State<Withdraw> {
       "hasBankDetails": (_withdrawData.accountNumber != null &&
           _withdrawData.accountNumber != null &&
           _withdrawData.ifscCode != null),
-      "withdraw_type": 1,
+      "withdraw_type": withdrawType,
     });
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
@@ -893,6 +894,8 @@ class WithdrawState extends State<Withdraw> {
             Material(
               color: Theme.of(context).primaryColor,
               child: TabBar(
+                indicatorColor: Colors.white,
+                indicatorWeight: 4.0,
                 tabs: [
                   Tab(
                     child: Text("PAYTM"),

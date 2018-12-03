@@ -1,14 +1,12 @@
 import 'dart:convert';
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/utils/httpmanager.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class EarnCash extends StatefulWidget {
   @override
@@ -18,7 +16,8 @@ class EarnCash extends StatefulWidget {
 }
 
 class EarnCashState extends State<EarnCash> {
-  int refAmount = 0;
+  int refAAmount = 0;
+  int refBAmount = 0;
   String cookie = "";
   String refCode = "";
   String inviteUrl = "";
@@ -43,9 +42,9 @@ class EarnCashState extends State<EarnCash> {
           Map<String, dynamic> response = json.decode(res.body);
           setState(() {
             refCode = response["refCode"];
-            inviteUrl =
-                (response["inviteUrl"] as String).replaceAll("%3d", "=");
-            refAmount = response["refAmount"];
+            inviteUrl = (response["refLink"] as String).replaceAll("%3d", "=");
+            refAAmount = response["amountUserA"];
+            refBAmount = response["amountUserB"];
           });
         }
       },
@@ -68,7 +67,7 @@ class EarnCashState extends State<EarnCash> {
   _shareNow() {
     String inviteMsg =
         "I'm having super fun playing Fantasy sports daily. Join me at PLAY FANTASY and win cash prizes in every match. Take this bonus of " +
-            refAmount.toString() +
+            refBAmount.toString() +
             "and join me at PLAY FANTASY. " +
             "Click " +
             inviteUrl +
@@ -93,7 +92,7 @@ class EarnCashState extends State<EarnCash> {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    strings.get("EARN_RS") + refAmount.toString(),
+                    strings.get("EARN_RS") + refBAmount.toString(),
                     style: TextStyle(
                       fontSize:
                           Theme.of(context).primaryTextTheme.display1.fontSize,
@@ -153,7 +152,7 @@ class EarnCashState extends State<EarnCash> {
                   child: Text(
                     "- " +
                         strings.get("USER_GETS_BONUS_TEXT_1") +
-                        refAmount.toString() +
+                        refAAmount.toString() +
                         " " +
                         strings.get("USER_GETS_BONUS_TEXT_2"),
                     textAlign: TextAlign.justify,
@@ -177,7 +176,7 @@ class EarnCashState extends State<EarnCash> {
                   child: Text(
                     "- " +
                         strings.get("FRIEND_SIGNUP_TEXT") +
-                        refAmount.toString(),
+                        refBAmount.toString(),
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                         color: Colors.black54,

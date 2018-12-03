@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -39,6 +40,7 @@ class LeagueDetailState extends State<LeagueDetail>
   int _sportType = 1;
   List<MyTeam> _myTeams;
   String title = "Match";
+  bool bShowInnings = false;
   Map<String, dynamic> l1UpdatePackate = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapMyContests = {};
@@ -415,21 +417,27 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _launchAddCash() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
-    }
-
-    Navigator.of(context).push(
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AddCash(),
-        fullscreenDialog: true,
       ),
     );
+    if (result != null) {
+      _showTransactionResult(json.decode(result));
+    }
+  }
+
+  _showTransactionResult(Map<String, dynamic> transactionResult) {
+    if (transactionResult["authStatus"] == "Authorised") {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TransactionSuccess(transactionResult, () {
+            Navigator.of(context).pop();
+          });
+        },
+      );
+    }
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) async {
@@ -588,32 +596,35 @@ class LeagueDetailState extends State<LeagueDetail>
                       child: LeagueCard(
                         widget.league,
                         clickable: false,
-                        tabBar: TabBar(
-                          labelColor: Colors.black87,
-                          unselectedLabelColor: Colors.black38,
-                          controller: tabController,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          indicator: UnderlineTabIndicator(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).primaryColorDark,
-                            ),
-                            insets: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
-                          ),
-                          tabs: [
-                            Container(
-                              height: 24.0,
-                              child: Tab(
-                                text: "MATCH",
-                              ),
-                            ),
-                            Container(
-                              height: 24.0,
-                              child: Tab(
-                                text: "INNINGS",
-                              ),
-                            ),
-                          ],
-                        ),
+                        tabBar: bShowInnings
+                            ? TabBar(
+                                labelColor: Colors.black87,
+                                unselectedLabelColor: Colors.black38,
+                                controller: tabController,
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                indicator: UnderlineTabIndicator(
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).primaryColorDark,
+                                  ),
+                                  insets:
+                                      EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                                ),
+                                tabs: [
+                                  Container(
+                                    height: 24.0,
+                                    child: Tab(
+                                      text: "MATCH",
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 24.0,
+                                    child: Tab(
+                                      text: "INNINGS",
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : null,
                       ),
                     ),
                   ],
@@ -625,10 +636,33 @@ class LeagueDetailState extends State<LeagueDetail>
                   child: Container(
                     child: Scaffold(
                       backgroundColor: Colors.transparent,
-                      body: TabBarView(
-                        controller: tabController,
-                        children: <Widget>[
-                          l1Data == null
+                      body: bShowInnings
+                          ? TabBarView(
+                              controller: tabController,
+                              children: <Widget>[
+                                l1Data == null
+                                    ? Container()
+                                    : Contests(
+                                        l1Data: l1Data,
+                                        myTeams: _myTeams,
+                                        league: widget.league,
+                                        scaffoldKey: _scaffoldKey,
+                                        mapContestTeams: _mapContestTeams,
+                                      ),
+                                l1Data == null
+                                    ? Container()
+                                    : Innings(
+                                        l1Data: l1Data,
+                                        myTeams: _myTeams,
+                                        league: widget.league,
+                                        leagues: widget.leagues,
+                                        scaffoldKey: _scaffoldKey,
+                                        mapContestTeams: _mapContestTeams,
+                                        onSportChange: widget.onSportChange,
+                                      ),
+                              ],
+                            )
+                          : l1Data == null
                               ? Container()
                               : Contests(
                                   l1Data: l1Data,
@@ -637,19 +671,6 @@ class LeagueDetailState extends State<LeagueDetail>
                                   scaffoldKey: _scaffoldKey,
                                   mapContestTeams: _mapContestTeams,
                                 ),
-                          l1Data == null
-                              ? Container()
-                              : Innings(
-                                  l1Data: l1Data,
-                                  myTeams: _myTeams,
-                                  league: widget.league,
-                                  leagues: widget.leagues,
-                                  scaffoldKey: _scaffoldKey,
-                                  mapContestTeams: _mapContestTeams,
-                                  onSportChange: widget.onSportChange,
-                                ),
-                        ],
-                      ),
                     ),
                   ),
                 ),

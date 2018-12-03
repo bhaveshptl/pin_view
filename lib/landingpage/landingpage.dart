@@ -45,6 +45,12 @@ class LandingPageState extends State<LandingPage> {
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
+  static const _kFontFam = 'MyFlutterApp';
+  static const IconData gplus_squared =
+      const IconData(0xf0d4, fontFamily: _kFontFam);
+  static const IconData facebook_squared =
+      const IconData(0xf308, fontFamily: _kFontFam);
+
   @override
   void initState() {
     super.initState();
@@ -297,7 +303,7 @@ class LandingPageState extends State<LandingPage> {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.only(bottom: 8.0),
                     child: ListTile(
                       leading: Column(
                         children: <Widget>[
@@ -318,7 +324,7 @@ class LandingPageState extends State<LandingPage> {
                           Row(
                             children: <Widget>[
                               Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
+                                padding: const EdgeInsets.only(top: 4.0),
                                 child: Text(
                                   strings.get("SIGN_IN_TO_CONTINUE"),
                                   style: TextStyle(
@@ -347,8 +353,17 @@ class LandingPageState extends State<LandingPage> {
                               },
                               color: Colors.red,
                               textColor: Colors.white70,
-                              child: Text(
-                                strings.get("GOOGLE").toUpperCase(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(gplus_squared),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 4.0),
+                                    child: Text(
+                                      strings.get("GOOGLE").toUpperCase(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -362,8 +377,17 @@ class LandingPageState extends State<LandingPage> {
                               },
                               color: Colors.blue,
                               textColor: Colors.white70,
-                              child: Text(
-                                strings.get("FACEBOOK").toUpperCase(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Icon(facebook_squared),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 4.0),
+                                    child: Text(
+                                      strings.get("FACEBOOK").toUpperCase(),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -371,43 +395,40 @@ class LandingPageState extends State<LandingPage> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: Container(),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Divider(
-                                  color: Colors.black54,
-                                ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
+                        child: Container(),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Divider(
+                                color: Colors.black54,
                               ),
-                              Expanded(
-                                child: Text(
-                                  strings.get("OR").toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                strings.get("OR").toUpperCase(),
+                                textAlign: TextAlign.center,
                               ),
-                              Expanded(
-                                child: Divider(
-                                  color: Colors.black54,
-                                ),
-                              )
-                            ],
-                          ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.black54,
+                              ),
+                            )
+                          ],
                         ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(),
-                        ),
-                      ],
-                    ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(),
+                      ),
+                    ],
                   ),
                   Row(
                     children: <Widget>[
@@ -418,64 +439,83 @@ class LandingPageState extends State<LandingPage> {
                             key: formKey,
                             child: Column(
                               children: <Widget>[
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: TextFormField(
-                                        onSaved: (val) => _authName = val,
-                                        decoration: InputDecoration(
-                                          labelText: strings.get("USERNAME"),
-                                          icon: const Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 15.0),
-                                            child: const Icon(Icons.face),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 8.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          onSaved: (val) => _authName = val,
+                                          decoration: InputDecoration(
+                                            labelText: strings.get("USERNAME"),
+                                            contentPadding: EdgeInsets.all(0.0),
+                                            prefixIcon: Icon(
+                                              Icons.face,
+                                              size: 16.0,
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Colors.black38,
+                                              ),
+                                            ),
                                           ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("USERNAME_ERROR");
+                                            }
+                                          },
+                                          keyboardType:
+                                              TextInputType.emailAddress,
                                         ),
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return strings
-                                                .get("USERNAME_ERROR");
-                                          }
-                                        },
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                      ),
-                                    )
-                                  ],
+                                      )
+                                    ],
+                                  ),
                                 ),
-                                Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: TextFormField(
-                                        onSaved: (val) => _password = val,
-                                        decoration: InputDecoration(
-                                          labelText: strings.get("PASSWORD"),
-                                          icon: const Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 15.0),
-                                            child: const Icon(Icons.lock),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 24.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: TextFormField(
+                                          onSaved: (val) => _password = val,
+                                          decoration: InputDecoration(
+                                            labelText: strings.get("PASSWORD"),
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Colors.black38,
+                                              ),
+                                            ),
+                                            contentPadding: EdgeInsets.all(0.0),
+                                            prefixIcon: Icon(
+                                              Icons.lock,
+                                              size: 16.0,
+                                            ),
+                                            suffixIcon: GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  _obscureText = !_obscureText;
+                                                });
+                                              },
+                                              child: Icon(
+                                                _obscureText
+                                                    ? Icons.visibility
+                                                    : Icons.visibility_off,
+                                                size: 16.0,
+                                              ),
+                                            ),
                                           ),
-                                          suffixIcon: GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                _obscureText = !_obscureText;
-                                              });
-                                            },
-                                            child: Icon(_obscureText
-                                                ? Icons.visibility
-                                                : Icons.visibility_off),
-                                          ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("PASSWORD_ERROR");
+                                            }
+                                          },
+                                          obscureText: _obscureText,
                                         ),
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return strings
-                                                .get("PASSWORD_ERROR");
-                                          }
-                                        },
-                                        obscureText: _obscureText,
-                                      ),
-                                    )
-                                  ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -484,18 +524,23 @@ class LandingPageState extends State<LandingPage> {
                       ),
                     ],
                   ),
-                  ListTile(
-                    leading: Row(
+                  Padding(
+                    padding:
+                        EdgeInsets.only(right: 16.0, top: 4.0, bottom: 8.0),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        FlatButton(
-                          onPressed: () {
+                        InkWell(
+                          onTap: () {
                             _showForgotPassword();
                           },
-                          padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
-                          child: Text(
-                            strings.get("FORGOT_PASSWORD"),
-                            style: TextStyle(color: Colors.black54),
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                left: 4.0, top: 2.0, bottom: 2.0),
+                            child: Text(
+                              strings.get("FORGOT_PASSWORD"),
+                              style: TextStyle(color: Colors.black54),
+                            ),
                           ),
                         )
                       ],
@@ -524,28 +569,28 @@ class LandingPageState extends State<LandingPage> {
                       ],
                     ),
                   ),
-                  ListTile(
-                    leading: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          strings.get("DONT_HAVE_ACCOUNT"),
-                          style: TextStyle(color: Colors.black38),
-                        ),
-                        FlatButton(
-                          onPressed: () {
-                            _launchSignup(context);
-                          },
-                          padding: EdgeInsets.fromLTRB(4.0, 0.0, 2.0, 0.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        strings.get("DONT_HAVE_ACCOUNT"),
+                        style: TextStyle(color: Colors.black38),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          _launchSignup(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(4.0),
                           child: Text(
                             strings.get("SIGNUP").toUpperCase(),
                             style: TextStyle(
                                 color: Colors.black54,
                                 fontWeight: FontWeight.bold),
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

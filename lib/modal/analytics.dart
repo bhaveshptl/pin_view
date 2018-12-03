@@ -1,17 +1,23 @@
 class Event {
   final int appVersion;
-  final int clientTimestamp;
+  int clientTimestamp;
   final int id;
   final String name;
   final String network;
   final String source;
   final int userId;
-  final int value1;
-  final int value2;
-  final int value3;
-  final int value4;
-  final int value5;
-  final int value6;
+  final int v1;
+  final int v2;
+  final int v3;
+  final int v4;
+  final int v5;
+  final int v6;
+  final int v7;
+  final String s1;
+  final String s2;
+  final String s3;
+  final String s4;
+  final String s5;
 
   Event({
     this.appVersion = 0,
@@ -21,12 +27,18 @@ class Event {
     this.network = "",
     this.source = "",
     this.userId = 0,
-    this.value1 = 0,
-    this.value2 = 0,
-    this.value3 = 0,
-    this.value4 = 0,
-    this.value5 = 0,
-    this.value6 = 0,
+    this.v1 = 0,
+    this.v2 = 0,
+    this.v3 = 0,
+    this.v4 = 0,
+    this.v5 = 0,
+    this.v6 = 0,
+    this.v7 = 0,
+    this.s1 = "",
+    this.s2 = "",
+    this.s3 = "",
+    this.s4 = "",
+    this.s5 = "",
   });
 
   Map<String, dynamic> toJson() => {
@@ -37,12 +49,18 @@ class Event {
         "network": network,
         "source": source,
         "userId": userId,
-        "value1": value1,
-        "value2": value2,
-        "value3": value3,
-        "value4": value4,
-        "value5": value5,
-        "value6": value6,
+        "v1": v1,
+        "v2": v2,
+        "v3": v3,
+        "v4": v4,
+        "v5": v5,
+        "v6": v6,
+        "v7": v7,
+        "s1": s1,
+        "s2": s2,
+        "s3": s3,
+        "s4": s4,
+        "s5": s5,
       };
 }
 

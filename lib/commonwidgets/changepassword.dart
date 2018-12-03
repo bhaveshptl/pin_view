@@ -13,11 +13,36 @@ class ChangePassword extends StatefulWidget {
 
 class ChangePasswordState extends State<ChangePassword> {
   String cookie = "";
+  String password = "";
+
+  bool bDigitsCountMatch = false;
+  bool bLettersCountMatch = false;
+  bool passConstraintMatch = false;
+  bool bSpecialCharCountMatch = false;
+
   bool _obscureNewPassword = true;
   bool _obscureCurrentPassword = true;
   final _formKey = new GlobalKey<FormState>();
   TextEditingController _newPasswordController = TextEditingController();
   TextEditingController _currentPasswordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _newPasswordController.addListener(() {
+      setState(() {
+        password = _newPasswordController.text;
+        bDigitsCountMatch = password.contains(RegExp('[0-9]'));
+        bLettersCountMatch = password.contains(RegExp('[A-z]'));
+        bSpecialCharCountMatch =
+            password.contains(RegExp('[_@#\$?().,!/:{}><;`*~%^&+=]'));
+        passConstraintMatch = bDigitsCountMatch &&
+            bLettersCountMatch &&
+            bSpecialCharCountMatch &&
+            password.length >= 8;
+      });
+    });
+  }
 
   _onChangePassword() async {
     http.Request req = http.Request(
@@ -54,10 +79,15 @@ class ChangePasswordState extends State<ChangePassword> {
                     controller: _currentPasswordController,
                     decoration: InputDecoration(
                       labelText: "Current password",
-                      hintText: strings.get("MIN_CHARS_PASSWORD"),
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 15.0),
-                        child: Icon(Icons.lock),
+                      contentPadding: EdgeInsets.all(4.0),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.black38,
+                        ),
+                      ),
+                      prefixIcon: Icon(
+                        Icons.lock,
+                        size: 16.0,
                       ),
                       suffixIcon: GestureDetector(
                         onTap: () {
@@ -65,9 +95,12 @@ class ChangePasswordState extends State<ChangePassword> {
                             _obscureCurrentPassword = !_obscureCurrentPassword;
                           });
                         },
-                        child: Icon(_obscureCurrentPassword
-                            ? Icons.visibility
-                            : Icons.visibility_off),
+                        child: Icon(
+                          _obscureCurrentPassword
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          size: 16.0,
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -80,38 +113,108 @@ class ChangePasswordState extends State<ChangePassword> {
                 )
               ],
             ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextFormField(
-                    controller: _newPasswordController,
-                    decoration: InputDecoration(
-                      labelText: "New password",
-                      hintText: strings.get("MIN_CHARS_PASSWORD"),
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 15.0),
-                        child: Icon(Icons.lock),
+            Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: TextFormField(
+                      controller: _newPasswordController,
+                      decoration: InputDecoration(
+                        labelText: "New password",
+                        contentPadding: EdgeInsets.all(0.0),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black38,
+                          ),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.lock,
+                          size: 16.0,
+                        ),
+                        suffixIcon: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _obscureNewPassword = !_obscureNewPassword;
+                            });
+                          },
+                          child: Icon(
+                            _obscureNewPassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            size: 16.0,
+                          ),
+                        ),
                       ),
-                      suffixIcon: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _obscureNewPassword = !_obscureNewPassword;
-                          });
-                        },
-                        child: Icon(_obscureNewPassword
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return strings.get("PASSWORD_ERROR");
+                        } else if (!passConstraintMatch) {
+                          strings.get("PASSWORD_CONSTRAINT_NOT_MATCHED");
+                        }
+                      },
+                      obscureText: _obscureNewPassword,
                     ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return strings.get("PASSWORD_ERROR");
-                      }
-                    },
-                    obscureText: _obscureNewPassword,
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.0),
+                    color: passConstraintMatch
+                        ? Color.fromRGBO(0, 255, 0, 0.1)
+                        : Color.fromRGBO(255, 0, 0, 0.1),
+                    border: Border.all(
+                      color: passConstraintMatch ? Colors.teal : Colors.red,
+                    )),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                                text: strings.get("PASSWORD_SHOULD"),
+                                style: TextStyle(color: Colors.teal)),
+                            TextSpan(
+                                text: strings.get("MIN_CHAR"),
+                                style: TextStyle(
+                                    color: password.length >= 8
+                                        ? Colors.teal
+                                        : Colors.red)),
+                            TextSpan(
+                                text: strings.get("ATLEAST_NUMBER"),
+                                style: TextStyle(
+                                    color: bDigitsCountMatch
+                                        ? Colors.teal
+                                        : Colors.red)),
+                            TextSpan(
+                                text: strings.get("ATLEAST_ALPHABET"),
+                                style: TextStyle(
+                                    color: bLettersCountMatch
+                                        ? Colors.teal
+                                        : Colors.red)),
+                            TextSpan(
+                                text: strings.get("ATLEAST_SPECIAL_CHARACTER"),
+                                style: TextStyle(
+                                    color: bSpecialCharCountMatch
+                                        ? Colors.teal
+                                        : Colors.red)),
+                          ],
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                      )),
+                    ],
                   ),
-                )
-              ],
+                ),
+              ),
             ),
           ],
         ),

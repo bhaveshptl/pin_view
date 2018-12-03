@@ -172,25 +172,35 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           key: _formKey,
                           child: Column(
                             children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _authNameController,
-                                      decoration: InputDecoration(
-                                        labelText:
-                                            strings.get("EMAIL_OR_MOBILE"),
+                              Padding(
+                                padding: EdgeInsets.only(top: 16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _authNameController,
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              strings.get("EMAIL_OR_MOBILE"),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                          contentPadding: EdgeInsets.all(12.0),
+                                        ),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return strings
+                                                .get("EMAIL_OR_MOBILE_ERROR");
+                                          }
+                                        },
+                                        keyboardType:
+                                            TextInputType.emailAddress,
                                       ),
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return strings
-                                              .get("EMAIL_OR_MOBILE_ERROR");
-                                        }
-                                      },
-                                      keyboardType: TextInputType.emailAddress,
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -320,26 +330,35 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                   ),
                                 )
                               : Container(),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _otpController,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("ENTER_OTP"),
+                          Padding(
+                            padding: EdgeInsets.only(top: 16.0),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _otpController,
+                                    decoration: InputDecoration(
+                                      labelText: strings.get("ENTER_OTP"),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black38,
+                                        ),
+                                      ),
+                                      contentPadding: EdgeInsets.all(12.0),
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings.get("ENTER_OTP_ERROR");
+                                      }
+                                    },
+                                    keyboardType: TextInputType.emailAddress,
                                   ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings.get("ENTER_OTP_ERROR");
-                                    }
-                                  },
-                                  keyboardType: TextInputType.emailAddress,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
+                            padding: EdgeInsets.only(top: 16.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -350,65 +369,100 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               ],
                             ),
                           ),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _newPasswordController,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("NEW_PASSWORD"),
-                                    suffixIcon: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _passObscureText = !_passObscureText;
-                                        });
-                                      },
-                                      child: Icon(_passObscureText
-                                          ? Icons.visibility
-                                          : Icons.visibility_off),
+                          Padding(
+                            padding: EdgeInsets.only(top: 16.0),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _newPasswordController,
+                                    decoration: InputDecoration(
+                                      labelText: strings.get("NEW_PASSWORD"),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black38,
+                                        ),
+                                      ),
+                                      contentPadding: EdgeInsets.all(0.0),
+                                      prefixIcon: Icon(
+                                        Icons.lock,
+                                        size: 16.0,
+                                      ),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _passObscureText =
+                                                !_passObscureText;
+                                          });
+                                        },
+                                        child: Icon(
+                                          _passObscureText
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          size: 16.0,
+                                        ),
+                                      ),
                                     ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings
+                                            .get("NEW_PASSWORD_ERROR");
+                                      }
+                                    },
+                                    keyboardType: TextInputType.text,
+                                    obscureText: _passObscureText,
                                   ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings.get("NEW_PASSWORD_ERROR");
-                                    }
-                                  },
-                                  keyboardType: TextInputType.text,
-                                  obscureText: _passObscureText,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _reEnterPasswordController,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("REENTER_PASSWORD"),
-                                    suffixIcon: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _repeatPassObscureText =
-                                              !_repeatPassObscureText;
-                                        });
-                                      },
-                                      child: Icon(_repeatPassObscureText
-                                          ? Icons.visibility
-                                          : Icons.visibility_off),
+                          Padding(
+                            padding: EdgeInsets.only(top: 16.0),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _reEnterPasswordController,
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          strings.get("REENTER_PASSWORD"),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black38,
+                                        ),
+                                      ),
+                                      contentPadding: EdgeInsets.all(0.0),
+                                      prefixIcon: Icon(
+                                        Icons.lock,
+                                        size: 16.0,
+                                      ),
+                                      suffixIcon: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _repeatPassObscureText =
+                                                !_repeatPassObscureText;
+                                          });
+                                        },
+                                        child: Icon(
+                                          _repeatPassObscureText
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          size: 16.0,
+                                        ),
+                                      ),
                                     ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return strings
+                                            .get("REENTER_PASSWORD_ERROR");
+                                      }
+                                    },
+                                    keyboardType: TextInputType.text,
+                                    obscureText: _repeatPassObscureText,
                                   ),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return strings
-                                          .get("REENTER_PASSWORD_ERROR");
-                                    }
-                                  },
-                                  keyboardType: TextInputType.text,
-                                  obscureText: _repeatPassObscureText,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           Padding(
                             padding:

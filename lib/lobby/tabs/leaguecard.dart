@@ -156,6 +156,7 @@ class LeagueCard extends StatelessWidget {
                                               child: CachedNetworkImage(
                                                 imageUrl: _league.teamB.logoUrl,
                                                 placeholder: Container(
+                                                  padding: EdgeInsets.all(4.0),
                                                   child:
                                                       CircularProgressIndicator(
                                                     strokeWidth: 2.0,

@@ -117,6 +117,7 @@ class AnalyticsManager {
   }
 
   addEvent(Event event) {
+    event.clientTimestamp = DateTime.now().millisecondsSinceEpoch;
     analyticsEvents.add(event);
     if (_timer == null) {
       statAnalytics();

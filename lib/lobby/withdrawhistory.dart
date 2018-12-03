@@ -97,7 +97,7 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
                   Text("#" + recentWithdraw["id"].toString()),
                 ],
               ),
-              trailing: recentWithdraw["status"] != "CANCELLED"
+              trailing: recentWithdraw["status"] == "REQUESTED"
                   ? RaisedButton(
                       onPressed: () {
                         onCancelTransaction(recentWithdraw);

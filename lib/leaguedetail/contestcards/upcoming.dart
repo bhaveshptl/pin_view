@@ -186,7 +186,7 @@ class UpcomingContest extends StatelessWidget {
                                                   .primaryColorDark,
                                               fontSize: Theme.of(context)
                                                   .primaryTextTheme
-                                                  .headline
+                                                  .title
                                                   .fontSize),
                                         ),
                                   Text(
@@ -200,7 +200,7 @@ class UpcomingContest extends StatelessWidget {
                                                 .primaryColorDark,
                                         fontSize: Theme.of(context)
                                             .primaryTextTheme
-                                            .headline
+                                            .title
                                             .fontSize),
                                   ),
                                 ],
@@ -260,7 +260,8 @@ class UpcomingContest extends StatelessWidget {
                       ],
                     ),
                     Container(
-                      padding: EdgeInsets.only(right: 24.0),
+                      padding:
+                          EdgeInsets.only(right: 24.0, top: 4.0, bottom: 4.0),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -273,7 +274,7 @@ class UpcomingContest extends StatelessWidget {
                                       bottomLeft: Radius.circular(15.0),
                                     ),
                               child: Container(
-                                height: 6.0,
+                                height: 3.0,
                                 color: Theme.of(context).primaryColorDark,
                               ),
                             ),
@@ -288,7 +289,7 @@ class UpcomingContest extends StatelessWidget {
                                       bottomRight: Radius.circular(15.0),
                                     ),
                               child: Container(
-                                height: 6.0,
+                                height: 3.0,
                                 color: Colors.black12.withAlpha(10),
                               ),
                             ),

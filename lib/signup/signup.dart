@@ -23,15 +23,21 @@ class SignupState extends State<Signup> {
   String _password;
   String _deviceId;
   String _pfRefCode;
-  String _installReferring_link = "";
-  String _installAndroid_link;
   bool _obscureText = true;
+  String _installAndroid_link;
   bool _bShowReferralInput = false;
+  String _installReferring_link = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   final formKey = new GlobalKey<FormState>();
-  final TextEditingController _referralCodeController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final TextEditingController _referralCodeController = TextEditingController();
+
+  static const _kFontFam = 'MyFlutterApp';  
+  static const IconData gplus_squared =
+      const IconData(0xf0d4, fontFamily: _kFontFam);
+  static const IconData facebook_squared =
+      const IconData(0xf308, fontFamily: _kFontFam);
 
   @override
   void initState() {
@@ -183,7 +189,7 @@ class SignupState extends State<Signup> {
     );
   }
 
-_doFacebookLogin(BuildContext context) async {
+  _doFacebookLogin(BuildContext context) async {
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.nativeWithFallback;
     var result = await facebookLogin
@@ -250,7 +256,7 @@ _doFacebookLogin(BuildContext context) async {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 24.0),
+                    padding: const EdgeInsets.only(bottom: 16.0),
                     child: Image(
                       height: 80.0,
                       fit: BoxFit.scaleDown,
@@ -259,43 +265,40 @@ _doFacebookLogin(BuildContext context) async {
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: ListTile(
-                  leading: Column(
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text(
-                            strings.get("WELCOME_TO_FANTASY"),
+              ListTile(
+                leading: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          strings.get("WELCOME_TO_FANTASY"),
+                          style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .headline
+                                  .fontSize),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            strings.get("FEW_SEC_AWAY"),
                             style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
+                                color: Colors.black38,
                                 fontSize: Theme.of(context)
                                     .primaryTextTheme
-                                    .headline
+                                    .subhead
                                     .fontSize),
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              strings.get("FEW_SEC_AWAY"),
-                              style: TextStyle(
-                                  color: Colors.black38,
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .fontSize),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               ListTile(
@@ -310,23 +313,41 @@ _doFacebookLogin(BuildContext context) async {
                           },
                           color: Colors.red,
                           textColor: Colors.white70,
-                          child: Text(
-                            strings.get("GOOGLE").toUpperCase(),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(gplus_squared),
+                              Padding(
+                                padding: EdgeInsets.only(left: 4.0),
+                                child: Text(
+                                  strings.get("GOOGLE").toUpperCase(),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
+                        padding: const EdgeInsets.only(left: 4.0),
                         child: RaisedButton(
                           onPressed: () {
                             _doFacebookLogin(context);
                           },
                           color: Colors.blue,
                           textColor: Colors.white70,
-                          child: Text(
-                            strings.get("FACEBOOK").toUpperCase(),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(facebook_squared),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  strings.get("FACEBOOK").toUpperCase(),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -378,64 +399,84 @@ _doFacebookLogin(BuildContext context) async {
                         key: formKey,
                         child: Column(
                           children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: TextFormField(
-                                    onSaved: (val) => _authName = val,
-                                    decoration: InputDecoration(
-                                      labelText: strings.get("EMAIL_OR_MOBILE"),
-                                      icon: const Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 15.0),
-                                        child: const Icon(Icons.face),
+                            Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextFormField(
+                                      onSaved: (val) => _authName = val,
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            strings.get("EMAIL_OR_MOBILE"),
+                                        contentPadding: EdgeInsets.all(0.0),
+                                        prefixIcon: Icon(
+                                          Icons.face,
+                                          size: 16.0,
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Colors.black38,
+                                          ),
+                                        ),
                                       ),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return strings
+                                              .get("EMAIL_OR_MOBILE_ERROR");
+                                        }
+                                      },
+                                      keyboardType: TextInputType.emailAddress,
                                     ),
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return strings
-                                            .get("EMAIL_OR_MOBILE_ERROR");
-                                      }
-                                    },
-                                    keyboardType: TextInputType.emailAddress,
-                                  ),
-                                )
-                              ],
+                                  )
+                                ],
+                              ),
                             ),
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: TextFormField(
-                                    onSaved: (val) => _password = val,
-                                    decoration: InputDecoration(
-                                      labelText: strings.get("PASSWORD"),
-                                      hintText:
-                                          strings.get("MIN_CHARS_PASSWORD"),
-                                      icon: const Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 15.0),
-                                        child: const Icon(Icons.lock),
+                            Padding(
+                              padding: EdgeInsets.only(top: 16.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: TextFormField(
+                                      onSaved: (val) => _password = val,
+                                      decoration: InputDecoration(
+                                        labelText: strings.get("PASSWORD"),
+                                        hintText:
+                                            strings.get("MIN_CHARS_PASSWORD"),
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Colors.black38,
+                                          ),
+                                        ),
+                                        contentPadding: EdgeInsets.all(0.0),
+                                        prefixIcon: Icon(
+                                          Icons.lock,
+                                          size: 16.0,
+                                        ),
+                                        suffixIcon: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _obscureText = !_obscureText;
+                                            });
+                                          },
+                                          child: Icon(
+                                            _obscureText
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            size: 16.0,
+                                          ),
+                                        ),
                                       ),
-                                      suffixIcon: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _obscureText = !_obscureText;
-                                          });
-                                        },
-                                        child: Icon(_obscureText
-                                            ? Icons.visibility
-                                            : Icons.visibility_off),
-                                      ),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return strings.get("PASSWORD_ERROR");
+                                        }
+                                      },
+                                      obscureText: _obscureText,
                                     ),
-                                    validator: (value) {
-                                      if (value.isEmpty) {
-                                        return strings.get("PASSWORD_ERROR");
-                                      }
-                                    },
-                                    obscureText: _obscureText,
-                                  ),
-                                )
-                              ],
+                                  )
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -467,7 +508,7 @@ _doFacebookLogin(BuildContext context) async {
               ),
               _bShowReferralInput
                   ? Padding(
-                      padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
+                      padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -475,6 +516,12 @@ _doFacebookLogin(BuildContext context) async {
                               controller: _referralCodeController,
                               decoration: InputDecoration(
                                 labelText: strings.get("REFERRAL_CODE"),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.black38,
+                                  ),
+                                ),
+                                contentPadding: EdgeInsets.all(12.0),
                               ),
                             ),
                           )

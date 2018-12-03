@@ -36,7 +36,7 @@ class Lobby extends StatefulWidget {
 }
 
 class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
-  int _sportType = 1;
+  int _sportType = 0;
   List<League> _leagues;
   TabController _controller;
   List<String> _carousel = [];
@@ -53,6 +53,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
       setState(() {
         _sportType = _controller.index + 1;
       });
+      SharedPrefHelper().saveSportsType(_sportType.toString());
     });
     _mapSportTypes = {
       "CRICKET": 1,
@@ -92,7 +93,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
         SharedPrefHelper.internal().getSportsType();
     await futureSportType.then((value) {
       if (value != null) {
-        int _sport = int.parse(value);
+        int _sport = int.parse(value == null ? "1" : value);
         _onSportSelectionChaged(_sport);
       } else {
         SharedPrefHelper().saveSportsType(_sportType.toString());
@@ -102,10 +103,14 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   _onSportSelectionChaged(int _sport) {
     if (_sportType != _sport) {
-      setState(() {
-        _sportType = _sport;
-      });
+      _controller.index = _sport - 1;
       SharedPrefHelper().saveSportsType(_sportType.toString());
+    } else if (_sportType <= 0) {
+      setState(() {
+        _sportType = 1;
+        _controller.index = _sportType - 1;
+        SharedPrefHelper().saveSportsType(_sportType.toString());
+      });
     }
   }
 
@@ -238,10 +243,13 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                         width: 48.0,
                       ),
                     ),
-                    Text("PLAY FANTASY"),
+                    Text(
+                      AppConfig.of(context).appName.toUpperCase(),
+                    ),
                   ],
                 ),
               ),
+              automaticallyImplyLeading: false,
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(122.0),
                 child: Column(
@@ -289,14 +297,16 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                     ),
                     Container(
                       height: 48.0,
-                      child: TabBar(
-                        controller: _controller,
-                        isScrollable: true,
-                        indicator: UnderlineTabIndicator(),
-                        tabs: _mapSportTypes.keys.map<Tab>((page) {
-                          return Tab(text: page);
-                        }).toList(),
-                      ),
+                      child: _sportType >= 0
+                          ? TabBar(
+                              controller: _controller,
+                              isScrollable: true,
+                              indicator: UnderlineTabIndicator(),
+                              tabs: _mapSportTypes.keys.map<Tab>((page) {
+                                return Tab(text: page);
+                              }).toList(),
+                            )
+                          : Container(),
                     ),
                   ],
                 ),
@@ -310,24 +320,26 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                 )
               ],
             ),
-            body: TabBarView(
-              controller: _controller,
-              children: _mapSportTypes.keys.map<Widget>((page) {
-                return Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: LobbyWidget(
-                        sportType: _mapSportTypes[page],
-                        onLeagues: (value) {
-                          _leagues = value;
-                        },
-                        onSportChange: _onSportSelectionChaged,
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
-            ),
+            body: _sportType >= 0
+                ? TabBarView(
+                    controller: _controller,
+                    children: _mapSportTypes.keys.map<Widget>((page) {
+                      return Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: LobbyWidget(
+                              sportType: _mapSportTypes[page],
+                              onLeagues: (value) {
+                                _leagues = value;
+                              },
+                              onSportChange: _onSportSelectionChaged,
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  )
+                : Container(),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),

@@ -1,16 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/modal/analytics.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/paymentmode.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 bool bShowAppBar = true;
@@ -22,35 +24,50 @@ class AddCash extends StatefulWidget {
 }
 
 class AddCashState extends State<AddCash> {
+  int amount;
   String cookie = "";
   Deposit depositData;
-  int customAmountBonus = 0;
   bool bShowPromoInput = false;
+  double customAmountBonus = 0.0;
+  Map<String, dynamic> bonusInfo;
+  bool bRepeatTransaction = false;
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController promoController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController customAmountController = TextEditingController();
-  TextEditingController repeatAmountController = TextEditingController();
+
+  static const _kFontFam = 'MyFlutterApp';
+  IconData gift_1 = const IconData(0xe800, fontFamily: _kFontFam);
 
   @override
   void initState() {
     super.initState();
+    initWebview();
     _getDepositInfo();
+
     AnalyticsManager().addEvent(Event());
     customAmountController.addListener(() {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
           : customAmountController.text);
+      if (bonusInfo != null) {
+        customAmountBonus = customAmount * bonusInfo["percentage"] / 100;
+        setState(() {
+          if (customAmount < bonusInfo["min"]) {
+            customAmountBonus = 0.0;
+          } else if (customAmountBonus > bonusInfo["max"]) {
+            customAmountBonus = (bonusInfo["max"]).toDouble();
+          }
+        });
+      }
+    });
+
+    amountController.addListener(() {
       setState(() {
-        if (customAmount >= 100 && customAmount <= 1000) {
-          customAmountBonus = customAmount;
-        } else if (customAmount > 1000) {
-          customAmountBonus = 1000;
-        } else {
-          customAmountBonus = 0;
-        }
+        amount =
+            amountController.text != "" ? int.parse(amountController.text) : 0;
       });
     });
   }
@@ -74,14 +91,47 @@ class AddCashState extends State<AddCash> {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           setState(() {
             depositData = Deposit.fromJson(json.decode(res.body));
-            repeatAmountController.text =
+            amountController.text =
                 depositData.chooseAmountData.lastPaymentArray == null
                     ? ""
                     : (depositData.chooseAmountData.lastPaymentArray[0]
                             ["amount"])
                         .toString();
+            bonusInfo = depositData.chooseAmountData.bonusArray[0];
           });
+        } else if (res.statusCode >= 400 && res.statusCode <= 499) {
+          JoinContestError error =
+              JoinContestError(json.decode(res.body)["error"]);
+          if (error.isBlockedUser()) {
+            _showJoinContestError(
+              title: error.getTitle(),
+              message: error.getErrorMessage(),
+            );
+          }
         }
+      },
+    );
+  }
+
+  _showJoinContestError({String title, String message}) {
+    showDialog(
+      context: _scaffoldKey.currentContext,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
+            )
+          ],
+        );
       },
     );
   }
@@ -104,34 +154,73 @@ class AddCashState extends State<AddCash> {
           elevation: 1.0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           child: Container(
-            height: 60.0,
+            height: 64.0,
             child: Stack(
               children: <Widget>[
-                Banner(
-                  message: amount >=
-                              depositData.chooseAmountData.bonusArray[0]
-                                  ["min"] &&
-                          amount <=
-                              depositData.chooseAmountData.bonusArray[0]["max"]
-                      ? "BONUS " + strings.rupee + getBonusAmount(amount)
-                      : "NO BONUS",
-                  location: BannerLocation.topStart,
-                ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.only(left: 50.0, right: 16.0),
+                      padding: EdgeInsets.only(left: 16.0, right: 16.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text(
-                            strings.rupee + amount.toString(),
-                            style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .primaryTextTheme
-                                  .display1
-                                  .fontSize,
+                          Expanded(
+                            child: Row(
+                              children: <Widget>[
+                                Text(
+                                  strings.rupee + amount.toString(),
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .display1
+                                        .fontSize,
+                                  ),
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          right: 8.0, left: 8.0),
+                                      child: Icon(
+                                        gift_1,
+                                        color: (amount >=
+                                                    depositData.chooseAmountData
+                                                        .bonusArray[0]["min"] &&
+                                                amount <=
+                                                    depositData.chooseAmountData
+                                                        .bonusArray[0]["max"])
+                                            ? Colors.teal
+                                            : Colors.red,
+                                        size: 18.0,
+                                      ),
+                                    ),
+                                    Text(
+                                      (amount >=
+                                                  depositData.chooseAmountData
+                                                      .bonusArray[0]["min"] &&
+                                              amount <=
+                                                  depositData.chooseAmountData
+                                                      .bonusArray[0]["max"]
+                                          ? ("+ " +
+                                              strings.rupee +
+                                              getFirstDepositBonusAmount(
+                                                  amount))
+                                          : "No Bonus"),
+                                      style: TextStyle(
+                                        color: (amount >=
+                                                    depositData.chooseAmountData
+                                                        .bonusArray[0]["min"] &&
+                                                amount <=
+                                                    depositData.chooseAmountData
+                                                        .bonusArray[0]["max"])
+                                            ? Colors.teal
+                                            : Colors.red,
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
                             ),
                           ),
                           OutlineButton(
@@ -164,45 +253,69 @@ class AddCashState extends State<AddCash> {
           height: 60.0,
           child: Stack(
             children: <Widget>[
-              Banner(
-                message: customAmountBonus >=
-                            depositData.chooseAmountData.bonusArray[0]["min"] &&
-                        customAmountBonus <=
-                            depositData.chooseAmountData.bonusArray[0]["max"]
-                    ? "BONUS " +
-                        strings.rupee +
-                        getBonusAmount(customAmountBonus)
-                    : "NO BONUS",
-                location: BannerLocation.topStart,
-              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Container(
-                    padding: EdgeInsets.only(left: 50.0, right: 16.0),
+                    padding: EdgeInsets.only(left: 16.0, right: 16.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Container(
-                          width: 100.0,
-                          child: TextFormField(
-                            controller: customAmountController,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.all(8.0),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.black38,
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                width: 100.0,
+                                child: TextFormField(
+                                  controller: customAmountController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(8.0),
+                                    border: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                        color: Colors.black38,
+                                      ),
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .fontSize,
+                                    color: Colors.black45,
+                                  ),
                                 ),
                               ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(
-                              fontSize: Theme.of(context)
-                                  .primaryTextTheme
-                                  .title
-                                  .fontSize,
-                              color: Colors.black45,
-                            ),
+                              customAmountController.text != ""
+                                  ? Row(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              right: 8.0, left: 8.0),
+                                          child: Icon(
+                                            gift_1,
+                                            color: customAmountBonus > 0
+                                                ? Colors.teal
+                                                : Colors.red,
+                                            size: 18.0,
+                                          ),
+                                        ),
+                                        Text(
+                                          (customAmountBonus > 0
+                                              ? ("+ " +
+                                                  strings.rupee +
+                                                  customAmountBonus.toString())
+                                              : "No Bonus"),
+                                          style: TextStyle(
+                                            color: customAmountBonus > 0
+                                                ? Colors.teal
+                                                : Colors.red,
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  : Container(),
+                            ],
                           ),
                         ),
                         OutlineButton(
@@ -228,18 +341,111 @@ class AddCashState extends State<AddCash> {
     return tiles;
   }
 
-  getBonusAmount(int amount) {
+  onApplyPromo() async {
+    int amount =
+        amountController.text != "" ? int.parse(amountController.text) : 0;
+    if (amountController.text == "") {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter amount to apply promo."),
+        ),
+      );
+    } else if (promoController.text == "") {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter promo code to apply."),
+        ),
+      );
+    } else {
+      final result = await validatePromo(amount);
+      if (result != null) {
+        Map<String, dynamic> paymentMode = json.decode(result);
+        if (paymentMode["error"] == true) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(paymentMode["msg"]),
+            ),
+          );
+        } else {
+          setState(() {
+            bonusInfo = paymentMode["details"];
+          });
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(paymentMode["message"]),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  onRepeatTransaction() async {
+    int amount =
+        amountController.text != "" ? int.parse(amountController.text) : 0;
+    if (promoController.text == "") {
+      initRepeatDeposit();
+    } else {
+      final result = await validatePromo(amount);
+      if (result != null) {
+        Map<String, dynamic> paymentMode = json.decode(result);
+        if (paymentMode["error"] == true) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(paymentMode["msg"]),
+            ),
+          );
+        } else {
+          initRepeatDeposit();
+        }
+      }
+    }
+  }
+
+  getBonusAmount() {
+    double bonusAmount = amount * bonusInfo["percentage"] / 100;
+    if (amount < bonusInfo["minimum"]) {
+      bonusAmount = 0;
+    } else if (bonusAmount > bonusInfo["maximum"]) {
+      bonusAmount = (bonusInfo["maximum"]).toDouble();
+    }
+    return bonusAmount;
+  }
+
+  getFirstDepositBonusAmount(int amount) {
     int minAmount = depositData.chooseAmountData.bonusArray[0]["min"];
     int maxAmount = depositData.chooseAmountData.bonusArray[0]["max"];
     int percentage = depositData.chooseAmountData.bonusArray[0]["percentage"];
-    return (amount >= minAmount && amount <= maxAmount
-            ? (amount * percentage ~/ 100)
-            : 0)
-        .toString();
+    double bonusAmount = amount * percentage / 100;
+    if (amount < minAmount) {
+      bonusAmount = 0;
+    } else if (bonusAmount > maxAmount) {
+      bonusAmount = maxAmount.toDouble();
+    }
+    return bonusAmount.toString();
   }
 
   getRepeatDepositUI() {
     List<Widget> rows = [
+      Padding(
+        padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 8.0),
+        child: ClipRRect(
+          clipBehavior: Clip.hardEdge,
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          child: Container(
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Image.network(
+                    depositData.bannerImage,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
       Row(
         children: <Widget>[
           Expanded(
@@ -260,7 +466,7 @@ class AddCashState extends State<AddCash> {
                           Padding(
                             padding: EdgeInsets.symmetric(vertical: 16.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
                                 Container(
@@ -284,20 +490,53 @@ class AddCashState extends State<AddCash> {
                                       ),
                                     ),
                                   ),
-                                )
+                                ),
+                                bonusInfo == null
+                                    ? Container()
+                                    : Row(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 16.0, right: 2.0),
+                                            child: Icon(
+                                              gift_1,
+                                              color: Colors.teal,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 2.0),
+                                            child: Text(
+                                              strings.rupee +
+                                                  getBonusAmount()
+                                                      .toStringAsFixed(2),
+                                              style: TextStyle(
+                                                  color: Colors.teal,
+                                                  fontSize: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .subhead
+                                                      .fontSize),
+                                            ),
+                                          )
+                                        ],
+                                      )
                               ],
                             ),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              RaisedButton(
+                              OutlineButton(
                                 onPressed: () {
                                   setDepositAmount(depositData
                                       .chooseAmountData.amountTiles[0]);
                                 },
-                                textColor: Colors.white70,
-                                color: Theme.of(context).primaryColorDark,
+                                textColor: Theme.of(context).primaryColorDark,
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColorDark,
+                                ),
+                                highlightedBorderColor:
+                                    Theme.of(context).primaryColor,
                                 child: Text(
                                   strings.rupee +
                                       depositData
@@ -305,13 +544,17 @@ class AddCashState extends State<AddCash> {
                                           .toString(),
                                 ),
                               ),
-                              RaisedButton(
+                              OutlineButton(
                                 onPressed: () {
                                   setDepositAmount(depositData
                                       .chooseAmountData.amountTiles[1]);
                                 },
-                                textColor: Colors.white70,
-                                color: Theme.of(context).primaryColorDark,
+                                textColor: Theme.of(context).primaryColorDark,
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColorDark,
+                                ),
+                                highlightedBorderColor:
+                                    Theme.of(context).primaryColor,
                                 child: Text(
                                   strings.rupee +
                                       depositData
@@ -319,13 +562,17 @@ class AddCashState extends State<AddCash> {
                                           .toString(),
                                 ),
                               ),
-                              RaisedButton(
+                              OutlineButton(
                                 onPressed: () {
                                   setDepositAmount(depositData
                                       .chooseAmountData.amountTiles[2]);
                                 },
-                                textColor: Colors.white70,
-                                color: Theme.of(context).primaryColorDark,
+                                textColor: Theme.of(context).primaryColorDark,
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColorDark,
+                                ),
+                                highlightedBorderColor:
+                                    Theme.of(context).primaryColor,
                                 child: Text(
                                   strings.rupee +
                                       depositData
@@ -335,30 +582,55 @@ class AddCashState extends State<AddCash> {
                               )
                             ],
                           ),
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                height: 24.0,
-                                child: FlatButton(
-                                  padding: EdgeInsets.all(0.0),
-                                  child: Text("Have a promocode?"),
-                                  onPressed: () {
-                                    setState(() {
-                                      promoController.text = "";
-                                      bShowPromoInput = !bShowPromoInput;
-                                    });
-                                  },
-                                ),
-                              )
-                            ],
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 4.0),
+                            child: Row(
+                              children: <Widget>[
+                                Text("Have a promocode?"),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: InkWell(
+                                    customBorder: Border(
+                                        bottom: BorderSide(
+                                      color: Colors.black,
+                                      width: 1.0,
+                                    )),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(4.0),
+                                      child: Text(
+                                        "Apply Now",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .button
+                                            .copyWith(
+                                              color: Colors.black87,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              decorationColor: Colors.black,
+                                            ),
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        promoController.text = "";
+                                        bShowPromoInput = !bShowPromoInput;
+                                      });
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                           bShowPromoInput
                               ? Padding(
-                                  padding: EdgeInsets.only(bottom: 8.0),
+                                  padding:
+                                      EdgeInsets.only(bottom: 8.0, top: 8.0),
                                   child: Row(
                                     children: <Widget>[
                                       Expanded(
                                         child: TextFormField(
+                                          textCapitalization:
+                                              TextCapitalization.characters,
                                           controller: promoController,
                                           keyboardType: TextInputType.text,
                                           decoration: InputDecoration(
@@ -369,9 +641,44 @@ class AddCashState extends State<AddCash> {
                                                 color: Colors.black38,
                                               ),
                                             ),
+                                            suffixIcon: FlatButton(
+                                              child:
+                                                  Text("Apply".toUpperCase()),
+                                              onPressed: () {
+                                                onApplyPromo();
+                                              },
+                                            ),
                                           ),
                                         ),
                                       )
+                                    ],
+                                  ),
+                                )
+                              : Container(),
+                          depositData.chooseAmountData.lastPaymentArray.length >
+                                  0
+                              ? InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      bRepeatTransaction = !bRepeatTransaction;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Checkbox(
+                                        value: bRepeatTransaction,
+                                        onChanged: (bool checked) {
+                                          setState(() {
+                                            bRepeatTransaction = checked;
+                                          });
+                                        },
+                                      ),
+                                      Text("Repeat transaction with " +
+                                          depositData.chooseAmountData
+                                              .lastPaymentArray[0]["label"]
+                                              .toString()
+                                              .toUpperCase()),
                                     ],
                                   ),
                                 )
@@ -386,107 +693,38 @@ class AddCashState extends State<AddCash> {
           ),
         ],
       ),
-      Row(
-        children: <Widget>[
-          Expanded(
-            child: Card(
-              elevation: 3.0,
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Text("Last transaction"),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Container(
-                                width: 150.0,
-                                child: TextFormField(
-                                  controller: repeatAmountController,
-                                  keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("AMOUNT"),
-                                    contentPadding: EdgeInsets.all(8.0),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.black38,
-                                      ),
-                                    ),
-                                    prefix: Padding(
-                                      padding: EdgeInsets.only(top: 4.0),
-                                      child: Text(
-                                        strings.rupee,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              RaisedButton(
-                                onPressed: () {
-                                  initRepeatDeposit();
-                                },
-                                textColor: Colors.white54,
-                                color: Theme.of(context).primaryColorDark,
-                                child: Text("REPEAT"),
-                              )
-                            ],
-                          ),
-                          depositData.chooseAmountData.lastPaymentArray
-                                      .length <=
-                                  0
-                              ? Container()
-                              : Row(
-                                  children: <Widget>[
-                                    Text(
-                                      (depositData.chooseAmountData
-                                          .lastPaymentArray[0]["label"]
-                                          .toString()
-                                          .toUpperCase()),
-                                    ),
-                                  ],
-                                )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      Container(
-        padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 8.0),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Image.network(
-                depositData.bannerImage,
-              ),
-            )
-          ],
-        ),
-      ),
       Padding(
-        padding: EdgeInsets.all(4.0),
+        padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 4.0),
         child: Row(
           children: <Widget>[
             Expanded(
               child: RaisedButton(
                 onPressed: () {
-                  onProceed();
+                  if (bRepeatTransaction) {
+                    onRepeatTransaction();
+                  } else {
+                    onProceed();
+                  }
                 },
                 textColor: Colors.white70,
                 color: Theme.of(context).primaryColorDark,
-                child: Text("PROCEED"),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    amountController.text != ""
+                        ? Text("PROCEED WITH ")
+                        : Text("PROCEED"),
+                    amountController.text != ""
+                        ? Padding(
+                            padding: EdgeInsets.only(left: 4.0),
+                            child: Text(
+                              strings.rupee + amount.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
               ),
             )
           ],
@@ -517,12 +755,15 @@ class AddCashState extends State<AddCash> {
           ),
         );
       } else {
-        validatePromo(amount);
+        final result = await proceedToPaymentMode(amount);
+        if (result != null) {
+          initPayment(json.decode(result), amount);
+        }
       }
     }
   }
 
-  validatePromo(int amount) async {
+  proceedToPaymentMode(int amount) async {
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PAYMENT_MODE));
     req.body = json.encode({
@@ -531,10 +772,28 @@ class AddCashState extends State<AddCash> {
       "promoCode": promoController.text,
       "transaction_amount_in_paise": amount * 100,
     });
-    await HttpManager(http.Client()).sendRequest(req).then(
+    return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
-          initPayment(json.decode(res.body), amount);
+          return res.body;
+        }
+      },
+    );
+  }
+
+  validatePromo(int amount) async {
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VALIDATE_PROMO));
+    req.body = json.encode({
+      "amount": amount,
+      "channelId": AppConfig.of(context).channelId,
+      "promoCode": promoController.text,
+      "transaction_amount_in_paise": amount * 100,
+    });
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          return res.body;
         }
       },
     );
@@ -569,14 +828,14 @@ class AddCashState extends State<AddCash> {
   }
 
   initRepeatDeposit() {
-    if (repeatAmountController.text == "") {
+    if (amountController.text == "") {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text("Please enter amount to repeat deposit"),
         ),
       );
     } else {
-      int amount = int.parse(repeatAmountController.text);
+      int amount = int.parse(amountController.text);
       paySecurely(amount);
     }
   }
@@ -589,7 +848,7 @@ class AddCashState extends State<AddCash> {
     Map<String, dynamic> payload = {
       "channelId": AppConfig.of(context).channelId,
       "orderId": null,
-      "promoCode": "",
+      "promoCode": promoController.text,
       "depositAmount": amount,
       "paymentOption": paymentModeDetails["paymentOption"],
       "paymentType": paymentModeDetails["paymentType"],
@@ -636,8 +895,28 @@ class AddCashState extends State<AddCash> {
     );
 
     if (result != null) {
-      Navigator.of(context).pop(result);
+      Map<String, dynamic> response = json.decode(result);
+      if ((response["authStatus"] as String).toLowerCase() ==
+          "Declined".toLowerCase()) {
+        _showTransactionFailed(response);
+      } else {
+        Navigator.of(context).pop(result);
+      }
     }
+  }
+
+  _showTransactionFailed(Map<String, dynamic> transactionResult) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TransactionFailed(transactionResult, () {
+          Navigator.of(context).pop();
+        }, () {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop(json.encode(transactionResult));
+        });
+      },
+    );
   }
 
   setDepositAmount(int amount) {

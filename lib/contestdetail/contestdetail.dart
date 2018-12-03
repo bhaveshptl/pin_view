@@ -774,59 +774,169 @@ class ContestDetailState extends State<ContestDetail> {
                                         ),
                                       ),
                                     ),
-                                    Container(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(left: 16.0),
-                                        child: RaisedButton(
-                                          onPressed: () {
-                                            if (!bIsContestFull) {
-                                              _onJoinContest(widget.contest);
-                                            }
-                                          },
-                                          color: bIsContestFull
-                                              ? Theme.of(context).disabledColor
-                                              : Theme.of(context)
-                                                  .primaryColorDark,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: 4.0, left: 16.0),
                                           child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: <Widget>[
-                                              _mapContestTeams != null &&
-                                                      _mapContestTeams.length >
-                                                          0
-                                                  ? Icon(
-                                                      Icons.add,
-                                                      color: Colors.white70,
-                                                      size: 20.0,
-                                                    )
-                                                  : Container(),
                                               Padding(
                                                 padding:
-                                                    EdgeInsets.only(right: 2.0),
-                                                child: widget.contest
-                                                            .prizeType ==
-                                                        1
-                                                    ? Image.asset(
-                                                        strings.chips,
-                                                        width: 12.0,
-                                                        height: 12.0,
-                                                        fit: BoxFit.contain,
-                                                      )
-                                                    : Text(
-                                                        strings.rupee,
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white70),
+                                                    EdgeInsets.only(right: 4.0),
+                                                child: Text(
+                                                  "Entry",
+                                                  style: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .caption
+                                                      .copyWith(
+                                                        color: Colors.black87,
                                                       ),
+                                                ),
                                               ),
+                                              widget.contest.prizeType == 1
+                                                  ? Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 2.0),
+                                                      child: Image.asset(
+                                                        strings.chips,
+                                                        width: 10.0,
+                                                        height: 10.0,
+                                                        fit: BoxFit.contain,
+                                                      ))
+                                                  : Text(
+                                                      strings.rupee,
+                                                      style: Theme.of(context)
+                                                          .primaryTextTheme
+                                                          .caption
+                                                          .copyWith(
+                                                            color:
+                                                                Colors.black87,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                    ),
                                               Text(
                                                 widget.contest.entryFee
                                                     .toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white70),
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .caption
+                                                    .copyWith(
+                                                      color: Colors.black87,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ),
+                                        Container(
+                                          child: Tooltip(
+                                            message: "Join contest with ₹" +
+                                                widget.contest.entryFee
+                                                    .toString() +
+                                                " entry fee.",
+                                            child: Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 16.0),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20.0)),
+                                                child: Container(
+                                                  height: 28.0,
+                                                  decoration: BoxDecoration(
+                                                    gradient: LinearGradient(
+                                                      colors: [
+                                                        Theme.of(context)
+                                                            .primaryColor
+                                                            .withAlpha(150),
+                                                        Theme.of(context)
+                                                            .primaryColor
+                                                            .withAlpha(220),
+                                                        Theme.of(context)
+                                                            .primaryColor,
+                                                        Theme.of(context)
+                                                            .primaryColor,
+                                                        Theme.of(context)
+                                                            .primaryColor
+                                                            .withAlpha(220),
+                                                        Theme.of(context)
+                                                            .primaryColor
+                                                            .withAlpha(150),
+                                                      ],
+                                                      begin:
+                                                          Alignment.topCenter,
+                                                      end: Alignment
+                                                          .bottomCenter,
+                                                    ),
+                                                  ),
+                                                  child: RaisedButton(
+                                                    onPressed: () {
+                                                      if (!bIsContestFull) {
+                                                        _onJoinContest(
+                                                            widget.contest);
+                                                      }
+                                                    },
+                                                    color: Colors.transparent,
+                                                    padding:
+                                                        EdgeInsets.all(0.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: <Widget>[
+                                                        _mapContestTeams !=
+                                                                    null &&
+                                                                _mapContestTeams
+                                                                        .length >
+                                                                    0
+                                                            ? Icon(
+                                                                Icons.add,
+                                                                color: Colors
+                                                                    .white70,
+                                                                size: Theme.of(
+                                                                        context)
+                                                                    .primaryTextTheme
+                                                                    .subhead
+                                                                    .fontSize,
+                                                              )
+                                                            : Container(),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: <Widget>[
+                                                            Text(
+                                                              "JOIN",
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white70,
+                                                                fontSize: Theme.of(
+                                                                        context)
+                                                                    .primaryTextTheme
+                                                                    .subhead
+                                                                    .fontSize,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     )
                                   ],
                                 ),
@@ -985,22 +1095,40 @@ class ContestDetailState extends State<ContestDetail> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+                    Container(
+                      padding:
+                          EdgeInsets.only(right: 16.0, left: 16.0, bottom: 4.0),
                       child: Row(
                         children: <Widget>[
                           Expanded(
                             flex: widget.contest.joined,
-                            child: Container(
-                              height: 4.0,
-                              color: Colors.green,
+                            child: ClipRRect(
+                              borderRadius:
+                                  widget.contest.joined == widget.contest.size
+                                      ? BorderRadius.all(Radius.circular(15.0))
+                                      : BorderRadius.only(
+                                          topLeft: Radius.circular(15.0),
+                                          bottomLeft: Radius.circular(15.0),
+                                        ),
+                              child: Container(
+                                height: 3.0,
+                                color: Theme.of(context).primaryColorDark,
+                              ),
                             ),
                           ),
                           Expanded(
                             flex: widget.contest.size - widget.contest.joined,
-                            child: Container(
-                              height: 4.0,
-                              color: Colors.black12,
+                            child: ClipRRect(
+                              borderRadius: widget.contest.joined == 0
+                                  ? BorderRadius.all(Radius.circular(15.0))
+                                  : BorderRadius.only(
+                                      topRight: Radius.circular(15.0),
+                                      bottomRight: Radius.circular(15.0),
+                                    ),
+                              child: Container(
+                                height: 3.0,
+                                color: Colors.black12.withAlpha(10),
+                              ),
                             ),
                           )
                         ],

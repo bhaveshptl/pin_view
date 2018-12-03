@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -35,6 +34,9 @@ class MyContestsState extends State<MyContests>
   int selectedSegment = 0;
   List<League> _leagues = [];
   TabController tabController;
+  bool bShowInnings = false;
+  TabController _sportsController;
+  Map<String, int> _mapSportTypes;
   Map<int, List<MyContestStatusTab>> tabs = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapLiveContest = {};
@@ -45,10 +47,26 @@ class MyContestsState extends State<MyContests>
   @override
   void initState() {
     super.initState();
+    _mapSportTypes = {
+      "CRICKET": 1,
+      "FOOTBALL": 2,
+      "KABADDI": 3,
+    };
+
+    sockets.register(_onWsMsg);
+
     _getMyContests();
     _leagues = widget.leagues;
-    sockets.register(_onWsMsg);
-    tabController = TabController(length: 2, vsync: this);
+    _sportsController =
+        TabController(vsync: this, length: _mapSportTypes.keys.length);
+    _sportsController.addListener(() {
+      setState(() {
+        _sportType = _sportsController.index + 1;
+        widget.onSportChange(_sportType);
+        _getMyContests(checkForPrevSelection: false);
+      });
+      SharedPrefHelper().saveSportsType(_sportType.toString());
+    });
   }
 
   _onWsMsg(onData) {
@@ -124,7 +142,6 @@ class MyContestsState extends State<MyContests>
       if (_contest.id == _data["cId"]) {
         setState(() {
           _contest.joined = _data["iJC"];
-          updateTabs();
         });
       }
     }
@@ -312,6 +329,7 @@ class MyContestsState extends State<MyContests>
       if (_sport != _sportType) {
         setState(() {
           _sportType = _sport;
+          _sportsController.index = _sportType - 1;
         });
       }
     });
@@ -337,77 +355,7 @@ class MyContestsState extends State<MyContests>
       _mapLiveContest = mapLiveContest;
       _mapResultContest = mapResultContest;
       _mapUpcomingContest = mapUpcomingContest;
-      updateTabs();
     });
-  }
-
-  updateTabs() {
-    tabs = {
-      1: [
-        MyContestStatusTab(
-          fantasyType: 1,
-          leagues: _leagues,
-          sportsType: _sportType,
-          scaffoldKey: _scaffoldKey,
-          onContestClick: _onContestClick,
-          mapContestTeams: _mapContestTeams,
-          mapMyContests: _mapUpcomingContest,
-          leagueStatus: LeagueStatus.UPCOMING,
-        ),
-        MyContestStatusTab(
-          fantasyType: 1,
-          leagues: _leagues,
-          sportsType: _sportType,
-          scaffoldKey: _scaffoldKey,
-          mapMyContests: _mapLiveContest,
-          onContestClick: _onContestClick,
-          mapContestTeams: _mapContestTeams,
-          leagueStatus: LeagueStatus.LIVE,
-        ),
-        MyContestStatusTab(
-          fantasyType: 1,
-          leagues: _leagues,
-          sportsType: _sportType,
-          scaffoldKey: _scaffoldKey,
-          onContestClick: _onContestClick,
-          mapMyContests: _mapResultContest,
-          mapContestTeams: _mapContestTeams,
-          leagueStatus: LeagueStatus.COMPLETED,
-        )
-      ],
-      2: [
-        MyContestStatusTab(
-          fantasyType: 2,
-          leagues: _leagues,
-          sportsType: _sportType,
-          scaffoldKey: _scaffoldKey,
-          onContestClick: _onContestClick,
-          mapContestTeams: _mapContestTeams,
-          mapMyContests: _mapUpcomingContest,
-          leagueStatus: LeagueStatus.UPCOMING,
-        ),
-        MyContestStatusTab(
-          fantasyType: 2,
-          leagues: _leagues,
-          sportsType: _sportType,
-          scaffoldKey: _scaffoldKey,
-          mapMyContests: _mapLiveContest,
-          onContestClick: _onContestClick,
-          mapContestTeams: _mapContestTeams,
-          leagueStatus: LeagueStatus.LIVE,
-        ),
-        MyContestStatusTab(
-          fantasyType: 2,
-          leagues: _leagues,
-          sportsType: _sportType,
-          scaffoldKey: _scaffoldKey,
-          onContestClick: _onContestClick,
-          mapMyContests: _mapResultContest,
-          mapContestTeams: _mapContestTeams,
-          leagueStatus: LeagueStatus.COMPLETED,
-        )
-      ]
-    };
   }
 
   _getMyContestMyTeams(Map<String, List<Contest>> _mapMyContests) async {
@@ -436,7 +384,6 @@ class MyContestsState extends State<MyContests>
 
         setState(() {
           _mapContestTeams = _mapContestMyTeams;
-          updateTabs();
         });
       }
     });
@@ -463,7 +410,7 @@ class MyContestsState extends State<MyContests>
     );
   }
 
-  getMyContestTabs(int fantasyType) {
+  getMyContestTabs({int fantasyType, int sportsType}) {
     return Column(
       children: <Widget>[
         Padding(
@@ -489,13 +436,23 @@ class MyContestsState extends State<MyContests>
         ),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 4.0,
-            ),
-            child: tabs[fantasyType] != null
-                ? tabs[fantasyType][selectedSegment]
-                : Container(),
-          ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 4.0,
+              ),
+              child: MyContestStatusTab(
+                leagues: _leagues,
+                sportsType: sportsType,
+                fantasyType: fantasyType,
+                scaffoldKey: _scaffoldKey,
+                onContestClick: _onContestClick,
+                mapContestTeams: _mapContestTeams,
+                mapMyContests: selectedSegment == 0
+                    ? _mapUpcomingContest
+                    : (selectedSegment == 1
+                        ? _mapLiveContest
+                        : _mapResultContest),
+                leagueStatus: selectedSegment + 1,
+              )),
         ),
       ],
     );
@@ -507,84 +464,94 @@ class MyContestsState extends State<MyContests>
         key: _scaffoldKey,
         appBar: AppBar(
           elevation: 0.0,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              DropdownButton(
-                style: TextStyle(
-                    color: Colors.black45,
-                    fontSize:
-                        Theme.of(context).primaryTextTheme.title.fontSize),
-                onChanged: (value) {
-                  setState(() {
-                    _sportType = value;
-
-                    _getMyContests(checkForPrevSelection: false);
-                  });
-                  if (widget.onSportChange != null) {
-                    widget.onSportChange(value);
-                  }
-                },
-                value: _sportType,
-                items: [
-                  DropdownMenuItem(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                      child: Text(strings.get("CRICKET").toUpperCase()),
-                    ),
-                    value: 1,
-                  ),
-                  DropdownMenuItem(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                      child: Text(strings.get("FOOTBALL").toUpperCase()),
-                    ),
-                    value: 2,
-                  ),
-                  DropdownMenuItem(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 24.0),
-                      child: Text(strings.get("KABADDI").toUpperCase()),
-                    ),
-                    value: 3,
-                  )
-                ],
-              ),
-            ],
-          ),
+          title: Text("My Contests"),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(widget.tabBarHeight),
-            child: TabBar(
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white30,
-              controller: tabController,
-              tabs: [
-                Container(
-                  height: widget.tabBarHeight,
-                  child: Tab(
-                    text: "MATCH",
+            child: Container(
+              padding: EdgeInsets.only(left: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  TabBar(
+                    controller: _sportsController,
+                    isScrollable: true,
+                    indicator: UnderlineTabIndicator(),
+                    indicatorSize: TabBarIndicatorSize.label,
+                    tabs: _mapSportTypes.keys.map<Tab>((page) {
+                      return Tab(text: page);
+                    }).toList(),
                   ),
-                ),
-                Container(
-                  height: widget.tabBarHeight,
-                  child: Tab(
-                    text: "INNINGS",
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
         body: TabBarView(
-          controller: tabController,
-          children: <Widget>[
-            Container(
-              child: getMyContestTabs(1),
-            ),
-            Container(
-              child: getMyContestTabs(2),
-            ),
-          ],
+          controller: _sportsController,
+          children: _mapSportTypes.keys.map<Widget>((page) {
+            return bShowInnings
+                ? DefaultTabController(
+                    length: 2,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              blurRadius: 3.0,
+                              spreadRadius: 3.0,
+                              color: Colors.black12,
+                            )
+                          ]),
+                          child: Container(
+                            color: Colors.white,
+                            child: TabBar(
+                              // indicatorColor: Colors.white,
+                              labelColor: Theme.of(context).primaryColor,
+                              indicatorSize: TabBarIndicatorSize.label,
+                              unselectedLabelColor:
+                                  Theme.of(context).primaryColor.withAlpha(100),
+                              tabs: [
+                                Tab(
+                                  text: "MATCH",
+                                ),
+                                Tab(
+                                  text: "INNINGS",
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.only(top: 6.0),
+                            child: TabBarView(
+                              children: <Widget>[
+                                Container(
+                                  child: getMyContestTabs(
+                                    fantasyType: 1,
+                                    sportsType: _mapSportTypes[page],
+                                  ),
+                                ),
+                                Container(
+                                  child: getMyContestTabs(
+                                    fantasyType: 2,
+                                    sportsType: _mapSportTypes[page],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(
+                    child: getMyContestTabs(
+                      fantasyType: 1,
+                      sportsType: _mapSportTypes[page],
+                    ),
+                  );
+          }).toList(),
         ));
   }
 

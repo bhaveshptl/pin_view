@@ -22,12 +22,12 @@ class JoinContestError {
           break;
         case 4:
           _title = strings.get("ALERT");
-          _errorMessage = strings.get("AGE_LESS_MSG_CASH_GAME");
+          _errorMessage = strings.get("AGE_LESS_MSG");
           _bIsBlockedUser = true;
           break;
         case 5:
           _title = strings.get("ALERT");
-          _errorMessage = strings.get("STATE_BLOCKED_MSG_CASH_GAME");
+          _errorMessage = strings.get("STATE_BLOCKED_MSG");
           _bIsBlockedUser = true;
           break;
         case 11:

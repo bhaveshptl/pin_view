@@ -6,6 +6,8 @@ import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
+import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/earncash.dart';
@@ -293,6 +295,31 @@ class AppDrawerState extends State<AppDrawer> {
     });
   }
 
+  _launchAddCash() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddCash(),
+      ),
+    );
+    if (result != null) {
+      await _showTransactionResult(json.decode(result));
+      getUserInfo();
+    }
+  }
+
+  _showTransactionResult(Map<String, dynamic> transactionResult) {
+    if (transactionResult["authStatus"] == "Authorised") {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TransactionSuccess(transactionResult, () {
+            Navigator.of(context).pop();
+          });
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -473,7 +500,9 @@ class AppDrawerState extends State<AppDrawer> {
                                   ),
                                 ),
                                 RaisedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    _launchAddCash();
+                                  },
                                   color: Colors.teal,
                                   child: Text(
                                     strings.get("ADD_CASH").toUpperCase(),

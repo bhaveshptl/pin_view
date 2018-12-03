@@ -127,7 +127,7 @@ preloadData() async {
       isForceUpdate: bIsForceUpdate,
       languages: initData["languages"],
       updateAvailable: bUpdateAvailable,
-      chooseLanguage: bAskToChooseLanguage,
+      chooseLanguage: false,
     );
   }
 
@@ -157,11 +157,8 @@ initFirebaseConfiguration() async {
   );
 
   _firebaseMessaging.subscribeToTopic('news');
-  _firebaseMessaging.subscribeToTopic('channelId_'+channelId+'_news');
-
+  _firebaseMessaging.subscribeToTopic('channelId_' + channelId + '_news');
 }
-
-
 
 ///
 /// Bootstraping APP.
@@ -177,7 +174,7 @@ void main() async {
   var configuredApp = AppConfig(
     channelId: channelId,
     apiBaseUrl: apiBaseUrl,
-    appName: 'Play Fantasy',
+    appName: 'Smart11',
     websocketUrl: websocketUrl,
     child: MaterialApp(
       home: _homePage,

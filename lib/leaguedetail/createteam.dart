@@ -80,7 +80,7 @@ class CreateTeamState extends State<CreateTeam>
     allPlayers.addAll(teamAPlayers);
     allPlayers.addAll(teamBPlayers);
 
-    onSort("NAME");
+    onSort("CREDITS");
 
     tabController =
         TabController(length: _fanTeamRules.styles.length, vsync: this);

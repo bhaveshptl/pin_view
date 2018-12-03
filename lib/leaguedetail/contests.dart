@@ -431,15 +431,17 @@ class ContestsState extends State<Contests> {
 
   void _showPrizeStructure(Contest contest) async {
     List<dynamic> prizeStructure = await _getPrizeStructure(contest);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return PrizeStructure(
-          contest: contest,
-          prizeStructure: prizeStructure,
-        );
-      },
-    );
+    if (prizeStructure != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return PrizeStructure(
+            contest: contest,
+            prizeStructure: prizeStructure,
+          );
+        },
+      );
+    }
   }
 
   _getPrizeStructure(Contest contest) async {
@@ -454,6 +456,8 @@ class ContestsState extends State<Contests> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           return json.decode(res.body);
+        } else {
+          return Future.value(null);
         }
       },
     );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/l1.dart';
 
@@ -363,47 +364,33 @@ class InningDetailsState extends State<InningDetails> {
   }
 
   _launchAddCash() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
-    }
-
-    Navigator.of(context).push(
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AddCash(),
-        fullscreenDialog: true,
       ),
     );
+    if (result != null) {
+      _showTransactionResult(json.decode(result));
+    }
+  }
+
+  _showTransactionResult(Map<String, dynamic> transactionResult) {
+    if (transactionResult["authStatus"] == "Authorised") {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TransactionSuccess(transactionResult, () {
+            Navigator.of(context).pop();
+          });
+        },
+      );
+    }
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) async {
     var result;
     switch (index) {
       case 0:
-        result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => MyTeams(
-                  league: widget.league,
-                  l1Data: inningsData,
-                  myTeams: _myTeams,
-                ),
-          ),
-        );
-        break;
-      case 1:
-        result = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => CreateContest(
-                league: widget.league,
-                l1data: inningsData,
-                myTeams: _myTeams,
-              ),
-        ));
-        break;
-      case 2:
         result = await Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => MyContests(
@@ -413,8 +400,28 @@ class InningDetailsState extends State<InningDetails> {
           ),
         );
         break;
-      case 3:
+      case 1:
         _launchAddCash();
+        break;
+      case 2:
+        result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => CreateContest(
+                league: widget.league,
+                l1data: inningsData,
+                myTeams: _myTeams,
+              ),
+        ));
+        break;
+      case 3:
+        result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => MyTeams(
+                  league: widget.league,
+                  l1Data: inningsData,
+                  myTeams: _myTeams,
+                ),
+          ),
+        );
         break;
     }
     if (result != null) {
