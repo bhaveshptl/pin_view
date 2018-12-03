@@ -23,8 +23,10 @@ String channelId = "9";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
-Map<String, dynamic> initData = {};
+String fcmSubscribeId = 'channelId_' + channelId + '_news'+'_stage';
+//String fcmSubscribeId = 'channelId_' + channelId + '_news'+'_prod';
 
+Map<String, dynamic> initData = {};
 const apiBaseUrl = "https://stg.playfantasy.com";
 const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
 String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
@@ -155,9 +157,8 @@ initFirebaseConfiguration() async {
       print('on launch $message');
     },
   );
-
   _firebaseMessaging.subscribeToTopic('news');
-  _firebaseMessaging.subscribeToTopic('channelId_' + channelId + '_news');
+  _firebaseMessaging.subscribeToTopic(fcmSubscribeId);
 }
 
 ///
