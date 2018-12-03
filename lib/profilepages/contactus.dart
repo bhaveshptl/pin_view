@@ -12,10 +12,11 @@ class ContactUs extends StatefulWidget {
 
 class ContactUsState extends State<ContactUs> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _description = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   String emailId = "";
   bool emailEnabled = false;
   String phoneNumber = "";
@@ -218,6 +219,7 @@ class ContactUsState extends State<ContactUs> {
                                 value: selectedSubCategory,
                                 elevation: 16,
                                 iconSize: 60.0,
+                                
                                 onChanged: (newVal) {
                                   selectedSubCategory = newVal;
                                   this.setState(() {});
