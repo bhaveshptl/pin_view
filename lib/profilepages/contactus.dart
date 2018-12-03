@@ -17,8 +17,9 @@ class ContactUsState extends State<ContactUs> {
   final TextEditingController _description = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String emailId = "";
+  bool emailEnabled = false;
   String phoneNumber = "";
-
+  bool phoneNumberEnabled = true;
   List<dynamic> categoriesData = [];
   List<DropdownMenuItem<String>> categoriesList = [];
   List<DropdownMenuItem<String>> subCategoriesList = [];
@@ -47,9 +48,16 @@ class ContactUsState extends State<ContactUs> {
           setState(() {
             emailId = response['email'];
             phoneNumber = response['mobile'];
+
             categoriesData = response['categories'];
             _emailController.text = emailId;
             _mobileController.text = phoneNumber;
+            if (phoneNumber != null && phoneNumber.length > 0) {
+              phoneNumberEnabled = false;
+            }
+            if (emailId != null && emailId.length > 0) {
+              emailEnabled = true;
+            }
           });
           categoriesList = [];
           for (var i = 0; i < categoriesData.length; i++) {
@@ -169,6 +177,7 @@ class ContactUsState extends State<ContactUs> {
                         Expanded(
                           child: TextFormField(
                             controller: _mobileController,
+                            enabled: phoneNumberEnabled,
                             decoration: InputDecoration(
                               labelText: "Mobile Number",
                             ),
