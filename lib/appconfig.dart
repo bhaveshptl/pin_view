@@ -7,6 +7,7 @@ class AppConfig extends InheritedWidget {
     @required this.channelId,
     @required this.apiBaseUrl,
     @required this.websocketUrl,
+    @required this.staticPageDomain,
     @required Widget child,
   }) : super(child: child);
 
@@ -14,6 +15,7 @@ class AppConfig extends InheritedWidget {
   final String channelId;
   final String apiBaseUrl;
   final String websocketUrl;
+  final String staticPageDomain;
 
   static AppConfig of(BuildContext context) {
     return context.inheritFromWidgetOfExactType(AppConfig);

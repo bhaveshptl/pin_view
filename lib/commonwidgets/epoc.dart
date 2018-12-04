@@ -54,11 +54,11 @@ class EPOCState extends State<EPOC> {
     return Text(
       leftDays.toString() +
           "d : " +
-          leftHours.toString() +
+          (leftHours >= 0 ? leftHours.toString() : "0") +
           "h : " +
-          leftMinutes.toString() +
+          (leftMinutes >= 0 ? leftMinutes.toString() : "0") +
           "m : " +
-          leftSeconds.toString() +
+          (leftSeconds >= 0 ? leftSeconds.toString() : "0") +
           "s",
       style: TextStyle(
         color: Colors.black45,

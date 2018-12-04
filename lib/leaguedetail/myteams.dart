@@ -341,7 +341,7 @@ class MyTeamsState extends State<MyTeams> {
                                       ('images/' +
                                               style.label +
                                               " " +
-                                              player.sportsId.toString() + "-blue"
+                                              player.sportsId.toString() + "-black"
                                               ".png")
                                           .toLowerCase()
                                           .replaceAll(" ", "-"),

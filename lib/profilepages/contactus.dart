@@ -12,22 +12,23 @@ class ContactUs extends StatefulWidget {
 
 class ContactUsState extends State<ContactUs> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final TextEditingController _description = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
-  final TextEditingController _description = TextEditingController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String emailId = "";
   bool emailEnabled = false;
-  String phoneNumber = "";
+  bool showSubCategory = false;
   bool phoneNumberEnabled = true;
   List<dynamic> categoriesData = [];
   List<DropdownMenuItem<String>> categoriesList = [];
   List<DropdownMenuItem<String>> subCategoriesList = [];
-  String selectedCategorie = null;
-  String selectedCategorieIndex = null;
-  String selectedSubCategory = null;
-  bool showSubCategory = false;
+
+  String emailId = "";
+  String phoneNumber = "";
+  String selectedCategorie;
+  String selectedSubCategory;
+  String selectedCategorieIndex;
 
   @override
   void initState() {
@@ -108,6 +109,7 @@ class ContactUsState extends State<ContactUs> {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         _showMessage(
             "Your support request has been submitted successfully. We will get back to you soon.");
+            Navigator.of(context).pop();
       } else {
         _showMessage("Unable to process request. Please try again...!");
       }
@@ -219,7 +221,6 @@ class ContactUsState extends State<ContactUs> {
                                 value: selectedSubCategory,
                                 elevation: 16,
                                 iconSize: 60.0,
-                                
                                 onChanged: (newVal) {
                                   selectedSubCategory = newVal;
                                   this.setState(() {});

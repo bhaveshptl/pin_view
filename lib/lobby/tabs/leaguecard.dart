@@ -131,10 +131,16 @@ class LeagueCard extends StatelessWidget {
                                                 color: Colors.black54,
                                               ),
                                             ),
-                                            EPOC(
-                                              timeInMiliseconds:
-                                                  _league.matchStartTime,
-                                            ),
+                                            _league.status ==
+                                                    LeagueStatus.UPCOMING
+                                                ? EPOC(
+                                                    timeInMiliseconds:
+                                                        _league.matchStartTime,
+                                                  )
+                                                : (_league.status ==
+                                                        LeagueStatus.LIVE
+                                                    ? Text("LIVE")
+                                                    : Text("COMPLETED")),
                                           ],
                                         ),
                                       ],

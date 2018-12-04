@@ -56,7 +56,7 @@ class InitPayState extends State<InitPay> {
 
   @override
   void dispose() {
-    flutterWebviewPlugin.dispose();
+    flutterWebviewPlugin.close();
     super.dispose();
   }
 

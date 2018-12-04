@@ -11,8 +11,9 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 class AnalyticsManager {
   static String _url;
   static Timer _timer;
-  static int _duration;
   static Visit _visit;
+  static int _duration;
+  static bool isEnabled;
   static DateTime _lastBatchUploadTime;
   static List<Event> analyticsEvents = [];
   static DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -66,16 +67,18 @@ class AnalyticsManager {
   }
 
   statAnalytics() {
-    _timer = Timer(Duration(seconds: _duration), () async {
-      if (_lastBatchUploadTime == null ||
-          _lastBatchUploadTime.difference(DateTime.now()) >
-              Duration(minutes: 30)) {
-        final result = await uploadEventBatch();
-      } else {
-        uploadEventBatch();
-      }
-      AnalyticsManager().statAnalytics();
-    });
+    if (isEnabled) {
+      _timer = Timer(Duration(seconds: _duration), () async {
+        if (_lastBatchUploadTime == null ||
+            _lastBatchUploadTime.difference(DateTime.now()) >
+                Duration(minutes: 30)) {
+          final result = await uploadEventBatch();
+        } else {
+          uploadEventBatch();
+        }
+        AnalyticsManager().statAnalytics();
+      });
+    }
   }
 
   Future<bool> uploadEventBatch() async {

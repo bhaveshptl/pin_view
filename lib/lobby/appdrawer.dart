@@ -109,13 +109,15 @@ class AppDrawerState extends State<AppDrawer> {
         break;
       case "SCORING":
         title = "SCORING SYSTEM";
-        url = "https://www.playfantasy.com/assets/help.html?cache=" +
+        url = AppConfig.of(context).staticPageDomain +
+            "assets/help.html?cache=" +
             DateTime.now().millisecondsSinceEpoch.toString() +
             "#ScoringSystem";
         break;
       case "HELP":
         title = "HELP";
-        url = "https://www.playfantasy.com/assets/help.html?cache=" +
+        url = AppConfig.of(context).staticPageDomain +
+            "assets/help.html?cache=" +
             DateTime.now().millisecondsSinceEpoch.toString();
         break;
       case "FORUM":
@@ -130,17 +132,20 @@ class AppDrawerState extends State<AppDrawer> {
         break;
       case "ABOUT_US":
         title = "ABOUT US";
-        url = "https://www.playfantasy.com/assets/aboutus.html?cache=" +
+        url = AppConfig.of(context).staticPageDomain +
+            "assets/aboutus.html?cache=" +
             DateTime.now().millisecondsSinceEpoch.toString();
         break;
       case "T&C":
         title = "TERMS AND CONDITIONS";
-        url = "https://www.playfantasy.com/assets/terms.html?cache=" +
+        url = AppConfig.of(context).staticPageDomain +
+            "assets/terms.html?cache=" +
             DateTime.now().millisecondsSinceEpoch.toString();
         break;
       case "PRIVACY":
         title = "PRIVACY POLICY";
-        url = "https://www.playfantasy.com/assets/privacy_policy.html?cache=" +
+        url = AppConfig.of(context).staticPageDomain +
+            "assets/privacy_policy.html?cache=" +
             DateTime.now().millisecondsSinceEpoch.toString();
         break;
     }
@@ -189,10 +194,11 @@ class AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  _showContactUsPage(){
-     Navigator.of(context).push(
+  _showContactUsPage() {
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ContactUs(),
+        fullscreenDialog: true,
       ),
     );
   }
@@ -680,13 +686,15 @@ class AppDrawerState extends State<AppDrawer> {
                       ],
                     ),
                   ),
-                  ListTile(
-                    title: Text('Become A Partner'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showPartnerPage();
-                    },
-                  ),
+                  AppConfig.of(context).channelId == '9'
+                      ? Container()
+                      : ListTile(
+                          title: Text('Become A Partner'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showPartnerPage();
+                          },
+                        ),
                   Divider(height: 2.0),
                   ListTile(
                     title: Text('Check For Update'),

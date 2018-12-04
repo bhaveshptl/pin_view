@@ -261,7 +261,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   @override
   void dispose() {
-    flutterWebviewPlugin.dispose();
+    flutterWebviewPlugin.close();
     super.dispose();
   }
 

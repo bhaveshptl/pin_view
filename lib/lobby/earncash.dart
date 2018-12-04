@@ -67,8 +67,9 @@ class EarnCashState extends State<EarnCash> {
   _shareNow() {
     String inviteMsg =
         "I'm having super fun playing Fantasy sports daily. Join me at PLAY FANTASY and win cash prizes in every match. Take this bonus of " +
+            strings.rupee +
             refBAmount.toString() +
-            "and join me at PLAY FANTASY. " +
+            " and join me at PLAY FANTASY. " +
             "Click " +
             inviteUrl +
             " to download PLAY FANTASY app and use my code " +
@@ -92,7 +93,7 @@ class EarnCashState extends State<EarnCash> {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    strings.get("EARN_RS") + refBAmount.toString(),
+                    strings.get("EARN_RS") + refAAmount.toString(),
                     style: TextStyle(
                       fontSize:
                           Theme.of(context).primaryTextTheme.display1.fontSize,

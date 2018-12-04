@@ -323,54 +323,78 @@ class ContestsState extends State<Contests> {
     );
   }
 
-  onJoinContest(Contest contest) async {
-    bShowJoinContest = false;
-    if (_myTeams.length > 0) {
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinContest(
-            l1Data: _l1Data,
-            contest: contest,
-            myTeams: _myTeams,
-            onCreateTeam: _onCreateTeam,
-            onError: onJoinContestError,
-          );
-        },
-      );
-
-      if (result != null) {
-        widget.scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(strings.get("ALERT").toUpperCase()),
-            content: Text(
-              strings.get("CREATE_TEAM_WARNING"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  strings.get("CANCEL").toUpperCase(),
-                ),
+  squadStatus() {
+    if (widget.l1Data.league.rounds[0].matches[0].squad == 0) {
+      widget.scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Row(
+            children: <Widget>[
+              Expanded(
+                child:
+                    Text("Squad is not yet announced. Please try again later."),
               ),
-              FlatButton(
-                onPressed: () {
-                  _onCreateTeam(context, contest);
-                },
-                child: Text(strings.get("CREATE").toUpperCase()),
-              )
             ],
-          );
-        },
+          ),
+          duration: Duration(
+            seconds: 3,
+          ),
+        ),
       );
+      return false;
+    }
+    return true;
+  }
+
+  onJoinContest(Contest contest) async {
+    if (squadStatus()) {
+      bShowJoinContest = false;
+      if (_myTeams.length > 0) {
+        final result = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return JoinContest(
+              l1Data: _l1Data,
+              contest: contest,
+              myTeams: _myTeams,
+              onCreateTeam: _onCreateTeam,
+              onError: onJoinContestError,
+            );
+          },
+        );
+
+        if (result != null) {
+          widget.scaffoldKey.currentState
+              .showSnackBar(SnackBar(content: Text("$result")));
+        }
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(strings.get("ALERT").toUpperCase()),
+              content: Text(
+                strings.get("CREATE_TEAM_WARNING"),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    strings.get("CANCEL").toUpperCase(),
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    _onCreateTeam(context, contest);
+                  },
+                  child: Text(strings.get("CREATE").toUpperCase()),
+                )
+              ],
+            );
+          },
+        );
+      }
     }
   }
 

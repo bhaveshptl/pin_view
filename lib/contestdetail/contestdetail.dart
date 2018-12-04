@@ -52,6 +52,7 @@ class ContestDetailState extends State<ContestDetail> {
   String _downloadTeamURL;
   final int rowsPerPage = 10;
   TeamsDataSource _teamsDataSource;
+  bool bDownloadTeamEnabled = false;
   List<MyTeam> _mapContestTeams = [];
   Map<String, dynamic> l1UpdatePackate = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -252,54 +253,56 @@ class ContestDetailState extends State<ContestDetail> {
   }
 
   _onJoinContest(Contest contest) async {
-    bShowJoinContest = false;
-    if (_myTeams != null && _myTeams.length > 0) {
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinContest(
-            sportsType: _sportType,
-            contest: contest,
-            myTeams: _myTeams,
-            onCreateTeam: _onCreateTeam,
-            l1Data: _l1Data,
-            onError: _onJoinContestError,
-          );
-        },
-      );
+    if (squadStatus()) {
+      bShowJoinContest = false;
+      if (_myTeams != null && _myTeams.length > 0) {
+        final result = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return JoinContest(
+              sportsType: _sportType,
+              contest: contest,
+              myTeams: _myTeams,
+              onCreateTeam: _onCreateTeam,
+              l1Data: _l1Data,
+              onError: _onJoinContestError,
+            );
+          },
+        );
 
-      if (result != null) {
-        _scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(strings.get("ALERT").toUpperCase()),
-            content: Text(
-              strings.get("CREATE_TEAM_WARNING"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  strings.get("CANCEL").toUpperCase(),
-                ),
+        if (result != null) {
+          _scaffoldKey.currentState
+              .showSnackBar(SnackBar(content: Text("$result")));
+        }
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(strings.get("ALERT").toUpperCase()),
+              content: Text(
+                strings.get("CREATE_TEAM_WARNING"),
               ),
-              FlatButton(
-                onPressed: () {
-                  _onCreateTeam(context, contest);
-                },
-                child: Text(strings.get("CREATE").toUpperCase()),
-              )
-            ],
-          );
-        },
-      );
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    strings.get("CANCEL").toUpperCase(),
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    _onCreateTeam(context, contest);
+                  },
+                  child: Text(strings.get("CREATE").toUpperCase()),
+                )
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -562,6 +565,28 @@ class ContestDetailState extends State<ContestDetail> {
         }
       },
     );
+  }
+
+  squadStatus() {
+    if (widget.l1Data.league.rounds[0].matches[0].squad == 0) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Row(
+            children: <Widget>[
+              Expanded(
+                child:
+                    Text("Squad is not yet announced. Please try again later."),
+              ),
+            ],
+          ),
+          duration: Duration(
+            seconds: 3,
+          ),
+        ),
+      );
+      return false;
+    }
+    return true;
   }
 
   // onDownload() async {
@@ -1175,12 +1200,14 @@ class ContestDetailState extends State<ContestDetail> {
                                 Text(
                                   strings.get("LEADERBOARD"),
                                 ),
-                                IconButton(
-                                  icon: Icon(Icons.file_download),
-                                  onPressed: () {
-                                    // onDownload();
-                                  },
-                                )
+                                bDownloadTeamEnabled
+                                    ? IconButton(
+                                        icon: Icon(Icons.file_download),
+                                        onPressed: () {
+                                          // onDownload();
+                                        },
+                                      )
+                                    : Container(),
                               ],
                             ),
                             rowsPerPage: (widget.contest.joined +

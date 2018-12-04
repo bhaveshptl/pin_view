@@ -136,12 +136,13 @@ class WithdrawState extends State<Withdraw> {
                 case -1:
                   _setAddressList();
                   Map<String, dynamic> response = json.decode(res.body);
+                  _setVerificationStatus(Withhdraw.fromJson(response["data"]));
                   setState(() {
                     _withdrawData = Withhdraw.fromJson(response["data"]);
                     _bIsMobileVerified = _withdrawData.mobileVerification;
-                    _bIsKYCVerified =
-                        _withdrawData.panVerification == "VERIFIED" &&
-                            _withdrawData.addressVerification == "VERIFIED";
+                    // _bIsKYCVerified =
+                    //     _withdrawData.panVerification == "VERIFIED" &&
+                    //         _withdrawData.addressVerification == "VERIFIED";
                     initFormInputs();
                   });
                   break;
@@ -236,7 +237,7 @@ class WithdrawState extends State<Withdraw> {
       _messageList.add(_getMessageWidget(AddressVerificationMessages.VERIFIED));
     }
 
-    if (kycStatus == "VERIFIED") {
+    if (kycStatus == "VERIFIED" && addressStatus == "VERIFIED") {
       _messageList.add(_getMessageWidget(DocVerificationMessages.VERIFIED));
     }
   }
@@ -1043,7 +1044,8 @@ class WithdrawState extends State<Withdraw> {
                                                                       .rupee +
                                                                   _withdrawData
                                                                       .paytmMinWithdraw
-                                                                      .toString();
+                                                                      .toStringAsFixed(
+                                                                          2);
                                                             } else if (amount >
                                                                 _withdrawData
                                                                     .withdrawableAmount) {
@@ -1052,8 +1054,8 @@ class WithdrawState extends State<Withdraw> {
                                                                       .rupee +
                                                                   _withdrawData
                                                                       .withdrawableAmount
-                                                                      .toString() +
-                                                                  ".";
+                                                                      .toStringAsFixed(
+                                                                          2);
                                                             } else if (amount >
                                                                 _withdrawData
                                                                     .paytmMaxWithdraw) {
@@ -1061,8 +1063,9 @@ class WithdrawState extends State<Withdraw> {
                                                                   strings
                                                                       .rupee +
                                                                   _withdrawData
-                                                                      .maxWithdraw
-                                                                      .toString();
+                                                                      .paytmMaxWithdraw
+                                                                      .toStringAsFixed(
+                                                                          2);
                                                             }
                                                           }
                                                         },
@@ -1332,7 +1335,7 @@ class WithdrawState extends State<Withdraw> {
                                                                 } else if (amount >
                                                                     _withdrawData
                                                                         .withdrawableAmount) {
-                                                                  return "You can not withdraw more than available withdraw amount(" +
+                                                                  return "You can not withdraw more than " +
                                                                       _withdrawData
                                                                           .withdrawableAmount
                                                                           .toString() +

@@ -108,6 +108,7 @@ class MyProfileState extends State<MyProfile> {
   }
 
   _showChangeTeamNameDialog() {
+    final _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -129,23 +130,26 @@ class MyProfileState extends State<MyProfile> {
                 padding: EdgeInsets.only(top: 16.0),
                 child: Row(
                   children: <Widget>[
-                    Expanded(
-                      child: TextFormField(
-                        controller: _teamNameController,
-                        decoration: InputDecoration(
-                          labelText: "Team name",
-                          contentPadding: EdgeInsets.all(8.0),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black38,
+                    Form(
+                      key: _formKey,
+                      child: Expanded(
+                        child: TextFormField(
+                          controller: _teamNameController,
+                          decoration: InputDecoration(
+                            labelText: "Team name",
+                            contentPadding: EdgeInsets.all(8.0),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
                             ),
                           ),
+                          validator: (value) {
+                            if (value.isEmpty || value.length < 6) {
+                              return "Minimum 6 characters required.";
+                            }
+                          },
                         ),
-                        validator: (value) {
-                          if (value.isEmpty) {
-                            return "Please enter team name.";
-                          }
-                        },
                       ),
                     )
                   ],
@@ -163,7 +167,9 @@ class MyProfileState extends State<MyProfile> {
             FlatButton(
               child: Text('CHANGE'),
               onPressed: () {
-                _changeTeamName();
+                if (_formKey.currentState.validate()) {
+                  _changeTeamName();
+                }
               },
             ),
           ],
@@ -188,6 +194,7 @@ class MyProfileState extends State<MyProfile> {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         _showMessage("Team name changed successfully.");
         _userProfile.isUserNameChangeAllowed = false;
+        _userProfile.teamName = _teamNameController.text;
         Navigator.of(context).pop();
       } else if (res.statusCode >= 400 && res.statusCode <= 499) {
         Map<String, dynamic> response = json.decode(res.body);
@@ -469,24 +476,26 @@ class MyProfileState extends State<MyProfile> {
 
   _updateProfileObject(Map<String, dynamic> response) {
     Map<String, dynamic> addressReaponse = response["addressResponse"];
-    _userProfile.fname = addressReaponse["first_name"] == null
-        ? _userProfile.fname
-        : addressReaponse["first_name"];
-    _userProfile.lname = addressReaponse["last_name"] == null
-        ? _userProfile.lname
-        : addressReaponse["last_name"];
-    _userProfile.lname = addressReaponse["city"] == null
-        ? _userProfile.city
-        : addressReaponse["city"];
-    _userProfile.lname = addressReaponse["pincode"] == null
-        ? _userProfile.pincode
-        : addressReaponse["pincode"];
-    _userProfile.lname = addressReaponse["add_line_1"] == null
-        ? _userProfile.address1
-        : addressReaponse["add_line_1"];
-    _userProfile.lname = addressReaponse["add_line_2"] == null
-        ? _userProfile.address2
-        : addressReaponse["add_line_2"];
+    setState(() {
+      _userProfile.fname = addressReaponse["first_name"] == null
+          ? _userProfile.fname
+          : addressReaponse["first_name"];
+      _userProfile.lname = addressReaponse["last_name"] == null
+          ? _userProfile.lname
+          : addressReaponse["last_name"];
+      _userProfile.city = addressReaponse["city"] == null
+          ? _userProfile.city
+          : addressReaponse["city"];
+      _userProfile.pincode = addressReaponse["pincode"] == null
+          ? _userProfile.pincode
+          : addressReaponse["pincode"];
+      _userProfile.address1 = addressReaponse["add_line_1"] == null
+          ? _userProfile.address1
+          : addressReaponse["add_line_1"];
+      _userProfile.address2 = addressReaponse["add_line_2"] == null
+          ? _userProfile.address2
+          : addressReaponse["add_line_2"];
+    });
   }
 
   @override

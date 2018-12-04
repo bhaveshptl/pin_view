@@ -339,6 +339,73 @@ class LeagueDetailState extends State<LeagueDetail>
               _modifiedleague["allowedContestTypes"];
         });
       }
+      if (_modifiedleague["lstAdded"] != null) {
+        (_modifiedleague["lstAdded"] as List).forEach((round) {
+          l1Data.league.rounds.add(round);
+        });
+      }
+
+      if (_modifiedleague["lstRemoved"] != null) {
+        (_modifiedleague["lstRemoved"] as List).forEach((round) {
+          l1Data.league.rounds.forEach((origRound) {
+            l1Data.league.rounds.remove(origRound);
+          });
+        });
+      }
+
+      if (_modifiedleague["lstModified"] != null) {
+        _modifiedleague["lstModified"].forEach((round) {
+          l1Data.league.rounds.forEach((Round origRound) {
+            if (round["id"] == origRound.id) {
+              if (round["lstAdded"].length > 0) {
+                round["lstAdded"].forEach((MatchInfo match) {
+                  origRound.matches.add(match);
+                });
+              }
+
+              if (round["lstRemoved"].length > 0) {
+                round["lstRemoved"].forEach((match) {
+                  origRound.matches.forEach((MatchInfo origMatch) {
+                    if (origMatch.id == match["id"]) {
+                      origRound.matches.remove(origMatch);
+                    }
+                  });
+                });
+              }
+
+              if (round["lstModified"].length > 0) {
+                round["lstModified"].forEach((match) {
+                  origRound.matches.forEach((MatchInfo origMatch) {
+                    if (origMatch.id == match["id"]) {
+                      if (match["sportDesc"] != null) {
+                        origMatch.sportDesc = match["sportDesc"];
+                      }
+                      if (match["name"] != null) {
+                        origMatch.name = match["name"];
+                      }
+                      if (match["startTime"] != null) {
+                        origMatch.startTime = match["startTime"];
+                      }
+                      if (match["endTime"] != null) {
+                        origMatch.endTime = match["endTime"];
+                      }
+                      if (match["status"] != null) {
+                        origMatch.status = match["status"];
+                      }
+                      if (match["sportType"] != null) {
+                        origMatch.sportType = match["sportType"];
+                      }
+                      if (match["squad"] == 0 || match["squad"] == 1) {
+                        origMatch.squad = match["squad"];
+                      }
+                    }
+                  });
+                });
+              }
+            }
+          });
+        });
+      }
     }
   }
 
@@ -457,33 +524,62 @@ class LeagueDetailState extends State<LeagueDetail>
         _launchAddCash();
         break;
       case 2:
-        result = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => CreateContest(
-                league: widget.league,
-                l1data: l1Data,
-                myTeams: _myTeams,
-              ),
-        ));
-        break;
-      case 3:
-        result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => MyTeams(
+        if (squadStatus()) {
+          result = await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CreateContest(
                   league: widget.league,
-                  l1Data: l1Data,
+                  l1data: l1Data,
                   myTeams: _myTeams,
                 ),
-          ),
-        );
+          ));
+        }
+        break;
+      case 3:
+        if (squadStatus()) {
+          result = await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => MyTeams(
+                    league: widget.league,
+                    l1Data: l1Data,
+                    myTeams: _myTeams,
+                  ),
+            ),
+          );
+        }
         break;
     }
     if (result != null) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text(result),
+          duration: Duration(
+            seconds: 3,
+          ),
         ),
       );
     }
+  }
+
+  squadStatus() {
+    if (l1Data.league.rounds[0].matches[0].squad == 0) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Row(
+            children: <Widget>[
+              Expanded(
+                child:
+                    Text("Squad is not yet announced. Please try again later."),
+              ),
+            ],
+          ),
+          duration: Duration(
+            seconds: 3,
+          ),
+        ),
+      );
+      return false;
+    }
+    return true;
   }
 
   _showFilterDialog() {

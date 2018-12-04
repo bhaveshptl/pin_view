@@ -10,6 +10,13 @@ packages:
       url: "git://github.com/bhaveshptl/plugins.git"
     source: git
     version: "0.2.1"
+  animated_text_kit:
+    dependency: "direct main"
+    description:
+      name: animated_text_kit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   async:
     dependency: transitive
     description:
@@ -131,7 +138,7 @@ packages:
       name: google_sign_in
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.2.1"
+    version: "3.2.4"
   http:
     dependency: "direct main"
     description:
@@ -309,4 +316,4 @@ packages:
     version: "1.0.9"
 sdks:
   dart: ">=2.0.0 <3.0.0"
-  flutter: ">=0.1.4 <2.0.0"
+  flutter: ">=0.3.0 <2.0.0"

@@ -97,7 +97,9 @@ class AddCashState extends State<AddCash> {
                     : (depositData.chooseAmountData.lastPaymentArray[0]
                             ["amount"])
                         .toString();
-            bonusInfo = depositData.chooseAmountData.bonusArray[0];
+            bonusInfo = depositData.chooseAmountData.bonusArray != null
+                ? depositData.chooseAmountData.bonusArray[0]
+                : null;
           });
         } else if (res.statusCode >= 400 && res.statusCode <= 499) {
           JoinContestError error =
@@ -948,7 +950,7 @@ class AddCashState extends State<AddCash> {
   @override
   void dispose() {
     if (flutterWebviewPlugin != null) {
-      flutterWebviewPlugin.dispose();
+      flutterWebviewPlugin.close();
     }
     super.dispose();
   }

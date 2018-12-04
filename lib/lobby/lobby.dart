@@ -94,7 +94,9 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     await futureSportType.then((value) {
       if (value != null) {
         int _sport = int.parse(value == null ? "1" : value);
-        _onSportSelectionChaged(_sport);
+        Timer(Duration(seconds: 1), () {
+          _onSportSelectionChaged(_sport);
+        });
       } else {
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }

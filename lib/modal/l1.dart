@@ -50,11 +50,13 @@ class LeagueDetails {
 }
 
 class Round {
+  int id;
   List<MatchInfo> matches;
-  Round({this.matches});
+  Round({this.matches, this.id});
 
   factory Round.fromJson(Map<String, dynamic> json) {
     return Round(
+      id: json["id"],
       matches:
           (json["matches"] as List).map((i) => MatchInfo.fromJson(i)).toList(),
     );
@@ -62,22 +64,24 @@ class Round {
 }
 
 class MatchInfo {
-  final String sportDesc;
-  final Series series;
-  final Team teamA;
-  final Team teamB;
-  final int id;
-  final String name;
-  final int startTime;
-  final int endTime;
-  final int status;
-  final int sportType;
+  String sportDesc;
+  Series series;
+  Team teamA;
+  Team teamB;
+  int id;
+  String name;
+  int squad;
+  int startTime;
+  int endTime;
+  int status;
+  int sportType;
   MatchInfo({
     this.sportDesc,
     this.series,
     this.teamA,
     this.teamB,
     this.id,
+    this.squad,
     this.name,
     this.startTime,
     this.endTime,
@@ -93,6 +97,7 @@ class MatchInfo {
       teamB: Team.fromJson(json["teamB"]),
       id: json["id"],
       name: json["name"],
+      squad: json["squad"],
       startTime: json["startTime"],
       endTime: json["endTime"],
       status: json["status"],

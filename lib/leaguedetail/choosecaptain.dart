@@ -240,7 +240,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                                     " " +
                                                     _player.sportsId
                                                         .toString() +
-                                                    "-blue" +
+                                                    "-black" +
                                                     ".png")
                                                 .toLowerCase()
                                                 .replaceAll(" ", "-"),

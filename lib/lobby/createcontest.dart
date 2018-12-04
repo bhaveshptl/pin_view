@@ -515,6 +515,12 @@ class CreateContestState extends State<CreateContest> {
                     leading: TextFormField(
                       decoration: InputDecoration(
                         labelText: strings.get("CONTEST_NAME"),
+                        contentPadding: EdgeInsets.all(8.0),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black38,
+                          ),
+                        ),
                       ),
                       controller: _nameController,
                       textInputAction: TextInputAction.next,
@@ -553,6 +559,12 @@ class CreateContestState extends State<CreateContest> {
                           padding: const EdgeInsets.only(left: 2.0, right: 4.0),
                           child: Text(strings.rupee),
                         ),
+                        contentPadding: EdgeInsets.all(8.0),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black38,
+                          ),
+                        ),
                       ),
                       controller: _entryFeeController,
                       validator: (value) {
@@ -571,28 +583,35 @@ class CreateContestState extends State<CreateContest> {
                     ),
                   ),
                   ListTile(
-                    leading: TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: strings.get("PARTICIPANTS"),
-                        hintText: '2-100',
-                      ),
-                      controller: _participantsController,
-                      validator: (value) {
-                        if (isNumeric(value)) {
-                          final int noOfParticipants = int.parse(value);
-                          if (value.isEmpty ||
-                              noOfParticipants <= 1 ||
-                              noOfParticipants > 100) {
-                            return strings.get("PARTICIPANTS_LIMIT");
-                          } else if (_entryFee > _totalPrize) {
-                            return strings.get("HIGHER_ENTRY_FEE");
+                    leading: Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: strings.get("PARTICIPANTS"),
+                          hintText: '2-100',
+                          contentPadding: EdgeInsets.all(8.0),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.black38,
+                            ),
+                          ),
+                        ),
+                        controller: _participantsController,
+                        validator: (value) {
+                          if (isNumeric(value)) {
+                            final int noOfParticipants = int.parse(value);
+                            if (value.isEmpty ||
+                                noOfParticipants <= 1 ||
+                                noOfParticipants > 100) {
+                              return strings.get("PARTICIPANTS_LIMIT");
+                            }
+                          } else {
+                            return strings.get("PARTICIPANTS_NUMBER_ERROR");
                           }
-                        } else {
-                          return strings.get("PARTICIPANTS_NUMBER_ERROR");
-                        }
-                      },
-                      textInputAction: TextInputAction.next,
+                        },
+                        textInputAction: TextInputAction.next,
+                      ),
                     ),
                   ),
                   ListTile(
