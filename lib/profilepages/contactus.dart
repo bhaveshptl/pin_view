@@ -107,10 +107,9 @@ class ContactUsState extends State<ContactUs> {
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
-         Navigator.of(context).pop();
+        //  Navigator.of(context).pop();
         _showDialog(
             "Your support request has been submitted successfully. We will get back to you soon.");
-             
       } else {
         _showDialog("Unable to process request. Please try again...!");
       }
@@ -131,7 +130,8 @@ class ContactUsState extends State<ContactUs> {
             new FlatButton(
               child: new Text("Close"),
               onPressed: () {
-               Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
             ),
           ],
