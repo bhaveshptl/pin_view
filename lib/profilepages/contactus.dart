@@ -107,13 +107,37 @@ class ContactUsState extends State<ContactUs> {
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode < 300) {
-        _showMessage(
+         Navigator.of(context).pop();
+        _showDialog(
             "Your support request has been submitted successfully. We will get back to you soon.");
-            Navigator.of(context).pop();
+             
       } else {
-        _showMessage("Unable to process request. Please try again...!");
+        _showDialog("Unable to process request. Please try again...!");
       }
     });
+  }
+
+  void _showDialog(msg) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Alert"),
+          content: new Text(msg),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+               Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _showMessage(String message) {
