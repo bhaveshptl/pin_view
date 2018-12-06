@@ -1,8 +1,10 @@
-import 'dart:async';
 import 'dart:io';
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:package_info/package_info.dart';
 import 'package:playfantasy/lobby/earncash.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -13,6 +15,7 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
@@ -76,15 +79,22 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   }
 
   _getInitData() async {
-    Future<dynamic> futureInitData =
-        SharedPrefHelper().getFromSharedPref(ApiUtil.KEY_INIT_DATA);
-    await futureInitData.then((onValue) {
-      final initData = json.decode(onValue);
-      setState(() {
-        _carousel = (initData["carousel"] as List).map((dynamic value) {
-          return value.toString();
-        }).toList();
-      });
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.INIT_DATA));
+    req.body = json.encode({
+      "version": double.parse(packageInfo.version),
+      "channelId": HttpManager.channelId,
+    });
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        final initData = json.decode(res.body);
+        setState(() {
+          _carousel = (initData["carousel"] as List).map((dynamic value) {
+            return value.toString();
+          }).toList();
+        });
+      }
     });
   }
 

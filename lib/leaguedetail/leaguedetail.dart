@@ -24,10 +24,11 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League league;
+  final int sportType;
   final List<League> leagues;
   final Function onSportChange;
 
-  LeagueDetail(this.league, {this.leagues, this.onSportChange});
+  LeagueDetail(this.league, {this.sportType, this.leagues, this.onSportChange});
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -37,7 +38,7 @@ class LeagueDetailState extends State<LeagueDetail>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   L1 l1Data;
   String cookie;
-  int _sportType = 1;
+  int _sportType;
   List<MyTeam> _myTeams;
   String title = "Match";
   bool bShowInnings = false;
@@ -60,6 +61,7 @@ class LeagueDetailState extends State<LeagueDetail>
   initState() {
     super.initState();
     sockets.register(_onWsMsg);
+    _sportType = widget.sportType;
     _createL1WSObject();
 
     _getMyContests();

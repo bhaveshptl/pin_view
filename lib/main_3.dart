@@ -23,9 +23,12 @@ String channelId = "3";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
-Map<String, dynamic> initData = {};
+String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
+//String fcmSubscribeId = 'channelId_' + channelId + '_news'+'_prod';
 
+Map<String, dynamic> initData = {};
 const apiBaseUrl = "https://stg.playfantasy.com";
+String staticPageDomain = "https://www.playfantasy.com/assets";
 const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
 String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
 
@@ -51,8 +54,10 @@ getInitData() async {
       initData = json.decode(res.body);
       apkUrl = initData["updateUrl"];
       bUpdateAvailable = initData["update"];
-      bIsForceUpdate = initData["isForceUpdate"];
       analyticsUrl = initData["analyticsURL"];
+      bIsForceUpdate = initData["isForceUpdate"];
+      staticPageDomain = initData["staticPageDomain"];
+      AnalyticsManager.isEnabled = initData["analyticsEnabled"];
       SharedPrefHelper()
           .saveToSharedPref(ApiUtil.KEY_INIT_DATA, json.encode(initData));
     }
@@ -127,7 +132,7 @@ preloadData() async {
       isForceUpdate: bIsForceUpdate,
       languages: initData["languages"],
       updateAvailable: bUpdateAvailable,
-      chooseLanguage: bAskToChooseLanguage,
+      chooseLanguage: false,
     );
   }
 
@@ -155,9 +160,8 @@ initFirebaseConfiguration() async {
       print('on launch $message');
     },
   );
-
   _firebaseMessaging.subscribeToTopic('news');
-  _firebaseMessaging.subscribeToTopic('channelId_' + channelId + '_news');
+  _firebaseMessaging.subscribeToTopic(fcmSubscribeId);
 }
 
 ///
@@ -172,10 +176,11 @@ void main() async {
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
+    appName: 'Smart11',
     channelId: channelId,
     apiBaseUrl: apiBaseUrl,
-    appName: 'Play Fantasy',
     websocketUrl: websocketUrl,
+    staticPageUrls: staticPageDomain,
     child: MaterialApp(
       home: _homePage,
       routes: FantasyRoutes().getRoutes(),

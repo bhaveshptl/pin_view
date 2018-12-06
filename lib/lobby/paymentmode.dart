@@ -45,8 +45,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   setPaymentModeList() {
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {
-      selectedPaymentMethod.add(
-          widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]][0]);
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+              .length >
+          0) {
+        selectedPaymentMethod.add(widget.paymentMode["choosePayment"]
+            ["paymentInfo"][type["type"]][0]);
+      }
     });
     lastNameController.text = widget.paymentMode["last_name"] == null
         ? ""
@@ -61,83 +65,87 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     int i = 0;
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
-      int index = i;
-      items.add(
-        ExpansionPanel(
-          isExpanded: _selectedItemIndex == i,
-          headerBuilder: (context, isExpanded) {
-            return FlatButton(
-              onPressed: () {
-                setState(() {
-                  if (_selectedItemIndex == index) {
-                    _selectedItemIndex = -1;
-                  } else {
-                    _selectedItemIndex = index;
-                  }
-                });
-              },
-              padding: EdgeInsets.only(left: 16.0),
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+              .length >
+          0) {
+        int index = i;
+        items.add(
+          ExpansionPanel(
+            isExpanded: _selectedItemIndex == i,
+            headerBuilder: (context, isExpanded) {
+              return FlatButton(
+                onPressed: () {
+                  setState(() {
+                    if (_selectedItemIndex == index) {
+                      _selectedItemIndex = -1;
+                    } else {
+                      _selectedItemIndex = index;
+                    }
+                  });
+                },
+                padding: EdgeInsets.only(left: 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Text(type["label"]),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
+            body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Text(type["label"]),
+                      DropdownButton(
+                        onChanged: (value) {
+                          setState(() {
+                            selectedPaymentMethod[index] = value;
+                          });
+                        },
+                        value: selectedPaymentMethod[i],
+                        items: (widget.paymentMode["choosePayment"]
+                                ["paymentInfo"][type["type"]] as List)
+                            .map((item) {
+                          return DropdownMenuItem(
+                            child: Text(item["info"]["label"]),
+                            value: item,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RaisedButton(
+                          onPressed: () {
+                            if (validateUserInfo()) {
+                              onPaySecurely(
+                                  selectedPaymentMethod[index], type["type"]);
+                            }
+                          },
+                          child: Text(
+                            strings.get("PAY_SECURELY").toUpperCase(),
+                          ),
+                          textColor: Colors.white70,
+                          color: Theme.of(context).primaryColorDark,
+                        ),
+                      )
                     ],
                   )
                 ],
               ),
-            );
-          },
-          body: Padding(
-            padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    DropdownButton(
-                      onChanged: (value) {
-                        setState(() {
-                          selectedPaymentMethod[index] = value;
-                        });
-                      },
-                      value: selectedPaymentMethod[i],
-                      items: (widget.paymentMode["choosePayment"]["paymentInfo"]
-                              [type["type"]] as List)
-                          .map((item) {
-                        return DropdownMenuItem(
-                          child: Text(item["info"]["label"]),
-                          value: item,
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: RaisedButton(
-                        onPressed: () {
-                          if (validateUserInfo()) {
-                            onPaySecurely(
-                                selectedPaymentMethod[index], type["type"]);
-                          }
-                        },
-                        child: Text(
-                          strings.get("PAY_SECURELY").toUpperCase(),
-                        ),
-                        textColor: Colors.white70,
-                        color: Theme.of(context).primaryColorDark,
-                      ),
-                    )
-                  ],
-                )
-              ],
             ),
           ),
-        ),
-      );
-      i++;
+        );
+        i++;
+      }
     });
     return items;
   }

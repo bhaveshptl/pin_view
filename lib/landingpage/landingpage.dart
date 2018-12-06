@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
 
 import 'package:playfantasy/signup/signup.dart';
@@ -297,7 +298,7 @@ class LandingPageState extends State<LandingPage> {
                         child: Image(
                           height: 80.0,
                           fit: BoxFit.scaleDown,
-                          image: new AssetImage("images/fantasy-logo.png"),
+                          image: new AssetImage("images/logo.png"),
                         ),
                       ),
                     ],
@@ -310,7 +311,9 @@ class LandingPageState extends State<LandingPage> {
                           Row(
                             children: <Widget>[
                               Text(
-                                strings.get("WELCOME_TO_FANTASY"),
+                                "Welcome to " +
+                                    AppConfig.of(context).appName +
+                                    ",",
                                 style: TextStyle(
                                     color: Colors.black87,
                                     fontWeight: FontWeight.bold,
@@ -447,7 +450,7 @@ class LandingPageState extends State<LandingPage> {
                                         child: TextFormField(
                                           onSaved: (val) => _authName = val,
                                           decoration: InputDecoration(
-                                            labelText: strings.get("USERNAME"),
+                                            labelText: "Email or Mobile number",
                                             contentPadding: EdgeInsets.all(0.0),
                                             prefixIcon: Icon(
                                               Icons.face,
@@ -611,7 +614,29 @@ class LandingPageState extends State<LandingPage> {
                         },
                       )
                     ],
-                  )
+                  ),
+                  AppConfig.of(context).channelId != '3'
+                      ? Column(
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("powered by"),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Image.asset(
+                                  "images/playfantasy.png",
+                                  height: 64.0,
+                                  width: 64.0,
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Container()
                 ],
               ),
             ),

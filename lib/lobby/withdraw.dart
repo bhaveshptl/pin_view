@@ -44,6 +44,8 @@ class WithdrawState extends State<Withdraw> {
   String _addressVerificationStatus;
   String _selectedAddressDocType = "";
 
+  Map<String, dynamic> _withdrawModes;
+
   final _formKey = new GlobalKey<FormState>();
   final _paytmFormKey = new GlobalKey<FormState>();
   final _bankMobileFormKey = new GlobalKey<FormState>();
@@ -98,6 +100,7 @@ class WithdrawState extends State<Withdraw> {
           setState(() {
             _bIsKYCVerified = true;
             _bIsMobileVerified = true;
+            _withdrawModes = response["withdrawModes"];
             _withdrawData = Withhdraw.fromJson(response);
             initFormInputs();
           });
@@ -132,17 +135,19 @@ class WithdrawState extends State<Withdraw> {
                 case 6:
                   _setAddressList();
                   _setVerificationStatus(Withhdraw.fromJson(response["data"]));
+                  setState(() {
+                    _withdrawData = Withhdraw.fromJson(response["data"]);
+                    _withdrawModes = response["data"]["withdrawModes"];
+                  });
                   break;
                 case -1:
                   _setAddressList();
                   Map<String, dynamic> response = json.decode(res.body);
                   _setVerificationStatus(Withhdraw.fromJson(response["data"]));
                   setState(() {
+                    _withdrawModes = response["data"]["withdrawModes"];
                     _withdrawData = Withhdraw.fromJson(response["data"]);
                     _bIsMobileVerified = _withdrawData.mobileVerification;
-                    // _bIsKYCVerified =
-                    //     _withdrawData.panVerification == "VERIFIED" &&
-                    //         _withdrawData.addressVerification == "VERIFIED";
                     initFormInputs();
                   });
                   break;
@@ -189,8 +194,7 @@ class WithdrawState extends State<Withdraw> {
 
     _panVerificationStatus = _withdrawData.panVerification;
     _addressVerificationStatus = _withdrawData.addressVerification;
-    _bIsKYCVerified = _withdrawData.panVerification == "VERIFIED" &&
-        _withdrawData.addressVerification == "VERIFIED";
+    _bIsKYCVerified = _withdrawData.panVerification == "VERIFIED";
     _setDocVerificationStatus();
   }
 
@@ -854,19 +858,555 @@ class WithdrawState extends State<Withdraw> {
               content: Text("Your withdraw request submitted successfully."),
             ),
           );
-          openWithdrawHistory(context);
+          final result = openWithdrawHistory(context);
+          if (result != null && result == true) {
+            _withdrawData.ifscCode = acIFSCCodeController.text;
+            _withdrawData.accountNumber = accountNumberController.text;
+          }
+        } else {
+          Map<String, dynamic> response = json.decode(res.body);
+          if (response["error"] != null) {
+            _scaffoldKey.currentState.showSnackBar(
+              SnackBar(
+                content: Text(response["error"]["erroMessage"]),
+              ),
+            );
+          }
         }
       },
     );
   }
 
   openWithdrawHistory(BuildContext context) {
-    Navigator.of(context).push(
+    return Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WithdrawHistory(),
         fullscreenDialog: true,
       ),
     );
+  }
+
+  Widget getPaytmWithDrawWidget(BuildContext context) {
+    return SingleChildScrollView(
+      child: Form(
+        key: _paytmFormKey,
+        child: !_bIsMobileVerified
+            ? Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: ExpansionPanelList(
+                            expansionCallback: (int index, bool isExpanded) {
+                              setState(() {
+                                if (_selectedItemIndex == index) {
+                                  _selectedItemIndex = -1;
+                                } else {
+                                  _selectedItemIndex = index;
+                                }
+                              });
+                            },
+                            children: [
+                              getMobileVerificationWidget(context, 4),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            : Column(
+                children: <Widget>[
+                  Container(
+                    color: Colors.black12,
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "Withdrawable balance",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .fontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            strings.rupee +
+                                (_withdrawData.withdrawableAmount
+                                    .toStringAsFixed(2)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Card(
+                      elevation: 3.0,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 8.0),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: paytmAmountController,
+                                    decoration: InputDecoration(
+                                      labelText: "Amount",
+                                      prefix: Text(
+                                        strings.rupee,
+                                        style: TextStyle(color: Colors.black87),
+                                      ),
+                                      hintText: _withdrawData.paytmMinWithdraw
+                                          .toString(),
+                                      contentPadding: EdgeInsets.all(8.0),
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Colors.black38,
+                                        ),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                    ),
+                                    validator: (value) {
+                                      if (value.isEmpty) {
+                                        return "Please enter amount to withdraw";
+                                      } else {
+                                        double amount = double.parse(value);
+                                        if (amount <
+                                            _withdrawData.paytmMinWithdraw) {
+                                          return "You can not withdraw amount less than " +
+                                              strings.rupee +
+                                              _withdrawData.paytmMinWithdraw
+                                                  .toStringAsFixed(2);
+                                        } else if (amount >
+                                            _withdrawData.withdrawableAmount) {
+                                          return "You can not withdraw more than " +
+                                              strings.rupee +
+                                              _withdrawData.withdrawableAmount
+                                                  .toStringAsFixed(2);
+                                        } else if (amount >
+                                            _withdrawData.paytmMaxWithdraw) {
+                                          return "You can not withdraw more than " +
+                                              strings.rupee +
+                                              _withdrawData.paytmMaxWithdraw
+                                                  .toStringAsFixed(2);
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 16.0,
+                                horizontal: 8.0,
+                              ),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: RichText(
+                                      textAlign: TextAlign.justify,
+                                      text: TextSpan(
+                                          style: TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: Theme.of(context)
+                                                .primaryTextTheme
+                                                .caption
+                                                .fontSize,
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                                text:
+                                                    "*Make sure your verified mobile number "),
+                                            TextSpan(
+                                              text: _withdrawData.mobile,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text:
+                                                  " is registered with PAYTM and it's KYC verification is completed on PAYTM.",
+                                            )
+                                          ]),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: RaisedButton(
+                                      onPressed: () {
+                                        if (_paytmFormKey.currentState
+                                            .validate()) {
+                                          makeWithdrawRequest(
+                                            context,
+                                            withdrawType: 4,
+                                            amount: int.parse(
+                                              paytmAmountController.text,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: Text("REQUEST WITHDRAW"),
+                                      textColor: Colors.white70,
+                                      color: Theme.of(context).primaryColorDark,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Text(
+                            "POWERED BY",
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .subhead
+                                  .fontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 32.0,
+                          child: Image.asset("images/paytm.png"),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget getBankWithdrawWidget(BuildContext context) {
+    return SingleChildScrollView(
+      child: !_bIsMobileVerified || !_bIsKYCVerified
+          ? Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: ExpansionPanelList(
+                          expansionCallback: (int index, bool isExpanded) {
+                            setState(() {
+                              if (_selectedItemIndex == index) {
+                                _selectedItemIndex = -1;
+                              } else {
+                                _selectedItemIndex = index;
+                              }
+                            });
+                          },
+                          children: [
+                            getMobileVerificationWidget(context, 1),
+                            getKYCVerificationWidget(context),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          : Padding(
+              padding: EdgeInsets.only(bottom: 16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      color: Colors.black12,
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            "Withdrawable balance",
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .subhead
+                                  .fontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 4.0),
+                            child: Text(
+                              strings.rupee +
+                                  (_withdrawData.withdrawableAmount
+                                      .toStringAsFixed(2)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Card(
+                        elevation: 3.0,
+                        child: Container(
+                          padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: amountController,
+                                        decoration: InputDecoration(
+                                          labelText: "Amount",
+                                          prefix: Text(
+                                            strings.rupee,
+                                            style: TextStyle(
+                                                color: Colors.black87),
+                                          ),
+                                          hintText: _withdrawData.minWithdraw
+                                              .toString(),
+                                          contentPadding: EdgeInsets.all(8.0),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        style: TextStyle(
+                                          color: Colors.black87,
+                                        ),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return "Please enter amount to withdraw";
+                                          } else {
+                                            double amount = double.parse(value);
+                                            if (amount <
+                                                _withdrawData.minWithdraw) {
+                                              return "You can not withdraw amount less than " +
+                                                  strings.rupee +
+                                                  _withdrawData.minWithdraw
+                                                      .toString();
+                                            } else if (amount >
+                                                _withdrawData
+                                                    .withdrawableAmount) {
+                                              return "You can not withdraw more than " +
+                                                  _withdrawData
+                                                      .withdrawableAmount
+                                                      .toString() +
+                                                  ")";
+                                            } else if (amount >
+                                                _withdrawData.maxWithdraw) {
+                                              return "You can not withdraw more than " +
+                                                  strings.rupee +
+                                                  _withdrawData.maxWithdraw
+                                                      .toString();
+                                            }
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        enabled:
+                                            _withdrawData.accountNumber == null,
+                                        controller: accountNameController,
+                                        decoration: InputDecoration(
+                                          labelText: "Account name",
+                                          contentPadding: EdgeInsets.all(8.0),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        style: TextStyle(
+                                          color: Colors.black45,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: accountNumberController,
+                                        enabled:
+                                            _withdrawData.accountNumber == null,
+                                        decoration: InputDecoration(
+                                          labelText: "Account number",
+                                          contentPadding: EdgeInsets.all(8.0),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        style: TextStyle(
+                                          color: Colors.black45,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: acIFSCCodeController,
+                                        enabled: _withdrawData.ifscCode == null,
+                                        decoration: InputDecoration(
+                                          labelText: "IFSC code",
+                                          contentPadding: EdgeInsets.all(8.0),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        style: TextStyle(
+                                          color: Colors.black45,
+                                        ),
+                                        validator: (value) {
+                                          if (RegExp(r'^[A-Za-z]{4}\d{7}$')
+                                                  .allMatches(value)
+                                                  .length ==
+                                              0) {
+                                            return "Please enter valid IFSC code";
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Text(
+                                        "*Account name is auto-populated as per your KYC if it is not matching with the Name of your Bank Account, please send a mail to support@algorintechlabs.com",
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: Theme.of(context)
+                                              .primaryTextTheme
+                                              .caption
+                                              .fontSize,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 8.0),
+                                      child: RaisedButton(
+                                        onPressed: () {
+                                          if (_withdrawData.withdrawCost !=
+                                                  null &&
+                                              _withdrawData.withdrawCost > 0 &&
+                                              _withdrawData
+                                                      .numberOfFreeWithdraw <
+                                                  _withdrawData.totalWithdraw) {
+                                            confirmWithdrawRequest(context);
+                                          } else {
+                                            if (_formKey.currentState
+                                                .validate()) {
+                                              makeWithdrawRequest(
+                                                context,
+                                                withdrawType: 1,
+                                                amount: int.parse(
+                                                  amountController.text,
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                        child: Text("REQUEST WITHDRAW"),
+                                        textColor: Colors.white70,
+                                        color:
+                                            Theme.of(context).primaryColorDark,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget getTabByWithdrawMode(BuildContext context, String mode) {
+    switch (mode) {
+      case "paytm":
+        return getPaytmWithDrawWidget(context);
+      case "bank":
+        return getBankWithdrawWidget(context);
+    }
+    return Container();
   }
 
   @override
@@ -888,700 +1428,36 @@ class WithdrawState extends State<Withdraw> {
           )
         ],
       ),
-      body: DefaultTabController(
-        length: 3,
-        child: Column(
-          children: <Widget>[
-            Material(
-              color: Theme.of(context).primaryColor,
-              child: TabBar(
-                indicatorColor: Colors.white,
-                indicatorWeight: 4.0,
-                tabs: [
-                  Tab(
-                    child: Text("PAYTM"),
-                  ),
-                  Tab(
-                    child: Text("BANK"),
-                  ),
-                  Tab(
-                    child: Text("UPI"),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
+      body: _withdrawModes != null && _withdrawModes.keys.length > 1
+          ? DefaultTabController(
+              length: _withdrawModes.keys.length,
+              child: Column(
                 children: <Widget>[
-                  _withdrawData == null
-                      ? Container()
-                      : SingleChildScrollView(
-                          child: Form(
-                            key: _paytmFormKey,
-                            child: !_bIsMobileVerified
-                                ? Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Row(
-                                          children: <Widget>[
-                                            Expanded(
-                                              child: ExpansionPanelList(
-                                                expansionCallback: (int index,
-                                                    bool isExpanded) {
-                                                  setState(() {
-                                                    if (_selectedItemIndex ==
-                                                        index) {
-                                                      _selectedItemIndex = -1;
-                                                    } else {
-                                                      _selectedItemIndex =
-                                                          index;
-                                                    }
-                                                  });
-                                                },
-                                                children: [
-                                                  getMobileVerificationWidget(
-                                                      context, 4),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Column(
-                                    children: <Widget>[
-                                      Container(
-                                        color: Colors.black12,
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text(
-                                              "Withdrawable balance",
-                                              style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .subhead
-                                                    .fontSize,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(left: 4.0),
-                                              child: Text(
-                                                strings.rupee +
-                                                    (_withdrawData
-                                                        .withdrawableAmount
-                                                        .toStringAsFixed(2)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Card(
-                                          elevation: 3.0,
-                                          child: Container(
-                                            padding: EdgeInsets.fromLTRB(
-                                                8.0, 16.0, 8.0, 8.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                Row(
-                                                  children: <Widget>[
-                                                    Expanded(
-                                                      child: TextFormField(
-                                                        controller:
-                                                            paytmAmountController,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          labelText: "Amount",
-                                                          prefix: Text(
-                                                            strings.rupee,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .black87),
-                                                          ),
-                                                          hintText: _withdrawData
-                                                              .paytmMinWithdraw
-                                                              .toString(),
-                                                          contentPadding:
-                                                              EdgeInsets.all(
-                                                                  8.0),
-                                                          border:
-                                                              OutlineInputBorder(
-                                                            borderSide:
-                                                                BorderSide(
-                                                              color: Colors
-                                                                  .black38,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        style: TextStyle(
-                                                          color: Colors.black87,
-                                                        ),
-                                                        validator: (value) {
-                                                          if (value.isEmpty) {
-                                                            return "Please enter amount to withdraw";
-                                                          } else {
-                                                            double amount =
-                                                                double.parse(
-                                                                    value);
-                                                            if (amount <
-                                                                _withdrawData
-                                                                    .paytmMinWithdraw) {
-                                                              return "You can not withdraw amount less than " +
-                                                                  strings
-                                                                      .rupee +
-                                                                  _withdrawData
-                                                                      .paytmMinWithdraw
-                                                                      .toStringAsFixed(
-                                                                          2);
-                                                            } else if (amount >
-                                                                _withdrawData
-                                                                    .withdrawableAmount) {
-                                                              return "You can not withdraw more than " +
-                                                                  strings
-                                                                      .rupee +
-                                                                  _withdrawData
-                                                                      .withdrawableAmount
-                                                                      .toStringAsFixed(
-                                                                          2);
-                                                            } else if (amount >
-                                                                _withdrawData
-                                                                    .paytmMaxWithdraw) {
-                                                              return "You can not withdraw more than " +
-                                                                  strings
-                                                                      .rupee +
-                                                                  _withdrawData
-                                                                      .paytmMaxWithdraw
-                                                                      .toStringAsFixed(
-                                                                          2);
-                                                            }
-                                                          }
-                                                        },
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    vertical: 16.0,
-                                                    horizontal: 8.0,
-                                                  ),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Expanded(
-                                                        child: RichText(
-                                                          textAlign:
-                                                              TextAlign.justify,
-                                                          text: TextSpan(
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .black54,
-                                                                fontSize: Theme.of(
-                                                                        context)
-                                                                    .primaryTextTheme
-                                                                    .caption
-                                                                    .fontSize,
-                                                              ),
-                                                              children: [
-                                                                TextSpan(
-                                                                    text:
-                                                                        "*Make sure your verified mobile number "),
-                                                                TextSpan(
-                                                                  text: _withdrawData
-                                                                      .mobile,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                  ),
-                                                                ),
-                                                                TextSpan(
-                                                                  text:
-                                                                      " is registered with PAYTM and it's KYC verification is completed on PAYTM.",
-                                                                )
-                                                              ]),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 8.0),
-                                                  child: Row(
-                                                    children: <Widget>[
-                                                      Expanded(
-                                                        child: RaisedButton(
-                                                          onPressed: () {
-                                                            if (_paytmFormKey
-                                                                .currentState
-                                                                .validate()) {
-                                                              makeWithdrawRequest(
-                                                                context,
-                                                                withdrawType: 4,
-                                                                amount:
-                                                                    int.parse(
-                                                                  paytmAmountController
-                                                                      .text,
-                                                                ),
-                                                              );
-                                                            }
-                                                          },
-                                                          child: Text(
-                                                              "REQUEST WITHDRAW"),
-                                                          textColor:
-                                                              Colors.white70,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .primaryColorDark,
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 16.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(right: 8.0),
-                                              child: Text(
-                                                "POWERED BY",
-                                                style: TextStyle(
-                                                  fontSize: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .subhead
-                                                      .fontSize,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              height: 32.0,
-                                              child: Image.asset(
-                                                  "images/paytm.png"),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                          ),
-                        ),
-                  _withdrawData == null
-                      ? Container()
-                      : SingleChildScrollView(
-                          child: !_bIsMobileVerified || !_bIsKYCVerified
-                              ? Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: ExpansionPanelList(
-                                              expansionCallback:
-                                                  (int index, bool isExpanded) {
-                                                setState(() {
-                                                  if (_selectedItemIndex ==
-                                                      index) {
-                                                    _selectedItemIndex = -1;
-                                                  } else {
-                                                    _selectedItemIndex = index;
-                                                  }
-                                                });
-                                              },
-                                              children: [
-                                                getMobileVerificationWidget(
-                                                    context, 1),
-                                                getKYCVerificationWidget(
-                                                    context),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(bottom: 16.0),
-                                  child: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Container(
-                                          color: Colors.black12,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Text(
-                                                "Withdrawable balance",
-                                                style: TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .subhead
-                                                      .fontSize,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 4.0),
-                                                child: Text(
-                                                  strings.rupee +
-                                                      (_withdrawData
-                                                          .withdrawableAmount
-                                                          .toStringAsFixed(2)),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Card(
-                                            elevation: 3.0,
-                                            child: Container(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  16.0, 8.0, 16.0, 8.0),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8.0),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: TextFormField(
-                                                            controller:
-                                                                amountController,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              labelText:
-                                                                  "Amount",
-                                                              prefix: Text(
-                                                                strings.rupee,
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .black87),
-                                                              ),
-                                                              hintText:
-                                                                  _withdrawData
-                                                                      .minWithdraw
-                                                                      .toString(),
-                                                              contentPadding:
-                                                                  EdgeInsets
-                                                                      .all(8.0),
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                                  color: Colors
-                                                                      .black38,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black87,
-                                                            ),
-                                                            validator: (value) {
-                                                              if (value
-                                                                  .isEmpty) {
-                                                                return "Please enter amount to withdraw";
-                                                              } else {
-                                                                double amount =
-                                                                    double.parse(
-                                                                        value);
-                                                                if (amount <
-                                                                    _withdrawData
-                                                                        .minWithdraw) {
-                                                                  return "You can not withdraw amount less than " +
-                                                                      strings
-                                                                          .rupee +
-                                                                      _withdrawData
-                                                                          .minWithdraw
-                                                                          .toString();
-                                                                } else if (amount >
-                                                                    _withdrawData
-                                                                        .withdrawableAmount) {
-                                                                  return "You can not withdraw more than " +
-                                                                      _withdrawData
-                                                                          .withdrawableAmount
-                                                                          .toString() +
-                                                                      ")";
-                                                                } else if (amount >
-                                                                    _withdrawData
-                                                                        .maxWithdraw) {
-                                                                  return "You can not withdraw more than " +
-                                                                      strings
-                                                                          .rupee +
-                                                                      _withdrawData
-                                                                          .maxWithdraw
-                                                                          .toString();
-                                                                }
-                                                              }
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8.0),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: TextFormField(
-                                                            enabled: _withdrawData
-                                                                    .accountNumber ==
-                                                                null,
-                                                            controller:
-                                                                accountNameController,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              labelText:
-                                                                  "Account name",
-                                                              contentPadding:
-                                                                  EdgeInsets
-                                                                      .all(8.0),
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                                  color: Colors
-                                                                      .black38,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .text,
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black45,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8.0),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: TextFormField(
-                                                            controller:
-                                                                accountNumberController,
-                                                            enabled: _withdrawData
-                                                                    .accountNumber ==
-                                                                null,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              labelText:
-                                                                  "Account number",
-                                                              contentPadding:
-                                                                  EdgeInsets
-                                                                      .all(8.0),
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                                  color: Colors
-                                                                      .black38,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black45,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8.0),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: TextFormField(
-                                                            controller:
-                                                                acIFSCCodeController,
-                                                            enabled: _withdrawData
-                                                                    .ifscCode ==
-                                                                null,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              labelText:
-                                                                  "IFSC code",
-                                                              contentPadding:
-                                                                  EdgeInsets
-                                                                      .all(8.0),
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(
-                                                                  color: Colors
-                                                                      .black38,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .text,
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black45,
-                                                            ),
-                                                            validator: (value) {
-                                                              if (RegExp(r'^[A-Za-z]{4}\d{7}$')
-                                                                      .allMatches(
-                                                                          value)
-                                                                      .length ==
-                                                                  0) {
-                                                                return "Please enter valid IFSC code";
-                                                              }
-                                                            },
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 16.0),
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Expanded(
-                                                          child: Text(
-                                                            "*Account name is auto-populated as per your KYC if it is not matching with the Name of your Bank Account, please send a mail to support@algorintechlabs.com",
-                                                            textAlign: TextAlign
-                                                                .justify,
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black54,
-                                                              fontSize: Theme.of(
-                                                                      context)
-                                                                  .primaryTextTheme
-                                                                  .caption
-                                                                  .fontSize,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Row(
-                                                    children: <Widget>[
-                                                      Expanded(
-                                                        child: Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  bottom: 8.0),
-                                                          child: RaisedButton(
-                                                            onPressed: () {
-                                                              if (_withdrawData.withdrawCost !=
-                                                                      null &&
-                                                                  _withdrawData
-                                                                          .withdrawCost >
-                                                                      0 &&
-                                                                  _withdrawData
-                                                                          .numberOfFreeWithdraw <
-                                                                      _withdrawData
-                                                                          .totalWithdraw) {
-                                                                confirmWithdrawRequest(
-                                                                    context);
-                                                              } else {
-                                                                if (_formKey
-                                                                    .currentState
-                                                                    .validate()) {
-                                                                  makeWithdrawRequest(
-                                                                    context,
-                                                                    withdrawType:
-                                                                        1,
-                                                                    amount: int
-                                                                        .parse(
-                                                                      amountController
-                                                                          .text,
-                                                                    ),
-                                                                  );
-                                                                }
-                                                              }
-                                                            },
-                                                            child: Text(
-                                                                "REQUEST WITHDRAW"),
-                                                            textColor:
-                                                                Colors.white70,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .primaryColorDark,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                        ),
-                  Center(
-                    child: Text("COMING SOON!!"),
-                  )
+                  Material(
+                    color: Theme.of(context).primaryColor,
+                    child: TabBar(
+                      indicatorColor: Colors.white,
+                      indicatorWeight: 4.0,
+                      tabs: _withdrawModes.keys.map((k) {
+                        return Tab(
+                          child: Text(k.toUpperCase()),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      children: _withdrawModes.keys.map((k) {
+                        return getTabByWithdrawMode(context, k);
+                      }).toList(),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
+            )
+          : (_withdrawModes != null
+              ? getTabByWithdrawMode(context, _withdrawModes.keys.elementAt(0))
+              : Container()),
     );
   }
 }

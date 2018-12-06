@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:playfantasy/appconfig.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -66,13 +67,19 @@ class EarnCashState extends State<EarnCash> {
 
   _shareNow() {
     String inviteMsg =
-        "I'm having super fun playing Fantasy sports daily. Join me at PLAY FANTASY and win cash prizes in every match. Take this bonus of " +
+        "I'm having super fun playing Fantasy sports daily. Join me at " +
+            AppConfig.of(context).appName +
+            " and win cash prizes in every match. Take this bonus of " +
             strings.rupee +
             refBAmount.toString() +
-            " and join me at PLAY FANTASY. " +
+            " and join me at " +
+            AppConfig.of(context).appName +
+            ". " +
             "Click " +
             inviteUrl +
-            " to download PLAY FANTASY app and use my code " +
+            " to download " +
+            AppConfig.of(context).appName +
+            " app and use my code " +
             refCode +
             " to register.";
     Share.share(inviteMsg);
@@ -111,7 +118,7 @@ class EarnCashState extends State<EarnCash> {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    "- " + strings.get("VERIFY_EMAIL_MOBILE"),
+                    "- As a first thing you need to verify your Email and Mobile.",
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                         color: Colors.black54,
@@ -131,7 +138,7 @@ class EarnCashState extends State<EarnCash> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                   child: Text(
-                    "- " + strings.get("FRIEND_MOBILE_VERIFIED"),
+                    "- Share you invite code with your friends.",
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                         color: Colors.black54,
@@ -151,33 +158,33 @@ class EarnCashState extends State<EarnCash> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                   child: Text(
-                    "- " +
-                        strings.get("USER_GETS_BONUS_TEXT_1") +
+                    "- Make sure your friend also verifies his Email and Mobile.",
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w500,
+                        fontSize: Theme.of(context)
+                            .primaryTextTheme
+                            .subhead
+                            .fontSize),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+                  child: Text(
+                    "- You gets " +
+                        strings.rupee +
                         refAAmount.toString() +
-                        " " +
-                        strings.get("USER_GETS_BONUS_TEXT_2"),
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Theme.of(context)
-                            .primaryTextTheme
-                            .subhead
-                            .fontSize),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                  child: Text(
-                    "- " +
-                        strings.get("FRIEND_SIGNUP_TEXT") +
-                        refBAmount.toString(),
+                        " and your friend gets " +
+                        strings.rupee +
+                        refBAmount.toString() +
+                        " as soon as your friend verifies his/her mobile number.",
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                         color: Colors.black54,

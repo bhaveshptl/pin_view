@@ -33,7 +33,7 @@ class SignupState extends State<Signup> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
 
-  static const _kFontFam = 'MyFlutterApp';  
+  static const _kFontFam = 'MyFlutterApp';
   static const IconData gplus_squared =
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
@@ -118,7 +118,7 @@ class SignupState extends State<Signup> {
         "platformType": androidInfo.version.baseOS,
         "manufacturer": androidInfo.manufacturer,
         "googleaddid": "",
-        "serial": androidInfo.hardware,
+        "serial": androidInfo.androidId,
       };
       if (_installReferring_link.length > 0) {
         var uri = Uri.parse(_installReferring_link);
@@ -260,7 +260,7 @@ class SignupState extends State<Signup> {
                     child: Image(
                       height: 80.0,
                       fit: BoxFit.scaleDown,
-                      image: new AssetImage("images/fantasy-logo.png"),
+                      image: new AssetImage("images/logo.png"),
                     ),
                   ),
                 ],
@@ -271,7 +271,7 @@ class SignupState extends State<Signup> {
                     Row(
                       children: <Widget>[
                         Text(
-                          strings.get("WELCOME_TO_FANTASY"),
+                          "Welcome to " + AppConfig.of(context).appName + ",",
                           style: TextStyle(
                               color: Colors.black87,
                               fontWeight: FontWeight.bold,
@@ -591,6 +591,31 @@ class SignupState extends State<Signup> {
                   ),
                 ),
               ),
+              Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: AppConfig.of(context).channelId != '3'
+                    ? Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("powered by"),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Image.asset(
+                                "images/playfantasy.png",
+                                height: 64.0,
+                                width: 64.0,
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
+                    : Container(),
+              )
             ],
           ),
         ),

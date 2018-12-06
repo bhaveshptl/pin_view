@@ -50,7 +50,7 @@ class ContestDetailState extends State<ContestDetail> {
   List<MyTeam> _myTeams;
   int _curPageOffset = 0;
   String _downloadTeamURL;
-  final int rowsPerPage = 10;
+  final int rowsPerPage = 7;
   TeamsDataSource _teamsDataSource;
   bool bDownloadTeamEnabled = false;
   List<MyTeam> _mapContestTeams = [];
@@ -244,7 +244,124 @@ class ContestDetailState extends State<ContestDetail> {
         for (Contest _contest in _l1Data.contests) {
           if (_contest.id == _changedContest["id"]) {
             setState(() {
-              _contest.joined = _changedContest["joined"];
+              if (_changedContest["name"] != null &&
+                  _contest.name != _changedContest["name"]) {
+                _contest.name = _changedContest["name"];
+              }
+              if (_changedContest["templateId"] != null &&
+                  _contest.templateId != _changedContest["templateId"]) {
+                _contest.templateId = _changedContest["templateId"];
+              }
+              if (_changedContest["size"] != null &&
+                  _contest.size != _changedContest["size"]) {
+                _contest.size = _changedContest["size"];
+              }
+              if (_changedContest["prizeType"] != null &&
+                  _contest.prizeType != _changedContest["prizeType"]) {
+                _contest.prizeType = _changedContest["prizeType"];
+              }
+              if (_changedContest["entryFee"] != null &&
+                  _contest.entryFee != _changedContest["entryFee"]) {
+                _contest.entryFee = _changedContest["entryFee"];
+              }
+              if (_changedContest["minUsers"] != null &&
+                  _contest.minUsers != _changedContest["minUsers"]) {
+                _contest.minUsers = _changedContest["minUsers"];
+              }
+              if (_changedContest["serviceFee"] != null &&
+                  _contest.serviceFee != _changedContest["serviceFee"]) {
+                _contest.serviceFee = _changedContest["serviceFee"];
+              }
+              if (_changedContest["teamsAllowed"] != null &&
+                  _contest.teamsAllowed != _changedContest["teamsAllowed"]) {
+                _contest.teamsAllowed = _changedContest["teamsAllowed"];
+              }
+              if (_changedContest["leagueId"] != null &&
+                  _contest.leagueId != _changedContest["leagueId"]) {
+                _contest.leagueId = _changedContest["leagueId"];
+              }
+              if (_changedContest["releaseTime"] != null &&
+                  _contest.releaseTime != _changedContest["releaseTime"]) {
+                _contest.releaseTime = _changedContest["releaseTime"];
+              }
+              if (_changedContest["regStartTime"] != null &&
+                  _contest.regStartTime != _changedContest["regStartTime"]) {
+                _contest.regStartTime = _changedContest["regStartTime"];
+              }
+              if (_changedContest["startTime"] != null &&
+                  _contest.startTime != _changedContest["startTime"]) {
+                _contest.startTime = _changedContest["startTime"];
+              }
+              if (_changedContest["endTime"] != null &&
+                  _contest.endTime != _changedContest["endTime"]) {
+                _contest.endTime = _changedContest["endTime"];
+              }
+              if (_changedContest["status"] != null &&
+                  _contest.status != _changedContest["status"]) {
+                _contest.status = _changedContest["status"];
+              }
+              if (_changedContest["visibilityId"] != null &&
+                  _contest.visibilityId != _changedContest["visibilityId"]) {
+                _contest.visibilityId = _changedContest["visibilityId"];
+              }
+              if (_changedContest["visibilityInfo"] != null &&
+                  _contest.visibilityInfo !=
+                      _changedContest["visibilityInfo"]) {
+                _contest.visibilityInfo = _changedContest["visibilityInfo"];
+              }
+              if (_changedContest["contestJoinCode"] != null &&
+                  _contest.contestJoinCode !=
+                      _changedContest["contestJoinCode"]) {
+                _contest.contestJoinCode = _changedContest["contestJoinCode"];
+              }
+              if (_changedContest["joined"] != null &&
+                  _contest.joined != _changedContest["joined"]) {
+                _contest.joined = _changedContest["joined"];
+              }
+              if (_changedContest["bonusAllowed"] != null &&
+                  _contest.bonusAllowed != _changedContest["bonusAllowed"]) {
+                _contest.bonusAllowed = _changedContest["bonusAllowed"];
+              }
+              if (_changedContest["guaranteed"] != null &&
+                  _contest.guaranteed != _changedContest["guaranteed"]) {
+                _contest.guaranteed = _changedContest["guaranteed"];
+              }
+              if (_changedContest["recommended"] != null &&
+                  _contest.recommended != _changedContest["recommended"]) {
+                _contest.recommended = _changedContest["recommended"];
+              }
+              if (_changedContest["deleted"] != null &&
+                  _contest.deleted != _changedContest["deleted"]) {
+                _contest.deleted = _changedContest["deleted"];
+              }
+              if (_changedContest["brand"] != null &&
+                  _changedContest["brand"]["info"] != null &&
+                  _contest.brand["info"] != _changedContest["brand"]["info"]) {
+                _contest.brand["info"] = _changedContest["brand"]["info"];
+              }
+              if ((_changedContest["lstAdded"] as List).length > 0) {
+                for (dynamic _prize in _changedContest["lstAdded"]) {
+                  _contest.prizeDetails.add(_prize);
+                }
+              }
+              if ((_changedContest["lstModified"] as List).length > 0) {
+                for (dynamic _modifiedPrize in _changedContest["lstModified"]) {
+                  for (dynamic _prize in _contest.prizeDetails) {
+                    if (_prize["id"] == _modifiedPrize["id"]) {
+                      if (_modifiedPrize["label"] != null) {
+                        _prize["label"] = _modifiedPrize["label"];
+                      }
+                      if (_modifiedPrize["noOfPrizes"] != null) {
+                        _prize["noOfPrizes"] = _modifiedPrize["noOfPrizes"];
+                      }
+                      if (_modifiedPrize["totalPrizeAmount"] != null) {
+                        _prize["totalPrizeAmount"] =
+                            _modifiedPrize["totalPrizeAmount"];
+                      }
+                    }
+                  }
+                }
+              }
             });
           }
         }
@@ -549,7 +666,7 @@ class ContestDetailState extends State<ContestDetail> {
             teamListOffset.toString() +
             "/" +
             (offset == 0
-                ? (rowsPerPage - _mapContestTeams.length).toString()
+                ? (rowsPerPage + _mapContestTeams.length).toString()
                 : rowsPerPage.toString()),
       ),
     );
@@ -559,16 +676,29 @@ class ContestDetailState extends State<ContestDetail> {
           List<dynamic> response = json.decode(res.body);
           List<MyTeam> _teams =
               response.map((i) => MyTeam.fromJson(i)).toList();
+          List<MyTeam> uniqueTeams = [];
+          _teams.forEach((MyTeam team) {
+            bool bTeamFound = false;
+            _mapContestTeams.forEach((MyTeam myTeam) {
+              if (team.id == myTeam.id) {
+                bTeamFound = true;
+                team = myTeam;
+              }
+            });
+            if (!bTeamFound) {
+              uniqueTeams.add(team);
+            }
+          });
           _teamsDataSource.setTeams(
               offset == 0 ? (offset + _mapContestTeams.length) : offset,
-              _teams);
+              uniqueTeams);
         }
       },
     );
   }
 
   squadStatus() {
-    if (widget.l1Data.league.rounds[0].matches[0].squad == 0) {
+    if (_l1Data.league.rounds[0].matches[0].squad == 0) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Row(
@@ -1210,13 +1340,10 @@ class ContestDetailState extends State<ContestDetail> {
                                     : Container(),
                               ],
                             ),
-                            rowsPerPage: (widget.contest.joined +
-                                        _mapContestTeams.length) <
-                                    rowsPerPage
+                            rowsPerPage: widget.contest.joined < rowsPerPage
                                 ? (widget.contest.joined == 0
                                     ? 1
-                                    : (widget.contest.joined +
-                                        _mapContestTeams.length))
+                                    : widget.contest.joined)
                                 : rowsPerPage,
                             onPageChanged: (int firstVisibleIndex) {
                               if (firstVisibleIndex == 0) {
@@ -1300,7 +1427,7 @@ class TeamsDataSource extends DataTableSource {
   }
 
   setMyContestTeams(Contest contest, List<MyTeam> _myContestTeams) {
-    this.size = contest.joined + _myContestTeams.length;
+    this.size = contest.joined;
     myContestTeams = _myContestTeams;
     for (int i = 0; i < size; i++) {
       if (i < _myContestTeams.length) {
@@ -1314,7 +1441,7 @@ class TeamsDataSource extends DataTableSource {
   }
 
   updateMyContestTeam(Contest contest, List<MyTeam> _myContestTeams) {
-    this.size = contest.joined + _myContestTeams.length;
+    this.size = contest.joined;
     myContestTeams = _myContestTeams;
 
     for (int i = 0; i < myContestTeams.length; i++) {

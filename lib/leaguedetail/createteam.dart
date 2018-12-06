@@ -617,14 +617,14 @@ class CreateTeamState extends State<CreateTeam>
         case "SCORE":
           setState(() {
             allPlayers.sort((a, b) {
-              return a.seriesScore - b.seriesScore;
+              return b.seriesScore - a.seriesScore;
             });
           });
           break;
         case "CREDITS":
           setState(() {
             allPlayers.sort((a, b) {
-              return ((a.credit - b.credit) * 100).toInt();
+              return ((b.credit - a.credit) * 100).toInt();
             });
           });
           break;

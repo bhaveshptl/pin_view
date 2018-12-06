@@ -143,10 +143,21 @@ class MyProfileState extends State<MyProfile> {
                                 color: Colors.black38,
                               ),
                             ),
+                            errorMaxLines: 2,
                           ),
                           validator: (value) {
-                            if (value.isEmpty || value.length < 6) {
-                              return "Minimum 6 characters required.";
+                            if (value.isEmpty || value.length < 4) {
+                              return "Minimum 4 characters required.";
+                            } else if (value.length > 12) {
+                              return "Maximum 12 characters allowed.";
+                            } else if (value.contains(
+                                    RegExp('[@#\$?(),!/:{}><;`*~%^&+=]')) ==
+                                true) {
+                              return "Name must contains characters, numbers, '.', '-', and '_' symbols only";
+                            } else if (value.indexOf(" ") != -1) {
+                              return "Name should not contain space";
+                            } else if (!value.startsWith(RegExp('[A-z]'))) {
+                              return "Name must starts with character.";
                             }
                           },
                         ),
@@ -407,6 +418,7 @@ class MyProfileState extends State<MyProfile> {
       setState(() {
         _date = picked;
         bIsDatePicked = true;
+        bIsInfoUpdated = true;
       });
     }
   }
@@ -495,6 +507,9 @@ class MyProfileState extends State<MyProfile> {
       _userProfile.address2 = addressReaponse["add_line_2"] == null
           ? _userProfile.address2
           : addressReaponse["add_line_2"];
+      _userProfile.state = _selectedState == null ? "" : _selectedState["code"];
+      _userProfile.gender =
+          _gender == null ? "" : (_gender == 1 ? "MALE" : "FEMALE");
     });
   }
 

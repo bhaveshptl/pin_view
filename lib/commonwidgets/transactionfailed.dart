@@ -12,6 +12,19 @@ class TransactionFailed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionResult["date"]));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString() +
+        " " +
+        date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
     return AlertDialog(
       title: Text(strings
           .get("TRANSACTION_FAILED")
@@ -31,7 +44,7 @@ class TransactionFailed extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   TextSpan(
-                    text: transactionResult["date"],
+                    text: dateinString,
                     style: TextStyle(color: Colors.black54),
                   ),
                 ],

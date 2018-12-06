@@ -1,5 +1,6 @@
 class Deposit {
   String bannerImage;
+  bool bAllowRepeatDeposit;
   ChooseAmountData chooseAmountData;
   Map<String, dynamic> refreshData;
 
@@ -7,6 +8,7 @@ class Deposit {
     this.bannerImage,
     this.refreshData,
     this.chooseAmountData,
+    this.bAllowRepeatDeposit,
   });
 
   factory Deposit.fromJson(Map<String, dynamic> json) {
@@ -14,6 +16,8 @@ class Deposit {
       bannerImage: json["bannerImage"],
       refreshData: json["refreshData"],
       chooseAmountData: ChooseAmountData.fromJson(json["chooseAmountData"]),
+      bAllowRepeatDeposit:
+          json["repeatAllowed"] == null ? false : json["repeatAllowed"],
     );
   }
 }
@@ -42,9 +46,10 @@ class ChooseAmountData {
       minAmount: json["minAmount"],
       bonusArray: json["bonusArray"],
       depositLimit: json["depositLimit"],
-      isFirstDeposit: json["isFirstDeposit"],
       balance: Balance.fromJson(json["balance"]),
       lastPaymentArray: json["lastPaymentArray"],
+      isFirstDeposit:
+          json["isFirstDeposit"] == null ? false : json["isFirstDeposit"],
       amountTiles:
           (json["amountTiles"] as List).map((i) => (i as int).toInt()).toList(),
     );

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:permission/permission.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:android_intent/android_intent.dart';
@@ -88,11 +89,13 @@ class DownloadAPKState extends State<DownloadAPK> {
     if (taskId != null) {
       FlutterDownloader.open(taskId: taskId);
     } else {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
       Directory appDocDir = await getExternalStorageDirectory();
       String fileUrl = appDocDir.path + "/playfantasy.apk";
       AndroidIntent(
               action: "action_view",
               fileUrl: fileUrl,
+              package: packageInfo.packageName,
               mimeType: "application/vnd.android.package-archive")
           .openFile();
     }

@@ -1,7 +1,7 @@
 class Withhdraw {
-  final String accountNumber;
+  String accountNumber;
   final String loginName;
-  final String ifscCode;
+  String ifscCode;
   final int numberOfFreeWithdraw;
   final int totalWithdraw;
   int withdrawCost;

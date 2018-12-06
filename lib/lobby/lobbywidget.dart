@@ -207,6 +207,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
             Expanded(
               child: StatusTab(
                 allLeagues: _allLeagues,
+                sportType: widget.sportType,
                 statusLeagues: upcomingLeagues,
                 onSportChange: widget.onSportChange,
                 leagueStatus: LeagueStatus.UPCOMING,

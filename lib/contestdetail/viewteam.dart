@@ -314,6 +314,7 @@ class _ViewTeamState extends State<ViewTeam> {
                                                                   " " +
                                                                   _sportsType
                                                                       .toString() +
+                                                                  "-black"
                                                                   ".png")
                                                               .toLowerCase()
                                                               .replaceAll(
@@ -453,7 +454,7 @@ class _ViewTeamState extends State<ViewTeam> {
                                       .fontSize),
                             ),
                       Text(
-                        _myTeamWithPlayers.prize.toString(),
+                        _myTeamWithPlayers.prize.toStringAsFixed(2),
                         style: TextStyle(
                             color: Colors.white54,
                             fontSize: Theme.of(context)

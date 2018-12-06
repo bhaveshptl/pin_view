@@ -15,9 +15,6 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
-bool bShowAppBar = true;
-Map<String, String> depositResponse;
-
 class AddCash extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => AddCashState();
@@ -660,21 +657,29 @@ class AddCashState extends State<AddCash> {
                           depositData.chooseAmountData.lastPaymentArray.length >
                                   0
                               ? InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      bRepeatTransaction = !bRepeatTransaction;
-                                    });
-                                  },
+                                  onTap: depositData.bAllowRepeatDeposit
+                                      ? () {
+                                          setState(() {
+                                            bRepeatTransaction =
+                                                !bRepeatTransaction;
+                                          });
+                                        }
+                                      : null,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Checkbox(
-                                        value: bRepeatTransaction,
-                                        onChanged: (bool checked) {
-                                          setState(() {
-                                            bRepeatTransaction = checked;
-                                          });
-                                        },
+                                        value: depositData.bAllowRepeatDeposit
+                                            ? bRepeatTransaction
+                                            : false,
+                                        onChanged: depositData
+                                                .bAllowRepeatDeposit
+                                            ? (bool checked) {
+                                                setState(() {
+                                                  bRepeatTransaction = checked;
+                                                });
+                                              }
+                                            : null,
                                       ),
                                       Text("Repeat transaction with " +
                                           depositData.chooseAmountData
@@ -1006,11 +1011,5 @@ class AddCashState extends State<AddCash> {
             ],
           ),
         ));
-  }
-
-  setAppBarVisibility(bool bShow) {
-    setState(() {
-      bShowAppBar = bShow;
-    });
   }
 }

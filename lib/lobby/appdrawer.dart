@@ -91,68 +91,50 @@ class AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  _onMyProfile() {
-    Navigator.of(context).push(
+  _onMyProfile() async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => MyProfile(),
       ),
     );
+    getUserInfo();
   }
 
   _launchStaticPage(String name) {
     String url = "";
     String title = "";
     switch (name) {
-      case "BECOME_PARTNER":
-        url = "";
-        title = "";
-        break;
       case "SCORING":
         title = "SCORING SYSTEM";
-        url = AppConfig.of(context).staticPageDomain +
-            "assets/help.html?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString() +
-            "#ScoringSystem";
+        url =
+            AppConfig.of(context).staticPageUrls["SCORING"] + "#ScoringSystem";
         break;
       case "HELP":
         title = "HELP";
-        url = AppConfig.of(context).staticPageDomain +
-            "assets/help.html?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString();
+        url = AppConfig.of(context).staticPageUrls["HOW_TO_PLAY"];
         break;
       case "FORUM":
         title = "FORUM";
-        url = "http://forum.playfantasy.com/?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString();
+        url = AppConfig.of(context).staticPageUrls["FORUM"];
         break;
       case "BLOG":
         title = "BLOG";
-        url = "http://blog.playfantasy.com/?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString();
-        break;
-      case "ABOUT_US":
-        title = "ABOUT US";
-        url = AppConfig.of(context).staticPageDomain +
-            "assets/aboutus.html?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString();
+        url = AppConfig.of(context).staticPageUrls["BLOG"];
         break;
       case "T&C":
         title = "TERMS AND CONDITIONS";
-        url = AppConfig.of(context).staticPageDomain +
-            "assets/terms.html?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString();
+        url = AppConfig.of(context).staticPageUrls["TERMS"];
         break;
       case "PRIVACY":
         title = "PRIVACY POLICY";
-        url = AppConfig.of(context).staticPageDomain +
-            "assets/privacy_policy.html?cache=" +
-            DateTime.now().millisecondsSinceEpoch.toString();
+        url = AppConfig.of(context).staticPageUrls["PRIVACY"];
         break;
     }
     Navigator.of(context).push(
       MaterialPageRoute(
           builder: (context) => WebviewScaffold(
                 url: url,
+                clearCache: true,
                 appBar: AppBar(
                   title: Text(title),
                 ),
@@ -161,13 +143,14 @@ class AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  _showEarnCash() {
-    Navigator.of(context).push(
+  _showEarnCash() async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EarnCash(),
         fullscreenDialog: true,
       ),
     );
+    getUserInfo();
   }
 
   _showMyAccount() {
@@ -703,14 +686,34 @@ class AppDrawerState extends State<AppDrawer> {
                     },
                   ),
                   Divider(height: 2.0),
-                  ListTile(
-                    title: Text('Blog'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchStaticPage("BLOG");
-                    },
-                  ),
-                  Divider(height: 2.0),
+                  AppConfig.of(context).staticPageUrls["BLOG"] != null
+                      ? Column(
+                          children: <Widget>[
+                            ListTile(
+                              title: Text('Blog'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                _launchStaticPage("BLOG");
+                              },
+                            ),
+                            Divider(height: 2.0),
+                          ],
+                        )
+                      : Container(),
+                  AppConfig.of(context).staticPageUrls["FORUM"] != null
+                      ? Column(
+                          children: <Widget>[
+                            ListTile(
+                              title: Text('Forum'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                _launchStaticPage("FORUM");
+                              },
+                            ),
+                            Divider(height: 2.0),
+                          ],
+                        )
+                      : Container(),
                   ListTile(
                     title: Text('Terms And Conditions'),
                     onTap: () {
