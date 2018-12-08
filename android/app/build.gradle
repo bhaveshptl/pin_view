@@ -31,6 +31,10 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+repositories {
+    mavenCentral()
+}
+
 android {
     compileSdkVersion 27
 
@@ -40,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId "com.algorin.playfantasy"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -77,6 +81,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'io.branch.sdk.android:library:3.+'
+    implementation 'com.razorpay:checkout:1.4.9'
 }
 
 apply plugin: 'com.google.gms.google-services'

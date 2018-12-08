@@ -38,6 +38,14 @@
 
         </activity>
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+
+        /**
+        * Add your API key
+        */
+        <meta-data
+            android:name="com.razorpay.ApiKey"
+            android:value="YOUR_API_KEY"
+            />
         <!-- Branch init -->
         <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_bhsR2zMTbzwpWFUmt77YzedhDskdbIUF" />
         <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_live_bhsR2zMTbzwpWFUmt77YzedhDskdbIUF" />
