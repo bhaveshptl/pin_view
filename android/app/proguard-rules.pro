@@ -10,3 +10,4 @@
 -dontwarn androidx.work.impl.**
 -dontwarn io.branch.referral.**
 -dontwarn io.branch.indexing.**
+-dontwarn com.razorpay.**

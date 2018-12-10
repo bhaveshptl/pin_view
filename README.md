@@ -1,7 +1,7 @@
 #To run app
 flutter run
 # To give signup build
-
+flutter build apk --release
 
 ####################################################
 ##################  Native code  ###################
