@@ -1,5 +1,6 @@
 package com.algorin.playfantasy;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +23,7 @@ import com.razorpay.Checkout;
 import com.razorpay.PaymentResultListener;
 
 
-public class MainActivity extends FlutterActivity {
+public class MainActivity extends FlutterActivity implements PaymentResultListener {
   private static final String BRANCH_IO_CHANNEL="com.algorin.pf.branch";
   private static final String RAZORPAY_IO_CHANNEL="com.algorin.pf.razorpay";
   MyHelperClass myHeperClass;
@@ -81,6 +82,7 @@ public class MainActivity extends FlutterActivity {
 //          val intent = Intent(this, NativeViewActivity::class.java)
 //          startActivity(intent);
 //          result.success(true);
+          startPayment();
           String razocode="testrazo";
           result.success(razocode);
 
@@ -160,7 +162,66 @@ public class MainActivity extends FlutterActivity {
       return installReferring_link;
   }
 
+  public void startPayment() {
+        /*
+          You need to pass current activity in order to let Razorpay create CheckoutActivity
+         */
+    final Activity activity = this;
 
+    final Checkout co = new Checkout();
+
+    try {
+      JSONObject options = new JSONObject();
+      options.put("name", "Razorpay Corp");
+      options.put("description", "Demoing Charges");
+      //You can omit the image option to fetch the image from dashboard
+      options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
+      options.put("currency", "INR");
+      options.put("amount", "100");
+
+      JSONObject preFill = new JSONObject();
+      preFill.put("email", "test@razorpay.com");
+      preFill.put("contact", "9876543210");
+
+      options.put("prefill", preFill);
+
+      co.open(activity, options);
+    } catch (Exception e) {
+      Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT)
+              .show();
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * The name of the function has to be
+   * onPaymentSuccess
+   * Wrap your code in try catch, as shown, to ensure that this method runs correctly
+   */
+  @SuppressWarnings("unused")
+  @Override
+  public void onPaymentSuccess(String razorpayPaymentID) {
+    try {
+      Toast.makeText(this, "Payment Successful: " + razorpayPaymentID, Toast.LENGTH_SHORT).show();
+    } catch (Exception e) {
+
+    }
+  }
+
+  /**
+   * The name of the function has to be
+   * onPaymentError
+   * Wrap your code in try catch, as shown, to ensure that this method runs correctly
+   */
+  @SuppressWarnings("unused")
+  @Override
+  public void onPaymentError(int code, String response) {
+    try {
+      Toast.makeText(this, "Payment failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
+    } catch (Exception e) {
+
+    }
+  }
 
 
 
