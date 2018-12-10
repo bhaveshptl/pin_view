@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
-
+import 'package:flutter/services.dart';
+import 'package:platform/platform.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -14,6 +15,7 @@ class ChoosePaymentMode extends StatefulWidget {
   final String url;
   final String promoCode;
   final Map<String, dynamic> paymentMode;
+  
   ChoosePaymentMode({this.amount, this.promoCode, this.url, this.paymentMode});
 
   @override
@@ -24,6 +26,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   String cookie;
   int _selectedItemIndex = -1;
   final flutterWebviewPlugin = FlutterWebviewPlugin();
+  static const razorpay_platform =
+      const MethodChannel('com.algorin.pf.razorpay');
   List<Map<String, dynamic>> selectedPaymentMethod = [];
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -40,6 +44,21 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
     );
+    _openRazorpayNative();
+  }
+
+
+
+ Future<String> _openRazorpayNative() async {
+    String value;
+    try {
+      value = await razorpay_platform.invokeMethod('_openRazorpayNative');
+      print("<<<<<<<<<<<<<<<<<<<RAZo>>>>>>>>>>>>>>");
+      print(value);
+    } catch (e) {
+      print(e);
+    }
+    return value;
   }
 
   setPaymentModeList() {

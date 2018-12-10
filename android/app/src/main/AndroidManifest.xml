@@ -44,7 +44,7 @@
         */
         <meta-data
             android:name="com.razorpay.ApiKey"
-            android:value="YOUR_API_KEY"
+            android:value="rzp_live_ILgsfZCZoFIKMb"
             />
         <!-- Branch init -->
         <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_bhsR2zMTbzwpWFUmt77YzedhDskdbIUF" />

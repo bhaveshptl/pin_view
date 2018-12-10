@@ -18,33 +18,22 @@ import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
+import com.razorpay.Checkout;
+import com.razorpay.PaymentResultListener;
+
 
 public class MainActivity extends FlutterActivity {
   private static final String BRANCH_IO_CHANNEL="com.algorin.pf.branch";
+  private static final String RAZORPAY_IO_CHANNEL="com.algorin.pf.razorpay";
   MyHelperClass myHeperClass;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     GeneratedPluginRegistrant.registerWith(this);
-    new MethodChannel(getFlutterView(),BRANCH_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
-      @Override
-      public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-        if(methodCall.method.equals("_getBranchRefCode")){
-          String pfRefCode=getRefCodeUsingBranch();
-          result.success(pfRefCode);
-        }
-        if(methodCall.method.equals("_getInstallReferringLink")){
-            String installReferring_link= getInstallReferringLink();
-            result.success(installReferring_link);
-        }
-      }
-    });
+    initFlutterChannels();
   }
 
-  @Override
-  public void onNewIntent(Intent intent) {
-    this.setIntent(intent);
-  }
   @Override
   public void onStart() {
     super.onStart();
@@ -60,13 +49,51 @@ public class MainActivity extends FlutterActivity {
           }
         }
       },intent.getData(), this);
-
     }
     catch(Exception e){
-
     }
+  }
+
+  @Override
+  public void onNewIntent(Intent intent) {
+    this.setIntent(intent);
+  }
+
+
+  protected  void initFlutterChannels(){
+    new MethodChannel(getFlutterView(),BRANCH_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+      @Override
+      public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+        if(methodCall.method.equals("_getBranchRefCode")){
+          String pfRefCode=getRefCodeUsingBranch();
+          result.success(pfRefCode);
+        }
+        if(methodCall.method.equals("_getInstallReferringLink")){
+          String installReferring_link= getInstallReferringLink();
+          result.success(installReferring_link);
+        }
+      }
+    });
+    new MethodChannel(getFlutterView(),RAZORPAY_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+      @Override
+      public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+        if (methodCall.method.equals("_openRazorpayNative")) {
+//          val intent = Intent(this, NativeViewActivity::class.java)
+//          startActivity(intent);
+//          result.success(true);
+          String razocode="testrazo";
+          result.success(razocode);
+
+        } else {
+          result.notImplemented();
+        }
+
+      }
+    });
 
   }
+
+
 /*Bracnch Io related code*/
   public String getRefCodeUsingBranch() {
     String refCodeFromBranch = "";
@@ -132,6 +159,9 @@ public class MainActivity extends FlutterActivity {
 
       return installReferring_link;
   }
+
+
+
 
 
 
