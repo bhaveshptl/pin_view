@@ -15,7 +15,7 @@ class ChoosePaymentMode extends StatefulWidget {
   final String url;
   final String promoCode;
   final Map<String, dynamic> paymentMode;
-  
+
   ChoosePaymentMode({this.amount, this.promoCode, this.url, this.paymentMode});
 
   @override
@@ -44,12 +44,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
     );
-    _openRazorpayNative();
+   
   }
 
-
-
- Future<String> _openRazorpayNative() async {
+  Future<String> _openRazorpayNative() async {
     String value;
     try {
       value = await razorpay_platform.invokeMethod('_openRazorpayNative');
@@ -59,6 +57,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       print(e);
     }
     return value;
+  }
+
+  initRazorpayPaymentMode(){
+     _openRazorpayNative();
   }
 
   setPaymentModeList() {
@@ -307,6 +309,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 padding: EdgeInsets.all(8.0),
                 child: Column(
                   children: <Widget>[
+                    RaisedButton(
+                      onPressed: () {
+                        initRazorpayPaymentMode();
+                      },
+                      color: Theme.of(context).primaryColorDark,
+                      textColor: Colors.white70,
+                      child: Text("RAZORPAY TEST"),
+                    ),
                     Container(
                       padding: EdgeInsets.all(8.0),
                       child: widget.paymentMode["first_name"] == null ||
