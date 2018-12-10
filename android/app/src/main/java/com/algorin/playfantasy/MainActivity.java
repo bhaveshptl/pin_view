@@ -191,31 +191,25 @@ public class MainActivity extends FlutterActivity implements PaymentResultListen
     }
   }
 
-  /**
-   * The name of the function has to be
-   * onPaymentSuccess
-   * Wrap your code in try catch, as shown, to ensure that this method runs correctly
-   */
+
   @SuppressWarnings("unused")
   @Override
   public void onPaymentSuccess(String razorpayPaymentID) {
     try {
-      Toast.makeText(this, "Payment Successful: " + razorpayPaymentID, Toast.LENGTH_SHORT).show();
+
+
+      onRazorPayPaymentSuccess();
     } catch (Exception e) {
 
     }
   }
 
-  /**
-   * The name of the function has to be
-   * onPaymentError
-   * Wrap your code in try catch, as shown, to ensure that this method runs correctly
-   */
+
   @SuppressWarnings("unused")
   @Override
   public void onPaymentError(int code, String response) {
     try {
-      Toast.makeText(this, "Payment failed: " + code + " " + response, Toast.LENGTH_SHORT).show();
+      onRazorPayPaymentFail();
     } catch (Exception e) {
 
     }
@@ -223,6 +217,33 @@ public class MainActivity extends FlutterActivity implements PaymentResultListen
 
 
 
+  public void onRazorPayPaymentFail(){
+    new MethodChannel(getFlutterView(),RAZORPAY_IO_CHANNEL).invokeMethod("onRazorPayPaymentFail", "", new MethodChannel.Result() {
+      @Override
+      public void success(Object o) {
+
+      }
+      @Override
+      public void error(String s, String s1, Object o) {}
+
+      @Override
+      public void notImplemented() {}
+    });
+  }
+
+  public void onRazorPayPaymentSuccess(){
+    new MethodChannel(getFlutterView(),RAZORPAY_IO_CHANNEL).invokeMethod("onRazorPayPaymentSuccess", "", new MethodChannel.Result() {
+      @Override
+      public void success(Object o) {
+
+      }
+      @Override
+      public void error(String s, String s1, Object o) {}
+
+      @Override
+      public void notImplemented() {}
+    });
+  }
 
 
 

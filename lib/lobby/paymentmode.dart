@@ -45,6 +45,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       hidden: true,
     );
    
+   razorpay_platform.setMethodCallHandler(myUtilsHandler);
   }
 
   Future<String> _openRazorpayNative() async {
@@ -65,11 +66,17 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
 
+
+
    Future<dynamic> myUtilsHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
-      case 'foo':
+      case 'onRazorPayPaymentFail':
+       print("<<<<<<<<<<<<<<<<<<<<<<<<<<<payment succes>>>>>>>>>>>>>>>>>>>>>>>>");
+       showSnackbar("payment Failed");
+      print("payment Failed");
         return 'some string';
-      case 'bar':
+      case 'onRazorPayPaymentSuccess':
+       showSnackbar("payment Success");
         return 123.0;
       default:
         // todo - throw not implemented
