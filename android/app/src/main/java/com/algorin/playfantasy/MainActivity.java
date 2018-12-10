@@ -79,10 +79,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultListen
       @Override
       public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         if (methodCall.method.equals("_openRazorpayNative")) {
-//          val intent = Intent(this, NativeViewActivity::class.java)
-//          startActivity(intent);
-//          result.success(true);
-          startPayment();
+            Map<String,Object> arguments=methodCall.arguments();
+          startPayment(arguments);
           String razocode="testrazo";
           result.success(razocode);
 
@@ -162,7 +160,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultListen
       return installReferring_link;
   }
 
-  public void startPayment() {
+  public void startPayment( Map<String,Object> arguments) {
         /*
           You need to pass current activity in order to let Razorpay create CheckoutActivity
          */
@@ -172,16 +170,16 @@ public class MainActivity extends FlutterActivity implements PaymentResultListen
 
     try {
       JSONObject options = new JSONObject();
-      options.put("name", "Razorpay Corp");
-      options.put("description", "Demoing Charges");
+      options.put("name", "PlayFantasy");
+      options.put("description", "Add Cash");
       //You can omit the image option to fetch the image from dashboard
       options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
       options.put("currency", "INR");
-      options.put("amount", "100");
+      options.put("amount", (String)arguments.get("amount"));
 
       JSONObject preFill = new JSONObject();
-      preFill.put("email", "test@razorpay.com");
-      preFill.put("contact", "9876543210");
+      preFill.put("email", (String)arguments.get("email"));
+      preFill.put("contact", (String)arguments.get("phone"));
 
       options.put("prefill", preFill);
 

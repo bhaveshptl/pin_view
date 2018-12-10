@@ -49,14 +49,31 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   Future<String> _openRazorpayNative() async {
     String value;
+    var paymentDetails=<String,dynamic>{
+       'email':'subbu@algorintechlabs.com',
+       'phone':'9494475165',
+       'amount':'100'
+    };
     try {
-      value = await razorpay_platform.invokeMethod('_openRazorpayNative');
+      value = await razorpay_platform.invokeMethod('_openRazorpayNative',paymentDetails);
       print("<<<<<<<<<<<<<<<<<<<RAZo>>>>>>>>>>>>>>");
       print(value);
     } catch (e) {
       print(e);
     }
     return value;
+  }
+
+
+   Future<dynamic> myUtilsHandler(MethodCall methodCall) async {
+    switch (methodCall.method) {
+      case 'foo':
+        return 'some string';
+      case 'bar':
+        return 123.0;
+      default:
+        // todo - throw not implemented
+    }
   }
 
   initRazorpayPaymentMode(){
