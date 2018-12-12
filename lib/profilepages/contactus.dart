@@ -222,34 +222,39 @@ class ContactUsState extends State<ContactUs> {
                       ],
                     ),
                     Row(children: <Widget>[
-                      new DropdownButton<String>(
-                          items: categoriesList,
-                          hint: Text("Select category"),
-                          value: selectedCategorieIndex,
-                          elevation: 16,
-                          iconSize: 60.0,
-                          onChanged: (newVal) {
-                            selectedCategorieIndex = newVal;
-                            setSubCategoriesListData(selectedCategorieIndex);
-                            this.setState(() {
-                              showSubCategory = true;
-                            });
-                          })
+                      Expanded(
+                        child: new DropdownButton<String>(
+                            items: categoriesList,
+                            hint: Text("Select category"),
+                            value: selectedCategorieIndex,
+                            elevation: 16,
+                            iconSize: 32.0,
+                            onChanged: (newVal) {
+                              selectedCategorieIndex = newVal;
+                              setSubCategoriesListData(selectedCategorieIndex);
+                              this.setState(() {
+                                showSubCategory = true;
+                              });
+                            }),
+                      )
                     ]),
                     Row(
                       children: <Widget>[
                         showSubCategory == true
-                            ? new DropdownButton<String>(
-                                items: subCategoriesList,
-                                hint: Text("Select Subcategory"),
-                                value: selectedSubCategory,
-                                elevation: 16,
-                                iconSize: 60.0,
-                                onChanged: (newVal) {
-                                  selectedSubCategory = newVal;
-                                  this.setState(() {});
-                                })
-                            : new Text("")
+                            ? Expanded(
+                                child: DropdownButton<String>(
+                                    items: subCategoriesList,
+                                    hint: Text("Select Subcategory"),
+                                    value: selectedSubCategory,
+                                    elevation: 16,
+                                    iconSize: 32.0,
+                                    onChanged: (newVal) {
+                                      this.setState(() {
+                                        selectedSubCategory = newVal;
+                                      });
+                                    }),
+                              )
+                            : Text("")
                       ],
                     ),
                     Row(

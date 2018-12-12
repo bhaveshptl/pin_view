@@ -323,6 +323,26 @@ class AppDrawerState extends State<AppDrawer> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Profile"),
+        actions: <Widget>[
+          !bIsUserVerified
+              ? Container(
+                  padding: EdgeInsets.all(12.0),
+                  child: RaisedButton(
+                    onPressed: () {
+                      _onVerify();
+                    },
+                    padding: EdgeInsets.all(0.0),
+                    color: Colors.white70,
+                    child: Text(
+                      "VERIFY",
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
       ),
       body: Container(
         child: ListView(

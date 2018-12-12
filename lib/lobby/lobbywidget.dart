@@ -8,12 +8,10 @@ import 'package:playfantasy/utils/fantasywebsocket.dart';
 class LobbyWidget extends StatefulWidget {
   final int sportType;
   final Function onLeagues;
-  final Function showLoader;
   final Function onSportChange;
 
   LobbyWidget({
     this.sportType = 1,
-    this.showLoader,
     this.onLeagues,
     this.onSportChange,
   });
@@ -24,6 +22,7 @@ class LobbyWidget extends StatefulWidget {
 
 class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool bShowLoader = true;
   int registeredSportType;
   List<League> _allLeagues;
   List<League> liveLeagues = [];
@@ -54,9 +53,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
 
     if (_response["bReady"] == 1) {
       sockets.sendMessage(lobbyUpdatePackate);
-      if (widget.showLoader != null) {
-        widget.showLoader(true);
-      }
     } else if (_response["sportsId"] == widget.sportType) {
       if (_response["iType"] == RequestType.GET_ALL_SERIES &&
           _response["bSuccessful"] == true) {
@@ -71,9 +67,9 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
           widget.onLeagues(_leagues);
         }
         _seperateLeaguesByRunningStatus(_leagues);
-        if (widget.showLoader != null) {
-          widget.showLoader(false);
-        }
+        setState(() {
+          bShowLoader = false;
+        });
       } else if (_response["iType"] == RequestType.LOBBY_REFRESH_DATA &&
           _response["bSuccessful"] == true) {
         if (_response["data"]["bDataModified"] == true &&
@@ -200,21 +196,68 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     }
     return Scaffold(
       key: _scaffoldKey,
-      body: Container(
-        padding: EdgeInsets.only(top: 8.0),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: StatusTab(
-                allLeagues: _allLeagues,
-                sportType: widget.sportType,
-                statusLeagues: upcomingLeagues,
-                onSportChange: widget.onSportChange,
-                leagueStatus: LeagueStatus.UPCOMING,
-              ),
-            ),
-          ],
-        ),
+      body: Stack(
+        children: <Widget>[
+          bShowLoader
+              ? Container(
+                  color: Colors.black12.withAlpha(10),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              "Loading...",
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .title
+                                  .copyWith(
+                                      color: Theme.of(context).primaryColor),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  "To me, cricket is a simple game.  Keep it simple and just go out and play - Shane Warne",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.black87,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  padding: EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: StatusTab(
+                          allLeagues: _allLeagues,
+                          sportType: widget.sportType,
+                          statusLeagues: upcomingLeagues,
+                          onSportChange: widget.onSportChange,
+                          leagueStatus: LeagueStatus.UPCOMING,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+        ],
       ),
     );
   }

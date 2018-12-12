@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:playfantasy/appconfig.dart';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -641,8 +642,9 @@ class ContestDetailState extends State<ContestDetail> {
     String contestVisibility =
         widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
     String contestCode = widget.contest.contestJoinCode;
-    String inviteMsg =
-        "PLAY FANTASY - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code $contestCode and join us.";
+    String contestShareUrl = AppConfig.of(context).contestShareUrl;
+    String inviteMsg = AppConfig.of(context).appName.toUpperCase() +
+        " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
 
     Share.share(inviteMsg);
   }
@@ -674,6 +676,7 @@ class ContestDetailState extends State<ContestDetail> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           List<dynamic> response = json.decode(res.body);
+          List<MyTeam> _myTeams = [];
           List<MyTeam> _teams =
               response.map((i) => MyTeam.fromJson(i)).toList();
           List<MyTeam> uniqueTeams = [];
@@ -682,13 +685,27 @@ class ContestDetailState extends State<ContestDetail> {
             _mapContestTeams.forEach((MyTeam myTeam) {
               if (team.id == myTeam.id) {
                 bTeamFound = true;
-                team = myTeam;
               }
             });
             if (!bTeamFound) {
               uniqueTeams.add(team);
+            } else {
+              _myTeams.add(team);
             }
           });
+          _mapContestTeams.forEach((team) {
+            _myTeams.forEach((myTeam) {
+              if (team.id == myTeam.id) {
+                team.rank = myTeam.rank;
+                team.score = myTeam.score;
+                team.prize = myTeam.prize;
+              }
+            });
+          });
+
+          _teamsDataSource.updateMyContestTeam(
+              widget.contest, _mapContestTeams);
+
           _teamsDataSource.setTeams(
               offset == 0 ? (offset + _mapContestTeams.length) : offset,
               uniqueTeams);
@@ -761,7 +778,7 @@ class ContestDetailState extends State<ContestDetail> {
                           ),
                           widget.league.status == LeagueStatus.COMPLETED
                               ? Container(
-                                  width: 50.0,
+                                  width: 70.0,
                                   child: Text(
                                     strings.get("PRIZE").toUpperCase(),
                                     textAlign: TextAlign.center,
@@ -1145,11 +1162,14 @@ class ContestDetailState extends State<ContestDetail> {
                                                           ),
                                                         ),
                                                         Text(
-                                                          widget.contest
-                                                                  .bonusAllowed
-                                                                  .toString() +
-                                                              strings.get(
-                                                                  "PERCENT_BONUS_ALLOWED"),
+                                                          strings
+                                                              .get(
+                                                                  "PERCENT_BONUS_ALLOWED")
+                                                              .replaceAll(
+                                                                  "\$percent",
+                                                                  widget.contest
+                                                                      .bonusAllowed
+                                                                      .toString()),
                                                           style: TextStyle(
                                                               fontSize: Theme.of(
                                                                       context)
@@ -1172,7 +1192,7 @@ class ContestDetailState extends State<ContestDetail> {
                                                               .get(
                                                                   "PARTICIPATE_WITH")
                                                               .replaceAll(
-                                                                  "count",
+                                                                  "\$count",
                                                                   widget.contest
                                                                       .teamsAllowed
                                                                       .toString()),
@@ -1528,7 +1548,11 @@ class TeamsDataSource extends DataTableSource {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                child: Text(_team.name == null ? "" : _team.name),
+                child: Text(_team.name == null
+                    ? ""
+                    : _team.name.length >= 15
+                        ? _team.name.substring(0, 14) + "..."
+                        : _team.name),
               ),
               _leagueStatus == LeagueStatus.UPCOMING
                   ? Row(
@@ -1579,7 +1603,7 @@ class TeamsDataSource extends DataTableSource {
                         ),
                         _leagueStatus == LeagueStatus.COMPLETED
                             ? Container(
-                                width: 50.0,
+                                width: 70.0,
                                 child: Text(
                                   _team.score != null
                                       ? _team.prize.toString()

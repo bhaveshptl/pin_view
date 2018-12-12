@@ -102,7 +102,9 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
         return _league;
       }
     }
-    return null;
+    return League(
+      leagueId: _leagueId,
+    );
   }
 
   _getMyContestCards() {
@@ -147,49 +149,57 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                             Padding(
                               padding:
                                   const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 0.0),
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: CachedNetworkImage(
-                                          imageUrl: _league.teamA.logoUrl,
-                                          placeholder: Container(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
+                              child: _league.teamA != null
+                                  ? Column(
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: CachedNetworkImage(
+                                                imageUrl: _league.teamA.logoUrl,
+                                                placeholder: Container(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2.0,
+                                                  ),
+                                                  width: TEAM_LOGO_HEIGHT,
+                                                  height: TEAM_LOGO_HEIGHT,
+                                                ),
+                                                height: TEAM_LOGO_HEIGHT,
+                                              ),
                                             ),
-                                            width: TEAM_LOGO_HEIGHT,
-                                            height: TEAM_LOGO_HEIGHT,
-                                          ),
-                                          height: TEAM_LOGO_HEIGHT,
-                                        ),
-                                      ),
-                                      Text(
-                                        _league.teamA.name +
-                                            " vs " +
-                                            _league.teamB.name,
-                                        style: TextStyle(color: Colors.black54),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(5.0),
-                                        child: CachedNetworkImage(
-                                          imageUrl: _league.teamB.logoUrl,
-                                          placeholder: Container(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
+                                            Text(
+                                              _league.teamA.name +
+                                                  " vs " +
+                                                  _league.teamB.name,
+                                              style: TextStyle(
+                                                  color: Colors.black54),
                                             ),
-                                            width: TEAM_LOGO_HEIGHT,
-                                            height: TEAM_LOGO_HEIGHT,
-                                          ),
-                                          height: TEAM_LOGO_HEIGHT,
+                                            Padding(
+                                              padding: EdgeInsets.all(5.0),
+                                              child: CachedNetworkImage(
+                                                imageUrl: _league.teamB.logoUrl,
+                                                placeholder: Container(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2.0,
+                                                  ),
+                                                  width: TEAM_LOGO_HEIGHT,
+                                                  height: TEAM_LOGO_HEIGHT,
+                                                ),
+                                                height: TEAM_LOGO_HEIGHT,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                      ],
+                                    )
+                                  : Column(
+                                      children: <Widget>[Text("Testing")],
+                                    ),
                             ),
                             Row(
                               children: <Widget>[

@@ -53,10 +53,12 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     _getInitData();
     _getSportsType();
     _controller.addListener(() {
-      setState(() {
-        _sportType = _controller.index + 1;
-      });
-      SharedPrefHelper().saveSportsType(_sportType.toString());
+      if (!_controller.indexIsChanging) {
+        setState(() {
+          _sportType = _controller.index + 1;
+        });
+        SharedPrefHelper().saveSportsType(_sportType.toString());
+      }
     });
     _mapSportTypes = {
       "CRICKET": 1,
@@ -103,7 +105,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
         SharedPrefHelper.internal().getSportsType();
     await futureSportType.then((value) {
       if (value != null) {
-        int _sport = int.parse(value == null ? "1" : value);
+        int _sport = int.parse(value == null || value == "0" ? "1" : value);
         Timer(Duration(seconds: 1), () {
           _onSportSelectionChaged(_sport);
         });
@@ -115,6 +117,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   _onSportSelectionChaged(int _sport) {
     if (_sportType != _sport) {
+      _sportType = _sport;
       _controller.index = _sport - 1;
       SharedPrefHelper().saveSportsType(_sportType.toString());
     } else if (_sportType <= 0) {

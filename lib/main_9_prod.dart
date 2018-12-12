@@ -181,6 +181,7 @@ void main() async {
     apiBaseUrl: apiBaseUrl,
     websocketUrl: websocketUrl,
     staticPageUrls: staticPageUrls,
+    contestShareUrl : initData["contestShareUrl"],
     child: MaterialApp(
       home: _homePage,
       routes: FantasyRoutes().getRoutes(),

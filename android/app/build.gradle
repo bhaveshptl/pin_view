@@ -28,6 +28,50 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def channelId = localProperties.getProperty('flutter.channelId')
+if (channelId == null) {
+    channelId = '3'
+}
+
+
+task copyReportsDirForArchiving(type: Copy) {
+    println 'Deleting images!!!!'
+    delete "../../images"
+    println 'Copying updated Images!!!!'
+    if (channelId == '3') {
+        println channelId
+        copy {
+            from "../../resources/images-fantasy"
+            into "../../images"
+        }
+    } else if (channelId == '9') {
+        println channelId
+        copy {
+            from "../../resources/images-smart11"
+            into "../../images"
+        }
+    }
+}
+
+task copyReportsDirForArchiving2(type: Copy) {
+    println 'Deleting resources!!!!'
+    delete "../../android/app/src/main/res"
+    println 'Copying updated resources!!!!'
+    if (channelId == '3') {
+        println channelId
+        copy {
+            from "../../resources/res-fantasy"
+            into "../../android/app/src/main/res"
+        }
+    } else if (channelId == '9') {
+        println channelId
+        copy {
+            from "../../resources/res-smart11"
+            into "../../android/app/src/main/res"
+        }
+    }
+}
+
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 

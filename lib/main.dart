@@ -56,7 +56,7 @@ getInitData() async {
       bUpdateAvailable = initData["update"];
       analyticsUrl = initData["analyticsURL"];
       bIsForceUpdate = initData["isForceUpdate"];
-      staticPageUrls = initData["staticPageUrls"];
+      staticPageUrls = initData["staticPageUrls"];      
       AnalyticsManager.isEnabled = initData["analyticsEnabled"];
       SharedPrefHelper()
           .saveToSharedPref(ApiUtil.KEY_INIT_DATA, json.encode(initData));
@@ -181,6 +181,7 @@ void main() async {
     apiBaseUrl: apiBaseUrl,
     websocketUrl: websocketUrl,
     staticPageUrls: staticPageUrls,
+    contestShareUrl : initData["contestShareUrl"],
     child: MaterialApp(
       home: _homePage,
       routes: FantasyRoutes().getRoutes(),

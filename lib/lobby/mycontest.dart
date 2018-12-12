@@ -60,12 +60,14 @@ class MyContestsState extends State<MyContests>
     _sportsController =
         TabController(vsync: this, length: _mapSportTypes.keys.length);
     _sportsController.addListener(() {
-      setState(() {
-        _sportType = _sportsController.index + 1;
-        widget.onSportChange(_sportType);
-        _getMyContests(checkForPrevSelection: false);
-      });
-      SharedPrefHelper().saveSportsType(_sportType.toString());
+      if (!_sportsController.indexIsChanging) {
+        setState(() {
+          _sportType = _sportsController.index + 1;
+          widget.onSportChange(_sportType);
+          _getMyContests(checkForPrevSelection: false);
+        });
+        SharedPrefHelper().saveSportsType(_sportType.toString());
+      }
     });
   }
 
@@ -347,6 +349,19 @@ class MyContestsState extends State<MyContests>
         } else if (league.status == LeagueStatus.LIVE) {
           mapLiveContest[key] = _contests;
         } else if (league.status == LeagueStatus.COMPLETED) {
+          mapResultContest[key] = _contests;
+        }
+      } else if (_contests.length > 0) {
+        int status = (_contests[0].status <= 3
+            ? LeagueStatus.UPCOMING
+            : (_contests[0].status <= 5
+                ? LeagueStatus.LIVE
+                : LeagueStatus.COMPLETED));
+        if (status == LeagueStatus.UPCOMING) {
+          mapUpcomingContest[key] = _contests;
+        } else if (status == LeagueStatus.LIVE) {
+          mapLiveContest[key] = _contests;
+        } else if (status == LeagueStatus.COMPLETED) {
           mapResultContest[key] = _contests;
         }
       }

@@ -248,14 +248,42 @@ class MyTeamsState extends State<MyTeams> {
                             onPressed: () {
                               _onEditTeam(context);
                             },
-                            icon: Icon(Icons.edit),
+                            icon: Column(
+                              children: <Widget>[
+                                Icon(Icons.edit),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    "EDIT",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           IconButton(
                             padding: EdgeInsets.all(0.0),
                             onPressed: () {
                               _onCloneTeam(context);
                             },
-                            icon: Icon(Icons.content_copy),
+                            icon: Column(
+                              children: <Widget>[
+                                Icon(Icons.content_copy),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    "CLONE",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
                           )
                         ],
                       )
@@ -341,7 +369,8 @@ class MyTeamsState extends State<MyTeams> {
                                       ('images/' +
                                               style.label +
                                               " " +
-                                              player.sportsId.toString() + "-black"
+                                              player.sportsId.toString() +
+                                              "-black"
                                               ".png")
                                           .toLowerCase()
                                           .replaceAll(" ", "-"),
