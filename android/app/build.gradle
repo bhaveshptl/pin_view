@@ -33,19 +33,22 @@ if (channelId == null) {
     channelId = '3'
 }
 
+def buildMode = localProperties.getProperty('flutter.buildMode')
+if(buildMode == null){
+    buildMode = 'debug'
+}
 
-task copyReportsDirForArchiving(type: Copy) {
+
+task copyImages(type: Copy) {
     println 'Deleting images!!!!'
     delete "../../images"
     println 'Copying updated Images!!!!'
     if (channelId == '3') {
-        println channelId
         copy {
             from "../../resources/images-fantasy"
             into "../../images"
         }
     } else if (channelId == '9') {
-        println channelId
         copy {
             from "../../resources/images-smart11"
             into "../../images"
@@ -53,21 +56,58 @@ task copyReportsDirForArchiving(type: Copy) {
     }
 }
 
-task copyReportsDirForArchiving2(type: Copy) {
+task copyRes(type: Copy) {
     println 'Deleting resources!!!!'
     delete "../../android/app/src/main/res"
     println 'Copying updated resources!!!!'
     if (channelId == '3') {
-        println channelId
         copy {
             from "../../resources/res-fantasy"
             into "../../android/app/src/main/res"
         }
     } else if (channelId == '9') {
-        println channelId
         copy {
             from "../../resources/res-smart11"
             into "../../android/app/src/main/res"
+        }
+    }
+}
+
+task copyFlutterInitialization(type: Copy) {
+    println 'Deleting main.dart!!!!'
+    delete "../../lib/main.dart"  
+    println 'Copying updated resources!!!!'
+    if (channelId == '3' && buildMode == 'debug') {
+        copy {
+            from "../../resources/main_3.dart"
+            into "../../lib"            
+            rename { String fileName ->
+                fileName.replace('_3', '')
+            }
+        }
+    } else if (channelId == '9' && buildMode == 'debug') {
+        copy {
+            from "../../resources/main_9.dart"
+            into "../../lib"            
+            rename { String fileName ->
+                fileName.replace('_9', '')
+            }
+        }
+    } else if (channelId == '3' && buildMode == 'release') {
+        copy {
+            from "../../resources/main_3_prod.dart"
+            into "../../lib"            
+            rename { String fileName ->
+                fileName.replace('_3_prod', '')
+            }
+        }
+    } else if (channelId == '9' && buildMode == 'release') {
+        copy {
+            from "../../resources/main_9_prod.dart"
+            into "../../lib"            
+            rename { String fileName ->
+                fileName.replace('_9_prod', '')
+            }
         }
     }
 }

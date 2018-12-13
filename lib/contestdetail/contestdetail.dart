@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/gradientbutton.dart';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -1019,89 +1020,57 @@ class ContestDetailState extends State<ContestDetail> {
                                             child: Padding(
                                               padding:
                                                   EdgeInsets.only(left: 16.0),
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(20.0)),
-                                                child: Container(
-                                                  height: 28.0,
-                                                  decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                      colors: [
-                                                        Theme.of(context)
-                                                            .primaryColor
-                                                            .withAlpha(150),
-                                                        Theme.of(context)
-                                                            .primaryColor
-                                                            .withAlpha(220),
-                                                        Theme.of(context)
-                                                            .primaryColor,
-                                                        Theme.of(context)
-                                                            .primaryColor,
-                                                        Theme.of(context)
-                                                            .primaryColor
-                                                            .withAlpha(220),
-                                                        Theme.of(context)
-                                                            .primaryColor
-                                                            .withAlpha(150),
-                                                      ],
-                                                      begin:
-                                                          Alignment.topCenter,
-                                                      end: Alignment
-                                                          .bottomCenter,
-                                                    ),
-                                                  ),
-                                                  child: RaisedButton(
-                                                    onPressed: () {
-                                                      if (!bIsContestFull) {
-                                                        _onJoinContest(
-                                                            widget.contest);
-                                                      }
-                                                    },
-                                                    color: Colors.transparent,
-                                                    padding:
-                                                        EdgeInsets.all(0.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: <Widget>[
-                                                        _mapContestTeams !=
-                                                                    null &&
-                                                                _mapContestTeams
-                                                                        .length >
-                                                                    0
-                                                            ? Icon(
-                                                                Icons.add,
-                                                                color: Colors
-                                                                    .white70,
-                                                                size: Theme.of(
-                                                                        context)
-                                                                    .primaryTextTheme
-                                                                    .subhead
-                                                                    .fontSize,
-                                                              )
-                                                            : Container(),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: <Widget>[
-                                                            Text(
-                                                              "JOIN",
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .white70,
-                                                                fontSize: Theme.of(
-                                                                        context)
-                                                                    .primaryTextTheme
-                                                                    .subhead
-                                                                    .fontSize,
-                                                              ),
+                                              child: GradientButton(
+                                                button: RaisedButton(
+                                                  onPressed: () {
+                                                    if (!bIsContestFull) {
+                                                      _onJoinContest(
+                                                          widget.contest);
+                                                    }
+                                                  },
+                                                  color: Colors.transparent,
+                                                  padding: EdgeInsets.all(0.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: <Widget>[
+                                                      _mapContestTeams !=
+                                                                  null &&
+                                                              _mapContestTeams
+                                                                      .length >
+                                                                  0
+                                                          ? Icon(
+                                                              Icons.add,
+                                                              color: Colors
+                                                                  .white70,
+                                                              size: Theme.of(
+                                                                      context)
+                                                                  .primaryTextTheme
+                                                                  .subhead
+                                                                  .fontSize,
+                                                            )
+                                                          : Container(),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: <Widget>[
+                                                          Text(
+                                                            "JOIN",
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .white70,
+                                                              fontSize: Theme.of(
+                                                                      context)
+                                                                  .primaryTextTheme
+                                                                  .subhead
+                                                                  .fontSize,
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               ),
@@ -1144,8 +1113,9 @@ class ContestDetailState extends State<ContestDetail> {
                                                                     right: 4.0),
                                                             child: CircleAvatar(
                                                               backgroundColor:
-                                                                  Colors
-                                                                      .redAccent,
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .primaryColorDark,
                                                               maxRadius: 10.0,
                                                               child: Text(
                                                                 "B",
@@ -1203,8 +1173,9 @@ class ContestDetailState extends State<ContestDetail> {
                                                                     right: 4.0),
                                                             child: CircleAvatar(
                                                               backgroundColor:
-                                                                  Colors
-                                                                      .redAccent,
+                                                                  Theme.of(
+                                                                          context)
+                                                                      .primaryColorDark,
                                                               maxRadius: 10.0,
                                                               child: Text(
                                                                 "M",

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/gradientbutton.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -126,7 +127,7 @@ class UpcomingContest extends StatelessWidget {
                         message: strings.get("USE_BONUS").replaceAll(
                             "\$bonusPercent", contest.bonusAllowed.toString()),
                         child: CircleAvatar(
-                          backgroundColor: Colors.redAccent,
+                          backgroundColor: Theme.of(context).primaryColorDark,
                           maxRadius: 10.0,
                           child: Text(
                             "B",
@@ -379,74 +380,46 @@ class UpcomingContest extends StatelessWidget {
                                 " entry fee.",
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
-                              child: ClipRRect(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                                child: Container(
-                                  height: 28.0,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Theme.of(context)
-                                            .primaryColor
-                                            .withAlpha(150),
-                                        Theme.of(context)
-                                            .primaryColor
-                                            .withAlpha(220),
-                                        Theme.of(context).primaryColor,
-                                        Theme.of(context).primaryColor,
-                                        Theme.of(context)
-                                            .primaryColor
-                                            .withAlpha(220),
-                                        Theme.of(context)
-                                            .primaryColor
-                                            .withAlpha(150),
-                                      ],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                    ),
-                                  ),
-                                  child: RaisedButton(
-                                    onPressed: () {
-                                      if (!bIsContestFull && onJoin != null) {
-                                        onJoin(contest);
-                                      }
-                                    },
-                                    color: Colors.transparent,
-                                    padding: EdgeInsets.all(0.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        myJoinedTeams != null &&
-                                                myJoinedTeams.length > 0
-                                            ? Icon(
-                                                Icons.add,
-                                                color: Colors.white70,
-                                                size: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .subhead
-                                                    .fontSize,
-                                              )
-                                            : Container(),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text(
-                                              "JOIN",
-                                              style: TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .subhead
-                                                    .fontSize,
-                                              ),
+                              child: GradientButton(
+                                button: RaisedButton(
+                                  onPressed: () {
+                                    if (!bIsContestFull && onJoin != null) {
+                                      onJoin(contest);
+                                    }
+                                  },
+                                  color: Colors.transparent,
+                                  padding: EdgeInsets.all(0.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      myJoinedTeams != null &&
+                                              myJoinedTeams.length > 0
+                                          ? Icon(
+                                              Icons.add,
+                                              color: Colors.white70,
+                                              size: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .fontSize,
+                                            )
+                                          : Container(),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            "JOIN",
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .fontSize,
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

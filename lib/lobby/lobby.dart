@@ -252,9 +252,9 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                 child: Row(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(right: 8.0),
+                      padding: EdgeInsets.only(right: 16.0),
                       child: Image.asset(
-                        "images/smart11.png",
+                        "images/logo.png",
                         width: 48.0,
                       ),
                     ),

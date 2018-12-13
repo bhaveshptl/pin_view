@@ -17,10 +17,18 @@
 
     <item
         android:width="220dp"
-        android:height="220dp"
-        android:drawable="@mipmap/ic_launcher"
+        android:height="156dp"
+        android:drawable="@mipmap/smart11"
         android:gravity="center_horizontal|top"
         android:top="140dp" />
+
+    <item
+        android:width="120dp"
+        android:height="120dp"
+        android:bottom="110dp"
+        android:drawable="@mipmap/pf_logo"
+        android:gravity="center_horizontal|bottom" />
+
 
     <item
         android:width="224dp"

@@ -364,10 +364,11 @@ class AppDrawerState extends State<AppDrawer> {
                           CircleAvatar(
                             maxRadius: 32.0,
                             backgroundColor:
-                                Theme.of(context).primaryColor.withAlpha(100),
+                                Theme.of(context).primaryColor,
                             child: Icon(
                               Icons.person,
                               size: 48.0,
+                              color: Colors.white70,
                             ),
                           ),
                         ],

@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
@@ -43,14 +42,36 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   setPaymentModeList() {
+    int i = 0;
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
               .length >
           0) {
-        selectedPaymentMethod.add(widget.paymentMode["choosePayment"]
-            ["paymentInfo"][type["type"]][0]);
+        Map<String, dynamic> lastPaymentArray = widget
+            .paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0];
+        if (lastPaymentArray != null &&
+            lastPaymentArray["paymentType"] == type["type"]) {
+          bool bLastTransactionFound = false;
+          (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  as List)
+              .forEach((type) {
+            if (type["name"] == lastPaymentArray["paymentOption"]) {
+              selectedPaymentMethod.add(type);
+              bLastTransactionFound = true;
+            }
+          });
+          if (!bLastTransactionFound) {
+            selectedPaymentMethod.add(widget.paymentMode["choosePayment"]
+                ["paymentInfo"][type["type"]][0]);
+          }
+          _selectedItemIndex = i;
+        } else {
+          selectedPaymentMethod.add(widget.paymentMode["choosePayment"]
+              ["paymentInfo"][type["type"]][0]);
+        }
       }
+      i++;
     });
     lastNameController.text = widget.paymentMode["last_name"] == null
         ? ""
