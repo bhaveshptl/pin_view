@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
@@ -53,10 +54,12 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     _getInitData();
     _getSportsType();
     _controller.addListener(() {
-      setState(() {
-        _sportType = _controller.index + 1;
-      });
-      SharedPrefHelper().saveSportsType(_sportType.toString());
+      if (!_controller.indexIsChanging) {
+        setState(() {
+          _sportType = _controller.index + 1;
+        });
+        SharedPrefHelper().saveSportsType(_sportType.toString());
+      }
     });
     _mapSportTypes = {
       "CRICKET": 1,
@@ -103,7 +106,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
         SharedPrefHelper.internal().getSportsType();
     await futureSportType.then((value) {
       if (value != null) {
-        int _sport = int.parse(value == null ? "1" : value);
+        int _sport = int.parse(value == null || value == "0" ? "1" : value);
         Timer(Duration(seconds: 1), () {
           _onSportSelectionChaged(_sport);
         });
@@ -115,6 +118,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   _onSportSelectionChaged(int _sport) {
     if (_sportType != _sport) {
+      _sportType = _sport;
       _controller.index = _sport - 1;
       SharedPrefHelper().saveSportsType(_sportType.toString());
     } else if (_sportType <= 0) {
@@ -144,7 +148,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
       switch (index) {
         case 0:
           Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => MyContests(
                     leagues: _leagues,
                     onSportChange: _onSportSelectionChaged,
@@ -157,14 +161,14 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
           break;
         case 2:
           Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => EarnCash(),
             ),
           );
           break;
         case 3:
           Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => AppDrawer(),
             ),
           );
@@ -175,7 +179,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   _launchAddCash() async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
       ),
     );
@@ -210,7 +214,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   launchHelp() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => WebviewScaffold(
               url: "https://www.playfantasy.com/assets/help.html?cache=" +
                   DateTime.now().millisecondsSinceEpoch.toString(),
@@ -249,9 +253,9 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                 child: Row(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(right: 8.0),
+                      padding: EdgeInsets.only(right: 16.0),
                       child: Image.asset(
-                        "images/smart11.png",
+                        "images/logo.png",
                         width: 48.0,
                       ),
                     ),
@@ -285,16 +289,17 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                                             child: Stack(
                                               children: <Widget>[
                                                 ClipRRect(
-                                                    clipBehavior: Clip.hardEdge,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(8.0),
-                                                    ),
-                                                    child: Image.network(
-                                                      img,
-                                                      fit: BoxFit.contain,
-                                                      width: 1000.0,
-                                                    )),
+                                                  clipBehavior: Clip.hardEdge,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(8.0),
+                                                  ),
+                                                  child: Image.network(
+                                                    img,
+                                                    fit: BoxFit.cover,
+                                                    width: 1000.0,
+                                                  ),
+                                                ),
                                               ],
                                             ));
                                       }).toList(),
@@ -332,26 +337,33 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                 )
               ],
             ),
-            body: _sportType >= 0
-                ? TabBarView(
-                    controller: _controller,
-                    children: _mapSportTypes.keys.map<Widget>((page) {
-                      return Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: LobbyWidget(
-                              sportType: _mapSportTypes[page],
-                              onLeagues: (value) {
-                                _leagues = value;
-                              },
-                              onSportChange: _onSportSelectionChaged,
+            body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/norwegian_rose.png"),
+                    repeat: ImageRepeat.repeat),
+              ),
+              child: _sportType >= 0
+                  ? TabBarView(
+                      controller: _controller,
+                      children: _mapSportTypes.keys.map<Widget>((page) {
+                        return Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: LobbyWidget(
+                                sportType: _mapSportTypes[page],
+                                onLeagues: (value) {
+                                  _leagues = value;
+                                },
+                                onSportChange: _onSportSelectionChaged,
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  )
-                : Container(),
+                          ],
+                        );
+                      }).toList(),
+                    )
+                  : Container(),
+            ),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),

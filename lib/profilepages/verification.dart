@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -532,7 +531,7 @@ class VerificationState extends State<Verification> {
                               return FlatButton(
                                 onPressed: () {
                                   setState(() {
-                                    if (_selectedItemIndex == 0) {
+                                    if (_selectedItemIndex == 1) {
                                       _selectedItemIndex = -1;
                                     } else {
                                       _selectedItemIndex = 1;
@@ -694,7 +693,7 @@ class VerificationState extends State<Verification> {
                               return FlatButton(
                                 onPressed: () {
                                   setState(() {
-                                    if (_selectedItemIndex == 0) {
+                                    if (_selectedItemIndex == 2) {
                                       _selectedItemIndex = -1;
                                     } else {
                                       _selectedItemIndex = 2;

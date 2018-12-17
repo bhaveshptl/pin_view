@@ -3,34 +3,45 @@ import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:package_info/package_info.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
-import 'package:playfantasy/utils/analytics.dart';
+import 'package:package_info/package_info.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/authcheck.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+/*
+╔═══════════════════════════════════════════════════════════════════╗
+║   ANY CHANGES IN "main.dart" WILL OVERRIDE WHILE BUILDING APK.    ║
+║   MAKE SURE TO EDIT FOLLWING FILES.                               ║
+║    - "resources/main_3.dart"                                      ║
+║    - "resources/main_9.dart"                                      ║
+║    - "resources/main_3_prod.dart"                                 ║
+║    - "resources/main_9_prod.dart"                                 ║
+╚═══════════════════════════════════════════════════════════════════╝
+*/
 
 String apkUrl;
 String cookie;
 Widget _homePage;
-String channelId = "3";
+String channelId = "9";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
-String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
-//String fcmSubscribeId = 'channelId_' + channelId + '_news'+'_prod';
+// String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
+String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
 Map<String, dynamic> initData = {};
-const apiBaseUrl = "https://stg.playfantasy.com";
-String staticPageDomain = "https://www.playfantasy.com/assets";
-const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
-String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
+Map<String, dynamic> staticPageUrls;
+const apiBaseUrl = "https://www.playfantasy.com";
+const websocketUrl = "wss://lobby-www.playfantasy.com/path?pid=";
+String analyticsUrl = "https://analytics.playfantasy.com/click/track";
 
 setWSCookie() async {
   Request req = Request("POST", Uri.parse(apiBaseUrl + ApiUtil.GET_COOKIE_URL));
@@ -56,7 +67,7 @@ getInitData() async {
       bUpdateAvailable = initData["update"];
       analyticsUrl = initData["analyticsURL"];
       bIsForceUpdate = initData["isForceUpdate"];
-      staticPageDomain = initData["staticPageDomain"];
+      staticPageUrls = initData["staticPageUrls"];
       AnalyticsManager.isEnabled = initData["analyticsEnabled"];
       SharedPrefHelper()
           .saveToSharedPref(ApiUtil.KEY_INIT_DATA, json.encode(initData));
@@ -180,7 +191,8 @@ void main() async {
     channelId: channelId,
     apiBaseUrl: apiBaseUrl,
     websocketUrl: websocketUrl,
-    staticPageUrls: staticPageDomain,
+    staticPageUrls: staticPageUrls,
+    contestShareUrl: initData["contestShareUrl"],
     child: MaterialApp(
       home: _homePage,
       routes: FantasyRoutes().getRoutes(),

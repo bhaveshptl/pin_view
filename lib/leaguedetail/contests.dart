@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -309,7 +310,7 @@ class ContestsState extends State<Contests> {
 
   _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => ContestDetail(
               contest: contest,
               league: league,
@@ -426,7 +427,7 @@ class ContestsState extends State<Contests> {
     bWaitingForTeamCreation = true;
     Navigator.of(context).pop();
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: _l1Data,
@@ -539,7 +540,7 @@ class ContestsState extends State<Contests> {
     }
 
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
@@ -41,21 +42,13 @@ class LeagueDetailState extends State<LeagueDetail>
   int _sportType;
   List<MyTeam> _myTeams;
   String title = "Match";
-  bool bShowInnings = false;
+  bool bShowInnings = true;
   Map<String, dynamic> l1UpdatePackate = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TabController tabController;
-
-  // bool _bShowLoader = false;
-
-  // _showLoader(bool bShow) {
-  //   setState(() {
-  //     _bShowLoader = bShow;
-  //   });
-  // }
 
   @override
   initState() {
@@ -487,7 +480,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _launchAddCash() async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
       ),
     );
@@ -514,7 +507,7 @@ class LeagueDetailState extends State<LeagueDetail>
     switch (index) {
       case 0:
         result = await Navigator.of(context).push(
-          MaterialPageRoute(
+          CupertinoPageRoute(
             builder: (context) => MyContests(
                   leagues: widget.leagues,
                   onSportChange: widget.onSportChange,
@@ -527,19 +520,21 @@ class LeagueDetailState extends State<LeagueDetail>
         break;
       case 2:
         if (squadStatus()) {
-          result = await Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => CreateContest(
-                  league: widget.league,
-                  l1data: l1Data,
-                  myTeams: _myTeams,
-                ),
-          ));
+          result = await Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => CreateContest(
+                    league: widget.league,
+                    l1data: l1Data,
+                    myTeams: _myTeams,
+                  ),
+            ),
+          );
         }
         break;
       case 3:
         if (squadStatus()) {
           result = await Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => MyTeams(
                     league: widget.league,
                     l1Data: l1Data,
@@ -626,7 +621,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _onSearchContest() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => SearchContest(
               leagues: widget.leagues,
             ),
@@ -670,59 +665,51 @@ class LeagueDetailState extends State<LeagueDetail>
             ],
           ),
           body: Container(
-            color: Color.fromARGB(255, 237, 237, 237),
-            // decoration: BoxDecoration(
-            //   // image: DecorationImage(
-            //   //   image: AssetImage("images/1.png"),
-            //   // ),
-            //   gradient: LinearGradient(
-            //     colors: [
-            //       Color.fromARGB(255, 2, 80, 197),
-            //       Color.fromARGB(255, 212, 63, 141)
-            //     ],
-            //     begin: Alignment.topLeft,
-            //     end: Alignment.bottomRight,
-            //     // stops: [0.5, 1.0],
-            //   ),
-            //   // backgroundBlendMode: BlendMode.overlay,
-            // ),
+            // color: Color.fromARGB(255, 237, 237, 237),
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/norwegian_rose.png"),
+                    repeat: ImageRepeat.repeat)),
             child: Column(
               children: <Widget>[
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: LeagueCard(
-                        widget.league,
-                        clickable: false,
-                        tabBar: bShowInnings
-                            ? TabBar(
-                                labelColor: Colors.black87,
-                                unselectedLabelColor: Colors.black38,
-                                controller: tabController,
-                                indicatorSize: TabBarIndicatorSize.tab,
-                                indicator: UnderlineTabIndicator(
-                                  borderSide: BorderSide(
-                                    color: Theme.of(context).primaryColorDark,
-                                  ),
-                                  insets:
-                                      EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
-                                ),
-                                tabs: [
-                                  Container(
-                                    height: 24.0,
-                                    child: Tab(
-                                      text: "MATCH",
+                      child: Hero(
+                        tag: "league-" + widget.league.leagueId.toString(),
+                        child: LeagueCard(
+                          widget.league,
+                          clickable: false,
+                          tabBar: bShowInnings
+                              ? TabBar(
+                                  labelColor: Colors.black87,
+                                  unselectedLabelColor: Colors.black38,
+                                  controller: tabController,
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  indicator: UnderlineTabIndicator(
+                                    borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColorDark,
                                     ),
+                                    insets: EdgeInsets.fromLTRB(
+                                        15.0, 0.0, 15.0, 0.0),
                                   ),
-                                  Container(
-                                    height: 24.0,
-                                    child: Tab(
-                                      text: "INNINGS",
+                                  tabs: [
+                                    Container(
+                                      height: 24.0,
+                                      child: Tab(
+                                        text: "MATCH",
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            : null,
+                                    Container(
+                                      height: 24.0,
+                                      child: Tab(
+                                        text: "INNINGS",
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : null,
+                        ),
                       ),
                     ),
                   ],
@@ -778,15 +765,6 @@ class LeagueDetailState extends State<LeagueDetail>
           bottomNavigationBar:
               LobbyBottomNavigation(_onNavigationSelectionChange, 1),
         ),
-        // _bShowLoader
-        //     ? Center(
-        //         child: Container(
-        //           color: Colors.black54,
-        //           child: Loader(),
-        //           constraints: BoxConstraints.expand(),
-        //         ),
-        //       )
-        //     : Container(),
       ],
     );
   }

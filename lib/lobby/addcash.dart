@@ -1,19 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/modal/analytics.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/deposit.dart';
-import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/lobby/paymentmode.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/utils/joincontesterror.dart';
 
 class AddCash extends StatefulWidget {
   @override
@@ -24,6 +25,7 @@ class AddCashState extends State<AddCash> {
   int amount;
   String cookie = "";
   Deposit depositData;
+  bool bShowLoader = false;
   bool bShowPromoInput = false;
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
@@ -49,6 +51,7 @@ class AddCashState extends State<AddCash> {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
           : customAmountController.text);
+
       if (bonusInfo != null) {
         customAmountBonus = customAmount * bonusInfo["percentage"] / 100;
         setState(() {
@@ -63,8 +66,9 @@ class AddCashState extends State<AddCash> {
 
     amountController.addListener(() {
       setState(() {
-        amount =
-            amountController.text != "" ? int.parse(amountController.text) : 0;
+        amount = amountController.text != ""
+            ? double.parse(amountController.text).round()
+            : 0;
       });
     });
   }
@@ -737,6 +741,40 @@ class AddCashState extends State<AddCash> {
           ],
         ),
       ),
+      Padding(
+        padding: EdgeInsets.only(top: 16.0),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: <Widget>[
+              Container(
+                child: Image.asset("images/amex.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/cashfree.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/master.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/paytm.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/pci.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/visa.png"),
+                height: 48.0,
+              ),
+            ],
+          ),
+        ),
+      )
     ];
 
     return rows;
@@ -752,25 +790,36 @@ class AddCashState extends State<AddCash> {
         ),
       );
     } else {
-      amount = amount == null ? int.parse(amountController.text) : amount;
-      if (amount < depositData.chooseAmountData.minAmount) {
+      if (amountController.text.indexOf(".") != -1) {
         _scaffoldKey.currentState.showSnackBar(
           SnackBar(
-            content: Text("Please enter more than " +
-                depositData.chooseAmountData.minAmount.toString() +
-                " to deposit."),
+            content: Text("Please enter amount without decimal point"),
           ),
         );
       } else {
-        final result = await proceedToPaymentMode(amount);
-        if (result != null) {
-          initPayment(json.decode(result), amount);
+        amount = amount == null ? int.parse(amountController.text) : amount;
+        if (amount < depositData.chooseAmountData.minAmount) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text("Please enter more than " +
+                  depositData.chooseAmountData.minAmount.toString() +
+                  " to deposit."),
+            ),
+          );
+        } else {
+          final result = await proceedToPaymentMode(amount);
+          if (result != null) {
+            initPayment(json.decode(result), amount);
+          }
         }
       }
     }
   }
 
   proceedToPaymentMode(int amount) async {
+    setState(() {
+      bShowLoader = true;
+    });
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PAYMENT_MODE));
     req.body = json.encode({
@@ -781,6 +830,9 @@ class AddCashState extends State<AddCash> {
     });
     return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
+        setState(() {
+          bShowLoader = false;
+        });
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           return res.body;
         }
@@ -816,7 +868,7 @@ class AddCashState extends State<AddCash> {
     } else {
       flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
-        MaterialPageRoute(
+        CupertinoPageRoute(
           builder: (context) => ChoosePaymentMode(
                 amount: amount,
                 paymentMode: paymentMode,
@@ -894,7 +946,7 @@ class AddCashState extends State<AddCash> {
     });
 
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => InitPay(
               url: BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString,
             ),
@@ -931,24 +983,33 @@ class AddCashState extends State<AddCash> {
   }
 
   onCustomAddAmount() {
-    int customAmount = int.parse(
-        customAmountController.text == "" ? "0" : customAmountController.text);
-    if (customAmount > depositData.chooseAmountData.depositLimit) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("You can not deposit more than " +
-            strings.rupee +
-            depositData.chooseAmountData.depositLimit.toString() +
-            " in single transaction."),
-      ));
-    } else if (customAmount < depositData.chooseAmountData.minAmount) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Minimum  " +
-            strings.rupee +
-            depositData.chooseAmountData.minAmount.toString() +
-            " should be deposit in a transaction."),
-      ));
+    if (customAmountController.text.indexOf(".") != -1) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter amount without decimal point"),
+        ),
+      );
     } else {
-      onProceed(amount: customAmount);
+      int customAmount = int.parse(customAmountController.text == ""
+          ? "0"
+          : customAmountController.text);
+      if (customAmount > depositData.chooseAmountData.depositLimit) {
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text("You can not deposit more than " +
+              strings.rupee +
+              depositData.chooseAmountData.depositLimit.toString() +
+              " in single transaction."),
+        ));
+      } else if (customAmount < depositData.chooseAmountData.minAmount) {
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text("Minimum  " +
+              strings.rupee +
+              depositData.chooseAmountData.minAmount.toString() +
+              " should be deposit in a transaction."),
+        ));
+      } else {
+        onProceed(amount: customAmount);
+      }
     }
   }
 
@@ -963,53 +1024,94 @@ class AddCashState extends State<AddCash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text(
-            strings.get("ADD_CASH"),
-          ),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(
+          strings.get("ADD_CASH"),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Container(
-                color: Colors.black12,
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Account balance",
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.subhead.fontSize,
-                        fontWeight: FontWeight.bold,
+      ),
+      body: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  color: Colors.black12,
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Account balance",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .fontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 4.0),
-                      child: Text(
-                        strings.rupee +
-                            (depositData == null
-                                ? "0.0"
-                                : (depositData.chooseAmountData.balance
-                                            .deposited +
-                                        depositData.chooseAmountData.balance
-                                            .nonWithdrawable +
-                                        depositData.chooseAmountData.balance
-                                            .withdrawable)
-                                    .toStringAsFixed(2)),
-                      ),
-                    )
-                  ],
+                      Padding(
+                        padding: EdgeInsets.only(left: 4.0),
+                        child: Text(
+                          strings.rupee +
+                              (depositData == null
+                                  ? "0.0"
+                                  : (depositData.chooseAmountData.balance
+                                              .deposited +
+                                          depositData.chooseAmountData.balance
+                                              .nonWithdrawable +
+                                          depositData.chooseAmountData.balance
+                                              .withdrawable)
+                                      .toStringAsFixed(2)),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              Column(
-                children: createChooseAmountUI(),
-              )
-            ],
+                Column(
+                  children: createChooseAmountUI(),
+                )
+              ],
+            ),
           ),
-        ));
+          bShowLoader
+              ? Center(
+                  child: Container(
+                    height: 56.0,
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(3.0),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 5.0,
+                            spreadRadius: 5.0,
+                            color: Colors.black12,
+                          )
+                        ]),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(right: 16.0),
+                          child: Container(
+                            height: 24.0,
+                            width: 24.0,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                            ),
+                          ),
+                        ),
+                        Text("Loading..."),
+                      ],
+                    ),
+                  ),
+                )
+              : Container()
+        ],
+      ),
+    );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/commonwidgets/epoc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -78,8 +78,17 @@ class LeagueCard extends StatelessWidget {
                                                 Padding(
                                                   padding:
                                                       EdgeInsets.only(top: 8.0),
-                                                  child:
-                                                      Text(_league.teamA.name),
+                                                  child: Text(
+                                                    _league.teamA.name,
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .subhead
+                                                        .copyWith(
+                                                          color: Colors.black87,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -176,7 +185,17 @@ class LeagueCard extends StatelessWidget {
                                             Padding(
                                               padding:
                                                   EdgeInsets.only(top: 8.0),
-                                              child: Text(_league.teamB.name),
+                                              child: Text(
+                                                _league.teamB.name,
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .subhead
+                                                    .copyWith(
+                                                      color: Colors.black87,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
                                             ),
                                           ],
                                         ),

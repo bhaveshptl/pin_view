@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -36,7 +37,7 @@ class AuthResult {
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY, response.body);
       await setWSCookie();
       Navigator.of(scaffoldKey.currentContext).pushReplacement(
-        MaterialPageRoute(
+        CupertinoPageRoute(
           builder: (context) => Lobby(),
         ),
       );

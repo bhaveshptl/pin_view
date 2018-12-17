@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -70,7 +71,7 @@ class InningsState extends State<Innings> {
 
   showInningDetails(BuildContext context, L1.Team team) async {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => InningDetails(
               team: team,
               league: widget.league,

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
@@ -85,7 +86,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _onVerify() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => Verification(),
       ),
     );
@@ -93,7 +94,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _onMyProfile() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => MyProfile(),
       ),
     );
@@ -131,7 +132,7 @@ class AppDrawerState extends State<AppDrawer> {
         break;
     }
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
           builder: (context) => WebviewScaffold(
                 url: url,
                 clearCache: true,
@@ -145,7 +146,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _showEarnCash() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => EarnCash(),
         fullscreenDialog: true,
       ),
@@ -155,7 +156,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _showMyAccount() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => MyAccount(),
       ),
     );
@@ -163,7 +164,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _showWithdraw() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => Withdraw(),
       ),
     );
@@ -171,7 +172,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _showPartnerPage() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => Partner(),
       ),
     );
@@ -179,7 +180,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _showContactUsPage() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => ContactUs(),
         fullscreenDialog: true,
       ),
@@ -295,7 +296,7 @@ class AppDrawerState extends State<AppDrawer> {
 
   _launchAddCash() async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
       ),
     );
@@ -323,8 +324,33 @@ class AppDrawerState extends State<AppDrawer> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Profile"),
+        actions: <Widget>[
+          !bIsUserVerified
+              ? Container(
+                  padding: EdgeInsets.all(12.0),
+                  child: RaisedButton(
+                    onPressed: () {
+                      _onVerify();
+                    },
+                    padding: EdgeInsets.all(0.0),
+                    color: Colors.white70,
+                    child: Text(
+                      "VERIFY",
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
       ),
       body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("images/norwegian_rose.png"),
+              repeat: ImageRepeat.repeat),
+        ),
         child: ListView(
           padding: EdgeInsets.all(8.0),
           children: <Widget>[
@@ -343,11 +369,11 @@ class AppDrawerState extends State<AppDrawer> {
                         children: <Widget>[
                           CircleAvatar(
                             maxRadius: 32.0,
-                            backgroundColor:
-                                Theme.of(context).primaryColor.withAlpha(100),
+                            backgroundColor: Theme.of(context).primaryColor,
                             child: Icon(
                               Icons.person,
                               size: 48.0,
+                              color: Colors.white70,
                             ),
                           ),
                         ],

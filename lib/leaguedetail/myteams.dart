@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -53,7 +54,7 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -69,7 +70,7 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onEditTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -86,7 +87,7 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onCloneTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -248,14 +249,42 @@ class MyTeamsState extends State<MyTeams> {
                             onPressed: () {
                               _onEditTeam(context);
                             },
-                            icon: Icon(Icons.edit),
+                            icon: Column(
+                              children: <Widget>[
+                                Icon(Icons.edit),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    "EDIT",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           IconButton(
                             padding: EdgeInsets.all(0.0),
                             onPressed: () {
                               _onCloneTeam(context);
                             },
-                            icon: Icon(Icons.content_copy),
+                            icon: Column(
+                              children: <Widget>[
+                                Icon(Icons.content_copy),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    "CLONE",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(color: Colors.black54),
+                                  ),
+                                ),
+                              ],
+                            ),
                           )
                         ],
                       )
@@ -341,7 +370,8 @@ class MyTeamsState extends State<MyTeams> {
                                       ('images/' +
                                               style.label +
                                               " " +
-                                              player.sportsId.toString() + "-black"
+                                              player.sportsId.toString() +
+                                              "-black"
                                               ".png")
                                           .toLowerCase()
                                           .replaceAll(" ", "-"),
@@ -425,6 +455,11 @@ class MyTeamsState extends State<MyTeams> {
         ),
       ),
       body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("images/norwegian_rose.png"),
+              repeat: ImageRepeat.repeat),
+        ),
         child: Column(
           children: <Widget>[
             LeagueCard(
