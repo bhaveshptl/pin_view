@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
@@ -365,7 +366,7 @@ class InningDetailsState extends State<InningDetails> {
 
   _launchAddCash() async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
       ),
     );
@@ -392,7 +393,7 @@ class InningDetailsState extends State<InningDetails> {
     switch (index) {
       case 0:
         result = await Navigator.of(context).push(
-          MaterialPageRoute(
+          CupertinoPageRoute(
             builder: (context) => MyContests(
                   leagues: widget.leagues,
                   onSportChange: widget.onSportChange,
@@ -404,24 +405,30 @@ class InningDetailsState extends State<InningDetails> {
         _launchAddCash();
         break;
       case 2:
-        result = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => CreateContest(
-                league: widget.league,
-                l1data: inningsData,
-                myTeams: _myTeams,
-              ),
-        ));
+        if (squadStatus()) {
+          result = await Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => CreateContest(
+                    league: widget.league,
+                    l1data: inningsData,
+                    myTeams: _myTeams,
+                  ),
+            ),
+          );
+        }
         break;
       case 3:
-        result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => MyTeams(
-                  league: widget.league,
-                  l1Data: inningsData,
-                  myTeams: _myTeams,
-                ),
-          ),
-        );
+        if (squadStatus()) {
+          result = await Navigator.of(context).push(
+            CupertinoPageRoute(
+              builder: (context) => MyTeams(
+                    league: widget.league,
+                    l1Data: inningsData,
+                    myTeams: _myTeams,
+                  ),
+            ),
+          );
+        }
         break;
     }
     if (result != null) {
@@ -431,6 +438,28 @@ class InningDetailsState extends State<InningDetails> {
         ),
       );
     }
+  }
+
+  squadStatus() {
+    if (inningsData.league.rounds[0].matches[0].squad == 0) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Row(
+            children: <Widget>[
+              Expanded(
+                child:
+                    Text("Squad is not yet announced. Please try again later."),
+              ),
+            ],
+          ),
+          duration: Duration(
+            seconds: 3,
+          ),
+        ),
+      );
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -453,30 +482,37 @@ class InningDetailsState extends State<InningDetails> {
               )
             ],
           ),
-          body: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: LeagueCard(
-                      widget.league,
-                      clickable: false,
-                    ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: inningsData == null
-                    ? Container()
-                    : Contests(
-                        l1Data: inningsData,
-                        myTeams: _myTeams,
-                        league: widget.league,
-                        scaffoldKey: _scaffoldKey,
-                        mapContestTeams: _mapContestTeams,
+          body: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("images/norwegian_rose.png"),
+                  repeat: ImageRepeat.repeat),
+            ),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: LeagueCard(
+                        widget.league,
+                        clickable: false,
                       ),
-              ),
-            ],
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: inningsData == null
+                      ? Container()
+                      : Contests(
+                          l1Data: inningsData,
+                          myTeams: _myTeams,
+                          league: widget.league,
+                          scaffoldKey: _scaffoldKey,
+                          mapContestTeams: _mapContestTeams,
+                        ),
+                ),
+              ],
+            ),
           ),
           bottomNavigationBar:
               LobbyBottomNavigation(_onNavigationSelectionChange, 1),

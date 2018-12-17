@@ -1,6 +1,8 @@
 class Withhdraw {
   String accountNumber;
+  final String lastName;
   final String loginName;
+  final String firstName;
   String ifscCode;
   final int numberOfFreeWithdraw;
   final int totalWithdraw;
@@ -20,6 +22,8 @@ class Withhdraw {
     this.loginName,
     this.accountNumber,
     this.ifscCode,
+    this.firstName,
+    this.lastName,
     this.numberOfFreeWithdraw,
     this.totalWithdraw,
     this.withdrawCost,
@@ -43,6 +47,8 @@ class Withhdraw {
         loginName: json["login_name"],
         minWithdraw: json["minWithdraw"],
         maxWithdraw: json["maxWithdraw"],
+        firstName: json["first_name"],
+        lastName: json["last_name"],
         withdrawCost: json["withdrawCost"],
         totalWithdraw: json["totalWithdraw"],
         accountNumber: json["account_number"],

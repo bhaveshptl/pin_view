@@ -17,20 +17,14 @@ import 'package:playfantasy/landingpage/landingpage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 /*
-++=======================================================================++
-||***********************************************************************||
-||**                                                                   **||
-||**                                                                   **||
-||**   ANY CHANGES IN "main.dart" WILL OVERRIDE WHILE BUILDING APK.    **||
-||**   MAKE SURE TO EDIT FOLLWING FILES.                               **||
-||**    - "resources/main_3.dart"                                      **||
-||**    - "resources/main_9.dart"                                      **||
-||**    - "resources/main_3_prod.dart"                                 **||
-||**    - "resources/main_9_prod.dart"                                 **||
-||**                                                                   **||
-||**                                                                   **||
-||***********************************************************************||
-++========================================================================+
+╔═══════════════════════════════════════════════════════════════════╗
+║   ANY CHANGES IN "main.dart" WILL OVERRIDE WHILE BUILDING APK.    ║
+║   MAKE SURE TO EDIT FOLLWING FILES.                               ║
+║    - "resources/main_3.dart"                                      ║
+║    - "resources/main_9.dart"                                      ║
+║    - "resources/main_3_prod.dart"                                 ║
+║    - "resources/main_9_prod.dart"                                 ║
+╚═══════════════════════════════════════════════════════════════════╝
 */
 
 String apkUrl;

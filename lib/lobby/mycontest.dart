@@ -34,7 +34,7 @@ class MyContestsState extends State<MyContests>
   int selectedSegment = 0;
   List<League> _leagues = [];
   TabController tabController;
-  bool bShowInnings = false;
+  bool bShowInnings = true;
   TabController _sportsController;
   Map<String, int> _mapSportTypes;
   Map<int, List<MyContestStatusTab>> tabs = {};
@@ -415,7 +415,7 @@ class MyContestsState extends State<MyContests>
 
   _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => ContestDetail(
               league: league,
               contest: contest,
@@ -439,7 +439,7 @@ class MyContestsState extends State<MyContests>
                 2: Text(strings.get("RESULT").toUpperCase()),
               },
               borderColor: Theme.of(context).primaryColorDark,
-              selectedColor: Theme.of(context).primaryColorLight,
+              selectedColor: Theme.of(context).primaryColorDark.withAlpha(240),
               onValueChanged: (int newValue) {
                 setState(() {
                   selectedSegment = newValue;

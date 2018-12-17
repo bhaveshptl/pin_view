@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
@@ -147,7 +148,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
       switch (index) {
         case 0:
           Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => MyContests(
                     leagues: _leagues,
                     onSportChange: _onSportSelectionChaged,
@@ -160,14 +161,14 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
           break;
         case 2:
           Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => EarnCash(),
             ),
           );
           break;
         case 3:
           Navigator.of(context).push(
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) => AppDrawer(),
             ),
           );
@@ -178,7 +179,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   _launchAddCash() async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
       ),
     );
@@ -213,7 +214,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   launchHelp() {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => WebviewScaffold(
               url: "https://www.playfantasy.com/assets/help.html?cache=" +
                   DateTime.now().millisecondsSinceEpoch.toString(),
@@ -288,16 +289,17 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                                             child: Stack(
                                               children: <Widget>[
                                                 ClipRRect(
-                                                    clipBehavior: Clip.hardEdge,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                      Radius.circular(8.0),
-                                                    ),
-                                                    child: Image.network(
-                                                      img,
-                                                      fit: BoxFit.contain,
-                                                      width: 1000.0,
-                                                    )),
+                                                  clipBehavior: Clip.hardEdge,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                    Radius.circular(8.0),
+                                                  ),
+                                                  child: Image.network(
+                                                    img,
+                                                    fit: BoxFit.cover,
+                                                    width: 1000.0,
+                                                  ),
+                                                ),
                                               ],
                                             ));
                                       }).toList(),
@@ -335,26 +337,33 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                 )
               ],
             ),
-            body: _sportType >= 0
-                ? TabBarView(
-                    controller: _controller,
-                    children: _mapSportTypes.keys.map<Widget>((page) {
-                      return Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: LobbyWidget(
-                              sportType: _mapSportTypes[page],
-                              onLeagues: (value) {
-                                _leagues = value;
-                              },
-                              onSportChange: _onSportSelectionChaged,
+            body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/norwegian_rose.png"),
+                    repeat: ImageRepeat.repeat),
+              ),
+              child: _sportType >= 0
+                  ? TabBarView(
+                      controller: _controller,
+                      children: _mapSportTypes.keys.map<Widget>((page) {
+                        return Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: LobbyWidget(
+                                sportType: _mapSportTypes[page],
+                                onLeagues: (value) {
+                                  _leagues = value;
+                                },
+                                onSportChange: _onSportSelectionChaged,
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  )
-                : Container(),
+                          ],
+                        );
+                      }).toList(),
+                    )
+                  : Container(),
+            ),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -53,7 +54,7 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -69,7 +70,7 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onEditTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -86,7 +87,7 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onCloneTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -454,6 +455,11 @@ class MyTeamsState extends State<MyTeams> {
         ),
       ),
       body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("images/norwegian_rose.png"),
+              repeat: ImageRepeat.repeat),
+        ),
         child: Column(
           children: <Widget>[
             LeagueCard(

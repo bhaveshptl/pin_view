@@ -33,9 +33,9 @@ if (channelId == null) {
     channelId = '3'
 }
 
-def buildMode = localProperties.getProperty('flutter.buildMode')
-if(buildMode == null){
-    buildMode = 'debug'
+def buildType = localProperties.getProperty('flutter.buildType')
+if(buildType == null){
+    buildType = 'stg'
 }
 
 
@@ -77,7 +77,7 @@ task copyFlutterInitialization(type: Copy) {
     println 'Deleting main.dart!!!!'
     delete "../../lib/main.dart"  
     println 'Copying updated resources!!!!'
-    if (channelId == '3' && buildMode == 'debug') {
+    if (channelId == '3' && buildType == 'stg') {
         copy {
             from "../../resources/main_3.dart"
             into "../../lib"            
@@ -85,7 +85,7 @@ task copyFlutterInitialization(type: Copy) {
                 fileName.replace('_3', '')
             }
         }
-    } else if (channelId == '9' && buildMode == 'debug') {
+    } else if (channelId == '9' && buildType == 'stg') {
         copy {
             from "../../resources/main_9.dart"
             into "../../lib"            
@@ -93,7 +93,7 @@ task copyFlutterInitialization(type: Copy) {
                 fileName.replace('_9', '')
             }
         }
-    } else if (channelId == '3' && buildMode == 'release') {
+    } else if (channelId == '3' && buildType == 'prod') {
         copy {
             from "../../resources/main_3_prod.dart"
             into "../../lib"            
@@ -101,7 +101,7 @@ task copyFlutterInitialization(type: Copy) {
                 fileName.replace('_3_prod', '')
             }
         }
-    } else if (channelId == '9' && buildMode == 'release') {
+    } else if (channelId == '9' && buildType == 'prod') {
         copy {
             from "../../resources/main_9_prod.dart"
             into "../../lib"            

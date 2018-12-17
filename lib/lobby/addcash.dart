@@ -1,19 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/modal/analytics.dart';
+import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/deposit.dart';
-import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/lobby/paymentmode.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/utils/joincontesterror.dart';
 
 class AddCash extends StatefulWidget {
   @override
@@ -740,6 +741,40 @@ class AddCashState extends State<AddCash> {
           ],
         ),
       ),
+      Padding(
+        padding: EdgeInsets.only(top: 16.0),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: <Widget>[
+              Container(
+                child: Image.asset("images/amex.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/cashfree.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/master.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/paytm.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/pci.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/visa.png"),
+                height: 48.0,
+              ),
+            ],
+          ),
+        ),
+      )
     ];
 
     return rows;
@@ -833,7 +868,7 @@ class AddCashState extends State<AddCash> {
     } else {
       flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
-        MaterialPageRoute(
+        CupertinoPageRoute(
           builder: (context) => ChoosePaymentMode(
                 amount: amount,
                 paymentMode: paymentMode,
@@ -911,7 +946,7 @@ class AddCashState extends State<AddCash> {
     });
 
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => InitPay(
               url: BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString,
             ),
@@ -989,93 +1024,94 @@ class AddCashState extends State<AddCash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text(
-            strings.get("ADD_CASH"),
-          ),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(
+          strings.get("ADD_CASH"),
         ),
-        body: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    color: Colors.black12,
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
+      ),
+      body: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  color: Colors.black12,
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Account balance",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .fontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 4.0),
+                        child: Text(
+                          strings.rupee +
+                              (depositData == null
+                                  ? "0.0"
+                                  : (depositData.chooseAmountData.balance
+                                              .deposited +
+                                          depositData.chooseAmountData.balance
+                                              .nonWithdrawable +
+                                          depositData.chooseAmountData.balance
+                                              .withdrawable)
+                                      .toStringAsFixed(2)),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Column(
+                  children: createChooseAmountUI(),
+                )
+              ],
+            ),
+          ),
+          bShowLoader
+              ? Center(
+                  child: Container(
+                    height: 56.0,
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(3.0),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 5.0,
+                            spreadRadius: 5.0,
+                            color: Colors.black12,
+                          )
+                        ]),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Text(
-                          "Account balance",
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .subhead
-                                .fontSize,
-                            fontWeight: FontWeight.bold,
+                        Padding(
+                          padding: EdgeInsets.only(right: 16.0),
+                          child: Container(
+                            height: 24.0,
+                            width: 24.0,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                            ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 4.0),
-                          child: Text(
-                            strings.rupee +
-                                (depositData == null
-                                    ? "0.0"
-                                    : (depositData
-                                                .chooseAmountData.balance.deposited +
-                                            depositData.chooseAmountData.balance
-                                                .nonWithdrawable +
-                                            depositData.chooseAmountData.balance
-                                                .withdrawable)
-                                        .toStringAsFixed(2)),
-                          ),
-                        )
+                        Text("Loading..."),
                       ],
                     ),
                   ),
-                  Column(
-                    children: createChooseAmountUI(),
-                  )
-                ],
-              ),
-            ),
-            bShowLoader
-                ? Center(
-                    child: Container(
-                      height: 56.0,
-                      padding: EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(3.0),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 5.0,
-                              spreadRadius: 5.0,
-                              color: Colors.black12,
-                            )
-                          ]),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(right: 16.0),
-                            child: Container(
-                              height: 24.0,
-                              width: 24.0,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.0,
-                              ),
-                            ),
-                          ),
-                          Text("Loading..."),
-                        ],
-                      ),
-                    ),
-                  )
-                : Container()
-          ],
-        ));
+                )
+              : Container()
+        ],
+      ),
+    );
   }
 }

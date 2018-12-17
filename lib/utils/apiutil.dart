@@ -76,9 +76,11 @@ class ApiUtil {
   static const PAYMENT_MODE = "/api/payment/player/deposit/proceed/v2";
   static const VALIDATE_PROMO = "/api/v2/payment/player/deposit/validate/promo";
   static const INIT_PAYMENT = "/api/payment/player/deposit/init-pay?";
+  static const INIT_PAYMENT_SEAMLESS =
+      "/api/v2/payment/player/deposit/init-pay-seamless?";
   static const CONTACTUS_SUBMIT = "/api/ups/contactUs/submit";
   static const CONTACTUS_FORM = "/api/ups/contactUsForm";
-  
+
   static const AUTH_WITHDRAW = "/api/v2/ups/user/authWithdraw";
   static const WITHDRAW = "/api/ups/user/withdraw";
   static const WITHDRAW_HISTORY = "/api/ups/user/withdraw/list";

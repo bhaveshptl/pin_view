@@ -17,30 +17,25 @@ import 'package:playfantasy/landingpage/landingpage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 /*
-++=======================================================================++
-||***********************************************************************||
-||**                                                                   **||
-||**                                                                   **||
-||**   ANY CHANGES IN "main.dart" WILL OVERRIDE WHILE BUILDING APK.    **||
-||**   MAKE SURE TO EDIT FOLLWING FILES.                               **||
-||**    - "resources/main_3.dart"                                      **||
-||**    - "resources/main_9.dart"                                      **||
-||**    - "resources/main_3_prod.dart"                                 **||
-||**    - "resources/main_9_prod.dart"                                 **||
-||**                                                                   **||
-||**                                                                   **||
-||***********************************************************************||
-++========================================================================+
+╔═══════════════════════════════════════════════════════════════════╗
+║   ANY CHANGES IN "main.dart" WILL OVERRIDE WHILE BUILDING APK.    ║
+║   MAKE SURE TO EDIT FOLLWING FILES.                               ║
+║    - "resources/main_3.dart"                                      ║
+║    - "resources/main_9.dart"                                      ║
+║    - "resources/main_3_prod.dart"                                 ║
+║    - "resources/main_9_prod.dart"                                 ║
+╚═══════════════════════════════════════════════════════════════════╝
 */
 
 String apkUrl;
 String cookie;
 Widget _homePage;
-String channelId = "9";
+String channelId = "3";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
 String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
+// String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
 Map<String, dynamic> initData = {};
 Map<String, dynamic> staticPageUrls;
@@ -180,6 +175,30 @@ initFirebaseConfiguration() async {
   _firebaseMessaging.subscribeToTopic(fcmSubscribeId);
 }
 
+ThemeData _buildLightTheme() {
+  const Color primaryColor = Color(0xFF0E4F87);
+  const Color secondaryColor = Color(0xFF244f83);
+  final ColorScheme colorScheme = const ColorScheme.light().copyWith(
+    primary: primaryColor,
+    secondary: secondaryColor,
+  );
+  final ThemeData base = ThemeData.light();
+  return base.copyWith(
+    colorScheme: colorScheme,
+    primaryColor: primaryColor,
+    primaryColorDark: secondaryColor,
+    buttonColor: primaryColor,
+    indicatorColor: Colors.white,
+    splashColor: Colors.white24,
+    splashFactory: InkRipple.splashFactory,
+    accentColor: secondaryColor,
+    canvasColor: Colors.white,
+    scaffoldBackgroundColor: Colors.white,
+    backgroundColor: Colors.white,
+    errorColor: const Color(0xFFB00020),
+  );
+}
+
 ///
 /// Bootstraping APP.
 ///
@@ -192,7 +211,7 @@ void main() async {
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
-    appName: 'Smart11',
+    appName: 'PlayFantasy',
     channelId: channelId,
     apiBaseUrl: apiBaseUrl,
     websocketUrl: websocketUrl,
@@ -201,12 +220,7 @@ void main() async {
     child: MaterialApp(
       home: _homePage,
       routes: FantasyRoutes().getRoutes(),
-      theme: ThemeData(
-        primaryColor: Color.fromARGB(255, 207, 34, 40),
-        accentColor: Color.fromARGB(255, 197, 34, 40),
-        primaryColorDark: Color.fromARGB(255, 227, 34, 40),
-        primaryColorLight: Color.fromARGB(255, 197, 34, 40),
-      ),
+      theme: _buildLightTheme(),
     ),
   );
 

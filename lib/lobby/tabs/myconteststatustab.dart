@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -379,7 +380,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     final curContest = contest;
     final league = _getLeague(contest.leagueId);
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: league,
               l1Data: _l1Data,
@@ -449,7 +450,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     }
 
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),

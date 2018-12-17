@@ -195,6 +195,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       sockets.sendMessage(lobbyUpdatePackate);
     }
     return Scaffold(
+      backgroundColor: Colors.transparent,
       key: _scaffoldKey,
       body: Stack(
         children: <Widget>[

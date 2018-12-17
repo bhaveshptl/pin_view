@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 
@@ -173,10 +176,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   bool validateUserInfo() {
     if ((widget.paymentMode["first_name"] == null &&
-            firstNameController.text == "") ||
-        (widget.paymentMode["last_name"] == null &&
-            lastNameController.text == "")) {
-      showSnackbar("First name and Last name are required to proceed.");
+        firstNameController.text == "")) {
+      showSnackbar("First name is required to proceed.");
       return false;
     } else if (widget.paymentMode["mobile"] == null &&
         phoneController.text == "") {
@@ -251,12 +252,25 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       index++;
     });
 
-    initPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+    if (paymentModeDetails["info"]["isSeamless"]) {
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl.apiUrl +
+              ApiUtil.INIT_PAYMENT_SEAMLESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        print(res.body);
+      });
+    } else {
+      initPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+    }
   }
 
   initPayment(String url) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => InitPay(
               url: url,
             ),
@@ -326,9 +340,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                         borderSide: BorderSide(
                                           color: Colors.black38,
                                         ),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(0.0),
-                                        ),
                                       ),
                                     ),
                                     keyboardType: TextInputType.text,
@@ -354,9 +365,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide(
                                           color: Colors.black38,
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(0.0),
                                         ),
                                       ),
                                     ),
@@ -388,9 +396,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                         borderSide: BorderSide(
                                           color: Colors.black38,
                                         ),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(0.0),
-                                        ),
                                       ),
                                     ),
                                     keyboardType: TextInputType.emailAddress,
@@ -420,9 +425,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide(
                                           color: Colors.black38,
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(0.0),
                                         ),
                                       ),
                                     ),
