@@ -340,6 +340,13 @@ class VerificationState extends State<Verification> {
         (http.Response res) {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
+            if (response["err"] != null && response["err"]) {
+              scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text(response["msg"]),
+                ),
+              );
+            }
             setState(() {
               _panVerificationStatus = response["pan_verification"];
               _addressVerificationStatus = response["address_verification"];
@@ -713,7 +720,7 @@ class VerificationState extends State<Verification> {
                                           ? Icon(Icons.check_circle_outline)
                                           : _verificationStatus ==
                                                   "DOC_SUBMITTED"
-                                              ? Icon(Icons.check)
+                                              ? Icon(Icons.warning)
                                               : Icon(
                                                   Icons.remove_circle_outline)
                                     ],

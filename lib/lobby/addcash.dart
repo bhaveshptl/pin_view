@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
@@ -37,6 +40,8 @@ class AddCashState extends State<AddCash> {
   TextEditingController amountController = TextEditingController();
   TextEditingController customAmountController = TextEditingController();
 
+  static const razorpay_platform =
+      const MethodChannel('com.algorin.pf.razorpay');
   static const _kFontFam = 'MyFlutterApp';
   IconData gift_1 = const IconData(0xe800, fontFamily: _kFontFam);
 
@@ -71,6 +76,8 @@ class AddCashState extends State<AddCash> {
             : 0;
       });
     });
+
+    razorpay_platform.setMethodCallHandler(myUtilsHandler);
   }
 
   initWebview() {
@@ -78,6 +85,59 @@ class AddCashState extends State<AddCash> {
       BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
     );
+  }
+
+  Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
+    String value;
+    try {
+      value =
+          await razorpay_platform.invokeMethod('_openRazorpayNative', payload);
+    } catch (e) {}
+    return value;
+  }
+
+  Future<dynamic> myUtilsHandler(MethodCall methodCall) async {
+    switch (methodCall.method) {
+      case 'onRazorPayPaymentFail':
+      case 'onRazorPayPaymentSuccess':
+        processSuccessResponse(json.decode(methodCall.arguments));
+        break;
+      default:
+    }
+  }
+
+  processSuccessResponse(Map<String, dynamic> payload) {
+    setState(() {
+      bShowLoader = false;
+    });
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SUCCESS_PAY));
+    req.body = json.encode(payload);
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      Map<String, dynamic> response = json.decode(res.body);
+      if ((response["authStatus"] as String).toLowerCase() ==
+              "Declined".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Failed".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Fail".toLowerCase()) {
+        if (response["orderId"] == null) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              ),
+            ),
+          );
+        } else {
+          _showTransactionFailed(response);
+        }
+      } else {
+        Navigator.of(context).pop(res.body);
+      }
+    });
   }
 
   _getDepositInfo() async {
@@ -685,11 +745,22 @@ class AddCashState extends State<AddCash> {
                                               }
                                             : null,
                                       ),
-                                      Text("Repeat transaction with " +
+                                      Text(
+                                        "Proceed with ",
+                                      ),
+                                      Text(
+                                        depositData.chooseAmountData
+                                            .lastPaymentArray[0]["label"]
+                                            .toString(),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: SvgPicture.network(
                                           depositData.chooseAmountData
-                                              .lastPaymentArray[0]["label"]
-                                              .toString()
-                                              .toUpperCase()),
+                                              .lastPaymentArray[0]["logoUrl"],
+                                          width: 24.0,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 )
@@ -748,7 +819,7 @@ class AddCashState extends State<AddCash> {
           child: Row(
             children: <Widget>[
               Container(
-                child: Image.asset("images/amex.png"),
+                child: Image.asset("images/visa.png"),
                 height: 48.0,
               ),
               Container(
@@ -768,7 +839,7 @@ class AddCashState extends State<AddCash> {
                 height: 48.0,
               ),
               Container(
-                child: Image.asset("images/visa.png"),
+                child: Image.asset("images/amex.png"),
                 height: 48.0,
               ),
             ],
@@ -882,6 +953,7 @@ class AddCashState extends State<AddCash> {
         Navigator.of(context).pop(result);
       } else {
         initWebview();
+        razorpay_platform.setMethodCallHandler(myUtilsHandler);
       }
     }
   }
@@ -933,7 +1005,8 @@ class AddCashState extends State<AddCash> {
       "updateEmail": false,
       "updateMobile": false,
       "updateName": false,
-      "isFirstDeposit": false
+      "isFirstDeposit": false,
+      "native": true,
     };
 
     int index = 0;
@@ -945,19 +1018,67 @@ class AddCashState extends State<AddCash> {
       index++;
     });
 
+    setState(() {
+      bShowLoader = true;
+    });
+
+    if (paymentModeDetails["isSeamless"]) {
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl.apiUrl +
+              ApiUtil.INIT_PAYMENT_SEAMLESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        _openRazorpayNative({
+          "email": payload["email"],
+          "phone": payload["phone"],
+          "amount": (payload["depositAmount"] * 100).toString(),
+          "orderId": response["action"]["value"],
+          "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+              ? payload["paymentType"].toLowerCase()
+              : "card"
+        });
+      });
+    } else {
+      startInitPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+    }
+  }
+
+  startInitPayment(String url) async {
     final result = await Navigator.of(context).push(
       CupertinoPageRoute(
         builder: (context) => InitPay(
-              url: BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString,
+              url: url,
             ),
       ),
     );
 
+    setState(() {
+      bShowLoader = false;
+    });
+
     if (result != null) {
       Map<String, dynamic> response = json.decode(result);
       if ((response["authStatus"] as String).toLowerCase() ==
-          "Declined".toLowerCase()) {
-        _showTransactionFailed(response);
+              "Declined".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Failed".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Fail".toLowerCase()) {
+        if (response["orderId"] == null) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              ),
+            ),
+          );
+        } else {
+          _showTransactionFailed(response);
+        }
       } else {
         Navigator.of(context).pop(result);
       }
@@ -1032,84 +1153,63 @@ class AddCashState extends State<AddCash> {
       ),
       body: Stack(
         children: <Widget>[
-          SingleChildScrollView(
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/norwegian_rose.png"),
+                repeat: ImageRepeat.repeat,
+              ),
+            ),
             child: Column(
               children: <Widget>[
-                Container(
-                  color: Colors.black12,
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                SingleChildScrollView(
+                  child: Column(
                     children: <Widget>[
-                      Text(
-                        "Account balance",
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: Theme.of(context)
-                              .primaryTextTheme
-                              .subhead
-                              .fontSize,
-                          fontWeight: FontWeight.bold,
+                      Container(
+                        color: Colors.black26,
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Account balance",
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: Theme.of(context)
+                                    .primaryTextTheme
+                                    .subhead
+                                    .fontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 4.0),
+                              child: Text(
+                                strings.rupee +
+                                    (depositData == null
+                                        ? "0.0"
+                                        : (depositData.chooseAmountData.balance
+                                                    .deposited +
+                                                depositData.chooseAmountData
+                                                    .balance.nonWithdrawable +
+                                                depositData.chooseAmountData
+                                                    .balance.withdrawable)
+                                            .toStringAsFixed(2)),
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 4.0),
-                        child: Text(
-                          strings.rupee +
-                              (depositData == null
-                                  ? "0.0"
-                                  : (depositData.chooseAmountData.balance
-                                              .deposited +
-                                          depositData.chooseAmountData.balance
-                                              .nonWithdrawable +
-                                          depositData.chooseAmountData.balance
-                                              .withdrawable)
-                                      .toStringAsFixed(2)),
-                        ),
+                      Column(
+                        children: createChooseAmountUI(),
                       )
                     ],
                   ),
                 ),
-                Column(
-                  children: createChooseAmountUI(),
-                )
               ],
             ),
           ),
-          bShowLoader
-              ? Center(
-                  child: Container(
-                    height: 56.0,
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(3.0),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 5.0,
-                            spreadRadius: 5.0,
-                            color: Colors.black12,
-                          )
-                        ]),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(right: 16.0),
-                          child: Container(
-                            height: 24.0,
-                            width: 24.0,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                            ),
-                          ),
-                        ),
-                        Text("Loading..."),
-                      ],
-                    ),
-                  ),
-                )
-              : Container()
+          bShowLoader ? Loader() : Container()
         ],
       ),
     );

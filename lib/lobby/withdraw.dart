@@ -1122,7 +1122,7 @@ class WithdrawState extends State<Withdraw> {
                                             ),
                                             TextSpan(
                                               text:
-                                                  " is registered with PAYTM and it's KYC verification is completed on PAYTM.",
+                                                  " is registered with PAYTM and its KYC verification is completed on PAYTM.",
                                             )
                                           ]),
                                     ),

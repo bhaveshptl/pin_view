@@ -133,14 +133,15 @@ class AppDrawerState extends State<AppDrawer> {
     }
     Navigator.of(context).push(
       CupertinoPageRoute(
-          builder: (context) => WebviewScaffold(
-                url: url,
-                clearCache: true,
-                appBar: AppBar(
-                  title: Text(title),
-                ),
+        builder: (context) => WebviewScaffold(
+              url: url,
+              clearCache: true,
+              appBar: AppBar(
+                title: Text(title),
               ),
-          fullscreenDialog: true),
+            ),
+        fullscreenDialog: true,
+      ),
     );
   }
 
@@ -625,7 +626,12 @@ class AppDrawerState extends State<AppDrawer> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text("View transactions".toUpperCase())
+                          Text(
+                            "View transactions".toUpperCase(),
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                            ),
+                          )
                         ],
                       ),
                     ),
@@ -654,7 +660,6 @@ class AppDrawerState extends State<AppDrawer> {
                   ListTile(
                     title: Text('How To Play'),
                     onTap: () {
-                      Navigator.pop(context);
                       _launchStaticPage("HELP");
                     },
                   ),
@@ -662,7 +667,6 @@ class AppDrawerState extends State<AppDrawer> {
                   ListTile(
                     title: Text('Scoring System'),
                     onTap: () {
-                      Navigator.pop(context);
                       _launchStaticPage("SCORING");
                     },
                   ),
@@ -670,7 +674,6 @@ class AppDrawerState extends State<AppDrawer> {
                   ListTile(
                     title: Text('Contact Us'),
                     onTap: () {
-                      Navigator.pop(context);
                       _showContactUsPage();
                     },
                   ),
@@ -700,7 +703,6 @@ class AppDrawerState extends State<AppDrawer> {
                       : ListTile(
                           title: Text('Become A Partner'),
                           onTap: () {
-                            Navigator.pop(context);
                             _showPartnerPage();
                           },
                         ),
@@ -718,7 +720,6 @@ class AppDrawerState extends State<AppDrawer> {
                             ListTile(
                               title: Text('Blog'),
                               onTap: () {
-                                Navigator.pop(context);
                                 _launchStaticPage("BLOG");
                               },
                             ),
@@ -732,7 +733,6 @@ class AppDrawerState extends State<AppDrawer> {
                             ListTile(
                               title: Text('Forum'),
                               onTap: () {
-                                Navigator.pop(context);
                                 _launchStaticPage("FORUM");
                               },
                             ),
@@ -743,7 +743,6 @@ class AppDrawerState extends State<AppDrawer> {
                   ListTile(
                     title: Text('Terms And Conditions'),
                     onTap: () {
-                      Navigator.pop(context);
                       _launchStaticPage("T&C");
                     },
                   ),
@@ -751,7 +750,6 @@ class AppDrawerState extends State<AppDrawer> {
                   ListTile(
                     title: Text('Privacy Policy'),
                     onTap: () {
-                      Navigator.pop(context);
                       _launchStaticPage("PRIVACY");
                     },
                   ),
