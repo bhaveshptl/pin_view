@@ -157,7 +157,7 @@ class MyProfileState extends State<MyProfile> {
                               return "Name must contains characters, numbers, '.', '-', and '_' symbols only";
                             } else if (value.indexOf(" ") != -1) {
                               return "Name should not contain space";
-                            } else if (!value.startsWith(RegExp('[A-z]'))) {
+                            } else if (!value.startsWith(RegExp('[A-Za-z]'))) {
                               return "Name must starts with character.";
                             }
                           },

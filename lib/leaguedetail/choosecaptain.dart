@@ -93,12 +93,15 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     padding: EdgeInsets.all(0.0),
                     onPressed: () {
                       if ((widget.fanTeamRules.captainMult != 0 &&
-                              _captain == null) ||
+                              _captain == null) &&
                           (widget.fanTeamRules.vcMult != 0.0 &&
                               _vCaptain == null)) {
                         _showErrorMessage(
                           strings.get("CAPTAIN_VCAPTAIN_SELECTION"),
                         );
+                      } else if ((widget.fanTeamRules.captainMult != 0 &&
+                          _captain == null)) {
+                        _showErrorMessage("Captain selection is necessary to save team.");
                       } else {
                         widget.onSave(_captain, _vCaptain);
                       }

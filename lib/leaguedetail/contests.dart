@@ -59,42 +59,40 @@ class ContestsState extends State<Contests> {
   }
 
   setContestsByCategory(List<Contest> contests) {
-    try {
-      contests.sort(
-        (Contest a, Contest b) {
-          if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
-            return (a.prizeDetails[0]["totalPrizeAmount"] ==
-                    b.prizeDetails[0]["totalPrizeAmount"]
-                ? a.entryFee - b.entryFee
-                : b.prizeDetails[0]["totalPrizeAmount"] -
-                    a.prizeDetails[0]["totalPrizeAmount"]);
-          } else {
-            return (a.brand["info"] as String)
-                .compareTo(b.brand["info"] as String);
-          }
-        },
-      );
-
-      List<Contest> cashRecomendedContests = [];
-      List<Contest> cashNonRecomendedContests = [];
-      List<Contest> practiseContests = [];
-      contests.forEach((Contest contest) {
-        if (contest.prizeType == 1) {
-          practiseContests.add(contest);
-        } else if (contest.recommended) {
-          cashRecomendedContests.add(contest);
+    contests.sort(
+      (Contest a, Contest b) {
+        if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
+          return (a.prizeDetails[0]["totalPrizeAmount"] ==
+                  b.prizeDetails[0]["totalPrizeAmount"]
+              ? ((a.entryFee - b.entryFee) * 100).toInt()
+              : ((b.prizeDetails[0]["totalPrizeAmount"] -
+                          a.prizeDetails[0]["totalPrizeAmount"]) *
+                      100)
+                  .toInt());
         } else {
-          cashNonRecomendedContests.add(contest);
+          return (a.brand["info"] as String)
+              .compareTo(b.brand["info"] as String);
         }
-      });
+      },
+    );
 
-      _contests = [];
-      _contests.addAll(cashRecomendedContests);
-      _contests.addAll(cashNonRecomendedContests);
-      _contests.addAll(practiseContests);
-    } on Exception {
-      _contests = contests;
-    }
+    List<Contest> cashRecomendedContests = [];
+    List<Contest> cashNonRecomendedContests = [];
+    List<Contest> practiseContests = [];
+    contests.forEach((Contest contest) {
+      if (contest.prizeType == 1) {
+        practiseContests.add(contest);
+      } else if (contest.recommended) {
+        cashRecomendedContests.add(contest);
+      } else {
+        cashNonRecomendedContests.add(contest);
+      }
+    });
+
+    _contests = [];
+    _contests.addAll(cashRecomendedContests);
+    _contests.addAll(cashNonRecomendedContests);
+    _contests.addAll(practiseContests);
   }
 
   _onWsMsg(onData) {
@@ -123,7 +121,15 @@ class ContestsState extends State<Contests> {
       _updateJoinCount(_response["data"]);
     } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
         _response["bSuccessful"] == true) {
-      _applyL1DataUpdate(_response["diffData"]["ld"]);
+      if (_response["diffData"]["ld"].length > 0) {
+        _applyL1DataUpdate(_response["diffData"]["ld"]);
+      }
+      if (_response["diffData"]["ld1"].length > 0) {
+        _applyL1DataUpdate(_response["diffData"]["ld1"]);
+      }
+      if (_response["diffData"]["ld2"].length > 0) {
+        _applyL1DataUpdate(_response["diffData"]["ld2"]);
+      }
     }
   }
 

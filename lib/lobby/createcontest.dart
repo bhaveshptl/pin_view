@@ -440,30 +440,41 @@ class CreateContestState extends State<CreateContest> {
   }
 
   _onEditPrize() async {
-    FocusScope.of(context).requestFocus(FocusNode());
-    _scaffoldKey.currentState.showBottomSheet((context) {
-      return Container(
-        decoration: new BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black,
-              blurRadius: 20.0,
-            ),
-          ],
-        ),
-        height: 550.0,
-        child: CreatePrizeStructure(
-          totalPrize: _totalPrize,
-          scaffoldKey: _scaffoldKey,
-          suggestedPrizes: prizeStructure,
-          onClose: (List<PrizeStructure> prizeStructure) {
-            _onCustomPrizeStructure(prizeStructure);
-          },
-          participants: int.parse(_participantsController.text),
+    if (_participantsController.text == "" || _entryFeeController.text == "") {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please enter entry fee and number of participants before edit.",
+          ),
         ),
       );
-    });
+    } else {
+      FocusScope.of(context).requestFocus(FocusNode());
+      _scaffoldKey.currentState.showBottomSheet((context) {
+        return Container(
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.black,
+                blurRadius: 20.0,
+              ),
+            ],
+          ),
+          height: 550.0,
+          child: CreatePrizeStructure(
+            totalPrize: _totalPrize,
+            scaffoldKey: _scaffoldKey,
+            suggestedPrizes: prizeStructure,
+            onClose: (List<PrizeStructure> prizeStructure) {
+              _onCustomPrizeStructure(prizeStructure);
+            },
+            participants:
+                int.parse(_participantsController.text, onError: (e) => 0),
+          ),
+        );
+      });
+    }
   }
 
   bool isNumeric(String s) {

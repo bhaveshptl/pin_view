@@ -848,7 +848,8 @@ class ContestDetailState extends State<ContestDetail> {
                         padding: EdgeInsets.only(top: 8.0),
                         color: Colors.white,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                          padding:
+                              const EdgeInsets.only(left: 16.0, right: 16.0),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -872,10 +873,11 @@ class ContestDetailState extends State<ContestDetail> {
                                                     "Prizes",
                                                     style: TextStyle(
                                                       color: Colors.black54,
-                                                      fontSize: Theme.of(context)
-                                                          .primaryTextTheme
-                                                          .caption
-                                                          .fontSize,
+                                                      fontSize:
+                                                          Theme.of(context)
+                                                              .primaryTextTheme
+                                                              .caption
+                                                              .fontSize,
                                                     ),
                                                     textAlign: TextAlign.left,
                                                   ),
@@ -906,20 +908,36 @@ class ContestDetailState extends State<ContestDetail> {
                                                     (widget.contest
                                                                 .prizeDetails !=
                                                             null
-                                                        ? widget
-                                                            .contest
-                                                            .prizeDetails[0][
-                                                                "totalPrizeAmount"]
-                                                            .toString()
+                                                        ? (widget
+                                                                    .contest
+                                                                    .prizeDetails[
+                                                                            0][
+                                                                        "totalPrizeAmount"]
+                                                                    .toString()
+                                                                    .indexOf(
+                                                                        ".") ==
+                                                                -1
+                                                            ? widget
+                                                                .contest
+                                                                .prizeDetails[
+                                                                        0][
+                                                                    "totalPrizeAmount"]
+                                                                .toString()
+                                                            : (widget.contest.prizeDetails[
+                                                                            0][
+                                                                        "totalPrizeAmount"]
+                                                                    as double)
+                                                                .toStringAsFixed(
+                                                                    2))
                                                         : 0.toString()),
                                                     style: TextStyle(
                                                         color: Theme.of(context)
                                                             .primaryColorDark,
-                                                        fontSize:
-                                                            Theme.of(context)
-                                                                .primaryTextTheme
-                                                                .headline
-                                                                .fontSize),
+                                                        fontSize: Theme.of(
+                                                                context)
+                                                            .primaryTextTheme
+                                                            .headline
+                                                            .fontSize),
                                                   ),
                                                 ],
                                               ),
@@ -928,7 +946,8 @@ class ContestDetailState extends State<ContestDetail> {
                                         ),
                                         Container(
                                           child: Tooltip(
-                                            message: strings.get("NO_OF_WINNERS"),
+                                            message:
+                                                strings.get("NO_OF_WINNERS"),
                                             child: InkWell(
                                               // padding: EdgeInsets.all(0.0),
                                               onTap: () {
@@ -938,18 +957,21 @@ class ContestDetailState extends State<ContestDetail> {
                                                 children: <Widget>[
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       Padding(
                                                         padding:
-                                                            const EdgeInsets.only(
+                                                            const EdgeInsets
+                                                                    .only(
                                                                 left: 16.0),
                                                         child: Text(
                                                           strings
                                                               .get("WINNERS")
                                                               .toUpperCase(),
                                                           style: TextStyle(
-                                                            color: Colors.black45,
+                                                            color:
+                                                                Colors.black45,
                                                             fontSize: Theme.of(
                                                                     context)
                                                                 .primaryTextTheme
@@ -967,7 +989,8 @@ class ContestDetailState extends State<ContestDetail> {
                                                   ),
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                     children: <Widget>[
                                                       Text(widget.contest
                                                                   .prizeDetails ==
@@ -1007,7 +1030,8 @@ class ContestDetailState extends State<ContestDetail> {
                                                           .primaryTextTheme
                                                           .caption
                                                           .copyWith(
-                                                            color: Colors.black87,
+                                                            color:
+                                                                Colors.black87,
                                                           ),
                                                     ),
                                                   ),
@@ -1025,7 +1049,8 @@ class ContestDetailState extends State<ContestDetail> {
                                                           ))
                                                       : Text(
                                                           strings.rupee,
-                                                          style: Theme.of(context)
+                                                          style: Theme.of(
+                                                                  context)
                                                               .primaryTextTheme
                                                               .caption
                                                               .copyWith(
@@ -1058,9 +1083,10 @@ class ContestDetailState extends State<ContestDetail> {
                                                         .toString() +
                                                     " entry fee.",
                                                 child: Padding(
-                                                  padding:
-                                                      EdgeInsets.only(left: 16.0),
+                                                  padding: EdgeInsets.only(
+                                                      left: 16.0),
                                                   child: GradientButton(
+                                                    disabled: bIsContestFull,
                                                     button: RaisedButton(
                                                       onPressed: () {
                                                         if (!bIsContestFull) {
@@ -1099,7 +1125,8 @@ class ContestDetailState extends State<ContestDetail> {
                                                             children: <Widget>[
                                                               Text(
                                                                 "JOIN",
-                                                                style: TextStyle(
+                                                                style:
+                                                                    TextStyle(
                                                                   color: Colors
                                                                       .white70,
                                                                   fontSize: Theme.of(
@@ -1123,7 +1150,8 @@ class ContestDetailState extends State<ContestDetail> {
                                       ],
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
                                       child: Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
@@ -1135,127 +1163,132 @@ class ContestDetailState extends State<ContestDetail> {
                                                 Padding(
                                                   padding: EdgeInsets.only(
                                                       bottom: 5.0),
-                                                  child:
-                                                      widget.contest
-                                                                  .bonusAllowed >
-                                                              0
-                                                          ? Row(
-                                                              children: <Widget>[
-                                                                Tooltip(
-                                                                  message: strings
-                                                                      .get(
-                                                                          "USE_BONUS")
-                                                                      .replaceAll(
-                                                                          "\$bonusPercent",
-                                                                          widget
-                                                                              .contest
-                                                                              .bonusAllowed
-                                                                              .toString()),
-                                                                  child: Padding(
-                                                                    padding: const EdgeInsets
+                                                  child: widget.contest
+                                                              .bonusAllowed >
+                                                          0
+                                                      ? Row(
+                                                          children: <Widget>[
+                                                            Tooltip(
+                                                              message: strings
+                                                                  .get(
+                                                                      "USE_BONUS")
+                                                                  .replaceAll(
+                                                                      "\$bonusPercent",
+                                                                      widget
+                                                                          .contest
+                                                                          .bonusAllowed
+                                                                          .toString()),
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
                                                                             .only(
                                                                         right:
                                                                             4.0),
-                                                                    child:
-                                                                        CircleAvatar(
-                                                                      backgroundColor:
-                                                                          Theme.of(context)
-                                                                              .primaryColorDark,
-                                                                      maxRadius:
-                                                                          10.0,
-                                                                      child: Text(
-                                                                        "B",
-                                                                        style: TextStyle(
-                                                                            color: Colors
-                                                                                .white70,
-                                                                            fontSize: Theme.of(context)
-                                                                                .primaryTextTheme
-                                                                                .caption
-                                                                                .fontSize),
-                                                                      ),
-                                                                    ),
+                                                                child:
+                                                                    CircleAvatar(
+                                                                  backgroundColor:
+                                                                      Theme.of(
+                                                                              context)
+                                                                          .primaryColorDark,
+                                                                  maxRadius:
+                                                                      10.0,
+                                                                  child: Text(
+                                                                    "B",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white70,
+                                                                        fontSize: Theme.of(context)
+                                                                            .primaryTextTheme
+                                                                            .caption
+                                                                            .fontSize),
                                                                   ),
                                                                 ),
-                                                                Text(
-                                                                  strings.get("PERCENT_BONUS_ALLOWED").replaceAll(
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              strings
+                                                                  .get(
+                                                                      "PERCENT_BONUS_ALLOWED")
+                                                                  .replaceAll(
                                                                       "\$percent",
                                                                       widget
                                                                           .contest
                                                                           .bonusAllowed
                                                                           .toString()),
-                                                                  style: TextStyle(
-                                                                      fontSize: Theme.of(
-                                                                              context)
-                                                                          .primaryTextTheme
-                                                                          .caption
-                                                                          .fontSize),
-                                                                ),
-                                                              ],
-                                                            )
-                                                          : Container(),
+                                                              style: TextStyle(
+                                                                  fontSize: Theme.of(
+                                                                          context)
+                                                                      .primaryTextTheme
+                                                                      .caption
+                                                                      .fontSize),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      : Container(),
                                                 ),
                                                 Container(
-                                                  child:
-                                                      widget.contest
-                                                                  .teamsAllowed >
-                                                              1
-                                                          ? Row(
-                                                              children: <Widget>[
-                                                                Tooltip(
-                                                                  message: strings
-                                                                      .get(
-                                                                          "PARTICIPATE_WITH")
-                                                                      .replaceAll(
-                                                                          "\$count",
-                                                                          widget
-                                                                              .contest
-                                                                              .teamsAllowed
-                                                                              .toString()),
-                                                                  child: Padding(
-                                                                    padding: const EdgeInsets
+                                                  child: widget.contest
+                                                              .teamsAllowed >
+                                                          1
+                                                      ? Row(
+                                                          children: <Widget>[
+                                                            Tooltip(
+                                                              message: strings
+                                                                  .get(
+                                                                      "PARTICIPATE_WITH")
+                                                                  .replaceAll(
+                                                                      "\$count",
+                                                                      widget
+                                                                          .contest
+                                                                          .teamsAllowed
+                                                                          .toString()),
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
                                                                             .only(
                                                                         right:
                                                                             4.0),
-                                                                    child:
-                                                                        CircleAvatar(
-                                                                      backgroundColor:
-                                                                          Theme.of(context)
-                                                                              .primaryColorDark,
-                                                                      maxRadius:
-                                                                          10.0,
-                                                                      child: Text(
-                                                                        "M",
-                                                                        style: TextStyle(
-                                                                            color: Colors
-                                                                                .white70,
-                                                                            fontSize: Theme.of(context)
-                                                                                .primaryTextTheme
-                                                                                .caption
-                                                                                .fontSize),
-                                                                      ),
-                                                                    ),
+                                                                child:
+                                                                    CircleAvatar(
+                                                                  backgroundColor:
+                                                                      Theme.of(
+                                                                              context)
+                                                                          .primaryColorDark,
+                                                                  maxRadius:
+                                                                      10.0,
+                                                                  child: Text(
+                                                                    "M",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white70,
+                                                                        fontSize: Theme.of(context)
+                                                                            .primaryTextTheme
+                                                                            .caption
+                                                                            .fontSize),
                                                                   ),
                                                                 ),
-                                                                Text(
-                                                                  strings
-                                                                      .get(
-                                                                          "MAXIMUM_ENTRY")
-                                                                      .replaceAll(
-                                                                          "\$count",
-                                                                          widget
-                                                                              .contest
-                                                                              .teamsAllowed
-                                                                              .toString()),
-                                                                  style: TextStyle(
-                                                                      fontSize: Theme.of(
-                                                                              context)
-                                                                          .primaryTextTheme
-                                                                          .caption
-                                                                          .fontSize),
-                                                                )
-                                                              ],
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              strings
+                                                                  .get(
+                                                                      "MAXIMUM_ENTRY")
+                                                                  .replaceAll(
+                                                                      "\$count",
+                                                                      widget
+                                                                          .contest
+                                                                          .teamsAllowed
+                                                                          .toString()),
+                                                              style: TextStyle(
+                                                                  fontSize: Theme.of(
+                                                                          context)
+                                                                      .primaryTextTheme
+                                                                      .caption
+                                                                      .fontSize),
                                                             )
-                                                          : Container(),
+                                                          ],
+                                                        )
+                                                      : Container(),
                                                 ),
                                               ],
                                             ),
@@ -1280,8 +1313,8 @@ class ContestDetailState extends State<ContestDetail> {
                                                             .primaryTextTheme
                                                             .button
                                                             .copyWith(
-                                                              color:
-                                                                  Colors.black54,
+                                                              color: Colors
+                                                                  .black54,
                                                             ),
                                                       ),
                                                     ],
@@ -1298,7 +1331,8 @@ class ContestDetailState extends State<ContestDetail> {
                                             child: Text(
                                               widget.contest.joined.toString() +
                                                   "/" +
-                                                  widget.contest.size.toString() +
+                                                  widget.contest.size
+                                                      .toString() +
                                                   " joined",
                                               textAlign: TextAlign.right,
                                             ),
@@ -1511,7 +1545,11 @@ class TeamsDataSource extends DataTableSource {
     myContestTeams = _myContestTeams;
 
     for (int i = 0; i < myContestTeams.length; i++) {
-      _teams[i] = myContestTeams[i];
+      if (i >= _teams.length) {
+        _teams.add(myContestTeams[i]);
+      } else {
+        _teams[i] = myContestTeams[i];
+      }
     }
 
     setUniqueTeams();

@@ -49,6 +49,7 @@ class LeagueDetailState extends State<LeagueDetail>
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TabController tabController;
+  int activeTabIndex = 0;
 
   @override
   initState() {
@@ -59,6 +60,11 @@ class LeagueDetailState extends State<LeagueDetail>
 
     _getMyContests();
     tabController = TabController(length: 2, vsync: this);
+    tabController.addListener(() {
+      setState(() {
+        activeTabIndex = tabController.index;
+      });
+    });
   }
 
   _onWsMsg(onData) {
@@ -762,8 +768,9 @@ class LeagueDetailState extends State<LeagueDetail>
               ],
             ),
           ),
-          bottomNavigationBar:
-              LobbyBottomNavigation(_onNavigationSelectionChange, 1),
+          bottomNavigationBar: activeTabIndex == 0
+              ? LobbyBottomNavigation(_onNavigationSelectionChange, 1)
+              : null,
         ),
       ],
     );

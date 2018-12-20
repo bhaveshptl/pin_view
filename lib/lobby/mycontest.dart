@@ -327,7 +327,7 @@ class MyContestsState extends State<MyContests>
   _getSportsType() async {
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getSportsType();
     await futureCookie.then((value) {
-      int _sport = int.parse(value == null ? "1" : value);
+      int _sport = int.parse(value == null || value == "0" ? "1" : value);
       if (_sport != _sportType) {
         setState(() {
           _sportType = _sport;

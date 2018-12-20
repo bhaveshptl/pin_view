@@ -1151,66 +1151,62 @@ class AddCashState extends State<AddCash> {
           strings.get("ADD_CASH"),
         ),
       ),
-      body: Stack(
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("images/norwegian_rose.png"),
-                repeat: ImageRepeat.repeat,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/norwegian_rose.png"),
+            repeat: ImageRepeat.repeat,
+          ),
+        ),
+        child: Stack(
+          children: <Widget>[
+            SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    color: Colors.black26,
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          "Account balance",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .fontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            strings.rupee +
+                                (depositData == null
+                                    ? "0.0"
+                                    : (depositData
+                                                .chooseAmountData.balance.deposited +
+                                            depositData.chooseAmountData.balance
+                                                .nonWithdrawable +
+                                            depositData.chooseAmountData.balance
+                                                .withdrawable)
+                                        .toStringAsFixed(2)),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Column(
+                    children: createChooseAmountUI(),
+                  )
+                ],
               ),
             ),
-            child: Column(
-              children: <Widget>[
-                SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        color: Colors.black26,
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              "Account balance",
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: Theme.of(context)
-                                    .primaryTextTheme
-                                    .subhead
-                                    .fontSize,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 4.0),
-                              child: Text(
-                                strings.rupee +
-                                    (depositData == null
-                                        ? "0.0"
-                                        : (depositData.chooseAmountData.balance
-                                                    .deposited +
-                                                depositData.chooseAmountData
-                                                    .balance.nonWithdrawable +
-                                                depositData.chooseAmountData
-                                                    .balance.withdrawable)
-                                            .toStringAsFixed(2)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Column(
-                        children: createChooseAmountUI(),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          bShowLoader ? Loader() : Container()
-        ],
+            bShowLoader ? Loader() : Container()
+          ],
+        ),
       ),
     );
   }

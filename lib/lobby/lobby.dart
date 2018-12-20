@@ -111,7 +111,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
           _onSportSelectionChaged(_sport);
         });
       } else {
-        SharedPrefHelper().saveSportsType(_sportType.toString());
+        SharedPrefHelper().saveSportsType("1");
       }
     });
   }

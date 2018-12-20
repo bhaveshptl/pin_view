@@ -80,6 +80,25 @@ class UpcomingContest extends StatelessWidget {
                       )
                     : Container(),
               ),
+              bMyContest
+                  ? (league.teamA.inningsId == contest.inningsId
+                      ? Container(
+                          padding: EdgeInsets.symmetric(horizontal: 4.0),
+                          color: Colors.redAccent,
+                          child: Text(
+                            league.teamA.name,
+                            style: TextStyle(color: Colors.white54),
+                          ),
+                        )
+                      : Container(
+                          padding: EdgeInsets.symmetric(horizontal: 4.0),
+                          color: Colors.redAccent,
+                          child: Text(
+                            league.teamB.name,
+                            style: TextStyle(color: Colors.white54),
+                          ),
+                        ))
+                  : Container(),
             ],
           ),
           Padding(
@@ -381,6 +400,7 @@ class UpcomingContest extends StatelessWidget {
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
                               child: GradientButton(
+                                disabled: bIsContestFull || onJoin == null,
                                 button: RaisedButton(
                                   onPressed: () {
                                     if (!bIsContestFull && onJoin != null) {

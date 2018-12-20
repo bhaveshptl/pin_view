@@ -153,10 +153,10 @@ class WithdrawState extends State<Withdraw> {
                     _withdrawModes = response["data"]["withdrawModes"];
                     _withdrawData = Withhdraw.fromJson(response["data"]);
                     _bIsMobileVerified = _withdrawData.mobileVerification;
-                    initFormInputs();
                   });
                   break;
               }
+              initFormInputs();
             }
           }
         }
@@ -431,8 +431,15 @@ class WithdrawState extends State<Withdraw> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  strings.get("KYC"),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "KYC Verification",
+                    ),
+                    Text(
+                      "(ID and Address)",
+                    ),
+                  ],
                 ),
                 _verificationStatus == "VERIFIED"
                     ? Icon(Icons.check_circle_outline)
@@ -793,9 +800,13 @@ class WithdrawState extends State<Withdraw> {
         ? _withdrawData.accountNumber.toString()
         : "";
     firstNameController.text =
-        _withdrawData.firstName != null ? _withdrawData.firstName : "";
+        _withdrawData.firstName != null && _withdrawData.firstName.isNotEmpty
+            ? _withdrawData.firstName
+            : "";
     lastNameController.text =
-        _withdrawData.firstName != null ? _withdrawData.firstName : "";
+        (_withdrawData.lastName != null && _withdrawData.lastName.isNotEmpty)
+            ? _withdrawData.lastName
+            : "";
   }
 
   confirmWithdrawRequest(BuildContext context) async {

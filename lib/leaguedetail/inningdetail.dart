@@ -137,13 +137,22 @@ class InningDetailsState extends State<InningDetails> {
       });
     } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
         _response["bSuccessful"] == true) {
-      _applyL1DataUpdate(_response["diffData"]["ld"]);
+      if (_response["diffData"]["ld"].length > 0) {
+        _applyL1DataUpdate(_response["diffData"]["ld"]);
+      }
+      if (_response["diffData"]["ld1"].length > 0) {
+        _applyL1DataUpdate(_response["diffData"]["ld1"]);
+      }
+      if (_response["diffData"]["ld2"].length > 0) {
+        _applyL1DataUpdate(_response["diffData"]["ld2"]);
+      }
     } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
         _response["bSuccessful"] == true) {
       _updateJoinCount(_response["data"]);
       _updateContestTeams(_response["data"]);
     } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
-        _response["bSuccessful"] == true) {
+        _response["bSuccessful"] == true &&
+        widget.team.inningsId == _response["data"]["inningsId"]) {
       MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
       bool bFound = false;
       for (MyTeam _myTeam in _myTeams) {
@@ -206,7 +215,9 @@ class InningDetailsState extends State<InningDetails> {
             }
           }
           if (!bFound && inningsData.league.id == _contest.leagueId) {
-            inningsData.contests.add(_contest);
+            setState(() {
+              inningsData.contests.add(_contest);
+            });
           }
         }
       });

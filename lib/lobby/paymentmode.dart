@@ -115,8 +115,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
               .length >
           1) {
-        Map<String, dynamic> lastPaymentArray = widget
-            .paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0];
+        Map<String, dynamic> lastPaymentArray =
+            widget.paymentMode["choosePayment"]["userInfo"]
+                        ["lastPaymentArray"] !=
+                    null
+                ? widget.paymentMode["choosePayment"]["userInfo"]
+                    ["lastPaymentArray"][0]
+                : {};
         if (lastPaymentArray != null &&
             lastPaymentArray["paymentType"] == type["type"]) {
           bool bLastTransactionFound = false;
@@ -224,8 +229,11 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   getLastPaymentWidget() {
     List<Widget> items = [];
     int i = 0;
-    Map<String, dynamic> lastPaymentArray =
-        widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0];
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
 
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {

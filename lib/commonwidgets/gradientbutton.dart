@@ -4,10 +4,12 @@ class GradientButton extends StatelessWidget {
   final RaisedButton button;
   final Gradient gradient;
   final double height;
+  final bool disabled;
   GradientButton({
     @required this.button,
     this.height = 28.0,
     this.gradient,
+    this.disabled = false,
   });
 
   @override
@@ -21,14 +23,19 @@ class GradientButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: gradient == null
               ? LinearGradient(
-                  colors: [
-                    Theme.of(context).primaryColor.withAlpha(150),
-                    Theme.of(context).primaryColor.withAlpha(220),
-                    Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColor.withAlpha(220),
-                    Theme.of(context).primaryColor.withAlpha(150),
-                  ],
+                  colors: disabled
+                      ? [
+                          Colors.black26,
+                          Colors.black26,
+                        ]
+                      : [
+                          Theme.of(context).primaryColor.withAlpha(150),
+                          Theme.of(context).primaryColor.withAlpha(220),
+                          Theme.of(context).primaryColor,
+                          Theme.of(context).primaryColor,
+                          Theme.of(context).primaryColor.withAlpha(220),
+                          Theme.of(context).primaryColor.withAlpha(150),
+                        ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 )

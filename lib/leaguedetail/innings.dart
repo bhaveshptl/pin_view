@@ -84,115 +84,127 @@ class InningsState extends State<Innings> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: 8.0),
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Card(
-              elevation: 6.0,
-              child: FlatButton(
-                onPressed: () {
-                  showInningDetails(
-                      context, widget.l1Data.league.rounds[0].matches[0].teamA);
-                },
-                padding: EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4.0),
-                      child: CachedNetworkImage(
-                        imageUrl: widget
-                            .l1Data.league.rounds[0].matches[0].teamA.logoUrl,
-                        placeholder: CircularProgressIndicator(),
-                        errorWidget: Icon(Icons.error),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(top: 8.0),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0),
+              child: Card(
+                elevation: 6.0,
+                child: FlatButton(
+                  onPressed: () {
+                    showInningDetails(context,
+                        widget.l1Data.league.rounds[0].matches[0].teamA);
+                  },
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4.0),
+                        child: _sportType == 1
+                            ? CachedNetworkImage(
+                                imageUrl: widget.l1Data.league.rounds[0]
+                                    .matches[0].teamA.logoUrl,
+                                placeholder: CircularProgressIndicator(),
+                                errorWidget: Icon(Icons.error),
+                              )
+                            : Container(),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                          widget.l1Data.league.rounds[0].matches[0].teamA.name +
-                              " " +
-                              "INNING"),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Card(
-              elevation: 6.0,
-              child: FlatButton(
-                onPressed: () {
-                  showInningDetails(
-                      context, widget.l1Data.league.rounds[0].matches[0].teamB);
-                },
-                padding: EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4.0),
-                      child: CachedNetworkImage(
-                        imageUrl: widget
-                            .l1Data.league.rounds[0].matches[0].teamB.logoUrl,
-                        placeholder: CircularProgressIndicator(),
-                        errorWidget: Icon(Icons.error),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                          widget.l1Data.league.rounds[0].matches[0].teamB.name +
-                              " " +
-                              "INNING"),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          _inningsData != null
-              ? Container(
-                  padding: EdgeInsets.only(top: 48.0),
-                  child: Column(
-                    children:
-                        (_inningsData["body"] as List).map((dynamic text) {
-                      return Padding(
-                        padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 4.0),
-                        child: Row(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Icon(
-                                Icons.chevron_right,
-                                color: Colors.black45,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                text.toString().replaceAll("<br /> ", "\n"),
-                                style: TextStyle(
-                                  color: Colors.black45,
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .fontSize,
-                                ),
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                          ],
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          _sportType == 1
+                              ? widget.l1Data.league.rounds[0].matches[0].teamA
+                                      .name +
+                                  " " +
+                                  "INNING"
+                              : "First half".toUpperCase(),
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
-                )
-              : Container(),
-        ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: Card(
+                elevation: 6.0,
+                child: FlatButton(
+                  onPressed: () {
+                    showInningDetails(context,
+                        widget.l1Data.league.rounds[0].matches[0].teamB);
+                  },
+                  padding: EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4.0),
+                        child: _sportType == 1
+                            ? CachedNetworkImage(
+                                imageUrl: widget.l1Data.league.rounds[0]
+                                    .matches[0].teamB.logoUrl,
+                                placeholder: CircularProgressIndicator(),
+                                errorWidget: Icon(Icons.error),
+                                fit: BoxFit.cover,
+                              )
+                            : Container(),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(_sportType == 1
+                            ? widget.l1Data.league.rounds[0].matches[0].teamB
+                                    .name +
+                                " " +
+                                "INNING"
+                            : "Second half".toUpperCase()),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            _inningsData != null
+                ? Container(
+                    padding: EdgeInsets.only(top: 48.0),
+                    child: Column(
+                      children:
+                          (_inningsData["body"] as List).map((dynamic text) {
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 4.0),
+                          child: Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(right: 8.0),
+                                child: Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.black45,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  text.toString().replaceAll("<br /> ", "\n"),
+                                  style: TextStyle(
+                                    color: Colors.black45,
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .subhead
+                                        .fontSize,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                : Container(),
+          ],
+        ),
       ),
     );
   }
