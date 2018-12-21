@@ -32,7 +32,7 @@ class AddCashState extends State<AddCash> {
   bool bShowPromoInput = false;
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
-  bool bRepeatTransaction = false;
+  bool bRepeatTransaction = true;
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -793,9 +793,7 @@ class AddCashState extends State<AddCash> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    amountController.text != ""
-                        ? Text("PROCEED WITH ")
-                        : Text("PROCEED"),
+                    Text("DEPOSIT "),
                     amountController.text != ""
                         ? Padding(
                             padding: EdgeInsets.only(left: 4.0),
@@ -819,15 +817,7 @@ class AddCashState extends State<AddCash> {
           child: Row(
             children: <Widget>[
               Container(
-                child: Image.asset("images/visa.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/cashfree.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/master.png"),
+                child: Image.asset("images/pci.png"),
                 height: 48.0,
               ),
               Container(
@@ -835,11 +825,19 @@ class AddCashState extends State<AddCash> {
                 height: 48.0,
               ),
               Container(
-                child: Image.asset("images/pci.png"),
+                child: Image.asset("images/visa.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/master.png"),
                 height: 48.0,
               ),
               Container(
                 child: Image.asset("images/amex.png"),
+                height: 48.0,
+              ),
+              Container(
+                child: Image.asset("images/cashfree.png"),
                 height: 48.0,
               ),
             ],

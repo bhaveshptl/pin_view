@@ -34,14 +34,13 @@ String channelId = "3";
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
-String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
-// String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
+String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
 Map<String, dynamic> initData = {};
 Map<String, dynamic> staticPageUrls;
-const apiBaseUrl = "https://stg.playfantasy.com";
-const websocketUrl = "wss://lobby-stg.playfantasy.com/path?pid=";
-String analyticsUrl = "https://stg-analytics.playfantasy.com/click/track";
+const apiBaseUrl = "https://www.playfantasy.com";
+const websocketUrl = "wss://lobby-www.playfantasy.com/path?pid=";
+String analyticsUrl = "https://analytics.playfantasy.com/click/track";
 
 setWSCookie() async {
   Request req = Request("POST", Uri.parse(apiBaseUrl + ApiUtil.GET_COOKIE_URL));

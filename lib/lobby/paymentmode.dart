@@ -590,15 +590,23 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           .sendRequest(req)
           .then((http.Response res) {
         Map<String, dynamic> response = json.decode(res.body);
-        _openRazorpayNative({
-          "email": payload["email"],
-          "phone": payload["phone"],
-          "amount": (payload["depositAmount"] * 100).toString(),
-          "orderId": response["action"]["value"],
-          "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-              ? payload["paymentType"].toLowerCase()
-              : "card"
-        });
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openRazorpayNative({
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": (payload["depositAmount"] * 100).toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card"
+          });
+        } else {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text("Opps!! Try again later."),
+            ),
+          );
+        }
       });
     } else {
       initPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
@@ -945,15 +953,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                               child: Row(
                                 children: <Widget>[
                                   Container(
-                                    child: Image.asset("images/visa.png"),
-                                    height: 48.0,
-                                  ),
-                                  Container(
-                                    child: Image.asset("images/cashfree.png"),
-                                    height: 48.0,
-                                  ),
-                                  Container(
-                                    child: Image.asset("images/master.png"),
+                                    child: Image.asset("images/pci.png"),
                                     height: 48.0,
                                   ),
                                   Container(
@@ -961,11 +961,19 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                     height: 48.0,
                                   ),
                                   Container(
-                                    child: Image.asset("images/pci.png"),
+                                    child: Image.asset("images/visa.png"),
+                                    height: 48.0,
+                                  ),
+                                  Container(
+                                    child: Image.asset("images/master.png"),
                                     height: 48.0,
                                   ),
                                   Container(
                                     child: Image.asset("images/amex.png"),
+                                    height: 48.0,
+                                  ),
+                                  Container(
+                                    child: Image.asset("images/cashfree.png"),
                                     height: 48.0,
                                   ),
                                 ],

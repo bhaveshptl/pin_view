@@ -458,7 +458,8 @@ class WithdrawState extends State<Withdraw> {
             color: Colors.black12,
           ),
           (_verificationStatus == "VERIFIED" ||
-                  _verificationStatus == "DOC_SUBMITTED")
+                  _verificationStatus == "DOC_SUBMITTED" ||
+                  _verificationStatus == "UNDER_REVIEW")
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -784,6 +785,13 @@ class WithdrawState extends State<Withdraw> {
         setState(() {
           _bIsMobileVerified = true;
         });
+      } else {
+        Map<String, dynamic> response = json.decode(res.body);
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(response["error"]["erroMessage"]),
+          ),
+        );
       }
     });
   }

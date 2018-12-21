@@ -236,6 +236,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
                 contest: _contest,
                 bShowBrandInfo: true,
                 onJoin: _onJoinContest,
+                status: widget.leagueStatus,
                 onClick: widget.onContestClick,
                 onPrizeStructure: _showPrizeStructure,
                 myJoinedTeams: widget.mapContestTeams[_contest.id],

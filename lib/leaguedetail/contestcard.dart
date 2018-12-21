@@ -9,6 +9,7 @@ import 'package:playfantasy/leaguedetail/contestcards/upcoming.dart';
 
 class ContestCard extends StatelessWidget {
   final L1 l1Data;
+  final int status;
   final League league;
   final Contest contest;
   final Function onJoin;
@@ -16,18 +17,19 @@ class ContestCard extends StatelessWidget {
   final bool isMyContest;
   final bool bShowBrandInfo;
   final EdgeInsetsGeometry margin;
-  final BorderRadiusGeometry radius;
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
+  final BorderRadiusGeometry radius;
 
   ContestCard({
     this.l1Data,
     this.onJoin,
     this.league,
     this.radius,
+    this.margin,
+    this.status,
     this.contest,
     this.onClick,
-    this.margin,
     this.isMyContest,
     this.myJoinedTeams,
     this.onPrizeStructure,
@@ -36,6 +38,15 @@ class ContestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int leagueStatus = status != null
+        ? status
+        : (((l1Data != null && l1Data.league.status == LeagueStatus.UPCOMING) ||
+                (league != null && league.status == LeagueStatus.UPCOMING))
+            ? LeagueStatus.UPCOMING
+            : (((l1Data != null && l1Data.league.status == LeagueStatus.LIVE) ||
+                    (league != null && league.status == LeagueStatus.LIVE))
+                ? LeagueStatus.LIVE
+                : LeagueStatus.COMPLETED));
     return Tooltip(
       message: contest.id.toString() + " - " + contest.name,
       child: Card(
@@ -50,9 +61,7 @@ class ContestCard extends StatelessWidget {
             onClick(contest, league);
           },
           padding: EdgeInsets.all(8.0),
-          child: (l1Data != null &&
-                      l1Data.league.status == LeagueStatus.UPCOMING) ||
-                  (l1Data == null && league.status == LeagueStatus.UPCOMING)
+          child: leagueStatus == LeagueStatus.UPCOMING
               ? UpcomingContest(
                   league: league,
                   onJoin: onJoin,
@@ -62,8 +71,7 @@ class ContestCard extends StatelessWidget {
                   bShowBrandInfo: bShowBrandInfo,
                   onPrizeStructure: onPrizeStructure,
                 )
-              : (l1Data != null && l1Data.league.status == LeagueStatus.LIVE) ||
-                      (l1Data == null && league.status == LeagueStatus.LIVE)
+              : leagueStatus == LeagueStatus.LIVE
                   ? LiveContest(
                       league: league,
                       contest: contest,

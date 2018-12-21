@@ -780,7 +780,7 @@ class ContestDetailState extends State<ContestDetail> {
                           ),
                           widget.league.status == LeagueStatus.COMPLETED
                               ? Container(
-                                  width: 70.0,
+                                  width: 60.0,
                                   child: Text(
                                     strings.get("PRIZE").toUpperCase(),
                                     textAlign: TextAlign.center,
@@ -1631,12 +1631,28 @@ class TeamsDataSource extends DataTableSource {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Container(
-                child: Text(_team.name == null
-                    ? ""
-                    : _team.name.length >= 15
-                        ? _team.name.substring(0, 14) + "..."
-                        : _team.name),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      _team.name == null
+                          ? ""
+                          : _team.name.length >= 15
+                              ? _team.name.substring(0, 14) + "..."
+                              : _team.name,
+                    ),
+                    bIsMyJoinedTeam
+                        ? Padding(
+                            padding: EdgeInsets.only(right: 4.0),
+                            child: Icon(
+                              Icons.people,
+                              color: Colors.black26,
+                            ),
+                          )
+                        : Container(),
+                  ],
+                ),
               ),
               _leagueStatus == LeagueStatus.UPCOMING
                   ? Row(
@@ -1687,7 +1703,7 @@ class TeamsDataSource extends DataTableSource {
                         ),
                         _leagueStatus == LeagueStatus.COMPLETED
                             ? Container(
-                                width: 70.0,
+                                width: 60.0,
                                 child: Text(
                                   _team.score != null
                                       ? _team.prize.toString()

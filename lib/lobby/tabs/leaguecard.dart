@@ -19,7 +19,9 @@ class LeagueCard extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.fromLTRB(5.0, 2.0, 5.0, 2.0),
       child: Tooltip(
-        message: _league.matchId.toString() + " - " + _league.matchName,
+        message: _league != null && _league.matchId != null
+            ? _league.matchId.toString() + " - " + _league.matchName
+            : "",
         child: Card(
           elevation: 3.0,
           child: FlatButton(
@@ -60,8 +62,10 @@ class LeagueCard extends StatelessWidget {
                                                       BorderRadius.circular(
                                                           2.0),
                                                   child: CachedNetworkImage(
-                                                    imageUrl:
-                                                        _league.teamA.logoUrl,
+                                                    imageUrl: _league.teamA !=
+                                                            null
+                                                        ? _league.teamA.logoUrl
+                                                        : "",
                                                     placeholder: Container(
                                                       padding:
                                                           EdgeInsets.all(4.0),
@@ -80,14 +84,6 @@ class LeagueCard extends StatelessWidget {
                                                       EdgeInsets.only(top: 8.0),
                                                   child: Text(
                                                     _league.teamA.name,
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .subhead
-                                                        .copyWith(
-                                                          color: Colors.black87,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
                                                   ),
                                                 ),
                                               ],
@@ -169,7 +165,9 @@ class LeagueCard extends StatelessWidget {
                                               borderRadius:
                                                   BorderRadius.circular(2.0),
                                               child: CachedNetworkImage(
-                                                imageUrl: _league.teamB.logoUrl,
+                                                imageUrl: _league.teamB != null
+                                                    ? _league.teamB.logoUrl
+                                                    : null,
                                                 placeholder: Container(
                                                   padding: EdgeInsets.all(4.0),
                                                   child:
@@ -187,14 +185,6 @@ class LeagueCard extends StatelessWidget {
                                                   EdgeInsets.only(top: 8.0),
                                               child: Text(
                                                 _league.teamB.name,
-                                                style: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .subhead
-                                                    .copyWith(
-                                                      color: Colors.black87,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
                                               ),
                                             ),
                                           ],

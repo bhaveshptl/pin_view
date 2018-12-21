@@ -65,10 +65,9 @@ class StatusTab extends StatelessWidget {
             Text(
               noLeaguesMsg,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Theme.of(context).errorColor,
-                fontSize: Theme.of(context).primaryTextTheme.headline.fontSize,
-              ),
+              style: Theme.of(context).primaryTextTheme.title.copyWith(
+                    color: Theme.of(context).errorColor,
+                  ),
             ),
           ],
         ),

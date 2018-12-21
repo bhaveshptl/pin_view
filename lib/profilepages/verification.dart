@@ -262,6 +262,13 @@ class VerificationState extends State<Verification> {
         setState(() {
           _bIsMobileVerified = true;
         });
+      } else {
+        Map<String, dynamic> response = json.decode(res.body);
+        scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(response["error"]["erroMessage"]),
+          ),
+        );
       }
     });
   }
@@ -713,14 +720,21 @@ class VerificationState extends State<Verification> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Text(
-                                        strings.get("KYC"),
+                                      Column(
+                                        children: <Widget>[
+                                          Text(
+                                            "KYC Verification",
+                                          ),
+                                          Text(
+                                            "(ID and Address)",
+                                          ),
+                                        ],
                                       ),
                                       _verificationStatus == "VERIFIED"
                                           ? Icon(Icons.check_circle_outline)
                                           : _verificationStatus ==
                                                   "DOC_SUBMITTED"
-                                              ? Icon(Icons.warning)
+                                              ? Icon(Icons.check)
                                               : Icon(
                                                   Icons.remove_circle_outline)
                                     ],
@@ -735,7 +749,9 @@ class VerificationState extends State<Verification> {
                                   color: Colors.black12,
                                 ),
                                 (_verificationStatus == "VERIFIED" ||
-                                        _verificationStatus == "DOC_SUBMITTED")
+                                        _verificationStatus ==
+                                            "DOC_SUBMITTED" ||
+                                        _verificationStatus == "UNDER_REVIEW")
                                     ? Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(

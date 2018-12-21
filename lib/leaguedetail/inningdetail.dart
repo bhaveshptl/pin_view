@@ -475,12 +475,26 @@ class InningDetailsState extends State<InningDetails> {
 
   @override
   Widget build(BuildContext context) {
+    String title = widget.league.teamA.name + " vs " + widget.league.teamB.name;
+    if (_sportType == 1) {
+      if (widget.league.teamA.inningsId == widget.team.inningsId) {
+        title = widget.league.teamA.name + " inning";
+      } else {
+        title = widget.league.teamB.name + " inning";
+      }
+    } else {
+      if (widget.league.teamA.inningsId == widget.team.inningsId) {
+        title = "First" + " half";
+      } else {
+        title = "Second" + " half";
+      }
+    }
     return Stack(
       children: <Widget>[
         Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-            title: Text(widget.team.name + " " + "inning"),
+            title: Text(title),
             actions: <Widget>[
               Tooltip(
                 message: strings.get("CONTEST_FILTER"),

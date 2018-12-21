@@ -110,6 +110,7 @@ class MyProfileState extends State<MyProfile> {
 
   _showChangeTeamNameDialog() {
     final _formKey = GlobalKey<FormState>();
+    final FocusNode focusNode = FocusNode();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -146,6 +147,7 @@ class MyProfileState extends State<MyProfile> {
                             ),
                             errorMaxLines: 2,
                           ),
+                          focusNode: focusNode,
                           validator: (value) {
                             if (value.isEmpty || value.length < 4) {
                               return "Minimum 4 characters required.";
@@ -188,6 +190,7 @@ class MyProfileState extends State<MyProfile> {
         );
       },
     );
+    FocusScope.of(context).requestFocus(focusNode);
   }
 
   _changeTeamName() {
@@ -239,6 +242,8 @@ class MyProfileState extends State<MyProfile> {
   _showChangeValueDialog(TextEditingController _controller, String label,
       {TextInputType keyboardType = TextInputType.text, int maxLength}) async {
     final _formKey = GlobalKey<FormState>();
+    FocusNode focus = FocusNode();
+    String defaultText = _controller.text;
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -266,6 +271,7 @@ class MyProfileState extends State<MyProfile> {
                             ),
                           ),
                           keyboardType: keyboardType,
+                          focusNode: focus,
                           validator: (value) {
                             if (value.isEmpty) {
                               return "Please enter " + label + ".";
@@ -289,7 +295,7 @@ class MyProfileState extends State<MyProfile> {
             FlatButton(
               child: Text('CANCEL'),
               onPressed: () {
-                _controller.text = "";
+                _controller.text = defaultText;
                 Navigator.of(context).pop();
               },
             ),
@@ -306,6 +312,7 @@ class MyProfileState extends State<MyProfile> {
         );
       },
     );
+    FocusScope.of(context).requestFocus(focus);
   }
 
   showSelectionGenderPopup() {
@@ -462,6 +469,13 @@ class MyProfileState extends State<MyProfile> {
   }
 
   onSaveProfile() {
+    if (_pincodeController.text.indexOf(".") != -1 ||
+        _pincodeController.text.indexOf(" ") != -1 ||
+        _pincodeController.text.indexOf(",") != -1 ||
+        _pincodeController.text.indexOf("-") != -1) {
+      _showMessage("Invalid pincode entered");
+      return null;
+    }
     http.Request req = http.Request(
       "PUT",
       Uri.parse(
@@ -570,7 +584,7 @@ class MyProfileState extends State<MyProfile> {
                               _showChangeTeamNameDialog();
                             } else {
                               _showMessage(
-                                  "You already changed team name once.");
+                                  "Team name can not be changed again!!!");
                             }
                           },
                           child: Container(
@@ -943,7 +957,8 @@ class MyProfileState extends State<MyProfile> {
                               _selectDate(context);
                             } else {
                               _showMessage(
-                                  "DOB is already set. You can not change it once set.");
+                                "Please contact support to change this filed.",
+                              );
                             }
                           },
                           child: Container(

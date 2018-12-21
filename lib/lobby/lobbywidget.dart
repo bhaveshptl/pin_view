@@ -231,7 +231,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                                       .primaryTextTheme
                                       .subhead
                                       .copyWith(
-                                        color: Colors.black87,
+                                        color: Colors.black87,                                        
                                       ),
                                 ),
                               ),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
 import 'package:package_info/package_info.dart';
@@ -320,7 +321,28 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                               isScrollable: true,
                               indicator: UnderlineTabIndicator(),
                               tabs: _mapSportTypes.keys.map<Tab>((page) {
-                                return Tab(text: page);
+                                return Tab(
+                                  text: page,
+                                  // child: Row(
+                                  //   children: <Widget>[
+                                  //     SvgPicture.asset(
+                                  //       _sportType == _mapSportTypes[page]
+                                  //           ? "images/" +
+                                  //               page.toLowerCase() +
+                                  //               ".svg"
+                                  //           : "images/" +
+                                  //               page.toLowerCase() +
+                                  //               "light" +
+                                  //               ".svg",
+                                  //       width: 18.0,
+                                  //     ),
+                                  //     Padding(
+                                  //       padding: EdgeInsets.only(left: 6.0),
+                                  //       child: Text(page),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                );
                               }).toList(),
                             )
                           : Container(),

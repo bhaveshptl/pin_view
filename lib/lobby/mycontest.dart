@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -60,6 +61,7 @@ class MyContestsState extends State<MyContests>
     _sportsController =
         TabController(vsync: this, length: _mapSportTypes.keys.length);
     _sportsController.addListener(() {
+      _setContestsByStatus({});
       if (!_sportsController.indexIsChanging) {
         setState(() {
           _sportType = _sportsController.index + 1;
@@ -493,7 +495,26 @@ class MyContestsState extends State<MyContests>
                     indicator: UnderlineTabIndicator(),
                     indicatorSize: TabBarIndicatorSize.label,
                     tabs: _mapSportTypes.keys.map<Tab>((page) {
-                      return Tab(text: page);
+                      return Tab(
+                        text: page,
+                        // child: Row(
+                        //   children: <Widget>[
+                        //     SvgPicture.asset(
+                        //       _sportType == _mapSportTypes[page]
+                        //           ? "images/" + page.toLowerCase() + ".svg"
+                        //           : "images/" +
+                        //               page.toLowerCase() +
+                        //               "light" +
+                        //               ".svg",
+                        //       width: 18.0,
+                        //     ),
+                        //     Padding(
+                        //       padding: EdgeInsets.only(left: 6.0),
+                        //       child: Text(page),
+                        //     ),
+                        //   ],
+                        // ),
+                      );
                     }).toList(),
                   ),
                 ],
