@@ -1,27 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/statedob.dart';
 import 'package:playfantasy/modal/user.dart';
-import 'package:playfantasy/modal/withdraw.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/lobby/earncash.dart';
-import 'package:playfantasy/lobby/withdraw.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/profilepages/partner.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/profilepages/contactus.dart';
-import 'package:playfantasy/profilepages/myaccount.dart';
 import 'package:playfantasy/profilepages/myprofile.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/profilepages/verification.dart';

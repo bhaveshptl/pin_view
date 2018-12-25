@@ -1,9 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -18,7 +15,9 @@ import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/leaguedetail/contestcard.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
 import 'package:playfantasy/contestdetail/contestdetail.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/prizestructure.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class Contests extends StatefulWidget {
   final L1 l1Data;

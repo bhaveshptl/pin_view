@@ -1,20 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter/cupertino.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/statedob.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
+import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/withdraw.dart';
-import 'package:playfantasy/modal/deposit.dart';
-import 'package:playfantasy/modal/withdraw.dart';
-import 'package:playfantasy/profilepages/myaccount.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/profilepages/myaccount.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
+import 'package:playfantasy/commonwidgets/statedob.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 
 RouteLauncher routeLauncher = new RouteLauncher();

@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -13,6 +11,7 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
 

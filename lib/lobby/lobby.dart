@@ -2,15 +2,10 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
 import 'package:package_info/package_info.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -20,9 +15,13 @@ import 'package:playfantasy/lobby/lobbywidget.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;

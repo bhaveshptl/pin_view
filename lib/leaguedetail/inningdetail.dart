@@ -1,26 +1,25 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
 
+import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/l1.dart' as L1;
 import 'package:playfantasy/lobby/mycontest.dart';
-import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class InningDetails extends StatefulWidget {
   final L1.Team team;

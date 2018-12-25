@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';

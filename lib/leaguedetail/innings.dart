@@ -1,15 +1,14 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/l1.dart' as L1;
-import 'package:playfantasy/leaguedetail/inningdetail.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/leaguedetail/inningdetail.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class Innings extends StatefulWidget {
   final L1.L1 l1Data;

@@ -1,21 +1,16 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/gradientbutton.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
@@ -25,7 +20,10 @@ import 'package:playfantasy/contestdetail/viewteam.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/contestdetail/switchteam.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/prizestructure.dart';
+import 'package:playfantasy/commonwidgets/gradientbutton.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 const TABLE_COLUMN_PADDING = 28;
 
