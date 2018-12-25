@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -71,8 +72,8 @@ class InningsState extends State<Innings> {
 
   showInningDetails(BuildContext context, L1.Team team) async {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => InningDetails(
+      FantasyPageRoute(
+        pageBuilder: (context) => InningDetails(
               team: team,
               league: widget.league,
               leagues: widget.leagues,

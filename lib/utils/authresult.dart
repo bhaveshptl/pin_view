@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -37,8 +38,8 @@ class AuthResult {
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY, response.body);
       await setWSCookie();
       Navigator.of(scaffoldKey.currentContext).pushReplacement(
-        CupertinoPageRoute(
-          builder: (context) => Lobby(),
+        FantasyPageRoute(
+          pageBuilder: (context) => Lobby(),
         ),
       );
       done();

@@ -172,45 +172,50 @@ class ChangePasswordState extends State<ChangePassword> {
                     )),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                          child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                                text: strings.get("PASSWORD_SHOULD"),
-                                style: TextStyle(color: Colors.teal)),
-                            TextSpan(
-                                text: strings.get("MIN_CHAR"),
-                                style: TextStyle(
-                                    color: password.length >= 8
-                                        ? Colors.teal
-                                        : Colors.red)),
-                            TextSpan(
-                                text: strings.get("ATLEAST_NUMBER"),
-                                style: TextStyle(
-                                    color: bDigitsCountMatch
-                                        ? Colors.teal
-                                        : Colors.red)),
-                            TextSpan(
-                                text: strings.get("ATLEAST_ALPHABET"),
-                                style: TextStyle(
-                                    color: bLettersCountMatch
-                                        ? Colors.teal
-                                        : Colors.red)),
-                            TextSpan(
-                                text: strings.get("ATLEAST_SPECIAL_CHARACTER"),
-                                style: TextStyle(
-                                    color: bSpecialCharCountMatch
-                                        ? Colors.teal
-                                        : Colors.red)),
-                          ],
-                          style: TextStyle(
-                            color: Colors.red,
-                          ),
-                        ),
-                      )),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: <Widget>[
+                          Text(strings.get("PASSWORD_SHOULD"),
+                              style: TextStyle(color: Colors.teal)),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(" - " + strings.get("MIN_CHAR"),
+                              style: TextStyle(
+                                  color: password.length >= 8
+                                      ? Colors.teal
+                                      : Colors.red)),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(" - " + strings.get("ATLEAST_NUMBER"),
+                              style: TextStyle(
+                                  color: bDigitsCountMatch
+                                      ? Colors.teal
+                                      : Colors.red)),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(" - " + strings.get("ATLEAST_ALPHABET"),
+                              style: TextStyle(
+                                  color: bLettersCountMatch
+                                      ? Colors.teal
+                                      : Colors.red)),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Text(" - " + strings.get("ATLEAST_SPECIAL_CHARACTER"),
+                              style: TextStyle(
+                                  color: bSpecialCharCountMatch
+                                      ? Colors.teal
+                                      : Colors.red)),
+                        ],
+                      ),
                     ],
                   ),
                 ),

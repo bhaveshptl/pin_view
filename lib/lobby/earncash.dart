@@ -1,15 +1,15 @@
-import 'dart:convert';
-import 'package:playfantasy/appconfig.dart';
 import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:playfantasy/utils/httpmanager.dart';
 
-import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class EarnCash extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  EarnCash({this.data});
+
   @override
   EarnCashState createState() {
     return new EarnCashState();
@@ -27,29 +27,14 @@ class EarnCashState extends State<EarnCash> {
   @override
   void initState() {
     super.initState();
-    getReferralCode();
+    setReferralDetails();
   }
 
-  getReferralCode() async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_REFERRAL_CODE,
-      ),
-    );
-    HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          Map<String, dynamic> response = json.decode(res.body);
-          setState(() {
-            refCode = response["refCode"];
-            inviteUrl = (response["refLink"] as String).replaceAll("%3d", "=");
-            refAAmount = response["amountUserA"];
-            refBAmount = response["amountUserB"];
-          });
-        }
-      },
-    );
+  setReferralDetails() async {
+    refCode = widget.data["refCode"];
+    refAAmount = widget.data["amountUserA"];
+    refBAmount = widget.data["amountUserB"];
+    inviteUrl = (widget.data["refLink"] as String).replaceAll("%3d", "=");
   }
 
   _copyCode() {

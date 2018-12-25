@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -42,6 +43,7 @@ class LeagueDetailState extends State<LeagueDetail>
   int _sportType;
   List<MyTeam> _myTeams;
   String title = "Match";
+  bool bShowLoader = false;
   bool bShowInnings = true;
   Map<String, dynamic> l1UpdatePackate = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
@@ -485,27 +487,20 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _launchAddCash() async {
-    final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => AddCash(),
-      ),
+    showLoader(true);
+    routeLauncher.launchAddCash(
+      context,
+      onSuccess: (result) {},
+      onComplete: () {
+        showLoader(false);
+      },
     );
-    if (result != null) {
-      _showTransactionResult(json.decode(result));
-    }
   }
 
-  _showTransactionResult(Map<String, dynamic> transactionResult) {
-    if (transactionResult["authStatus"] == "Authorised") {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TransactionSuccess(transactionResult, () {
-            Navigator.of(context).pop();
-          });
-        },
-      );
-    }
+  showLoader(bool bShow) {
+    setState(() {
+      bShowLoader = bShow;
+    });
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) async {
@@ -513,8 +508,8 @@ class LeagueDetailState extends State<LeagueDetail>
     switch (index) {
       case 0:
         result = await Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => MyContests(
+          FantasyPageRoute(
+            pageBuilder: (context) => MyContests(
                   leagues: widget.leagues,
                   onSportChange: widget.onSportChange,
                 ),
@@ -527,8 +522,8 @@ class LeagueDetailState extends State<LeagueDetail>
       case 2:
         if (squadStatus()) {
           result = await Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => CreateContest(
+            FantasyPageRoute(
+              pageBuilder: (context) => CreateContest(
                     league: widget.league,
                     l1data: l1Data,
                     myTeams: _myTeams,
@@ -540,8 +535,8 @@ class LeagueDetailState extends State<LeagueDetail>
       case 3:
         if (squadStatus()) {
           result = await Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => MyTeams(
+            FantasyPageRoute(
+              pageBuilder: (context) => MyTeams(
                     league: widget.league,
                     l1Data: l1Data,
                     myTeams: _myTeams,
@@ -627,8 +622,8 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _onSearchContest() {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => SearchContest(
+      FantasyPageRoute(
+        pageBuilder: (context) => SearchContest(
               leagues: widget.leagues,
             ),
       ),
@@ -737,6 +732,7 @@ class LeagueDetailState extends State<LeagueDetail>
                                         l1Data: l1Data,
                                         myTeams: _myTeams,
                                         league: widget.league,
+                                        showLoader: showLoader,
                                         scaffoldKey: _scaffoldKey,
                                         mapContestTeams: _mapContestTeams,
                                       ),
@@ -759,6 +755,7 @@ class LeagueDetailState extends State<LeagueDetail>
                                   l1Data: l1Data,
                                   myTeams: _myTeams,
                                   league: widget.league,
+                                  showLoader: showLoader,
                                   scaffoldKey: _scaffoldKey,
                                   mapContestTeams: _mapContestTeams,
                                 ),
@@ -772,6 +769,7 @@ class LeagueDetailState extends State<LeagueDetail>
               ? LobbyBottomNavigation(_onNavigationSelectionChange, 1)
               : null,
         ),
+        bShowLoader ? Loader() : Container(),
       ],
     );
   }

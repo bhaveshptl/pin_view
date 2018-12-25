@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -615,8 +616,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   initPayment(String url) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => InitPay(
+      FantasyPageRoute(
+        pageBuilder: (context) => InitPay(
               url: url,
             ),
       ),

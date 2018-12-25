@@ -1,22 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:device_info/device_info.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:device_info/device_info.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/update.dart';
 
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/chooselanguage.dart';
 import 'package:playfantasy/commonwidgets/forgotpassword.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class LandingPage extends StatefulWidget {
   final String appUrl;
@@ -43,6 +45,7 @@ class LandingPageState extends State<LandingPage> {
   String _deviceId;
   bool _obscureText = true;
   List<dynamic> _languages;
+  bool bShowLoader = false;
   bool bUpdateAppConfirmationShown = false;
 
   final formKey = new GlobalKey<FormState>();
@@ -124,6 +127,12 @@ class LandingPageState extends State<LandingPage> {
     );
   }
 
+  showLoader(bool bShow) {
+    setState(() {
+      bShowLoader = bShow;
+    });
+  }
+
   updateStringTable(Map<String, dynamic> language) async {
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.UPDATE_LANGUAGE_TABLE));
@@ -153,8 +162,8 @@ class LandingPageState extends State<LandingPage> {
 
   _launchSignup(BuildContext context) {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => Signup(),
+      FantasyPageRoute(
+        pageBuilder: (context) => Signup(),
         fullscreenDialog: true,
       ),
     );
@@ -163,6 +172,8 @@ class LandingPageState extends State<LandingPage> {
   _doSignIn(String _authName, String _password) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
+    showLoader(true);
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
@@ -191,10 +202,12 @@ class LandingPageState extends State<LandingPage> {
               .showSnackBar(SnackBar(content: Text(response['error'])));
         });
       }
+      showLoader(false);
     });
   }
 
   _doGoogleLogin(BuildContext context) async {
+    showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
       scopes: [
         'email',
@@ -209,25 +222,33 @@ class LandingPageState extends State<LandingPage> {
             _sendTokenToAuthenticate(
                 _googleSignInAuthentication.accessToken, 1);
           },
-        );
+        ).whenComplete(() {
+          showLoader(false);
+        });
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   _doFacebookLogin(BuildContext context) async {
+    showLoader(true);
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.nativeWithFallback;
     var result = await facebookLogin
         .logInWithReadPermissions(['email', 'public_profile']);
-
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         _sendTokenToAuthenticate(result.accessToken.token, 2);
         break;
       case FacebookLoginStatus.cancelledByUser:
+        showLoader(false);
         break;
       case FacebookLoginStatus.error:
+        showLoader(false);
         break;
+      default:
+        showLoader(false);
     }
   }
 
@@ -260,13 +281,14 @@ class LandingPageState extends State<LandingPage> {
               .showSnackBar(SnackBar(content: Text(response['error'])));
         });
       }
+      showLoader(false);
     });
   }
 
   _showForgotPassword() async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => ForgotPassword(),
+      FantasyPageRoute(
+        pageBuilder: (context) => ForgotPassword(),
         fullscreenDialog: true,
       ),
     );
@@ -288,11 +310,11 @@ class LandingPageState extends State<LandingPage> {
       });
     }
 
-    return Scaffold(
-      key: _scaffoldKey,
-      body: Stack(
-        children: <Widget>[
-          Center(
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          key: _scaffoldKey,
+          body: Center(
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -602,26 +624,26 @@ class LandingPageState extends State<LandingPage> {
                       )
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      FlatButton(
-                        child: Text(
-                          "CHANGE LANGUAGE",
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                            color: Colors.black45,
-                          ),
-                        ),
-                        onPressed: () {
-                          _showChooseLanguage();
-                        },
-                      )
-                    ],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: <Widget>[
+                  //     FlatButton(
+                  //       child: Text(
+                  //         "CHANGE LANGUAGE",
+                  //         style: TextStyle(
+                  //           fontSize: Theme.of(context)
+                  //               .primaryTextTheme
+                  //               .caption
+                  //               .fontSize,
+                  //           color: Colors.black45,
+                  //         ),
+                  //       ),
+                  //       onPressed: () {
+                  //         _showChooseLanguage();
+                  //       },
+                  //     )
+                  //   ],
+                  // ),
                   AppConfig.of(context).channelId != '3'
                       ? Column(
                           children: <Widget>[
@@ -648,8 +670,9 @@ class LandingPageState extends State<LandingPage> {
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        bShowLoader ? Loader() : Container()
+      ],
     );
   }
 }

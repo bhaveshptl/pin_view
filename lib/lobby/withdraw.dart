@@ -1,24 +1,27 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/withdraw.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/withdrawhistory.dart';
-import 'package:playfantasy/commonwidgets/statedob.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/profilepages/verification.dart';
 
 class Withdraw extends StatefulWidget {
+  final Map<String, dynamic> data;
+
+  Withdraw({this.data});
+
   @override
   WithdrawState createState() => WithdrawState();
 }
@@ -39,7 +42,6 @@ class WithdrawState extends State<Withdraw> {
   String _mobileVerificationError;
   bool _bShowImageUploadError = false;
 
-  String _docName;
   String _verificationStatus;
   String _panVerificationStatus;
   String _addressVerificationStatus;
@@ -54,21 +56,25 @@ class WithdrawState extends State<Withdraw> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController amountController = TextEditingController();
-  TextEditingController _otpController = new TextEditingController();
+  TextEditingController otpController = new TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
   TextEditingController acIFSCCodeController = TextEditingController();
+  TextEditingController mobileController = new TextEditingController();
   TextEditingController paytmAmountController = TextEditingController();
-  TextEditingController _mobileController = new TextEditingController();
   TextEditingController accountNumberController = TextEditingController();
   TextEditingController accountLastNameController = TextEditingController();
   TextEditingController accountFirstNameController = TextEditingController();
 
-  TextEditingController lastNameController = TextEditingController();
-  TextEditingController firstNameController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
-    authenticateWithdraw();
+    _setAddressList();
+    _withdrawData = Withhdraw.fromJson(widget.data);
+
+    _setVerificationStatus(_withdrawData);
+    _withdrawModes = widget.data["withdrawModes"];
+    initFormInputs();
   }
 
   _setAddressList() async {
@@ -91,102 +97,6 @@ class WithdrawState extends State<Withdraw> {
     });
   }
 
-  authenticateWithdraw() async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.AUTH_WITHDRAW,
-      ),
-    );
-    return HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          Map<String, dynamic> response = json.decode(res.body);
-          setState(() {
-            _bIsKYCVerified = true;
-            _bIsMobileVerified = true;
-            _withdrawModes = response["withdrawModes"];
-            _withdrawData = Withhdraw.fromJson(response);
-            initFormInputs();
-          });
-        } else if (res.statusCode == 401) {
-          Map<String, dynamic> response = json.decode(res.body);
-
-          if (response["error"].length > 0) {
-            JoinContestError error = JoinContestError(response["error"]);
-            if (error.isBlockedUser()) {
-              _showJoinContestError(
-                title: error.getTitle(),
-                message: error.getErrorMessage(),
-              );
-            } else {
-              int errorCode = error.getErrorCode();
-              switch (errorCode) {
-                case 3:
-                  showDialog(
-                    context: _scaffoldKey.currentContext,
-                    builder: (BuildContext context) {
-                      return StateDob(
-                        onSuccess: (String msg) {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(msg),
-                          ));
-                          authenticateWithdraw();
-                        },
-                      );
-                    },
-                  );
-                  break;
-                case 6:
-                  _setAddressList();
-                  _setVerificationStatus(Withhdraw.fromJson(response["data"]));
-                  setState(() {
-                    _withdrawData = Withhdraw.fromJson(response["data"]);
-                    _withdrawModes = response["data"]["withdrawModes"];
-                  });
-                  break;
-                case -1:
-                  _setAddressList();
-                  Map<String, dynamic> response = json.decode(res.body);
-                  _setVerificationStatus(Withhdraw.fromJson(response["data"]));
-                  setState(() {
-                    _withdrawModes = response["data"]["withdrawModes"];
-                    _withdrawData = Withhdraw.fromJson(response["data"]);
-                    _bIsMobileVerified = _withdrawData.mobileVerification;
-                  });
-                  break;
-              }
-              initFormInputs();
-            }
-          }
-        }
-      },
-    );
-  }
-
-  _showJoinContestError({String title, String message}) {
-    showDialog(
-      context: _scaffoldKey.currentContext,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
   _setVerificationStatus(Withhdraw withdrawData) async {
     setState(() {
       _withdrawData = withdrawData;
@@ -194,7 +104,7 @@ class WithdrawState extends State<Withdraw> {
 
     mobile = _withdrawData.mobile != null ? _withdrawData.mobile : "";
 
-    _mobileController.text = mobile;
+    mobileController.text = mobile;
     _bIsMobileVerified = _withdrawData.mobileVerification;
 
     _panVerificationStatus = _withdrawData.panVerification;
@@ -308,7 +218,7 @@ class WithdrawState extends State<Withdraw> {
                     children: <Widget>[
                       ListTile(
                         leading: TextFormField(
-                          controller: _mobileController,
+                          controller: mobileController,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               labelText: "Enter mobile number",
@@ -327,7 +237,7 @@ class WithdrawState extends State<Withdraw> {
                                     return 'Please enter OTP.';
                                   }
                                 },
-                                controller: _otpController,
+                                controller: otpController,
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   labelText: "Enter OTP",
@@ -752,8 +662,8 @@ class WithdrawState extends State<Withdraw> {
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_OTP));
     req.body = json.encode({
-      "phone": _mobileController.text.toString(),
-      "isChanged": mobile.toString() != _mobileController.text.toString(),
+      "phone": mobileController.text.toString(),
+      "isChanged": mobile.toString() != mobileController.text.toString(),
     });
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -775,13 +685,13 @@ class WithdrawState extends State<Withdraw> {
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VERIFY_OTP));
     req.body = json.encode({
-      "otp": _otpController.text.toString(),
+      "otp": otpController.text.toString(),
     });
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        authenticateWithdraw();
+        // authenticateWithdraw();
         setState(() {
           _bIsMobileVerified = true;
         });
@@ -855,7 +765,7 @@ class WithdrawState extends State<Withdraw> {
                 if (_formKey.currentState.validate()) {
                   makeWithdrawRequest(context,
                       withdrawType: 1,
-                      amount: int.parse(amountController.text));
+                      amount: double.parse(amountController.text));
                 }
               },
             )
@@ -866,7 +776,7 @@ class WithdrawState extends State<Withdraw> {
   }
 
   makeWithdrawRequest(BuildContext context,
-      {int withdrawType, int amount}) async {
+      {int withdrawType, double amount}) async {
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.WITHDRAW));
     req.body = json.encode({
@@ -918,8 +828,8 @@ class WithdrawState extends State<Withdraw> {
 
   openWithdrawHistory(BuildContext context) {
     return Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => WithdrawHistory(),
+      FantasyPageRoute(
+        pageBuilder: (context) => WithdrawHistory(),
         fullscreenDialog: true,
       ),
     );
@@ -1161,7 +1071,7 @@ class WithdrawState extends State<Withdraw> {
                                           makeWithdrawRequest(
                                             context,
                                             withdrawType: 4,
-                                            amount: int.parse(
+                                            amount: double.parse(
                                               paytmAmountController.text,
                                             ),
                                           );
@@ -1508,7 +1418,7 @@ class WithdrawState extends State<Withdraw> {
                                               makeWithdrawRequest(
                                                 context,
                                                 withdrawType: 1,
-                                                amount: int.parse(
+                                                amount: double.parse(
                                                   amountController.text,
                                                 ),
                                               );

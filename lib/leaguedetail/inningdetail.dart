@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
-import 'package:playfantasy/lobby/addcash.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -39,6 +39,7 @@ class InningDetailsState extends State<InningDetails> {
   int _sportType;
   L1.L1 inningsData;
   List<MyTeam> _myTeams;
+  bool bShowLoader = false;
   Map<String, dynamic> inningsDataObj = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapMyContests = {};
@@ -90,6 +91,12 @@ class InningDetailsState extends State<InningDetails> {
           _getMyContestMyTeams(_mapMyContests);
         });
       }
+    });
+  }
+
+  showLoader(bool bShow) {
+    setState(() {
+      bShowLoader = bShow;
     });
   }
 
@@ -376,27 +383,10 @@ class InningDetailsState extends State<InningDetails> {
   }
 
   _launchAddCash() async {
-    final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => AddCash(),
-      ),
-    );
-    if (result != null) {
-      _showTransactionResult(json.decode(result));
-    }
-  }
-
-  _showTransactionResult(Map<String, dynamic> transactionResult) {
-    if (transactionResult["authStatus"] == "Authorised") {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TransactionSuccess(transactionResult, () {
-            Navigator.of(context).pop();
-          });
-        },
-      );
-    }
+    showLoader(true);
+    routeLauncher.launchAddCash(context, onComplete: () {
+      showLoader(false);
+    });
   }
 
   _onNavigationSelectionChange(BuildContext context, int index) async {
@@ -404,8 +394,8 @@ class InningDetailsState extends State<InningDetails> {
     switch (index) {
       case 0:
         result = await Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => MyContests(
+          FantasyPageRoute(
+            pageBuilder: (context) => MyContests(
                   leagues: widget.leagues,
                   onSportChange: widget.onSportChange,
                 ),
@@ -418,8 +408,8 @@ class InningDetailsState extends State<InningDetails> {
       case 2:
         if (squadStatus()) {
           result = await Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => CreateContest(
+            FantasyPageRoute(
+              pageBuilder: (context) => CreateContest(
                     league: widget.league,
                     l1data: inningsData,
                     myTeams: _myTeams,
@@ -431,8 +421,8 @@ class InningDetailsState extends State<InningDetails> {
       case 3:
         if (squadStatus()) {
           result = await Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => MyTeams(
+            FantasyPageRoute(
+              pageBuilder: (context) => MyTeams(
                     league: widget.league,
                     l1Data: inningsData,
                     myTeams: _myTeams,
@@ -529,6 +519,7 @@ class InningDetailsState extends State<InningDetails> {
                   child: inningsData == null
                       ? Container()
                       : Contests(
+                          showLoader: showLoader,
                           l1Data: inningsData,
                           myTeams: _myTeams,
                           league: widget.league,
@@ -542,6 +533,7 @@ class InningDetailsState extends State<InningDetails> {
           bottomNavigationBar:
               LobbyBottomNavigation(_onNavigationSelectionChange, 1),
         ),
+        bShowLoader ? Loader() : Container(),
       ],
     );
   }

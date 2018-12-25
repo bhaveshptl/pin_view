@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/lobby/initpay.dart';
 import 'package:playfantasy/modal/analytics.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
@@ -17,9 +18,12 @@ import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/lobby/paymentmode.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 
 class AddCash extends StatefulWidget {
+  final Deposit depositData;
+
+  AddCash({this.depositData});
+
   @override
   State<StatefulWidget> createState() => AddCashState();
 }
@@ -27,7 +31,7 @@ class AddCash extends StatefulWidget {
 class AddCashState extends State<AddCash> {
   int amount;
   String cookie = "";
-  Deposit depositData;
+  // Deposit depositData;
   bool bShowLoader = false;
   bool bShowPromoInput = false;
   double customAmountBonus = 0.0;
@@ -49,7 +53,7 @@ class AddCashState extends State<AddCash> {
   void initState() {
     super.initState();
     initWebview();
-    _getDepositInfo();
+    setDepositInfo();
 
     AnalyticsManager().addEvent(Event());
     customAmountController.addListener(() {
@@ -140,69 +144,27 @@ class AddCashState extends State<AddCash> {
     });
   }
 
-  _getDepositInfo() async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.DEPOSIT_INFO,
-      ),
-    );
-    HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          setState(() {
-            depositData = Deposit.fromJson(json.decode(res.body));
-            amountController.text =
-                depositData.chooseAmountData.lastPaymentArray == null
-                    ? ""
-                    : (depositData.chooseAmountData.lastPaymentArray[0]
-                            ["amount"])
-                        .toString();
-            bonusInfo = depositData.chooseAmountData.bonusArray != null
-                ? depositData.chooseAmountData.bonusArray[0]
-                : null;
-          });
-        } else if (res.statusCode >= 400 && res.statusCode <= 499) {
-          JoinContestError error =
-              JoinContestError(json.decode(res.body)["error"]);
-          if (error.isBlockedUser()) {
-            _showJoinContestError(
-              title: error.getTitle(),
-              message: error.getErrorMessage(),
-            );
-          }
-        }
-      },
-    );
-  }
-
-  _showJoinContestError({String title, String message}) {
-    showDialog(
-      context: _scaffoldKey.currentContext,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
+  setDepositInfo() async {
+    // depositData = widget.depositData;
+    amountController.text =
+        widget.depositData.chooseAmountData.lastPaymentArray == null
+            ? ""
+            : (widget.depositData.chooseAmountData.lastPaymentArray[0]
+                    ["amount"])
+                .toString();
+    amount = amountController.text != ""
+        ? double.parse(amountController.text).round()
+        : 0;
+    bonusInfo = widget.depositData.chooseAmountData.bonusArray != null
+        ? widget.depositData.chooseAmountData.bonusArray[0]
+        : null;
   }
 
   createChooseAmountUI() {
-    if (depositData != null && depositData.chooseAmountData.isFirstDeposit) {
+    if (widget.depositData != null &&
+        widget.depositData.chooseAmountData.isFirstDeposit) {
       return getAmountTiles();
-    } else if (depositData != null) {
+    } else if (widget.depositData != null) {
       return getRepeatDepositUI();
     } else {
       return [Container()];
@@ -211,7 +173,7 @@ class AddCashState extends State<AddCash> {
 
   getAmountTiles() {
     List<Widget> tiles = [];
-    depositData.chooseAmountData.amountTiles.forEach((amount) {
+    widget.depositData.chooseAmountData.amountTiles.forEach((amount) {
       tiles.add(
         Card(
           elevation: 1.0,
@@ -248,10 +210,14 @@ class AddCashState extends State<AddCash> {
                                       child: Icon(
                                         gift_1,
                                         color: (amount >=
-                                                    depositData.chooseAmountData
+                                                    widget
+                                                        .depositData
+                                                        .chooseAmountData
                                                         .bonusArray[0]["min"] &&
                                                 amount <=
-                                                    depositData.chooseAmountData
+                                                    widget
+                                                        .depositData
+                                                        .chooseAmountData
                                                         .bonusArray[0]["max"])
                                             ? Colors.teal
                                             : Colors.red,
@@ -260,10 +226,14 @@ class AddCashState extends State<AddCash> {
                                     ),
                                     Text(
                                       (amount >=
-                                                  depositData.chooseAmountData
+                                                  widget
+                                                      .depositData
+                                                      .chooseAmountData
                                                       .bonusArray[0]["min"] &&
                                               amount <=
-                                                  depositData.chooseAmountData
+                                                  widget
+                                                      .depositData
+                                                      .chooseAmountData
                                                       .bonusArray[0]["max"]
                                           ? ("+ " +
                                               strings.rupee +
@@ -272,10 +242,14 @@ class AddCashState extends State<AddCash> {
                                           : "No Bonus"),
                                       style: TextStyle(
                                         color: (amount >=
-                                                    depositData.chooseAmountData
+                                                    widget
+                                                        .depositData
+                                                        .chooseAmountData
                                                         .bonusArray[0]["min"] &&
                                                 amount <=
-                                                    depositData.chooseAmountData
+                                                    widget
+                                                        .depositData
+                                                        .chooseAmountData
                                                         .bonusArray[0]["max"])
                                             ? Colors.teal
                                             : Colors.red,
@@ -477,9 +451,10 @@ class AddCashState extends State<AddCash> {
   }
 
   getFirstDepositBonusAmount(int amount) {
-    int minAmount = depositData.chooseAmountData.bonusArray[0]["min"];
-    int maxAmount = depositData.chooseAmountData.bonusArray[0]["max"];
-    int percentage = depositData.chooseAmountData.bonusArray[0]["percentage"];
+    int minAmount = widget.depositData.chooseAmountData.bonusArray[0]["min"];
+    int maxAmount = widget.depositData.chooseAmountData.bonusArray[0]["max"];
+    int percentage =
+        widget.depositData.chooseAmountData.bonusArray[0]["percentage"];
     double bonusAmount = amount * percentage / 100;
     if (amount < minAmount) {
       bonusAmount = 0;
@@ -501,7 +476,7 @@ class AddCashState extends State<AddCash> {
               children: <Widget>[
                 Expanded(
                   child: Image.network(
-                    depositData.bannerImage,
+                    widget.depositData.bannerImage,
                   ),
                 )
               ],
@@ -591,7 +566,7 @@ class AddCashState extends State<AddCash> {
                             children: <Widget>[
                               OutlineButton(
                                 onPressed: () {
-                                  setDepositAmount(depositData
+                                  setDepositAmount(widget.depositData
                                       .chooseAmountData.amountTiles[0]);
                                 },
                                 textColor: Theme.of(context).primaryColorDark,
@@ -602,14 +577,14 @@ class AddCashState extends State<AddCash> {
                                     Theme.of(context).primaryColor,
                                 child: Text(
                                   strings.rupee +
-                                      depositData
-                                          .chooseAmountData.amountTiles[0]
+                                      widget.depositData.chooseAmountData
+                                          .amountTiles[0]
                                           .toString(),
                                 ),
                               ),
                               OutlineButton(
                                 onPressed: () {
-                                  setDepositAmount(depositData
+                                  setDepositAmount(widget.depositData
                                       .chooseAmountData.amountTiles[1]);
                                 },
                                 textColor: Theme.of(context).primaryColorDark,
@@ -620,14 +595,14 @@ class AddCashState extends State<AddCash> {
                                     Theme.of(context).primaryColor,
                                 child: Text(
                                   strings.rupee +
-                                      depositData
-                                          .chooseAmountData.amountTiles[1]
+                                      widget.depositData.chooseAmountData
+                                          .amountTiles[1]
                                           .toString(),
                                 ),
                               ),
                               OutlineButton(
                                 onPressed: () {
-                                  setDepositAmount(depositData
+                                  setDepositAmount(widget.depositData
                                       .chooseAmountData.amountTiles[2]);
                                 },
                                 textColor: Theme.of(context).primaryColorDark,
@@ -638,8 +613,8 @@ class AddCashState extends State<AddCash> {
                                     Theme.of(context).primaryColor,
                                 child: Text(
                                   strings.rupee +
-                                      depositData
-                                          .chooseAmountData.amountTiles[2]
+                                      widget.depositData.chooseAmountData
+                                          .amountTiles[2]
                                           .toString(),
                                 ),
                               )
@@ -718,10 +693,11 @@ class AddCashState extends State<AddCash> {
                                   ),
                                 )
                               : Container(),
-                          depositData.chooseAmountData.lastPaymentArray.length >
+                          widget.depositData.chooseAmountData.lastPaymentArray
+                                      .length >
                                   0
                               ? InkWell(
-                                  onTap: depositData.bAllowRepeatDeposit
+                                  onTap: widget.depositData.bAllowRepeatDeposit
                                       ? () {
                                           setState(() {
                                             bRepeatTransaction =
@@ -733,11 +709,12 @@ class AddCashState extends State<AddCash> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Checkbox(
-                                        value: depositData.bAllowRepeatDeposit
+                                        value: widget
+                                                .depositData.bAllowRepeatDeposit
                                             ? bRepeatTransaction
                                             : false,
-                                        onChanged: depositData
-                                                .bAllowRepeatDeposit
+                                        onChanged: widget
+                                                .depositData.bAllowRepeatDeposit
                                             ? (bool checked) {
                                                 setState(() {
                                                   bRepeatTransaction = checked;
@@ -749,14 +726,14 @@ class AddCashState extends State<AddCash> {
                                         "Proceed with ",
                                       ),
                                       Text(
-                                        depositData.chooseAmountData
+                                        widget.depositData.chooseAmountData
                                             .lastPaymentArray[0]["label"]
                                             .toString(),
                                       ),
                                       Padding(
                                         padding: EdgeInsets.only(left: 8.0),
                                         child: SvgPicture.network(
-                                          depositData.chooseAmountData
+                                          widget.depositData.chooseAmountData
                                               .lastPaymentArray[0]["logoUrl"],
                                           width: 24.0,
                                         ),
@@ -850,8 +827,8 @@ class AddCashState extends State<AddCash> {
   }
 
   onProceed({int amount}) async {
-    if ((depositData.chooseAmountData.isFirstDeposit && amount == 0) ||
-        (!depositData.chooseAmountData.isFirstDeposit &&
+    if ((widget.depositData.chooseAmountData.isFirstDeposit && amount == 0) ||
+        (!widget.depositData.chooseAmountData.isFirstDeposit &&
             amountController.text == "")) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
@@ -867,11 +844,11 @@ class AddCashState extends State<AddCash> {
         );
       } else {
         amount = amount == null ? int.parse(amountController.text) : amount;
-        if (amount < depositData.chooseAmountData.minAmount) {
+        if (amount < widget.depositData.chooseAmountData.minAmount) {
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
               content: Text("Please enter more than " +
-                  depositData.chooseAmountData.minAmount.toString() +
+                  widget.depositData.chooseAmountData.minAmount.toString() +
                   " to deposit."),
             ),
           );
@@ -937,12 +914,12 @@ class AddCashState extends State<AddCash> {
     } else {
       flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
-        CupertinoPageRoute(
-          builder: (context) => ChoosePaymentMode(
+        FantasyPageRoute(
+          pageBuilder: (context) => ChoosePaymentMode(
                 amount: amount,
                 paymentMode: paymentMode,
-                promoCode: depositData.chooseAmountData.isFirstDeposit
-                    ? depositData.chooseAmountData.bonusArray[0]["code"]
+                promoCode: widget.depositData.chooseAmountData.isFirstDeposit
+                    ? widget.depositData.chooseAmountData.bonusArray[0]["code"]
                     : promoController.text,
               ),
         ),
@@ -971,9 +948,9 @@ class AddCashState extends State<AddCash> {
 
   paySecurely(int amount) async {
     String querParamString = '';
-    Map<String, dynamic> userDetails = depositData.refreshData;
+    Map<String, dynamic> userDetails = widget.depositData.refreshData;
     Map<String, dynamic> paymentModeDetails =
-        depositData.chooseAmountData.lastPaymentArray[0];
+        widget.depositData.chooseAmountData.lastPaymentArray[0];
     Map<String, dynamic> payload = {
       "channelId": AppConfig.of(context).channelId,
       "orderId": null,
@@ -1047,8 +1024,8 @@ class AddCashState extends State<AddCash> {
 
   startInitPayment(String url) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => InitPay(
+      FantasyPageRoute(
+        pageBuilder: (context) => InitPay(
               url: url,
             ),
       ),
@@ -1112,18 +1089,18 @@ class AddCashState extends State<AddCash> {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
           : customAmountController.text);
-      if (customAmount > depositData.chooseAmountData.depositLimit) {
+      if (customAmount > widget.depositData.chooseAmountData.depositLimit) {
         _scaffoldKey.currentState.showSnackBar(SnackBar(
           content: Text("You can not deposit more than " +
               strings.rupee +
-              depositData.chooseAmountData.depositLimit.toString() +
+              widget.depositData.chooseAmountData.depositLimit.toString() +
               " in single transaction."),
         ));
-      } else if (customAmount < depositData.chooseAmountData.minAmount) {
+      } else if (customAmount < widget.depositData.chooseAmountData.minAmount) {
         _scaffoldKey.currentState.showSnackBar(SnackBar(
           content: Text("Minimum  " +
               strings.rupee +
-              depositData.chooseAmountData.minAmount.toString() +
+              widget.depositData.chooseAmountData.minAmount.toString() +
               " should be deposit in a transaction."),
         ));
       } else {
@@ -1182,14 +1159,14 @@ class AddCashState extends State<AddCash> {
                           padding: EdgeInsets.only(left: 4.0),
                           child: Text(
                             strings.rupee +
-                                (depositData == null
+                                (widget.depositData == null
                                     ? "0.0"
-                                    : (depositData
-                                                .chooseAmountData.balance.deposited +
-                                            depositData.chooseAmountData.balance
-                                                .nonWithdrawable +
-                                            depositData.chooseAmountData.balance
-                                                .withdrawable)
+                                    : (widget.depositData.chooseAmountData.balance
+                                                .deposited +
+                                            widget.depositData.chooseAmountData
+                                                .balance.nonWithdrawable +
+                                            widget.depositData.chooseAmountData
+                                                .balance.withdrawable)
                                         .toStringAsFixed(2)),
                           ),
                         )

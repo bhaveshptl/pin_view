@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/profile.dart';
@@ -222,21 +223,7 @@ class MyProfileState extends State<MyProfile> {
   }
 
   _launchAddCash() async {
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
-    }
-
-    Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => AddCash(),
-        fullscreenDialog: true,
-      ),
-    );
+    routeLauncher.launchAddCash(context);
   }
 
   _showChangeValueDialog(TextEditingController _controller, String label,

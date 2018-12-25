@@ -33,8 +33,25 @@ class LiveContest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String title = "";
     MyTeam _myBestTeam = _getMyBestTeam();
     bool bMyContest = isMyContest == null ? false : isMyContest;
+
+    if (contest.inningsId != 0 &&
+        league.teamA != null &&
+        league.teamA.sportType == 1) {
+      if (league.teamA.inningsId == contest.inningsId) {
+        title = league.teamA.name;
+      } else {
+        title = league.teamB.name;
+      }
+    } else if (contest.inningsId != 0 && league.teamA != null) {
+      if (league.teamA.inningsId == contest.inningsId) {
+        title = "First";
+      } else {
+        title = "Second";
+      }
+    }
 
     return Column(
       children: <Widget>[
@@ -55,28 +72,15 @@ class LiveContest extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                (bMyContest &&
-                        contest.inningsId != 0 &&
-                        league != null &&
-                        league.teamA != null &&
-                        league.teamB != null)
-                    ? (league.teamA.inningsId == contest.inningsId
-                        ? Container(
-                            padding: EdgeInsets.symmetric(horizontal: 4.0),
-                            color: Colors.redAccent,
-                            child: Text(
-                              league.teamA.name,
-                              style: TextStyle(color: Colors.white54),
-                            ),
-                          )
-                        : Container(
-                            padding: EdgeInsets.symmetric(horizontal: 4.0),
-                            color: Colors.redAccent,
-                            child: Text(
-                              league.teamB.name,
-                              style: TextStyle(color: Colors.white54),
-                            ),
-                          ))
+                (bMyContest && title.isNotEmpty)
+                    ? Container(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        color: Colors.redAccent,
+                        child: Text(
+                          title,
+                          style: TextStyle(color: Colors.white54),
+                        ),
+                      )
                     : Container(),
                 Padding(
                   padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),

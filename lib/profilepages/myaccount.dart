@@ -1,13 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:playfantasy/modal/account.dart';
 
-import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class MyAccount extends StatefulWidget {
+  final Map<String, dynamic> accountData;
+
+  MyAccount({this.accountData});
+
   @override
   MyAccountState createState() => MyAccountState();
 }
@@ -19,28 +19,7 @@ class MyAccountState extends State<MyAccount> {
   @override
   void initState() {
     super.initState();
-    _getAccountDetails();
-  }
-
-  _getAccountDetails() async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_ACCOUNT_DETAILS,
-      ),
-    );
-    return HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          setState(() {
-            accountDetails = Account.fromJson(json.decode(res.body));
-          });
-        } else if (res.statusCode == 401) {
-          Map<String, dynamic> response = json.decode(res.body);
-          if (response["error"]["reasons"].length > 0) {}
-        }
-      },
-    );
+    accountDetails = Account.fromJson(widget.accountData);
   }
 
   @override

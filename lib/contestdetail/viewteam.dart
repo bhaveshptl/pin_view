@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -115,8 +116,8 @@ class _ViewTeamState extends State<ViewTeam> {
 
   void _onEditTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
               selectedTeam: getTeam(),
@@ -133,8 +134,8 @@ class _ViewTeamState extends State<ViewTeam> {
 
   void _onCloneTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
               selectedTeam: MyTeam.fromJson(

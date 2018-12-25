@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/leaguedetail/contestcard.dart';
@@ -26,6 +26,7 @@ class MyContestStatusTab extends StatefulWidget {
   final int sportsType;
   final int fantasyType;
   final int leagueStatus;
+  final Function showLoader;
   final List<League> leagues;
   final Function onContestClick;
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -34,6 +35,7 @@ class MyContestStatusTab extends StatefulWidget {
 
   MyContestStatusTab({
     this.leagues,
+    this.showLoader,
     this.sportsType,
     this.scaffoldKey,
     this.fantasyType,
@@ -381,8 +383,8 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     final curContest = contest;
     final league = _getLeague(contest.leagueId);
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: league,
               l1Data: _l1Data,
             ),
@@ -441,24 +443,14 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
 
   _launchDepositJourneyForJoinContest(Contest contest) async {
     final curContest = contest;
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
-    }
-
-    final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => AddCash(),
-        fullscreenDialog: true,
-      ),
-    );
-    if (result == true) {
-      _onJoinContest(curContest);
-    }
+    widget.showLoader(true);
+    routeLauncher.launchAddCash(context, onSuccess: (result) {
+      if (result != null) {
+        _onJoinContest(curContest);
+      }
+    }, onComplete: () {
+      widget.showLoader(false);
+    });
   }
 
   onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {

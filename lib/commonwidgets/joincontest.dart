@@ -38,6 +38,7 @@ class JoinContestState extends State<JoinContest> {
 
   double _cashBalance = 0.0;
   double _bonusBalance = 0.0;
+  double _playableBonus = 0.0;
 
   _joinContest(BuildContext context) async {
     if (_selectedTeamId == null || _selectedTeamId == -1) {
@@ -59,6 +60,7 @@ class JoinContestState extends State<JoinContest> {
         "inningsId": widget.contest.inningsId,
         "realTeamId": widget.contest.realTeamId,
         "visibilityId": widget.contest.visibilityId,
+        "bonusAllowed": widget.contest.bonusAllowed,
         "contestCode": widget.contest.contestJoinCode,
         "matchId": widget.l1Data.league.rounds[0].matches[0].id,
       });
@@ -100,7 +102,7 @@ class JoinContestState extends State<JoinContest> {
             if (response["error"] == false) {
               Navigator.of(context).pop(res.body);
             } else if (response["error"] == true) {
-              Navigator.of(context).pop({"msg": response["message"]});
+              Navigator.of(context).pop(json.encode(response));
               // widget.onError(null, response["error"]);
             }
           } else if (res.statusCode == 401) {
@@ -176,6 +178,7 @@ class JoinContestState extends State<JoinContest> {
                 (response["withdrawable"] + response["depositBucket"])
                     .toDouble();
             _bonusBalance = (response["nonWithdrawable"]).toDouble();
+            _playableBonus = response["playablebonus"].toDouble();
           });
         }
       },
@@ -229,7 +232,9 @@ class JoinContestState extends State<JoinContest> {
         : (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
     double usableBonus = widget.contest == null
         ? 0.0
-        : _bonusBalance > bonusUsable ? bonusUsable : _bonusBalance;
+        : _bonusBalance > bonusUsable
+            ? (bonusUsable > _playableBonus ? _playableBonus : bonusUsable)
+            : _bonusBalance;
 
     return AlertDialog(
       title: Text(strings.get("CONFIRMATION").toUpperCase()),

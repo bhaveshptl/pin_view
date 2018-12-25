@@ -4,6 +4,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -33,9 +35,10 @@ class MyContestsState extends State<MyContests>
   String cookie;
   int _sportType = 1;
   int selectedSegment = 0;
+  bool bShowInnings = true;
+  bool bShowLoader = false;
   List<League> _leagues = [];
   TabController tabController;
-  bool bShowInnings = true;
   TabController _sportsController;
   Map<String, int> _mapSportTypes;
   Map<int, List<MyContestStatusTab>> tabs = {};
@@ -368,10 +371,49 @@ class MyContestsState extends State<MyContests>
         }
       }
     });
+
+    List<String> upcomingKeys = mapUpcomingContest.keys.toList();
+    upcomingKeys.sort((a, b) {
+      League leagueA = _getLeague(int.parse(a));
+      League leagueB = _getLeague(int.parse(b));
+      int leagueAStartTime = leagueA != null ? leagueA.matchStartTime : 0;
+      int leagueBStartTime = leagueB != null ? leagueB.matchStartTime : 0;
+      return leagueAStartTime - leagueBStartTime;
+    });
+
+    List<String> liveKeys = mapLiveContest.keys.toList();
+    liveKeys.sort((a, b) {
+      League leagueA = _getLeague(int.parse(a));
+      League leagueB = _getLeague(int.parse(b));
+      int leagueAStartTime = leagueA != null ? leagueA.matchStartTime : 0;
+      int leagueBStartTime = leagueB != null ? leagueB.matchStartTime : 0;
+      return leagueBStartTime - leagueAStartTime;
+    });
+
+    List<String> resultKeys = mapResultContest.keys.toList();
+    resultKeys.sort((a, b) {
+      League leagueA = _getLeague(int.parse(a));
+      League leagueB = _getLeague(int.parse(b));
+      int leagueAEndTime = leagueA != null ? leagueA.matchEndTime : 0;
+      int leagueBEndTime = leagueB != null ? leagueB.matchEndTime : 0;
+      return leagueBEndTime - leagueAEndTime;
+    });
+    _mapUpcomingContest = {};
+    _mapLiveContest = {};
+    _mapResultContest = {};
+
     setState(() {
-      _mapLiveContest = mapLiveContest;
-      _mapResultContest = mapResultContest;
-      _mapUpcomingContest = mapUpcomingContest;
+      upcomingKeys.forEach((key) {
+        _mapUpcomingContest[key] = mapUpcomingContest[key];
+      });
+
+      liveKeys.forEach((key) {
+        _mapLiveContest[key] = mapLiveContest[key];
+      });
+
+      resultKeys.forEach((key) {
+        _mapResultContest[key] = mapResultContest[key];
+      });
     });
   }
 
@@ -406,7 +448,7 @@ class MyContestsState extends State<MyContests>
     });
   }
 
-  _getLeague(int _leagueId) {
+  League _getLeague(int _leagueId) {
     for (League _league in _leagues) {
       if (_league.leagueId == _leagueId) {
         return _league;
@@ -417,14 +459,20 @@ class MyContestsState extends State<MyContests>
 
   _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => ContestDetail(
+      FantasyPageRoute(
+        pageBuilder: (context) => ContestDetail(
               league: league,
               contest: contest,
               mapContestTeams: _mapContestTeams[contest.id],
             ),
       ),
     );
+  }
+
+  showLoader(bool bShow) {
+    setState(() {
+      bShowLoader = bShow;
+    });
   }
 
   getMyContestTabs({int fantasyType, int sportsType}) {
@@ -459,6 +507,7 @@ class MyContestsState extends State<MyContests>
               child: MyContestStatusTab(
                 leagues: _leagues,
                 sportsType: sportsType,
+                showLoader: showLoader,
                 fantasyType: fantasyType,
                 scaffoldKey: _scaffoldKey,
                 onContestClick: _onContestClick,
@@ -477,118 +526,125 @@ class MyContestsState extends State<MyContests>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          elevation: 0.0,
-          title: Text("My Contests"),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(widget.tabBarHeight),
-            child: Container(
-              padding: EdgeInsets.only(left: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  TabBar(
-                    controller: _sportsController,
-                    isScrollable: true,
-                    indicator: UnderlineTabIndicator(),
-                    indicatorSize: TabBarIndicatorSize.label,
-                    tabs: _mapSportTypes.keys.map<Tab>((page) {
-                      return Tab(
-                        text: page,
-                        // child: Row(
-                        //   children: <Widget>[
-                        //     SvgPicture.asset(
-                        //       _sportType == _mapSportTypes[page]
-                        //           ? "images/" + page.toLowerCase() + ".svg"
-                        //           : "images/" +
-                        //               page.toLowerCase() +
-                        //               "light" +
-                        //               ".svg",
-                        //       width: 18.0,
-                        //     ),
-                        //     Padding(
-                        //       padding: EdgeInsets.only(left: 6.0),
-                        //       child: Text(page),
-                        //     ),
-                        //   ],
-                        // ),
-                      );
-                    }).toList(),
-                  ),
-                ],
+    return Stack(
+      children: <Widget>[
+        Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            elevation: 0.0,
+            title: Text("My Contests"),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(widget.tabBarHeight),
+              child: Container(
+                padding: EdgeInsets.only(left: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    TabBar(
+                      controller: _sportsController,
+                      isScrollable: true,
+                      indicator: UnderlineTabIndicator(),
+                      indicatorSize: TabBarIndicatorSize.label,
+                      tabs: _mapSportTypes.keys.map<Tab>((page) {
+                        return Tab(
+                          text: page,
+                          // child: Row(
+                          //   children: <Widget>[
+                          //     SvgPicture.asset(
+                          //       _sportType == _mapSportTypes[page]
+                          //           ? "images/" + page.toLowerCase() + ".svg"
+                          //           : "images/" +
+                          //               page.toLowerCase() +
+                          //               "light" +
+                          //               ".svg",
+                          //       width: 18.0,
+                          //     ),
+                          //     Padding(
+                          //       padding: EdgeInsets.only(left: 6.0),
+                          //       child: Text(page),
+                          //     ),
+                          //   ],
+                          // ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
+          body: TabBarView(
+            controller: _sportsController,
+            children: _mapSportTypes.keys.map<Widget>((page) {
+              return bShowInnings
+                  ? DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            decoration: BoxDecoration(boxShadow: [
+                              BoxShadow(
+                                blurRadius: 3.0,
+                                spreadRadius: 3.0,
+                                color: Colors.black12,
+                              )
+                            ]),
+                            child: Container(
+                              color: Colors.white,
+                              child: TabBar(
+                                // indicatorColor: Colors.white,
+                                labelColor: Theme.of(context).primaryColor,
+                                indicatorSize: TabBarIndicatorSize.label,
+                                unselectedLabelColor: Theme.of(context)
+                                    .primaryColor
+                                    .withAlpha(100),
+                                tabs: [
+                                  Tab(
+                                    text: "MATCH",
+                                  ),
+                                  Tab(
+                                    text: "INNINGS",
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.only(top: 6.0),
+                              child: TabBarView(
+                                children: <Widget>[
+                                  Container(
+                                    child: getMyContestTabs(
+                                      fantasyType: 1,
+                                      sportsType: _mapSportTypes[page],
+                                    ),
+                                  ),
+                                  Container(
+                                    child: getMyContestTabs(
+                                      fantasyType: 2,
+                                      sportsType: _mapSportTypes[page],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container(
+                      child: getMyContestTabs(
+                        fantasyType: 1,
+                        sportsType: _mapSportTypes[page],
+                      ),
+                    );
+            }).toList(),
+          ),
         ),
-        body: TabBarView(
-          controller: _sportsController,
-          children: _mapSportTypes.keys.map<Widget>((page) {
-            return bShowInnings
-                ? DefaultTabController(
-                    length: 2,
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                              blurRadius: 3.0,
-                              spreadRadius: 3.0,
-                              color: Colors.black12,
-                            )
-                          ]),
-                          child: Container(
-                            color: Colors.white,
-                            child: TabBar(
-                              // indicatorColor: Colors.white,
-                              labelColor: Theme.of(context).primaryColor,
-                              indicatorSize: TabBarIndicatorSize.label,
-                              unselectedLabelColor:
-                                  Theme.of(context).primaryColor.withAlpha(100),
-                              tabs: [
-                                Tab(
-                                  text: "MATCH",
-                                ),
-                                Tab(
-                                  text: "INNINGS",
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.only(top: 6.0),
-                            child: TabBarView(
-                              children: <Widget>[
-                                Container(
-                                  child: getMyContestTabs(
-                                    fantasyType: 1,
-                                    sportsType: _mapSportTypes[page],
-                                  ),
-                                ),
-                                Container(
-                                  child: getMyContestTabs(
-                                    fantasyType: 2,
-                                    sportsType: _mapSportTypes[page],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Container(
-                    child: getMyContestTabs(
-                      fantasyType: 1,
-                      sportsType: _mapSportTypes[page],
-                    ),
-                  );
-          }).toList(),
-        ));
+        bShowLoader ? Loader() : Container(),
+      ],
+    );
   }
 
   @override

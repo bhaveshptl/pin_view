@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/leaguedetail/createteam.dart';
@@ -23,6 +23,7 @@ import 'package:playfantasy/commonwidgets/prizestructure.dart';
 class Contests extends StatefulWidget {
   final L1 l1Data;
   final League league;
+  final Function showLoader;
   final List<MyTeam> myTeams;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<int, List<MyTeam>> mapContestTeams;
@@ -31,6 +32,7 @@ class Contests extends StatefulWidget {
     this.league,
     this.l1Data,
     this.myTeams,
+    this.showLoader,
     this.scaffoldKey,
     this.mapContestTeams,
   });
@@ -316,8 +318,8 @@ class ContestsState extends State<Contests> {
 
   _onContestClick(Contest contest, League league) {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => ContestDetail(
+      FantasyPageRoute(
+        pageBuilder: (context) => ContestDetail(
               contest: contest,
               league: league,
               l1Data: _l1Data,
@@ -433,8 +435,8 @@ class ContestsState extends State<Contests> {
     bWaitingForTeamCreation = true;
     Navigator.of(context).pop();
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: _l1Data,
             ),
@@ -536,24 +538,14 @@ class ContestsState extends State<Contests> {
 
   _launchDepositJourneyForJoinContest(Contest contest) async {
     final curContest = contest;
-    if (cookie == null) {
-      Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
-      await futureCookie.then((value) {
-        setState(() {
-          cookie = value;
-        });
-      });
-    }
-
-    final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => AddCash(),
-        fullscreenDialog: true,
-      ),
-    );
-    if (result == true) {
-      onJoinContest(curContest);
-    }
+    widget.showLoader(true);
+    routeLauncher.launchAddCash(context, onSuccess: (result) {
+      if (result != null) {
+        onJoinContest(curContest);
+      }
+    }, onComplete: () {
+      widget.showLoader(false);
+    });
   }
 
   onJoinContestError(

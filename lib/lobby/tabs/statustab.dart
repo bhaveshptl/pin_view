@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -23,8 +24,8 @@ class StatusTab extends StatelessWidget {
 
   onLeagueSelect(BuildContext context, League league) {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => LeagueDetail(
+      FantasyPageRoute(
+        pageBuilder: (context) => LeagueDetail(
               league,
               leagues: allLeagues,
               sportType: sportType,

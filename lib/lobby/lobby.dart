@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
 import 'package:package_info/package_info.dart';
-import 'package:playfantasy/lobby/earncash.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
@@ -23,7 +23,6 @@ import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/commonwidgets/transactionsuccess.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
@@ -43,10 +42,12 @@ class Lobby extends StatefulWidget {
 class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   int _sportType = 0;
   List<League> _leagues;
+  bool bShowLoader = false;
   TabController _controller;
   List<String> _carousel = [];
   Map<String, int> _mapSportTypes;
   bool bUpdateAppConfirmationShown = false;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   initState() {
@@ -131,26 +132,13 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     }
   }
 
-  _showTransactionResult(Map<String, dynamic> transactionResult) {
-    if (transactionResult["authStatus"] == "Authorised") {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TransactionSuccess(transactionResult, () {
-            Navigator.of(context).pop();
-          });
-        },
-      );
-    }
-  }
-
   _onNavigationSelectionChange(BuildContext context, int index) {
     setState(() {
       switch (index) {
         case 0:
           Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => MyContests(
+            FantasyPageRoute(
+              pageBuilder: (context) => MyContests(
                     leagues: _leagues,
                     onSportChange: _onSportSelectionChaged,
                   ),
@@ -161,16 +149,15 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
           _launchAddCash();
           break;
         case 2:
-          Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => EarnCash(),
-            ),
-          );
+          showLoader(true);
+          routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
+            showLoader(false);
+          });
           break;
         case 3:
           Navigator.of(context).push(
-            CupertinoPageRoute(
-              builder: (context) => AppDrawer(),
+            FantasyPageRoute(
+              pageBuilder: (context) => AppDrawer(),
             ),
           );
           break;
@@ -179,14 +166,20 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   }
 
   _launchAddCash() async {
-    final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => AddCash(),
-      ),
+    showLoader(true);
+    routeLauncher.launchAddCash(
+      context,
+      onSuccess: (result) {},
+      onComplete: () {
+        showLoader(false);
+      },
     );
-    if (result != null) {
-      _showTransactionResult(json.decode(result));
-    }
+  }
+
+  showLoader(bool bShow) {
+    setState(() {
+      bShowLoader = bShow;
+    });
   }
 
   Future<bool> _onWillPop() {
@@ -215,8 +208,8 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
   launchHelp() {
     Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => WebviewScaffold(
+      FantasyPageRoute(
+        pageBuilder: (context) => WebviewScaffold(
               url: "https://www.playfantasy.com/assets/help.html?cache=" +
                   DateTime.now().millisecondsSinceEpoch.toString(),
               appBar: AppBar(
@@ -247,6 +240,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
       child: Stack(
         children: <Widget>[
           Scaffold(
+            key: scaffoldKey,
             appBar: AppBar(
               elevation: 3.0,
               title: Container(
@@ -359,36 +353,41 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                 )
               ],
             ),
-            body: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/norwegian_rose.png"),
-                    repeat: ImageRepeat.repeat),
-              ),
-              child: _sportType >= 0
-                  ? TabBarView(
-                      controller: _controller,
-                      children: _mapSportTypes.keys.map<Widget>((page) {
-                        return Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: LobbyWidget(
-                                sportType: _mapSportTypes[page],
-                                onLeagues: (value) {
-                                  _leagues = value;
-                                },
-                                onSportChange: _onSportSelectionChaged,
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                    )
-                  : Container(),
+            body: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("images/norwegian_rose.png"),
+                        repeat: ImageRepeat.repeat),
+                  ),
+                  child: _sportType >= 0
+                      ? TabBarView(
+                          controller: _controller,
+                          children: _mapSportTypes.keys.map<Widget>((page) {
+                            return Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: LobbyWidget(
+                                    sportType: _mapSportTypes[page],
+                                    onLeagues: (value) {
+                                      _leagues = value;
+                                    },
+                                    onSportChange: _onSportSelectionChaged,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        )
+                      : Container(),
+                ),
+              ],
             ),
             bottomNavigationBar:
                 LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),
+          bShowLoader ? Loader() : Container(),
         ],
       ),
     );

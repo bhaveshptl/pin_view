@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -54,8 +55,8 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
             ),
@@ -70,8 +71,8 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onEditTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
               selectedTeam: widget.myTeams[_selectedItemIndex],
@@ -87,8 +88,8 @@ class MyTeamsState extends State<MyTeams> {
 
   void _onCloneTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      CupertinoPageRoute(
-        builder: (context) => CreateTeam(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
               selectedTeam: MyTeam.fromJson(
