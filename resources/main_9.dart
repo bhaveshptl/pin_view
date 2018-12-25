@@ -188,6 +188,7 @@ void main() async {
   var configuredApp = AppConfig(
     appName: 'Smart11',
     channelId: channelId,
+    showBackground: false,
     apiBaseUrl: apiBaseUrl,
     websocketUrl: websocketUrl,
     staticPageUrls: staticPageUrls,

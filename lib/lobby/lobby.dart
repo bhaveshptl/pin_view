@@ -355,11 +355,13 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
             body: Stack(
               children: <Widget>[
                 Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
-                        repeat: ImageRepeat.repeat),
-                  ),
+                  decoration: AppConfig.of(context).showBackground
+                      ? BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage("images/norwegian_rose.png"),
+                              repeat: ImageRepeat.repeat),
+                        )
+                      : null,
                   child: _sportType >= 0
                       ? TabBarView(
                           controller: _controller,

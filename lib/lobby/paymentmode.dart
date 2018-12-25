@@ -35,7 +35,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   Map<String, dynamic> lastPaymentMethod;
-  List<Map<String, dynamic>> selectedPaymentMethod = [];
+  Map<String, Map<String, dynamic>> selectedPaymentMethod = {};
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
@@ -129,19 +129,19 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                   as List)
               .forEach((type) {
             if (type["name"] == lastPaymentArray["paymentOption"]) {
-              selectedPaymentMethod.add(type);
+              selectedPaymentMethod[type["type"]] = type;
               lastPaymentMethod = type;
               bLastTransactionFound = true;
             }
           });
           if (!bLastTransactionFound) {
-            selectedPaymentMethod.add(widget.paymentMode["choosePayment"]
-                ["paymentInfo"][type["type"]][0]);
+            selectedPaymentMethod[type["type"]] = widget
+                .paymentMode["choosePayment"]["paymentInfo"][type["type"]][0];
           }
           _selectedItemIndex = i;
         } else {
-          selectedPaymentMethod.add(widget.paymentMode["choosePayment"]
-              ["paymentInfo"][type["type"]][0]);
+          selectedPaymentMethod[type["type"]] = widget
+              .paymentMode["choosePayment"]["paymentInfo"][type["type"]][0];
         }
       }
       i++;
@@ -452,10 +452,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                       DropdownButton(
                         onChanged: (value) {
                           setState(() {
-                            selectedPaymentMethod[index] = value;
+                            selectedPaymentMethod[type["type"]] = value;
                           });
                         },
-                        value: selectedPaymentMethod[i],
+                        value: selectedPaymentMethod[type["type"]],
                         items: (widget.paymentMode["choosePayment"]
                                 ["paymentInfo"][type["type"]] as List)
                             .map((item) {
@@ -473,8 +473,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         child: RaisedButton(
                           onPressed: () {
                             if (validateUserInfo()) {
-                              onPaySecurely(
-                                  selectedPaymentMethod[index], type["type"]);
+                              onPaySecurely(selectedPaymentMethod[type["type"]],
+                                  type["type"]);
                             }
                           },
                           child: Text(
@@ -592,13 +592,19 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         Map<String, dynamic> response = json.decode(res.body);
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           _openRazorpayNative({
+            "name": AppConfig.of(context).channelId == '3'
+                ? "PlayFantasy"
+                : "Smart 11",
             "email": payload["email"],
             "phone": payload["phone"],
             "amount": (payload["depositAmount"] * 100).toString(),
             "orderId": response["action"]["value"],
             "method": (payload["paymentType"] as String).indexOf("CARD") == -1
                 ? payload["paymentType"].toLowerCase()
-                : "card"
+                : "card",
+            "image": AppConfig.of(context).channelId == '3'
+                ? "https://dyrnmb8cbz1ud.cloudfront.net/images/logo.png"
+                : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
           });
         } else {
           _scaffoldKey.currentState.showSnackBar(
@@ -671,12 +677,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("images/norwegian_rose.png"),
-            repeat: ImageRepeat.repeat,
-          ),
-        ),
+        decoration: AppConfig.of(context).showBackground
+            ? BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("images/norwegian_rose.png"),
+                  repeat: ImageRepeat.repeat,
+                ),
+              )
+            : null,
         child: Stack(
           children: <Widget>[
             widget.paymentMode != null

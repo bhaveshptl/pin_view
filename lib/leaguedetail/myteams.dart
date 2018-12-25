@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -455,11 +456,13 @@ class MyTeamsState extends State<MyTeams> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("images/norwegian_rose.png"),
-              repeat: ImageRepeat.repeat),
-        ),
+        decoration: AppConfig.of(context).showBackground
+            ? BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/norwegian_rose.png"),
+                    repeat: ImageRepeat.repeat),
+              )
+            : null,
         child: Column(
           children: <Widget>[
             LeagueCard(

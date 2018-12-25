@@ -2,12 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/lobby/searchcontest.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -15,6 +12,8 @@ import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
+import 'package:playfantasy/lobby/searchcontest.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/leaguedetail/innings.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
@@ -22,6 +21,8 @@ import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League league;
@@ -637,6 +638,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   Widget build(BuildContext context) {
+    bShowInnings = AppConfig.of(context).channelId == "3" ? true : false;
     return Stack(
       children: <Widget>[
         Scaffold(
@@ -666,10 +668,13 @@ class LeagueDetailState extends State<LeagueDetail>
           ),
           body: Container(
             // color: Color.fromARGB(255, 237, 237, 237),
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/norwegian_rose.png"),
-                    repeat: ImageRepeat.repeat)),
+            decoration: AppConfig.of(context).showBackground
+                ? BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("images/norwegian_rose.png"),
+                        repeat: ImageRepeat.repeat),
+                  )
+                : null,
             child: Column(
               children: <Widget>[
                 Row(

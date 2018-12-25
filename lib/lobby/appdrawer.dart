@@ -332,11 +332,13 @@ class AppDrawerState extends State<AppDrawer> {
             ],
           ),
           body: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("images/norwegian_rose.png"),
-                  repeat: ImageRepeat.repeat),
-            ),
+            decoration: AppConfig.of(context).showBackground
+                ? BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("images/norwegian_rose.png"),
+                        repeat: ImageRepeat.repeat),
+                  )
+                : null,
             child: ListView(
               padding: EdgeInsets.all(8.0),
               children: <Widget>[

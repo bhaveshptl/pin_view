@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -524,6 +526,7 @@ class MyContestsState extends State<MyContests>
 
   @override
   Widget build(BuildContext context) {
+    bShowInnings = AppConfig.of(context).channelId == "3" ? true : false;
     return Stack(
       children: <Widget>[
         Scaffold(

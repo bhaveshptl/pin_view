@@ -172,10 +172,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         try {
             JSONObject options = new JSONObject();
-            options.put("name", "PlayFantasy");
+            options.put("name", (String) arguments.get("name"));
             options.put("description", "Add Cash");
             //You can omit the image option to fetch the image from dashboard
-            options.put("image", "https://dyrnmb8cbz1ud.cloudfront.net/images/logo.png");
+            options.put("image", (String) arguments.get("image"));
             options.put("currency", "INR");
             options.put("amount", (String) arguments.get("amount"));
             options.put("order_id", (String) arguments.get("orderId"));

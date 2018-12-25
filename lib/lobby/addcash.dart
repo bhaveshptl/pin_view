@@ -1007,13 +1007,17 @@ class AddCashState extends State<AddCash> {
           .then((http.Response res) {
         Map<String, dynamic> response = json.decode(res.body);
         _openRazorpayNative({
+          "name": AppConfig.of(context).channelId == '3' ? "PlayFantasy" : "Smart11",
           "email": payload["email"],
           "phone": payload["phone"],
           "amount": (payload["depositAmount"] * 100).toString(),
           "orderId": response["action"]["value"],
           "method": (payload["paymentType"] as String).indexOf("CARD") == -1
               ? payload["paymentType"].toLowerCase()
-              : "card"
+              : "card",
+          "image": AppConfig.of(context).channelId == '3'
+                ? "https://dyrnmb8cbz1ud.cloudfront.net/images/logo.png"
+                : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
         });
       });
     } else {
@@ -1126,12 +1130,14 @@ class AddCashState extends State<AddCash> {
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("images/norwegian_rose.png"),
-            repeat: ImageRepeat.repeat,
-          ),
-        ),
+        decoration: AppConfig.of(context).showBackground
+            ? BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("images/norwegian_rose.png"),
+                  repeat: ImageRepeat.repeat,
+                ),
+              )
+            : null,
         child: Stack(
           children: <Widget>[
             SingleChildScrollView(
