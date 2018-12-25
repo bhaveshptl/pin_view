@@ -29,6 +29,8 @@ dependencies:
   cached_network_image: ^0.5.0    
   flutter_facebook_login: ^1.1.1
   flutter_webview_plugin: ^0.2.1+2
+  firebase_analytics: ^1.0.6
+  firebase_core: ^0.2.5+1
   flutter_downloader:
     git: 
       url: git://github.com/bhaveshptl/flutter_downloader.git
