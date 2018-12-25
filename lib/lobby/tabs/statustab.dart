@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/league.dart';
@@ -21,14 +22,16 @@ class StatusTab extends StatelessWidget {
   });
 
   onLeagueSelect(BuildContext context, League league) {
-    MaterialPageRoute route = MaterialPageRoute(
+    Navigator.of(context).push(
+      CupertinoPageRoute(
         builder: (context) => LeagueDetail(
               league,
               leagues: allLeagues,
               sportType: sportType,
               onSportChange: onSportChange,
-            ));
-    Navigator.of(context).push(route);
+            ),
+      ),
+    );
   }
 
   @override
@@ -62,10 +65,9 @@ class StatusTab extends StatelessWidget {
             Text(
               noLeaguesMsg,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Theme.of(context).errorColor,
-                fontSize: Theme.of(context).primaryTextTheme.headline.fontSize,
-              ),
+              style: Theme.of(context).primaryTextTheme.title.copyWith(
+                    color: Theme.of(context).errorColor,
+                  ),
             ),
           ],
         ),

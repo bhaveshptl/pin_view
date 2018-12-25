@@ -617,7 +617,7 @@ class CreateTeamState extends State<CreateTeam>
         case "SCORE":
           setState(() {
             allPlayers.sort((a, b) {
-              return b.seriesScore - a.seriesScore;
+              return ((b.seriesScore - a.seriesScore) * 100).toInt();
             });
           });
           break;
@@ -657,11 +657,24 @@ class CreateTeamState extends State<CreateTeam>
 
   @override
   Widget build(BuildContext context) {
+    String title = widget.league.teamA.name + " vs " + widget.league.teamB.name;
+    if (widget.l1Data.league.inningsId != 0 && _sportType == 1) {
+      if (widget.league.teamA.inningsId == widget.l1Data.league.inningsId) {
+        title = widget.league.teamA.name + " inning";
+      } else {
+        title = widget.league.teamB.name + " inning";
+      }
+    } else if (widget.l1Data.league.inningsId != 0) {
+      if (widget.league.teamA.inningsId == widget.l1Data.league.inningsId) {
+        title = "First" + " half";
+      } else {
+        title = "Second" + " half";
+      }
+    }
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title:
-            Text(widget.league.teamA.name + " vs " + widget.league.teamB.name),
+        title: Text(title),
       ),
       body: Column(
         children: <Widget>[

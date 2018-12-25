@@ -9,10 +9,26 @@ class TransactionSuccess extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double withdrawable = double.tryParse(transactionResult["withdrawable"]);
+    double withdrawable =
+        double.tryParse(transactionResult["withdrawable"].toString());
     double nonWithdrawable =
-        double.tryParse(transactionResult["nonWithdrawable"]);
-    double depositBucket = double.tryParse(transactionResult["depositBucket"]);
+        double.tryParse(transactionResult["nonWithdrawable"].toString());
+    double depositBucket =
+        double.tryParse(transactionResult["depositBucket"].toString());
+
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionResult["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString() +
+        " " +
+        date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
 
     return AlertDialog(
       title: new Text(
@@ -33,7 +49,8 @@ class TransactionSuccess extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   new TextSpan(
-                    text: strings.rupee + transactionResult["amount"],
+                    text:
+                        strings.rupee + transactionResult["amount"].toString(),
                     style: new TextStyle(color: Colors.black54),
                   ),
                 ],
@@ -75,7 +92,7 @@ class TransactionSuccess extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   new TextSpan(
-                    text: transactionResult["orderId"],
+                    text: transactionResult["orderId"].toString(),
                     style: new TextStyle(color: Colors.black54),
                   ),
                 ],
@@ -93,7 +110,7 @@ class TransactionSuccess extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   new TextSpan(
-                    text: transactionResult["date"],
+                    text: dateinString,
                     style: new TextStyle(color: Colors.black54),
                   ),
                 ],

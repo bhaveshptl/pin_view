@@ -4,9 +4,9 @@ class MyTeam {
   final int id;
   final int userId;
   final int captain;
-  final double prize;
-  final int rank;
-  final double score;
+  int rank;
+  double prize;
+  double score;
   final int innings;
   final int matchId;
   final String name;

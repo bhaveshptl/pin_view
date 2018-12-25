@@ -10,3 +10,15 @@
 -dontwarn androidx.work.impl.**
 -dontwarn io.branch.referral.**
 -dontwarn io.branch.indexing.**
+-dontwarn com.razorpay.**
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+-keepattributes JavascriptInterface
+-keepattributes *Annotation*
+
+-dontwarn com.razorpay.**
+-keep class com.razorpay.** {*;}
+
+-optimizations !method/inlining/*

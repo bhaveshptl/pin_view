@@ -118,7 +118,7 @@ class EarnCashState extends State<EarnCash> {
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    "- As a first thing you need to verify your Email and Mobile.",
+                    "- As a first thing you need to verify your Mobile.",
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                         color: Colors.black54,
@@ -158,7 +158,7 @@ class EarnCashState extends State<EarnCash> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
                   child: Text(
-                    "- Make sure your friend also verifies his Email and Mobile.",
+                    "- Make sure your friend also verifies his Mobile.",
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                         color: Colors.black54,

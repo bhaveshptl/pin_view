@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:device_info/device_info.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
@@ -151,7 +153,7 @@ class LandingPageState extends State<LandingPage> {
 
   _launchSignup(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => Signup(),
         fullscreenDialog: true,
       ),
@@ -159,6 +161,9 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
     req.body = json.encode({
@@ -166,11 +171,11 @@ class LandingPageState extends State<LandingPage> {
         "channel_id": HttpManager.channelId,
         "deviceId": _deviceId,
         "uid": "",
-        "model": "",
-        "platformType": "",
-        "manufacturer": "",
+        "model": androidInfo.model,
+        "platformType": androidInfo.version.baseOS,
+        "manufacturer": androidInfo.manufacturer,
         "googleaddid": "",
-        "serial": ""
+        "serial": androidInfo.androidId
       },
       "value": {"auth_attribute": _authName, "password": _password}
     });
@@ -259,10 +264,12 @@ class LandingPageState extends State<LandingPage> {
   }
 
   _showForgotPassword() async {
-    final result = await Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => ForgotPassword(),
-      fullscreenDialog: true,
-    ));
+    final result = await Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => ForgotPassword(),
+        fullscreenDialog: true,
+      ),
+    );
 
     if (result != null && result == true) {
       _scaffoldKey.currentState.showSnackBar(

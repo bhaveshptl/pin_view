@@ -55,7 +55,11 @@ class LiveContest extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                (bMyContest && contest.inningsId != 0 && league != null)
+                (bMyContest &&
+                        contest.inningsId != 0 &&
+                        league != null &&
+                        league.teamA != null &&
+                        league.teamB != null)
                     ? (league.teamA.inningsId == contest.inningsId
                         ? Container(
                             padding: EdgeInsets.symmetric(horizontal: 4.0),

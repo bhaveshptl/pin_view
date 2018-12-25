@@ -73,16 +73,19 @@ class ApiUtil {
   static const GET_ACCOUNT_DETAILS = "/api/account/overview";
   static const PARTNER_REQUEST = "/api/ups/partner-request";
   static const DEPOSIT_INFO = "/api/v2/payment/player/deposit/v2";
-  static const PAYMENT_MODE = "/api/payment/player/deposit/proceed/v2";
+  static const PAYMENT_MODE = "/api/v2/payment/player/deposit/proceed/v2";
   static const VALIDATE_PROMO = "/api/v2/payment/player/deposit/validate/promo";
   static const INIT_PAYMENT = "/api/payment/player/deposit/init-pay?";
+  static const INIT_PAYMENT_SEAMLESS =
+      "/api/v2/payment/player/deposit/init-pay-seamless?";
   static const CONTACTUS_SUBMIT = "/api/ups/contactUs/submit";
   static const CONTACTUS_FORM = "/api/ups/contactUsForm";
-  
+
   static const AUTH_WITHDRAW = "/api/v2/ups/user/authWithdraw";
   static const WITHDRAW = "/api/ups/user/withdraw";
   static const WITHDRAW_HISTORY = "/api/ups/user/withdraw/list";
   static const CANCEL_WITHDRAW = "/api/ups/user/withdraw/cancel/";
   static const CHECK_APP_UPDATE = "/api/v2/lobby/update";
   static const PAYMENT_SUCCESS = "/assets/payment-response.html";
+  static const SUCCESS_PAY = "/api/payment/success-razor-pay?type_id=4&source=RAZORPAY";
 }

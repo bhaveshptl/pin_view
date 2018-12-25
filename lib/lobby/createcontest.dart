@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/contestdetail/contestdetail.dart';
@@ -205,7 +206,7 @@ class CreateContestState extends State<CreateContest> {
         Map<String, dynamic> response = json.decode(result);
         Contest contest = Contest.fromJson(response["contest"]);
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
+          CupertinoPageRoute(
             builder: (context) => ContestDetail(
                   contest: contest,
                   l1Data: _l1Data,
@@ -304,7 +305,7 @@ class CreateContestState extends State<CreateContest> {
     }
 
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => AddCash(),
         fullscreenDialog: true,
       ),
@@ -344,7 +345,7 @@ class CreateContestState extends State<CreateContest> {
 
     Navigator.of(context).pop();
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: _l1Data,
@@ -439,30 +440,41 @@ class CreateContestState extends State<CreateContest> {
   }
 
   _onEditPrize() async {
-    FocusScope.of(context).requestFocus(FocusNode());
-    _scaffoldKey.currentState.showBottomSheet((context) {
-      return Container(
-        decoration: new BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black,
-              blurRadius: 20.0,
-            ),
-          ],
-        ),
-        height: 550.0,
-        child: CreatePrizeStructure(
-          totalPrize: _totalPrize,
-          scaffoldKey: _scaffoldKey,
-          suggestedPrizes: prizeStructure,
-          onClose: (List<PrizeStructure> prizeStructure) {
-            _onCustomPrizeStructure(prizeStructure);
-          },
-          participants: int.parse(_participantsController.text),
+    if (_participantsController.text == "" || _entryFeeController.text == "") {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please enter entry fee and number of participants before edit.",
+          ),
         ),
       );
-    });
+    } else {
+      FocusScope.of(context).requestFocus(FocusNode());
+      _scaffoldKey.currentState.showBottomSheet((context) {
+        return Container(
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.black,
+                blurRadius: 20.0,
+              ),
+            ],
+          ),
+          height: 550.0,
+          child: CreatePrizeStructure(
+            totalPrize: _totalPrize,
+            scaffoldKey: _scaffoldKey,
+            suggestedPrizes: prizeStructure,
+            onClose: (List<PrizeStructure> prizeStructure) {
+              _onCustomPrizeStructure(prizeStructure);
+            },
+            participants:
+                int.parse(_participantsController.text, onError: (e) => 0),
+          ),
+        );
+      });
+    }
   }
 
   bool isNumeric(String s) {

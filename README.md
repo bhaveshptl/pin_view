@@ -1,8 +1,13 @@
-# playfantasy
+#To run app
+flutter run
+# To give signup build
+flutter build apk --release
 
-A new Flutter project.
+####################################################
+##################  Native code  ###################
+#################################################### 
+https://docs.flutter.io/flutter/services/MethodChannel/invokeMethod.html
 
-## Getting Started
+https://stackoverflow.com/questions/50187680/flutter-how-to-call-methods-in-dart-portion-of-the-app-from-the-native-platfor
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+https://stackoverflow.com/questions/49847513/is-there-a-way-to-get-the-future-from-setmethodcallhandler

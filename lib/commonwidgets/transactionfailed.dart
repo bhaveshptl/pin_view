@@ -13,7 +13,7 @@ class TransactionFailed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(transactionResult["date"]));
+        int.parse(transactionResult["date"].toString()));
     String dateinString = date.day.toString() +
         "-" +
         date.month.toString() +
@@ -62,7 +62,7 @@ class TransactionFailed extends StatelessWidget {
                         fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   TextSpan(
-                    text: transactionResult["orderId"],
+                    text: transactionResult["orderId"].toString(),
                     style: TextStyle(color: Colors.black54),
                   ),
                 ],

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -263,6 +262,13 @@ class VerificationState extends State<Verification> {
         setState(() {
           _bIsMobileVerified = true;
         });
+      } else {
+        Map<String, dynamic> response = json.decode(res.body);
+        scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(response["error"]["erroMessage"]),
+          ),
+        );
       }
     });
   }
@@ -341,6 +347,13 @@ class VerificationState extends State<Verification> {
         (http.Response res) {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
+            if (response["err"] != null && response["err"]) {
+              scaffoldKey.currentState.showSnackBar(
+                SnackBar(
+                  content: Text(response["msg"]),
+                ),
+              );
+            }
             setState(() {
               _panVerificationStatus = response["pan_verification"];
               _addressVerificationStatus = response["address_verification"];
@@ -532,7 +545,7 @@ class VerificationState extends State<Verification> {
                               return FlatButton(
                                 onPressed: () {
                                   setState(() {
-                                    if (_selectedItemIndex == 0) {
+                                    if (_selectedItemIndex == 1) {
                                       _selectedItemIndex = -1;
                                     } else {
                                       _selectedItemIndex = 1;
@@ -694,7 +707,7 @@ class VerificationState extends State<Verification> {
                               return FlatButton(
                                 onPressed: () {
                                   setState(() {
-                                    if (_selectedItemIndex == 0) {
+                                    if (_selectedItemIndex == 2) {
                                       _selectedItemIndex = -1;
                                     } else {
                                       _selectedItemIndex = 2;
@@ -707,8 +720,15 @@ class VerificationState extends State<Verification> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Text(
-                                        strings.get("KYC"),
+                                      Column(
+                                        children: <Widget>[
+                                          Text(
+                                            "KYC Verification",
+                                          ),
+                                          Text(
+                                            "(ID and Address)",
+                                          ),
+                                        ],
                                       ),
                                       _verificationStatus == "VERIFIED"
                                           ? Icon(Icons.check_circle_outline)
@@ -729,7 +749,9 @@ class VerificationState extends State<Verification> {
                                   color: Colors.black12,
                                 ),
                                 (_verificationStatus == "VERIFIED" ||
-                                        _verificationStatus == "DOC_SUBMITTED")
+                                        _verificationStatus ==
+                                            "DOC_SUBMITTED" ||
+                                        _verificationStatus == "UNDER_REVIEW")
                                     ? Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(

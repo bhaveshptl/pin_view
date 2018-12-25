@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
@@ -53,12 +54,16 @@ class WithdrawState extends State<Withdraw> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController amountController = TextEditingController();
+  TextEditingController _otpController = new TextEditingController();
   TextEditingController acIFSCCodeController = TextEditingController();
   TextEditingController paytmAmountController = TextEditingController();
-  TextEditingController accountNameController = TextEditingController();
+  TextEditingController _mobileController = new TextEditingController();
   TextEditingController accountNumberController = TextEditingController();
-  final TextEditingController _otpController = new TextEditingController();
-  final TextEditingController _mobileController = new TextEditingController();
+  TextEditingController accountLastNameController = TextEditingController();
+  TextEditingController accountFirstNameController = TextEditingController();
+
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
 
   @override
   void initState() {
@@ -148,10 +153,10 @@ class WithdrawState extends State<Withdraw> {
                     _withdrawModes = response["data"]["withdrawModes"];
                     _withdrawData = Withhdraw.fromJson(response["data"]);
                     _bIsMobileVerified = _withdrawData.mobileVerification;
-                    initFormInputs();
                   });
                   break;
               }
+              initFormInputs();
             }
           }
         }
@@ -426,8 +431,15 @@ class WithdrawState extends State<Withdraw> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  strings.get("KYC"),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "KYC Verification",
+                    ),
+                    Text(
+                      "(ID and Address)",
+                    ),
+                  ],
                 ),
                 _verificationStatus == "VERIFIED"
                     ? Icon(Icons.check_circle_outline)
@@ -446,7 +458,8 @@ class WithdrawState extends State<Withdraw> {
             color: Colors.black12,
           ),
           (_verificationStatus == "VERIFIED" ||
-                  _verificationStatus == "DOC_SUBMITTED")
+                  _verificationStatus == "DOC_SUBMITTED" ||
+                  _verificationStatus == "UNDER_REVIEW")
               ? Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -772,6 +785,13 @@ class WithdrawState extends State<Withdraw> {
         setState(() {
           _bIsMobileVerified = true;
         });
+      } else {
+        Map<String, dynamic> response = json.decode(res.body);
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(response["error"]["erroMessage"]),
+          ),
+        );
       }
     });
   }
@@ -779,12 +799,22 @@ class WithdrawState extends State<Withdraw> {
   initFormInputs() {
     acIFSCCodeController.text =
         _withdrawData.ifscCode != null ? _withdrawData.ifscCode.toString() : "";
-    accountNameController.text = _withdrawData.loginName != null
-        ? _withdrawData.loginName.toString()
+    accountFirstNameController.text = _withdrawData.firstName != null
+        ? _withdrawData.firstName.toString()
         : "";
+    accountLastNameController.text =
+        _withdrawData.lastName != null ? _withdrawData.lastName.toString() : "";
     accountNumberController.text = _withdrawData.accountNumber != null
         ? _withdrawData.accountNumber.toString()
         : "";
+    firstNameController.text =
+        _withdrawData.firstName != null && _withdrawData.firstName.isNotEmpty
+            ? _withdrawData.firstName
+            : "";
+    lastNameController.text =
+        (_withdrawData.lastName != null && _withdrawData.lastName.isNotEmpty)
+            ? _withdrawData.lastName
+            : "";
   }
 
   confirmWithdrawRequest(BuildContext context) async {
@@ -844,11 +874,20 @@ class WithdrawState extends State<Withdraw> {
       "bankDetails": {
         "account_number": accountNumberController.text,
         "ifsc_code": acIFSCCodeController.text,
+        "bank_name": withdrawType == 4
+            ? firstNameController.text + " " + lastNameController.text
+            : accountFirstNameController.text +
+                " " +
+                accountLastNameController.text,
       },
       "hasBankDetails": (_withdrawData.accountNumber != null &&
-          _withdrawData.accountNumber != null &&
+          _withdrawData.accountNumber != "" &&
+          _withdrawData.loginName != null &&
+          _withdrawData.loginName != "" &&
+          _withdrawData.ifscCode != "" &&
           _withdrawData.ifscCode != null),
       "withdraw_type": withdrawType,
+      "name": firstNameController.text
     });
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
@@ -879,7 +918,7 @@ class WithdrawState extends State<Withdraw> {
 
   openWithdrawHistory(BuildContext context) {
     return Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => WithdrawHistory(),
         fullscreenDialog: true,
       ),
@@ -1011,6 +1050,68 @@ class WithdrawState extends State<Withdraw> {
                               ],
                             ),
                             Padding(
+                              padding: EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 0.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(right: 4.0),
+                                      child: TextFormField(
+                                        controller: firstNameController,
+                                        enabled:
+                                            _withdrawData.loginName == null ||
+                                                _withdrawData.loginName == "",
+                                        decoration: InputDecoration(
+                                          labelText: "First name",
+                                          contentPadding: EdgeInsets.all(8.0),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                          errorMaxLines: 2,
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        style: TextStyle(
+                                          color: Colors.black45,
+                                        ),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return "Account name is required for paytm withdraw.";
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 4.0),
+                                      child: TextFormField(
+                                        controller: lastNameController,
+                                        enabled:
+                                            _withdrawData.loginName == null ||
+                                                _withdrawData.loginName == "",
+                                        decoration: InputDecoration(
+                                          labelText: "Last name",
+                                          contentPadding: EdgeInsets.all(8.0),
+                                          border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: Colors.black38,
+                                            ),
+                                          ),
+                                          errorMaxLines: 2,
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        style: TextStyle(
+                                          color: Colors.black45,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
                               padding: EdgeInsets.symmetric(
                                 vertical: 16.0,
                                 horizontal: 8.0,
@@ -1040,7 +1141,7 @@ class WithdrawState extends State<Withdraw> {
                                             ),
                                             TextSpan(
                                               text:
-                                                  " is registered with PAYTM and it's KYC verification is completed on PAYTM.",
+                                                  " is registered with PAYTM and its KYC verification is completed on PAYTM.",
                                             )
                                           ]),
                                     ),
@@ -1248,22 +1349,58 @@ class WithdrawState extends State<Withdraw> {
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
-                                      child: TextFormField(
-                                        enabled:
-                                            _withdrawData.accountNumber == null,
-                                        controller: accountNameController,
-                                        decoration: InputDecoration(
-                                          labelText: "Account name",
-                                          contentPadding: EdgeInsets.all(8.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black38,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(right: 4.0),
+                                        child: TextFormField(
+                                          controller:
+                                              accountFirstNameController,
+                                          enabled: _withdrawData.firstName ==
+                                                  null ||
+                                              _withdrawData.firstName.isEmpty,
+                                          decoration: InputDecoration(
+                                            labelText: "First name",
+                                            contentPadding: EdgeInsets.all(8.0),
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Colors.black38,
+                                              ),
                                             ),
+                                            errorMaxLines: 2,
                                           ),
+                                          keyboardType: TextInputType.text,
+                                          style: TextStyle(
+                                            color: Colors.black45,
+                                          ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return "Account name is required for bank withdraw.";
+                                            }
+                                          },
                                         ),
-                                        keyboardType: TextInputType.text,
-                                        style: TextStyle(
-                                          color: Colors.black45,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: 4.0),
+                                        child: TextFormField(
+                                          controller: accountLastNameController,
+                                          enabled: _withdrawData.firstName ==
+                                                  null ||
+                                              _withdrawData.firstName.isEmpty,
+                                          decoration: InputDecoration(
+                                            labelText: "Last name",
+                                            contentPadding: EdgeInsets.all(8.0),
+                                            border: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: Colors.black38,
+                                              ),
+                                            ),
+                                            errorMaxLines: 2,
+                                          ),
+                                          keyboardType: TextInputType.text,
+                                          style: TextStyle(
+                                            color: Colors.black45,
+                                          ),
                                         ),
                                       ),
                                     ),

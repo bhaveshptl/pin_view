@@ -100,7 +100,8 @@ class JoinContestState extends State<JoinContest> {
             if (response["error"] == false) {
               Navigator.of(context).pop(res.body);
             } else if (response["error"] == true) {
-              Navigator.of(context).pop(response["message"]);
+              Navigator.of(context).pop({"msg": response["message"]});
+              // widget.onError(null, response["error"]);
             }
           } else if (res.statusCode == 401) {
             Map<String, dynamic> response = json.decode(res.body);

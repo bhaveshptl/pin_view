@@ -8,6 +8,7 @@ class AppConfig extends InheritedWidget {
     @required this.apiBaseUrl,
     @required this.websocketUrl,
     @required this.staticPageUrls,
+    @required this.contestShareUrl,
     @required Widget child,
   }) : super(child: child);
 
@@ -15,6 +16,7 @@ class AppConfig extends InheritedWidget {
   final String channelId;
   final String apiBaseUrl;
   final String websocketUrl;
+  final String contestShareUrl;
   final Map<String,dynamic> staticPageUrls;
 
   static AppConfig of(BuildContext context) {

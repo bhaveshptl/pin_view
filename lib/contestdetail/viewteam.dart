@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -114,7 +115,7 @@ class _ViewTeamState extends State<ViewTeam> {
 
   void _onEditTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -132,7 +133,7 @@ class _ViewTeamState extends State<ViewTeam> {
 
   void _onCloneTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
-      MaterialPageRoute(
+      CupertinoPageRoute(
         builder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
