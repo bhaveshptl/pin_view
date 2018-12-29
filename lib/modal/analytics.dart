@@ -1,11 +1,12 @@
 class Event {
-  final int appVersion;
+  double appVersion;
   int clientTimestamp;
   final int id;
   final String name;
   final String network;
-  final String source;
-  final int userId;
+  String source;
+  String journey;
+  int userId;
   final int v1;
   final int v2;
   final int v3;
@@ -26,6 +27,7 @@ class Event {
     this.name = "",
     this.network = "",
     this.source = "",
+    this.journey = "",
     this.userId = 0,
     this.v1 = 0,
     this.v2 = 0,
@@ -49,6 +51,7 @@ class Event {
         "network": network,
         "source": source,
         "userId": userId,
+        "journey": journey,
         "v1": v1,
         "v2": v2,
         "v3": v3,

@@ -9,6 +9,8 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class AnalyticsManager {
+  String source;
+  String journey;
   static String _url;
   static Timer _timer;
   static Visit _visit;
@@ -120,10 +122,22 @@ class AnalyticsManager {
   }
 
   addEvent(Event event) {
+    event.source = source;
+    event.journey = journey;
+    event.userId = _visit.userId;
+    event.appVersion = _visit.appVersion;
     event.clientTimestamp = DateTime.now().millisecondsSinceEpoch;
     analyticsEvents.add(event);
     if (_timer == null) {
       statAnalytics();
     }
+  }
+
+  setJourney(String journey) {
+    journey = journey;
+  }
+
+  setSource(String source) {
+    source = source;
   }
 }

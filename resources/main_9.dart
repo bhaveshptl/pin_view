@@ -31,6 +31,7 @@ String apkUrl;
 String cookie;
 Widget _homePage;
 String channelId = "9";
+List<dynamic> updateLogs;
 bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
@@ -63,6 +64,7 @@ getInitData() async {
     if (res.statusCode >= 200 && res.statusCode <= 299) {
       initData = json.decode(res.body);
       apkUrl = initData["updateUrl"];
+      updateLogs = initData["updateLogs"];
       bUpdateAvailable = initData["update"];
       analyticsUrl = initData["analyticsURL"];
       bIsForceUpdate = initData["isForceUpdate"];
@@ -133,12 +135,14 @@ preloadData() async {
   if (_result) {
     _homePage = Lobby(
       appUrl: apkUrl,
+      logs: updateLogs,
       isForceUpdate: bIsForceUpdate,
       updateAvailable: bUpdateAvailable,
     );
   } else {
     _homePage = LandingPage(
       appUrl: apkUrl,
+      logs: updateLogs,
       isForceUpdate: bIsForceUpdate,
       languages: initData["languages"],
       updateAvailable: bUpdateAvailable,

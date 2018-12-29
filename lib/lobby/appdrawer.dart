@@ -208,12 +208,14 @@ class AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  _showUpdatingAppDialog(String url, bool bIsForceUpdate) {
+  _showUpdatingAppDialog(String url, bool bIsForceUpdate,
+      {List<dynamic> logs}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return DownloadAPK(
           url: url,
+          logs: logs,
           isForceUpdate: bIsForceUpdate,
         );
       },

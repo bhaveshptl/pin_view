@@ -21,12 +21,14 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class LandingPage extends StatefulWidget {
   final String appUrl;
+  final List<dynamic> logs;
   final bool isForceUpdate;
   final bool chooseLanguage;
   final bool updateAvailable;
   final List<dynamic> languages;
 
   LandingPage({
+    this.logs,
     this.appUrl,
     this.languages,
     this.isForceUpdate,
@@ -87,6 +89,7 @@ class LandingPageState extends State<LandingPage> {
       builder: (BuildContext context) {
         return DownloadAPK(
           url: url,
+          logs: widget.logs,
           isForceUpdate: widget.isForceUpdate,
         );
       },

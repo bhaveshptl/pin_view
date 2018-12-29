@@ -11,9 +11,11 @@ import 'package:playfantasy/utils/stringtable.dart';
 class DownloadAPK extends StatefulWidget {
   final String url;
   final bool isForceUpdate;
+  final List<dynamic> logs;
 
   DownloadAPK({
     this.url,
+    this.logs,
     this.isForceUpdate = false,
   });
 
@@ -23,7 +25,9 @@ class DownloadAPK extends StatefulWidget {
 
 class DownloadAPKState extends State<DownloadAPK> {
   var taskId;
+  bool bShowCancelButton;
   int downloadProgress = 0;
+  bool downloadStarted = false;
   bool bIsAPKInstallationAvailable = false;
   PermissionStatus permissionStatus = PermissionStatus.allow;
 
@@ -31,6 +35,7 @@ class DownloadAPKState extends State<DownloadAPK> {
   void initState() {
     super.initState();
     checkForPermission();
+    bShowCancelButton = !widget.isForceUpdate;
   }
 
   checkForPermission() async {
@@ -39,9 +44,7 @@ class DownloadAPKState extends State<DownloadAPK> {
     setState(() {
       permissionStatus = permissions[0].permissionStatus;
     });
-    if (permissions[0].permissionStatus == PermissionStatus.allow) {
-      startDownload();
-    } else {
+    if (permissions[0].permissionStatus != PermissionStatus.allow) {
       askForPermission();
     }
   }
@@ -53,13 +56,13 @@ class DownloadAPKState extends State<DownloadAPK> {
       setState(() {
         permissionStatus = result;
       });
-      if (permissionStatus == PermissionStatus.allow) {
-        startDownload();
-      }
     }
   }
 
   startDownload() async {
+    setState(() {
+      downloadStarted = true;
+    });
     Directory appDocDir = await getExternalStorageDirectory();
     String appDocPath = appDocDir.path;
 
@@ -109,54 +112,87 @@ class DownloadAPKState extends State<DownloadAPK> {
           : () => Future.value(true),
       child: permissionStatus == PermissionStatus.allow
           ? AlertDialog(
-              title: Text("Downloading..."),
+              title: Text("Update available"),
               titlePadding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
               contentPadding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              content: downloadStarted
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        CircleAvatar(
-                          maxRadius: 32.0,
-                          child: Icon(
-                            Icons.file_download,
-                            size: 48.0,
-                            color: Colors.white70,
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 16.0),
-                            child: Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 8.0),
-                                  child: Row(
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              CircleAvatar(
+                                maxRadius: 32.0,
+                                child: Icon(
+                                  Icons.file_download,
+                                  size: 48.0,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 16.0),
+                                  child: Column(
                                     children: <Widget>[
-                                      Text(
-                                        downloadProgress.toString() + "%",
+                                      Padding(
+                                        padding: EdgeInsets.only(bottom: 8.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text(
+                                              downloadProgress.toString() + "%",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      LinearProgressIndicator(
+                                        value: (downloadProgress / 100),
                                       ),
                                     ],
                                   ),
                                 ),
-                                LinearProgressIndicator(
-                                  value: (downloadProgress / 100),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            Text(
+                              "Change logs",
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .title
+                                  .copyWith(
+                                    color: Colors.black54,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: Column(
+                            children: widget.logs.map((text) {
+                              return Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(text),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        )
+                      ],
                     ),
-                  ),
-                ],
-              ),
               actions: <Widget>[
-                !widget.isForceUpdate
+                bShowCancelButton
                     ? FlatButton(
                         child: Text(
                           strings.get("CANCEL").toUpperCase(),
@@ -168,13 +204,22 @@ class DownloadAPKState extends State<DownloadAPK> {
                     : Container(),
                 FlatButton(
                   child: Text(
-                    "Install".toUpperCase(),
+                    bIsAPKInstallationAvailable
+                        ? "Install".toUpperCase()
+                        : "Update".toUpperCase(),
                   ),
-                  onPressed: bIsAPKInstallationAvailable
-                      ? () {
-                          installAPK();
-                        }
-                      : null,
+                  onPressed: downloadStarted && !bIsAPKInstallationAvailable
+                      ? null
+                      : (bIsAPKInstallationAvailable
+                          ? () {
+                              installAPK();
+                            }
+                          : () {
+                              setState(() {
+                                bShowCancelButton = false;
+                              });
+                              startDownload();
+                            }),
                 )
               ],
             )

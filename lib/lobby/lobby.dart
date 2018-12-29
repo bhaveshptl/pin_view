@@ -25,10 +25,12 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
+  final List<dynamic> logs;
   final bool isForceUpdate;
   final bool updateAvailable;
 
   Lobby({
+    this.logs,
     this.appUrl,
     this.updateAvailable,
     this.isForceUpdate,
@@ -75,6 +77,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
       builder: (BuildContext context) {
         return DownloadAPK(
           url: url,
+          logs: widget.logs,
           isForceUpdate: widget.isForceUpdate,
         );
       },
