@@ -52,6 +52,12 @@ class AddCashState extends State<AddCash> {
   void initState() {
     super.initState();
     initWebview();
+    // if (widget.depositData.chooseAmountData.lastPaymentArray.length == 0) {
+    //   widget.depositData.chooseAmountData.lastPaymentArray = null;
+    // }
+    // if (widget.depositData.chooseAmountData.lastPaymentArray == null) {
+    //   bRepeatTransaction = false;
+    // }
     setDepositInfo();
 
     AnalyticsManager().setJourney("deposit");
@@ -711,9 +717,12 @@ class AddCashState extends State<AddCash> {
                                   ),
                                 )
                               : Container(),
-                          widget.depositData.chooseAmountData.lastPaymentArray
-                                      .length >
-                                  0
+                          widget.depositData.chooseAmountData
+                                          .lastPaymentArray !=
+                                      null &&
+                                  widget.depositData.chooseAmountData
+                                          .lastPaymentArray.length >
+                                      0
                               ? InkWell(
                                   onTap: widget.depositData.bAllowRepeatDeposit
                                       ? () {

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/leaguedetail/contestcards/live.dart';
 import 'package:playfantasy/leaguedetail/contestcards/result.dart';
-import 'package:playfantasy/leaguedetail/contestcards/upcoming.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/upcoming.dart';
 
-class ContestCard extends StatelessWidget {
-  final L1 l1Data;
+class PredictionContestCard extends StatelessWidget {
   final int status;
   final League league;
   final Contest contest;
@@ -16,13 +16,14 @@ class ContestCard extends StatelessWidget {
   final Function onClick;
   final bool isMyContest;
   final bool bShowBrandInfo;
+  final Prediction predictionData;
   final EdgeInsetsGeometry margin;
   final Function onPrizeStructure;
-  final List<MyTeam> myJoinedTeams;
+  final List<int> myJoinedSheetIds;
   final BorderRadiusGeometry radius;
+  final List<MySheet> myJoinedSheets;
 
-  ContestCard({
-    this.l1Data,
+  PredictionContestCard({
     this.onJoin,
     this.league,
     this.radius,
@@ -31,7 +32,9 @@ class ContestCard extends StatelessWidget {
     this.contest,
     this.onClick,
     this.isMyContest,
-    this.myJoinedTeams,
+    this.myJoinedSheets,
+    this.predictionData,
+    this.myJoinedSheetIds,
     this.onPrizeStructure,
     this.bShowBrandInfo = false,
   });
@@ -40,15 +43,17 @@ class ContestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     int leagueStatus = status != null
         ? status
-        : (((l1Data != null && l1Data.league.status == LeagueStatus.UPCOMING) ||
+        : (((predictionData != null &&
+                    predictionData.league.status == LeagueStatus.UPCOMING) ||
                 (league != null && league.status == LeagueStatus.UPCOMING))
             ? LeagueStatus.UPCOMING
-            : (((l1Data != null && l1Data.league.status == LeagueStatus.LIVE) ||
+            : (((predictionData != null &&
+                        predictionData.league.status == LeagueStatus.LIVE) ||
                     (league != null && league.status == LeagueStatus.LIVE))
                 ? LeagueStatus.LIVE
                 : LeagueStatus.COMPLETED));
     return Tooltip(
-      message: "", //contest.id.toString() + " - " + contest.name,
+      message: contest.id.toString() + " - " + contest.name,
       child: Card(
         elevation: 3.0,
         shape: radius != null
@@ -62,13 +67,13 @@ class ContestCard extends StatelessWidget {
           },
           padding: EdgeInsets.all(8.0),
           child: leagueStatus == LeagueStatus.UPCOMING
-              ? UpcomingContest(
+              ? UpcomingPredictionContest(
                   league: league,
                   onJoin: onJoin,
                   contest: contest,
-                  isMyContest: isMyContest,
-                  myJoinedTeams: myJoinedTeams,
+                  myJoinedSheets: myJoinedSheets,
                   bShowBrandInfo: bShowBrandInfo,
+                  myJoinedSheetIds: myJoinedSheetIds,
                   onPrizeStructure: onPrizeStructure,
                 )
               : leagueStatus == LeagueStatus.LIVE
@@ -76,14 +81,14 @@ class ContestCard extends StatelessWidget {
                       league: league,
                       contest: contest,
                       isMyContest: isMyContest,
-                      myJoinedTeams: myJoinedTeams,
+                      // myJoinedTeams: myJoinedSheets,
                       onPrizeStructure: onPrizeStructure,
                     )
                   : ResultContest(
                       league: league,
                       contest: contest,
                       isMyContest: isMyContest,
-                      myJoinedTeams: myJoinedTeams,
+                      // myJoinedTeams: myJoinedSheets,
                       onPrizeStructure: onPrizeStructure,
                     ),
         ),

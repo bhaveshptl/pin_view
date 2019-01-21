@@ -62,6 +62,8 @@ class ApiUtil {
   static const GET_MY_CONTESTS = "/api/lobby/user/mycontests/v2/";
   static const GET_CONTEST_TEAMS = "/api/lobby/contest/";
   static const GET_PRIZESTRUCTURE = "/api/lobby/contest/";
+  static const GET_PREDICTION_PRIZESTRUCTURE =
+      "/api/v2/lobby/quiz/prizestructure/";
   static const GET_TEAM_INFO = "/api/lobby/contest/";
   static const SEARCH_CONTEST = "/api/v2/lobby/contest/private";
 
@@ -87,5 +89,15 @@ class ApiUtil {
   static const CANCEL_WITHDRAW = "/api/ups/user/withdraw/cancel/";
   static const CHECK_APP_UPDATE = "/api/v2/lobby/update";
   static const PAYMENT_SUCCESS = "/assets/payment-response.html";
-  static const SUCCESS_PAY = "/api/payment/success-razor-pay?type_id=4&source=RAZORPAY";
+  static const SUCCESS_PAY =
+      "/api/payment/success-razor-pay?type_id=4&source=RAZORPAY";
+
+  static const SAVE_SHEET = "/api/v2/lobby/quiz/save-answer-sheet";
+  static const JOIN_PREDICTION_CONTEST = "/api/v2/lobby/quiz/join";
+  static const GET_MY_CONTEST_MY_SHEETS =
+      "/api/v2/lobby/quiz/mycontest-all-answersheet";
+  static const GET_MY_ALL_CONTESTS = "/api/v2/lobby/mycontests/";
+  static const GET_LEAGUE_FLIPS = "/api/v2/lobby/quiz/get-flips/";
+  static const GET_FLIP_BALANCE = "/api/v2/lobby/quiz/get-flips/usable/";
+  static const GET_CONTEST_SHEETS = "/api/lobby/contest/";
 }

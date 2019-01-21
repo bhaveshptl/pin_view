@@ -36,6 +36,9 @@ class DownloadAPKState extends State<DownloadAPK> {
     super.initState();
     checkForPermission();
     bShowCancelButton = !widget.isForceUpdate;
+    if (widget.logs == null) {
+      startDownload();
+    }
   }
 
   checkForPermission() async {

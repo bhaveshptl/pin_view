@@ -45,7 +45,8 @@ class PrizeStructureState extends State<PrizeStructure> {
                             )
                           : Text(strings.rupee),
                       Text(
-                        _prize["amount"].toStringAsFixed(2),
+                        double.parse(_prize["amount"].toString())
+                            .toStringAsFixed(2),
                       )
                     ],
                   )

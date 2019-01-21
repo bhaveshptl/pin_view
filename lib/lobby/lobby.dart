@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
 import 'package:package_info/package_info.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:playfantasy/lobby/mycontests/newmycontest.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
-import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -140,7 +140,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
         case 0:
           Navigator.of(context).push(
             FantasyPageRoute(
-              pageBuilder: (context) => MyContests(
+              pageBuilder: (context) => NewMyContests(
                     leagues: _leagues,
                     onSportChange: _onSportSelectionChaged,
                   ),

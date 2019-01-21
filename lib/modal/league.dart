@@ -2,6 +2,7 @@ class League {
   final int matchId;
   final String matchName;
   final int status;
+  final int prediction;
   final int leagueId;
   final int matchStartTime;
   final int matchEndTime;
@@ -13,6 +14,7 @@ class League {
       {this.matchId,
       this.matchName,
       this.status,
+      this.prediction,
       this.leagueId,
       this.matchStartTime,
       this.matchEndTime,
@@ -28,6 +30,7 @@ class League {
           matchId: json['matchId'],
           matchName: json['matchName'],
           status: json['status'],
+          prediction: json['prediction'],
           leagueId: json['leagueId'],
           matchStartTime: json['matchStartTime'],
           matchEndTime: json['matchEndTime'],

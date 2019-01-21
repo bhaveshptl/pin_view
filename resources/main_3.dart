@@ -36,7 +36,6 @@ bool bIsForceUpdate = false;
 bool bUpdateAvailable = false;
 bool bAskToChooseLanguage = false;
 String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
-// String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
 Map<String, dynamic> initData = {};
 Map<String, dynamic> staticPageUrls;

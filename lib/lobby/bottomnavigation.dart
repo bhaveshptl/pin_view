@@ -11,6 +11,64 @@ class LobbyBottomNavigation extends StatelessWidget {
     onNavigationSelectionChange(context, index);
   }
 
+  getNavigationItems() {
+    List<BottomNavigationBarItem> items = [];
+    items.add(BottomNavigationBarItem(
+      icon: Image.asset(
+        "images/mycontests_icon3.png",
+        height: 24.0,
+      ),
+      title: Text(
+        strings.get("MY_CONTESTS"),
+        textAlign: TextAlign.center,
+        maxLines: 2,
+      ),
+    ));
+    items.add(BottomNavigationBarItem(
+      icon: Icon(
+        Icons.account_balance_wallet,
+        // color: Colors.black87,
+      ),
+      title: Text(
+        strings.get("ADD_CASH"),
+        textAlign: TextAlign.center,
+        maxLines: 2,
+      ),
+    ));
+
+    items.add(BottomNavigationBarItem(
+      icon: _screenIndex == 0
+          ? Image.asset(
+              "images/earncash.png",
+              height: 24.0,
+            )
+          : Icon(
+              Icons.add_circle,
+              // color: Colors.black87,
+            ),
+      title: Text(
+        _screenIndex == 0 ? strings.get("EARN_CASH") : "Create contest",
+        textAlign: TextAlign.center,
+        maxLines: 2,
+      ),
+    ));
+
+    items.add(BottomNavigationBarItem(
+      icon: Icon(
+        _screenIndex == 0 ? Icons.account_circle : Icons.people,
+        // color: Colors.black87,
+      ),
+      title: Text(
+        _screenIndex == 0
+            ? strings.get("PROFILE")
+            : (_screenIndex == 1 ? strings.get("MY_TEAMS") : "Predictions"),
+        textAlign: TextAlign.center,
+        maxLines: 2,
+      ),
+    ));
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -26,10 +84,7 @@ class LobbyBottomNavigation extends StatelessWidget {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              blurRadius: 5.0,
-              spreadRadius: 2.0,
-              color: Colors.black26
-            ),
+                blurRadius: 5.0, spreadRadius: 2.0, color: Colors.black26),
           ],
         ),
         child: BottomNavigationBar(
@@ -38,59 +93,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           },
           fixedColor: Colors.white,
           type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                "images/mycontests_icon3.png",
-                height: 24.0,
-              ),
-              title: Text(
-                strings.get("MY_CONTESTS"),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.account_balance_wallet,
-                // color: Colors.black87,
-              ),
-              title: Text(
-                strings.get("ADD_CASH"),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
-            ),
-            BottomNavigationBarItem(
-              icon: _screenIndex == 1
-                  ? Icon(
-                      Icons.add_circle,
-                      // color: Colors.black87,
-                    )
-                  : Image.asset(
-                      "images/earncash.png",
-                      height: 24.0,
-                    ),
-              title: Text(
-                _screenIndex == 0 ? strings.get("EARN_CASH") : "Create contest",
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                _screenIndex == 0 ? Icons.account_circle : Icons.people,
-                // color: Colors.black87,
-              ),
-              title: Text(
-                _screenIndex == 0
-                    ? strings.get("PROFILE")
-                    : strings.get("MY_TEAMS"),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
-            ),
-          ],
+          items: getNavigationItems(),
         ),
       ),
     );

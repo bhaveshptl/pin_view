@@ -311,7 +311,7 @@ class MyContestsState extends State<MyContests>
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+        BaseUrl.apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + _sportType.toString(),
       ),
     );
     return HttpManager(http.Client())
@@ -321,7 +321,7 @@ class MyContestsState extends State<MyContests>
         Map<String, dynamic> response = json.decode(res.body);
         setState(() {
           Map<String, List<Contest>> _mapMyContests =
-              MyContest.fromJson(response).leagues;
+              MyContest.fromJson(response["normal"]).leagues;
           _getMyContestMyTeams(_mapMyContests);
           _setContestsByStatus(_mapMyContests);
         });

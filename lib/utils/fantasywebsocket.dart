@@ -22,6 +22,8 @@ class RequestType {
   static const REQ_REG_DEREG_MY_CONTEST = 9;
   static const REQ_L1_INNINGS_ALL_DATA = 10;
   static const REQ_L1_INNINGS_DATA = 11;
+  static const PREDICTION_DATA_UPDATE = 15;
+  static const MY_SHEET_ADDED = 16;
 }
 
 class FantasyWebSocket {

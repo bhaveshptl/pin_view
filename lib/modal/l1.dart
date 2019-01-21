@@ -355,17 +355,54 @@ class Contest {
     this.hideBonusInfo,
   });
 
+  copyFrom(Contest contest) {
+    this.id = contest.id;
+    this.name = contest.name;
+    this.templateId = contest.templateId;
+    this.size = contest.size;
+    this.prizeType = contest.prizeType;
+    this.entryFee = contest.entryFee;
+    this.minUsers = contest.minUsers;
+    this.serviceFee = contest.serviceFee;
+    this.teamsAllowed = contest.teamsAllowed;
+    this.leagueId = contest.leagueId;
+    this.releaseTime = contest.releaseTime;
+    this.regStartTime = contest.regStartTime;
+    this.startTime = contest.startTime;
+    this.endTime = contest.endTime;
+    this.status = contest.status;
+    this.visibilityId = contest.visibilityId;
+    this.visibilityInfo = contest.visibilityInfo;
+    this.contestJoinCode = contest.contestJoinCode;
+    this.joined = contest.joined;
+    this.realTeamId = contest.realTeamId;
+    this.prizeDetails = contest.prizeDetails;
+    this.brand = contest.brand;
+    this.milestones = contest.milestones;
+    this.inningsId = contest.inningsId;
+    this.bonusAllowed = contest.bonusAllowed;
+    this.guaranteed = contest.guaranteed;
+    this.recommended = contest.recommended;
+    this.deleted = contest.deleted;
+    this.hideBonusInfo = contest.hideBonusInfo;
+  }
+
   factory Contest.fromJson(Map<String, dynamic> json) {
     return Contest(
       id: json["id"],
       name: json["name"],
       templateId: json["templateId"],
-      size: json["size"],
+      size: json["size"] == null
+          ? (json["maxEntries"] != null ? json["maxEntries"] : 0)
+          : json["size"],
       prizeType: json["prizeType"],
       entryFee: json["entryFee"],
       minUsers: json["minUsers"],
-      serviceFee: (json["serviceFee"]).toDouble(),
-      teamsAllowed: json["teamsAllowed"],
+      serviceFee:
+          (json["serviceFee"] == null ? 0 : json["serviceFee"]).toDouble(),
+      teamsAllowed: json["teamsAllowed"] == null
+          ? (json["sheetsAllowed"] == null ? 1 : json["sheetsAllowed"])
+          : json["teamsAllowed"],
       leagueId: json["leagueId"],
       releaseTime: json["releaseTime"],
       regStartTime: json["regStartTime"],
@@ -390,6 +427,38 @@ class Contest {
       hideBonusInfo: json["hideBonusInfo"],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        "id": this.id,
+        "name": this.name,
+        "templateId": this.templateId,
+        "size": this.size,
+        "prizeType": this.prizeType,
+        "entryFee": this.entryFee,
+        "minUsers": this.minUsers,
+        "serviceFee": this.serviceFee,
+        "teamsAllowed": this.teamsAllowed,
+        "leagueId": this.leagueId,
+        "releaseTime": this.releaseTime,
+        "regStartTime": this.regStartTime,
+        "startTime": this.startTime,
+        "endTime": this.endTime,
+        "status": this.status,
+        "visibilityId": this.visibilityId,
+        "visibilityInfo": this.visibilityInfo,
+        "contestJoinCode": this.contestJoinCode,
+        "joined": this.joined,
+        "realTeamId": this.realTeamId,
+        "prizeDetails": this.prizeDetails,
+        "brand": this.brand,
+        "milestones": this.milestones,
+        "inningsId": this.inningsId,
+        "bonusAllowed": this.bonusAllowed,
+        "guaranteed": this.guaranteed,
+        "recommended": this.recommended,
+        "deleted": this.deleted,
+        "hideBonusInfo": this.hideBonusInfo,
+      };
 }
 
 class MyContest {
@@ -404,5 +473,41 @@ class MyContest {
           (value as List).map((i) => Contest.fromJson(i)).toList();
     });
     return MyContest(leagues: myContests);
+  }
+}
+
+class NewMyContest {
+  Map<String, MyAllContest> leagues;
+
+  NewMyContest({this.leagues});
+
+  factory NewMyContest.fromJson(Map<String, dynamic> json) {
+    Map<String, MyAllContest> myContests = {};
+    json.forEach((String key, dynamic value) {
+      myContests[key] = MyAllContest.fromJson(value);
+    });
+    return NewMyContest(leagues: myContests);
+  }
+}
+
+class MyAllContest {
+  final List<Contest> normal;
+  final List<Contest> prediction;
+
+  MyAllContest({this.normal, this.prediction});
+
+  factory MyAllContest.fromJson(Map<String, dynamic> json) {
+    return MyAllContest(
+      normal: json["normal"] == null
+          ? []
+          : (json["normal"] as List<dynamic>)
+              .map((f) => Contest.fromJson(f))
+              .toList(),
+      prediction: json["prediction"] == null
+          ? []
+          : (json["prediction"] as List<dynamic>)
+              .map((f) => Contest.fromJson(f))
+              .toList(),
+    );
   }
 }

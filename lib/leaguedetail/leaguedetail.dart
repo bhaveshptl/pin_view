@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/lobby/mycontests/newmycontest.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/mycontest.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -14,7 +17,6 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/leaguedetail/innings.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
@@ -23,6 +25,8 @@ import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
+import 'package:playfantasy/leaguedetail/prediction/prediction.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League league;
@@ -45,8 +49,12 @@ class LeagueDetailState extends State<LeagueDetail>
   String title = "Match";
   bool bShowLoader = false;
   bool bShowInnings = true;
+  List<MySheet> _mySheets;
+  Prediction predictionData;
+  List<int> predictionContestIds;
   Map<String, dynamic> l1UpdatePackate = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
+  Map<int, List<MySheet>> _mapContestSheets = {};
   Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -77,11 +85,27 @@ class LeagueDetailState extends State<LeagueDetail>
       _getL1Data();
     } else if (_response["iType"] == RequestType.GET_ALL_L1 &&
         _response["bSuccessful"] == true) {
+      List<dynamic> contestIds = _response["data"]["myPredictionContestIds"]
+          [widget.league.leagueId.toString()];
+      predictionContestIds = contestIds != null
+          ? contestIds.map((f) => (f as int).toInt()).toList()
+          : [];
+      getMyContestMySheets(predictionContestIds);
+
       setState(() {
         l1Data = L1.fromJson(_response["data"]["l1"]);
         _myTeams = (_response["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
+        if (_response["data"]["prediction"] != null) {
+          predictionData = Prediction.fromJson(_response["data"]["prediction"]);
+        }
+        if (_response["data"]["mySheets"] != null &&
+            _response["data"]["mySheets"] != "") {
+          _mySheets = (_response["data"]["mySheets"] as List<dynamic>).map((f) {
+            return MySheet.fromJson(f);
+          }).toList();
+        }
       });
       // _showLoader(false);
     } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
@@ -117,7 +141,56 @@ class LeagueDetailState extends State<LeagueDetail>
         }
         i++;
       }
+    } else if (_response["iType"] == RequestType.PREDICTION_DATA_UPDATE) {
+      if (_response["leagueId"] == widget.league.leagueId) {
+        _applyPredictionUpdate(_response["diffData"]);
+      }
+    } else if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
+        _response["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(_response["data"]);
+      int existingIndex = -1;
+      List<int>.generate(_mySheets.length, (index) {
+        MySheet mySheet = _mySheets[index];
+        if (mySheet.id == sheetAdded.id) {
+          existingIndex = index;
+        }
+      });
+      if (existingIndex == -1) {
+        setState(() {
+          _mySheets.add(sheetAdded);
+        });
+      } else {
+        setState(() {
+          _mySheets[existingIndex] = sheetAdded;
+        });
+      }
     }
+  }
+
+  _applyPredictionUpdate(List<dynamic> updates) {
+    Map<String, dynamic> predictionJson = predictionData.toJson();
+    updates.forEach((diff) {
+      if (diff["kind"] == "E") {
+        dynamic tmpData = predictionJson;
+        List<int>.generate(diff["path"].length - 1, (index) {
+          tmpData = tmpData[diff["path"][index]];
+        });
+        tmpData[diff["path"][diff["path"].length - 1]] = diff["rhs"];
+      } else if (diff["kind"] == "A" && diff["item"]["kind"] == "N") {
+        dynamic tmpData = predictionJson;
+        List<int>.generate(diff["path"].length - 1, (index) {
+          tmpData = tmpData[diff["path"][index]];
+        });
+        if (tmpData[diff["path"][diff["path"].length - 1]].length <=
+            diff["index"]) {
+          tmpData[diff["path"][diff["path"].length - 1]]
+              .add(diff["item"]["rhs"]);
+        }
+      }
+    });
+    setState(() {
+      predictionData = Prediction.fromJson(predictionJson);
+    });
   }
 
   _updateJoinCount(Map<String, dynamic> _data) {
@@ -418,7 +491,7 @@ class LeagueDetailState extends State<LeagueDetail>
     l1UpdatePackate["bResAvail"] = true;
     l1UpdatePackate["sportsId"] = _sportType;
     l1UpdatePackate["id"] = widget.league.leagueId;
-
+    l1UpdatePackate["withPrediction"] = true;
     _getL1Data();
   }
 
@@ -486,6 +559,39 @@ class LeagueDetailState extends State<LeagueDetail>
     }
   }
 
+  getMyContestMySheets(List<int> contests) {
+    if (contests != null && contests.length > 0) {
+      http.Request req = http.Request(
+          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
+      req.body = json.encode(contests);
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<int, List<MySheet>> _mapContestMySheets = {};
+          Map<String, dynamic> response = json.decode(res.body);
+          response.keys.forEach((k) {
+            List<dynamic> sheetIds = response[k];
+            List<MySheet> mySheets = [];
+            sheetIds.forEach((sheetId) {
+              _mySheets.forEach((sheet) {
+                if (sheet.id == sheetId) {
+                  mySheets.add(sheet);
+                }
+              });
+            });
+            if (mySheets.length > 0) {
+              _mapContestMySheets[int.parse(k)] = mySheets;
+            }
+          });
+          setState(() {
+            _mapContestSheets = _mapContestMySheets;
+          });
+        }
+      });
+    }
+  }
+
   _launchAddCash() async {
     showLoader(true);
     routeLauncher.launchAddCash(
@@ -509,7 +615,7 @@ class LeagueDetailState extends State<LeagueDetail>
       case 0:
         result = await Navigator.of(context).push(
           FantasyPageRoute(
-            pageBuilder: (context) => MyContests(
+            pageBuilder: (context) => NewMyContests(
                   leagues: widget.leagues,
                   onSportChange: widget.onSportChange,
                 ),
@@ -520,29 +626,37 @@ class LeagueDetailState extends State<LeagueDetail>
         _launchAddCash();
         break;
       case 2:
-        if (squadStatus()) {
-          result = await Navigator.of(context).push(
-            FantasyPageRoute(
-              pageBuilder: (context) => CreateContest(
-                    league: widget.league,
-                    l1data: l1Data,
-                    myTeams: _myTeams,
-                  ),
-            ),
-          );
+        if (activeTabIndex == 0) {
+          if (squadStatus()) {
+            result = await Navigator.of(context).push(
+              FantasyPageRoute(
+                pageBuilder: (context) => CreateContest(
+                      league: widget.league,
+                      l1data: l1Data,
+                      myTeams: _myTeams,
+                    ),
+              ),
+            );
+          }
+        } else {
+          _showComingSoonDialog();
         }
         break;
       case 3:
-        if (squadStatus()) {
-          result = await Navigator.of(context).push(
-            FantasyPageRoute(
-              pageBuilder: (context) => MyTeams(
-                    league: widget.league,
-                    l1Data: l1Data,
-                    myTeams: _myTeams,
-                  ),
-            ),
-          );
+        if (activeTabIndex == 0) {
+          if (squadStatus()) {
+            result = await Navigator.of(context).push(
+              FantasyPageRoute(
+                pageBuilder: (context) => MyTeams(
+                      league: widget.league,
+                      l1Data: l1Data,
+                      myTeams: _myTeams,
+                    ),
+              ),
+            );
+          }
+        } else {
+          launchMySheet();
         }
         break;
     }
@@ -555,6 +669,26 @@ class LeagueDetailState extends State<LeagueDetail>
           ),
         ),
       );
+    }
+  }
+
+  launchMySheet() async {
+    Quiz quiz = predictionData.quizSet.quiz["0"];
+    if (quiz != null && quiz.questions != null && quiz.questions.length > 0) {
+      final result = await Navigator.of(context).push(
+        FantasyPageRoute(
+          pageBuilder: (context) => MySheets(
+                league: widget.league,
+                predictionData: predictionData,
+                mySheets: _mySheets,
+              ),
+        ),
+      );
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text(
+            "Questions are not yet set for this prediction. Please try again later!!"),
+      ));
     }
   }
 
@@ -586,6 +720,46 @@ class LeagueDetailState extends State<LeagueDetail>
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Filter"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 10.0),
+                    child: Text(
+                      "Coming Soon!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                  "We are currently working on this feature and will launch soon.")
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(
+                strings.get("OK").toUpperCase(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _showComingSoonDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Alert!!"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -708,7 +882,7 @@ class LeagueDetailState extends State<LeagueDetail>
                                     Container(
                                       height: 24.0,
                                       child: Tab(
-                                        text: "INNINGS",
+                                        text: "PREDICTION",
                                       ),
                                     ),
                                   ],
@@ -740,16 +914,17 @@ class LeagueDetailState extends State<LeagueDetail>
                                         scaffoldKey: _scaffoldKey,
                                         mapContestTeams: _mapContestTeams,
                                       ),
-                                l1Data == null
+                                predictionData == null
                                     ? Container()
-                                    : Innings(
-                                        l1Data: l1Data,
-                                        myTeams: _myTeams,
+                                    : PredictionView(
+                                        mySheets: _mySheets,
                                         league: widget.league,
-                                        leagues: widget.leagues,
+                                        showLoader: showLoader,
                                         scaffoldKey: _scaffoldKey,
-                                        mapContestTeams: _mapContestTeams,
-                                        onSportChange: widget.onSportChange,
+                                        prediction: predictionData,
+                                        predictionContestIds:
+                                            predictionContestIds,
+                                        mapContestSheets: _mapContestSheets,
                                       ),
                               ],
                             )
@@ -771,7 +946,7 @@ class LeagueDetailState extends State<LeagueDetail>
           ),
           bottomNavigationBar: activeTabIndex == 0
               ? LobbyBottomNavigation(_onNavigationSelectionChange, 1)
-              : null,
+              : LobbyBottomNavigation(_onNavigationSelectionChange, 2),
         ),
         bShowLoader ? Loader() : Container(),
       ],
