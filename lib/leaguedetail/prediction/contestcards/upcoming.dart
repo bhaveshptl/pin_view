@@ -13,7 +13,6 @@ class UpcomingPredictionContest extends StatelessWidget {
   final Function onJoin;
   final bool bShowBrandInfo;
   final Function onPrizeStructure;
-  final List<int> myJoinedSheetIds;
   final List<MySheet> myJoinedSheets;
 
   UpcomingPredictionContest({
@@ -21,7 +20,6 @@ class UpcomingPredictionContest extends StatelessWidget {
     this.onJoin,
     this.contest,
     this.myJoinedSheets,
-    this.myJoinedSheetIds,
     this.onPrizeStructure,
     this.bShowBrandInfo = false,
   });
@@ -30,9 +28,7 @@ class UpcomingPredictionContest extends StatelessWidget {
   Widget build(BuildContext context) {
     bool bIsContestFull = contest.size <= contest.joined ||
         (myJoinedSheets != null &&
-            (contest.teamsAllowed <= myJoinedSheets.length)) ||
-        (myJoinedSheetIds != null &&
-            (contest.teamsAllowed <= myJoinedSheetIds.length));
+            (contest.teamsAllowed <= myJoinedSheets.length));
 
     return Container(
       child: Column(
@@ -395,10 +391,8 @@ class UpcomingPredictionContest extends StatelessWidget {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      ((myJoinedSheets != null &&
-                                                  myJoinedSheets.length > 0) ||
-                                              (myJoinedSheetIds != null &&
-                                                  myJoinedSheetIds.length > 0))
+                                      (myJoinedSheets != null &&
+                                              myJoinedSheets.length > 0)
                                           ? Icon(
                                               Icons.add,
                                               color: Colors.white70,

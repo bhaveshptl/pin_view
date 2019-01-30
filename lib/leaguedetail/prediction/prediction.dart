@@ -77,9 +77,10 @@ class PredictionViewState extends State<PredictionView> {
 
   onJoinContest(Contest contest) async {
     Quiz quiz = widget.prediction.quizSet.quiz["0"];
-    if (!(quiz != null &&
-        quiz.questions != null &&
-        quiz.questions.length > 0)) {
+    if (widget.prediction.league.qfVisibility == 0 &&
+        !(quiz != null &&
+            quiz.questions != null &&
+            quiz.questions.length > 0)) {
       widget.scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text(
             "Questions are not yet set for this prediction. Please try again later!!"),

@@ -37,6 +37,12 @@ class PredictionSummaryWidget extends StatelessWidget {
             answers[index] != -1 &&
             answers[index] < question.options.length) {
           var answer = question.options[answers[index]];
+          var positiveScore =
+              index == xBooster ? answer["positive"] * 2 : answer["positive"];
+          var negativeScore =
+              index == xBooster ? answer["negative"] * 2 : answer["negative"];
+          negativeScore = index == bPlusBooster ? 0 : negativeScore;
+
           return Row(
             children: <Widget>[
               Expanded(
@@ -134,47 +140,71 @@ class PredictionSummaryWidget extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                  "+" + answer["positive"].toString(),
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subtitle
-                                      .copyWith(
-                                        color: Colors.green.shade800,
-                                        fontWeight: FontWeight.bold,
+                            child: predictionData.league.status == 1 ||
+                                    question.answer == -1
+                                ? Row(
+                                    children: <Widget>[
+                                      Text(
+                                        "+" + positiveScore.toString(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subtitle
+                                            .copyWith(
+                                              color: Colors.green.shade800,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 16.0),
-                                  child: Text(
-                                    answer["negative"].toString(),
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subtitle
-                                        .copyWith(
-                                          color: Colors.red.shade800,
-                                          fontWeight: FontWeight.bold,
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 16.0),
+                                        child: Text(
+                                          negativeScore.toString(),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .subtitle
+                                              .copyWith(
+                                                color: Colors.red.shade800,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                         ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    children: <Widget>[
+                                      question.answer == answers[index]
+                                          ? Text(
+                                              "+" + positiveScore.toString(),
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subtitle
+                                                  .copyWith(
+                                                    color:
+                                                        Colors.green.shade800,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            )
+                                          : Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 16.0),
+                                              child: Text(
+                                                negativeScore.toString(),
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .subtitle
+                                                    .copyWith(
+                                                      color:
+                                                          Colors.red.shade800,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                            ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
                           )
                         ],
                       ),
                     )
-                    // Container(
-                    //   padding:
-                    //       EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                    //   child: Column(
-                    //     children: <Widget>[
-
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

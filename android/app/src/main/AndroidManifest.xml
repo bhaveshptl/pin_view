@@ -42,10 +42,8 @@
         /**
         * Add your API key
         */
-        <meta-data
-            android:name="com.razorpay.ApiKey"
-            android:value="rzp_test_tXPpy16Oy4GQiO"
-            />
+        <meta-data android:name="com.razorpay.ApiKey" android:value="rzp_live_SkYhnxxxX1XYX8" />
+        <!-- android:value="rzp_test_tXPpy16Oy4GQiO" -->
         <!-- Branch init -->
         <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_bhsR2zMTbzwpWFUmt77YzedhDskdbIUF" />
         <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_live_bhsR2zMTbzwpWFUmt77YzedhDskdbIUF" />
@@ -53,7 +51,7 @@
         <!-- Set to true to use Branch_Test_Key -->
 
         <!-- Branch install referrer tracking (optional) -->
-        <receiver android:name="io.branch.referral.InstallListener" android:permission=""  android:exported="true">
+        <receiver android:name="io.branch.referral.InstallListener" android:permission="" android:exported="true">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>

@@ -1,6 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:playfantasy/leaguedetail/prediction/createsheet.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictionsummarywidget.dart';
 
@@ -9,7 +9,9 @@ import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/prediction.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
@@ -36,14 +38,15 @@ class ViewSheet extends StatefulWidget {
 
 class ViewSheetState extends State<ViewSheet> {
   Prediction predictionData;
+  MySheet sheet = MySheet.fromJson({});
   Map<String, dynamic> l1UpdatePackate = {};
-  MyTeam _myTeamWithPlayers = MyTeam.fromJson({});
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     sockets.register(_onWsMsg);
+    getSheet();
     if (widget.predictionData == null) {
       _createL1WSObject();
     } else {
@@ -73,7 +76,36 @@ class ViewSheetState extends State<ViewSheet> {
           predictionData = Prediction.fromJson(_response["data"]["prediction"]);
         }
       });
+    } else if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
+        _response["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(_response["data"]);
+      if (sheetAdded.id == sheet.id) {
+        setState(() {
+          sheet = sheetAdded;
+        });
+      }
     }
+  }
+
+  getSheet() {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl.apiUrl +
+            ApiUtil.GET_ANSWER_SHEET_DETAILS +
+            widget.sheet.id.toString(),
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> response = json.decode(res.body);
+        setState(() {
+          sheet = MySheet.fromJson(response);
+        });
+      }
+    });
   }
 
   _getL1Data() {
@@ -86,7 +118,7 @@ class ViewSheetState extends State<ViewSheet> {
       FantasyPageRoute(
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
-              selectedSheet: widget.sheet,
+              selectedSheet: sheet,
               mode: SheetCreationMode.EDIT_SHEET,
               predictionData: widget.predictionData,
             ),
@@ -104,7 +136,7 @@ class ViewSheetState extends State<ViewSheet> {
       FantasyPageRoute(
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
-              selectedSheet: widget.sheet,
+              selectedSheet: sheet,
               mode: SheetCreationMode.CLONE_SHEET,
               predictionData: widget.predictionData,
             ),
@@ -122,10 +154,10 @@ class ViewSheetState extends State<ViewSheet> {
     int maxQuestionRules = 0;
     Quiz quiz =
         predictionData == null ? null : predictionData.quizSet.quiz["0"];
-    if (quiz != null) {
-      List<int>.generate(widget.sheet.answers.length, (index) {
-        if (widget.sheet.answers[index] != -1) {
-          mapAnswers[index] = widget.sheet.answers[index];
+    if (quiz != null && sheet.answers != null) {
+      List<int>.generate(sheet.answers.length, (index) {
+        if (sheet.answers[index] != -1) {
+          mapAnswers[index] = sheet.answers[index];
         }
       });
       maxQuestionRules =
@@ -136,7 +168,7 @@ class ViewSheetState extends State<ViewSheet> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(widget.sheet.name),
+        title: Text(sheet.name),
         actions: <Widget>[
           widget.league.status == LeagueStatus.UPCOMING
               ? IconButton(
@@ -193,8 +225,8 @@ class ViewSheetState extends State<ViewSheet> {
                 ),
                 PredictionSummaryWidget(
                   answers: mapAnswers,
-                  xBooster: widget.sheet.boosterOne,
-                  bPlusBooster: widget.sheet.boosterTwo,
+                  xBooster: sheet.boosterOne,
+                  bPlusBooster: sheet.boosterTwo,
                   predictionData: widget.predictionData,
                 ),
               ],
@@ -244,7 +276,7 @@ class ViewSheetState extends State<ViewSheet> {
                           children: <Widget>[
                             Expanded(
                               child: Text(
-                                _myTeamWithPlayers.rank.toString(),
+                                widget.sheet.rank.toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: Colors.white54,
@@ -256,7 +288,7 @@ class ViewSheetState extends State<ViewSheet> {
                             ),
                             Expanded(
                               child: Text(
-                                _myTeamWithPlayers.score.toString(),
+                                widget.sheet.score.toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: Colors.white54,
@@ -307,7 +339,7 @@ class ViewSheetState extends State<ViewSheet> {
                                       .fontSize),
                             ),
                       Text(
-                        _myTeamWithPlayers.prize.toStringAsFixed(2),
+                        widget.sheet.prize.toStringAsFixed(2),
                         style: TextStyle(
                             color: Colors.white54,
                             fontSize: Theme.of(context)

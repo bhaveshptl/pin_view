@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/live.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/result.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/prediction.dart';
-import 'package:playfantasy/leaguedetail/contestcards/live.dart';
-import 'package:playfantasy/leaguedetail/contestcards/result.dart';
 import 'package:playfantasy/leaguedetail/prediction/contestcards/upcoming.dart';
 
 class PredictionContestCard extends StatelessWidget {
@@ -16,10 +16,10 @@ class PredictionContestCard extends StatelessWidget {
   final Function onClick;
   final bool isMyContest;
   final bool bShowBrandInfo;
+  final List<MySheet> myAllSheets;
   final Prediction predictionData;
   final EdgeInsetsGeometry margin;
   final Function onPrizeStructure;
-  final List<int> myJoinedSheetIds;
   final BorderRadiusGeometry radius;
   final List<MySheet> myJoinedSheets;
 
@@ -31,10 +31,10 @@ class PredictionContestCard extends StatelessWidget {
     this.status,
     this.contest,
     this.onClick,
+    this.myAllSheets,
     this.isMyContest,
     this.myJoinedSheets,
     this.predictionData,
-    this.myJoinedSheetIds,
     this.onPrizeStructure,
     this.bShowBrandInfo = false,
   });
@@ -73,22 +73,19 @@ class PredictionContestCard extends StatelessWidget {
                   contest: contest,
                   myJoinedSheets: myJoinedSheets,
                   bShowBrandInfo: bShowBrandInfo,
-                  myJoinedSheetIds: myJoinedSheetIds,
                   onPrizeStructure: onPrizeStructure,
                 )
               : leagueStatus == LeagueStatus.LIVE
-                  ? LiveContest(
+                  ? LivePredictionContest(
                       league: league,
                       contest: contest,
-                      isMyContest: isMyContest,
-                      // myJoinedTeams: myJoinedSheets,
+                      myJoinedSheets: myJoinedSheets,
                       onPrizeStructure: onPrizeStructure,
                     )
-                  : ResultContest(
+                  : ResultPredictionContest(
                       league: league,
                       contest: contest,
-                      isMyContest: isMyContest,
-                      // myJoinedTeams: myJoinedSheets,
+                      myJoinedSheets: myJoinedSheets,
                       onPrizeStructure: onPrizeStructure,
                     ),
         ),

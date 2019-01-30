@@ -100,4 +100,9 @@ class ApiUtil {
   static const GET_LEAGUE_FLIPS = "/api/v2/lobby/quiz/get-flips/";
   static const GET_FLIP_BALANCE = "/api/v2/lobby/quiz/get-flips/usable/";
   static const GET_CONTEST_SHEETS = "/api/lobby/contest/";
+  static const GET_ANSWER_SHEET_DETAILS = "/api/v2/lobby/quiz/answersheet/";
+  static const GET_ALL_ANSWER_SHEETS = "/api/v2/lobby/quiz/get-answer-sheets";
+  static const GET_CONTEST_MY_ANSWER_SHEETS = "/api/v2/lobby/quiz/contest-all-my-answersheets";
+
+  static const QUIZ_USER_BALANCE = "/api/v2/lobby/quiz-userbalance";
 }

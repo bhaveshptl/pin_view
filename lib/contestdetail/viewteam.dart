@@ -31,6 +31,7 @@ class ViewTeam extends StatefulWidget {
 class _ViewTeamState extends State<ViewTeam> {
   int _sportsType;
   FanTeamRule _fanTeamRules;
+  Map<String, dynamic> l1UpdatePackate = {};
   MyTeam _myTeamWithPlayers = MyTeam.fromJson({});
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 

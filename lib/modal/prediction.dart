@@ -40,6 +40,7 @@ class PredictionLeague {
   int startTime;
   int inningsId;
   int captainMult;
+  int qfVisibility;
   List<Rounds> rounds;
 
   PredictionLeague({
@@ -52,6 +53,7 @@ class PredictionLeague {
     this.startTime,
     this.inningsId,
     this.captainMult,
+    this.qfVisibility,
   });
 
   factory PredictionLeague.fromJson(Map<String, dynamic> json) {
@@ -64,6 +66,7 @@ class PredictionLeague {
       inningsId: json["inningsId"],
       captainMult: json["captainMult"],
       vcMult: json["vcMult"].toDouble(),
+      qfVisibility: json["qfVisibility"] == null ? 0 : json["qfVisibility"],
       rounds: (json["rounds"] as List).map((i) => Rounds.fromJson(i)).toList(),
     );
   }
@@ -72,11 +75,12 @@ class PredictionLeague {
         "id": this.id,
         "name": this.name,
         "status": this.status,
+        "vcMult": this.vcMult,
         "endTime": this.endTime,
         "startTime": this.startTime,
         "inningsId": this.inningsId,
         "captainMult": this.captainMult,
-        "vcMult": this.vcMult,
+        "qfVisibility": this.qfVisibility,
         "rounds": this.rounds.map((f) => f.toJson()).toList(),
       };
 }

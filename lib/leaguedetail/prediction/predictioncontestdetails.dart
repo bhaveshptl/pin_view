@@ -70,9 +70,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     sockets.register(_onWsMsg);
     _createAndReqL1WS();
     createDataSource();
-    _getContestSheets(0);
     _mapContestSheets =
         widget.mapContestSheets == null ? [] : widget.mapContestSheets;
+    _getContestSheets(0);
     if (_mapContestSheets.length == 0) {
       getMyContestMySheets();
     }
@@ -113,7 +113,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     }
   }
 
-  onViewSheet(MySheet sheet) { 
+  onViewSheet(MySheet sheet) {
     Navigator.of(context).push(
       FantasyPageRoute(
           pageBuilder: (context) => ViewSheet(
@@ -176,7 +176,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
         bWaitingForSheetCreation = false;
       }
     } else if (_response["iType"] == RequestType.PREDICTION_DATA_UPDATE) {
-      if (_response["leagueId"] == widget.league.leagueId) {
+      if (_response["leagueId"] == widget.league.leagueId &&
+          predictionData != null) {
         _applyPredictionUpdate(_response["diffData"]);
       }
       getMyContestMySheets();
@@ -362,9 +363,10 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
 
   joinPredictionContest(Contest contest) async {
     Quiz quiz = widget.predictionData.quizSet.quiz["0"];
-    if (!(quiz != null &&
-        quiz.questions != null &&
-        quiz.questions.length > 0)) {
+    if (predictionData.league.qfVisibility == 0 &&
+        !(quiz != null &&
+            quiz.questions != null &&
+            quiz.questions.length > 0)) {
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text(
             "Questions are not yet set for this prediction. Please try again later!!"),
@@ -1313,9 +1315,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                               : widget.contest.joined)
                                           : rowsPerPage,
                                   onPageChanged: (int firstVisibleIndex) {
-                                    if (firstVisibleIndex == 0) {
-                                      getMyContestMySheets();
-                                    }
+                                    // if (firstVisibleIndex == 0) {
+                                    //   getMyContestMySheets();
+                                    // }
                                     _getContestSheets(firstVisibleIndex);
                                   },
                                   columns: _getDataTableHeader(),
@@ -1411,15 +1413,15 @@ class SheetDataSource extends DataTableSource {
   setUniqueSheets() {
     List<MySheet> myUniqueSheets = [];
     for (MySheet sheet in (_myAllSheets == null ? [] : _myAllSheets)) {
-      bool bIsSheetUsed = false;
+      MySheet usedSheet;
       for (MySheet contestSheet in myContestSheets) {
         if (sheet.id == contestSheet.id) {
-          bIsSheetUsed = true;
+          usedSheet = contestSheet;
           break;
         }
       }
-      if (!bIsSheetUsed) {
-        myUniqueSheets.add(sheet);
+      if (usedSheet != null) {
+        myUniqueSheets.add(usedSheet);
       }
     }
     _myUniqueSheets = myUniqueSheets;
@@ -1549,7 +1551,7 @@ class SheetDataSource extends DataTableSource {
                                 width: 60.0,
                                 child: Text(
                                   _sheet.score != null
-                                      ? _sheet.prize.toString()
+                                      ? _sheet.prize.toStringAsFixed(2)
                                       : "-",
                                   textAlign: TextAlign.center,
                                 ),

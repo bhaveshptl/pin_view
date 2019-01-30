@@ -1,12 +1,13 @@
 class MySheet {
   int rank;
-  int prize;
-  int score;
+  double score;
+  double prize;
   final int id;
   final int userId;
   final int status;
   final String name;
   final int leagueId;
+  final int contestId;
   final int inningsId;
   final int boosterOne;
   final int boosterTwo;
@@ -25,6 +26,7 @@ class MySheet {
     this.answers,
     this.leagueId,
     this.inningsId,
+    this.contestId,
     this.channelId,
     this.boosterOne,
     this.boosterTwo,
@@ -33,16 +35,21 @@ class MySheet {
 
   factory MySheet.fromJson(Map<String, dynamic> json) {
     return MySheet(
-      id: json["id"],
+      id: json["id"] == null || json["id"] == 0
+          ? (json["answerSheetId"] == null ? json["id"] : json["answerSheetId"])
+          : json["id"],
       name: json["name"] == null ? "" : json["name"],
-      score: json["score"],
+      score: json["score"] == null ? 0.0 : json["score"].toDouble(),
       status: json["status"],
       userId: json["userId"],
+      contestId: json["contestId"],
       rank: json["rank"] == null ? 0 : json["rank"],
-      prize: json["prize"] == null ? 0 : json["prize"],
-      answers: (json["answers"] as List<dynamic>).map((f) {
-        return (f as int).toInt();
-      }).toList(),
+      prize: json["prize"] == null ? 0.0 : json["prize"].toDouble(),
+      answers: json["answers"] == null
+          ? null
+          : (json["answers"] as List<dynamic>).map((f) {
+              return (f as int).toInt();
+            }).toList(),
       leagueId: json["leagueId"],
       inningsId: json["inningsId"],
       channelId: json["channelId"],
@@ -64,6 +71,7 @@ class MySheet {
         "userId": this.userId,
         "answers": this.answers,
         "leagueId": this.leagueId,
+        "contestId": this.contestId,
         "inningsId": this.inningsId,
         "channelId": this.channelId,
         "boosterOne": this.boosterOne,

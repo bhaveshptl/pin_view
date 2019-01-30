@@ -674,7 +674,10 @@ class LeagueDetailState extends State<LeagueDetail>
 
   launchMySheet() async {
     Quiz quiz = predictionData.quizSet.quiz["0"];
-    if (quiz != null && quiz.questions != null && quiz.questions.length > 0) {
+    if (predictionData.league.qfVisibility != 0 &&
+        quiz != null &&
+        quiz.questions != null &&
+        quiz.questions.length > 0) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => MySheets(

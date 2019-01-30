@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
@@ -40,7 +41,7 @@ class NewMyContestsState extends State<NewMyContests>
   bool bShowLoader = false;
   TabController _sportsController;
   Map<int, List<MyTeam>> _mapContestTeams = {};
-  Map<int, List<int>> _mapContestSheets = {};
+  Map<int, List<MySheet>> _mapContestSheets = {};
   Map<int, Map<String, MyAllContest>> myContests = {};
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -149,18 +150,19 @@ class NewMyContestsState extends State<NewMyContests>
       }
     });
 
-    http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
+    http.Request req = http.Request("POST",
+        Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_CONTEST_MY_ANSWER_SHEETS));
     req.body = json.encode(_contestIds);
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        Map<int, List<int>> _mapContestMySheets = {};
-        Map<String, dynamic> response = json.decode(res.body);
+        Map<int, List<MySheet>> _mapContestMySheets = {};
+        Map<String, dynamic> response =
+            json.decode(res.body == "\"\"" ? "{}" : res.body);
         response.forEach((String key, dynamic value) {
           _mapContestMySheets[int.parse(key)] = (value as List<dynamic>)
-              .map((contestId) => int.parse(contestId.toString()))
+              .map((sheet) => MySheet.fromJson(sheet))
               .toList();
         });
 

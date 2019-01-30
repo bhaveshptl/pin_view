@@ -73,18 +73,19 @@ class PredictionSummaryState extends State<PredictionSummary> {
           : lstAnswers.add(widget.answers[curIndex]);
     });
     var mapObj = {
-      "inningsId": 0,
       "name": "",
       "score": 0,
       "status": 0,
-      "id": widget.answerSheetId,
+      "inningsId": 0,
+      "final": true,
       "answers": lstAnswers,
-      "boosterOne": widget.xBooster,
-      "boosterTwo": widget.bPlusBooster,
-      "answerSheetId": widget.answerSheetId,
+      "id": widget.answerSheetId,
       "boosterThree": getFlipObject(),
+      "answerSheetId": widget.answerSheetId,
       "leagueId": widget.predictionData.league.id,
       "channelId": AppConfig.of(context).channelId,
+      "boosterOne": widget.xBooster == -1 ? null : widget.xBooster,
+      "boosterTwo": widget.bPlusBooster == -1 ? null : widget.bPlusBooster,
     };
     createAnswerSheet(mapObj, context);
   }
@@ -143,6 +144,50 @@ class PredictionSummaryState extends State<PredictionSummary> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(top: 8.0),
+                    color: Colors.transparent,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            RaisedButton(
+                              onPressed: () {
+                                onEdit(context);
+                              },
+                              color: Theme.of(context).primaryColor,
+                              child: Text(
+                                "EDIT",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .button
+                                    .copyWith(
+                                      color: Colors.white70,
+                                    ),
+                              ),
+                            ),
+                            RaisedButton(
+                              onPressed: () {
+                                onFinish(context);
+                              },
+                              color: Theme.of(context).primaryColor,
+                              child: Text(
+                                "FINISH",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .button
+                                    .copyWith(
+                                      color: Colors.white70,
+                                    ),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                   Card(
                     elevation: 3.0,
                     margin: EdgeInsets.all(16.0),
@@ -186,87 +231,10 @@ class PredictionSummaryState extends State<PredictionSummary> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(bottom: 8.0),
-                    color: Colors.transparent,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            RaisedButton(
-                              onPressed: () {
-                                onEdit(context);
-                              },
-                              color: Theme.of(context).primaryColor,
-                              child: Text(
-                                "EDIT",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .button
-                                    .copyWith(
-                                      color: Colors.white70,
-                                    ),
-                              ),
-                            ),
-                            RaisedButton(
-                              onPressed: () {
-                                onFinish(context);
-                              },
-                              color: Theme.of(context).primaryColor,
-                              child: Text(
-                                "FINISH",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .button
-                                    .copyWith(
-                                      color: Colors.white70,
-                                    ),
-                              ),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
           ),
-          // bottomNavigationBar: Container(
-          //   color: Colors.transparent,
-          //   child: Column(
-          //     mainAxisSize: MainAxisSize.min,
-          //     children: <Widget>[
-          //       Row(
-          //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //         children: <Widget>[
-          //           RaisedButton(
-          //             onPressed: () {},
-          //             color: Theme.of(context).primaryColor,
-          //             child: Text(
-          //               "EDIT",
-          //               style: Theme.of(context).primaryTextTheme.button.copyWith(
-          //                     color: Colors.white70,
-          //                   ),
-          //             ),
-          //           ),
-          //           RaisedButton(
-          //             onPressed: () {},
-          //             color: Theme.of(context).primaryColor,
-          //             child: Text(
-          //               "FINISH",
-          //               style: Theme.of(context).primaryTextTheme.button.copyWith(
-          //                     color: Colors.white70,
-          //                   ),
-          //             ),
-          //           )
-          //         ],
-          //       )
-          //     ],
-          //   ),
-          // ),
         ),
         bShowLoader ? Loader() : Container(),
       ],

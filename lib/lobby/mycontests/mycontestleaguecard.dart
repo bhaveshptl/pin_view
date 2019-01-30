@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -23,14 +24,14 @@ class MyContestLeagueCard extends StatefulWidget {
   final Function onJoinNormalContest;
   final Function onJoinPredictionContest;
   final Map<int, List<MyTeam>> mapMyTeams;
-  final Map<int, List<int>> mapMySheetIds;
+  final Map<int, List<MySheet>> mapMySheets;
   final Function onPredictionContestDetail;
 
   MyContestLeagueCard({
     this.league,
     this.mapMyTeams,
     this.mapContests,
-    this.mapMySheetIds,
+    this.mapMySheets,
     this.onContestDetails,
     this.onJoinNormalContest,
     this.onJoinPredictionContest,
@@ -48,6 +49,7 @@ class MyContestLeagueCardState extends State<MyContestLeagueCard>
   bool bIsExpanded = false;
   TabController typeController;
   int activeTabIndex = 0;
+  List<MySheet> myAllSheets = [];
 
   @override
   void initState() {
@@ -60,6 +62,24 @@ class MyContestLeagueCardState extends State<MyContestLeagueCard>
         });
       }
     });
+    getAllMySheets();
+  }
+
+  getAllMySheets() {
+    http.Request req = http.Request(
+      "POST",
+      Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_CONTEST_MY_ANSWER_SHEETS),
+    );
+    HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          List<dynamic> response = json.decode(res.body);
+          myAllSheets = response.map((f) {
+            return MySheet.fromJson(f);
+          }).toList();
+        }
+      },
+    );
   }
 
   void _showPredictionPrizeStructure(Contest contest) async {
@@ -190,14 +210,14 @@ class MyContestLeagueCardState extends State<MyContestLeagueCard>
           contest: contest,
           isMyContest: true,
           league: widget.league,
+          myAllSheets: myAllSheets,
           status: widget.league.status,
           onJoin: widget.onJoinPredictionContest,
           onClick: widget.onPredictionContestDetail,
           margin: EdgeInsets.symmetric(vertical: 8.0),
           onPrizeStructure: _showPredictionPrizeStructure,
-          myJoinedSheetIds: widget.mapMySheetIds == null
-              ? []
-              : widget.mapMySheetIds[contest.id],
+          myJoinedSheets:
+              widget.mapMySheets == null ? [] : widget.mapMySheets[contest.id],
         );
       }).toList();
     }

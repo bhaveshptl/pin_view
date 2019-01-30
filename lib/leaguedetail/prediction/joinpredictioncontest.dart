@@ -91,7 +91,7 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
 
   _getUserBalance() async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.USER_BALANCE));
+        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.QUIZ_USER_BALANCE));
     req.body = json.encode({
       "leagueId": widget.contest.leagueId,
       "contestId": widget.contest == null ? "" : widget.contest.id

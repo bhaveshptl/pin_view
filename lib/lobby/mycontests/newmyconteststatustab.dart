@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/mycontests/mycontestleaguecard.dart';
@@ -11,7 +12,7 @@ class NewMyContestStatusTab extends StatefulWidget {
   final List<League> leagues;
   final Function onContestDetails;
   final Function onJoinNormalContest;
-  final Map<int, List<int>> mapMySheets;
+  final Map<int, List<MySheet>> mapMySheets;
   final Function onJoinPredictionContest;
   final Map<int, List<MyTeam>> mapMyTeams;
   final Function onPredictionContestDetails;
@@ -63,12 +64,13 @@ class NewMyContestStatusTabState extends State<NewMyContestStatusTab> {
                       child: MyContestLeagueCard(
                         league: league,
                         mapMyTeams: widget.mapMyTeams,
-                        mapMySheetIds: widget.mapMySheets,
+                        mapMySheets: widget.mapMySheets,
                         onContestDetails: widget.onContestDetails,
                         onJoinNormalContest: widget.onJoinNormalContest,
                         mapContests: widget.mapContests[leagues[index]],
                         onJoinPredictionContest: widget.onJoinPredictionContest,
-                        onPredictionContestDetail: widget.onPredictionContestDetails,
+                        onPredictionContestDetail:
+                            widget.onPredictionContestDetails,
                       ),
                     );
                   }

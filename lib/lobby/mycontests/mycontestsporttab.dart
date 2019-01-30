@@ -25,7 +25,7 @@ class MyContestSportTab extends StatefulWidget {
   final int sportsType;
   final Function showLoader;
   final List<League> leagues;
-  final Map<int, List<int>> mapMySheets;
+  final Map<int, List<MySheet>> mapMySheets;
   final Map<int, List<MyTeam>> mapMyTeams;
   final Map<String, MyAllContest> myContests;
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -184,7 +184,7 @@ class MyContestSportTabState extends State<MyContestSportTab> {
         pageBuilder: (context) => PredictionContestDetail(
               league: league,
               contest: contest,
-              mySheets: mySheets,
+              mapContestSheets: widget.mapMySheets[contest.id],
             ),
       ),
     );

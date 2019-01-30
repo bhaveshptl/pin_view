@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/leaguedetail/prediction/predictionsummary.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
-import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/leaguedetail/prediction/predictionsummary.dart';
 
 class SheetCreationMode {
   static const int CREATE_SHEET = 1;
@@ -47,13 +47,14 @@ class CreateSheetState extends State<CreateSheet>
 
   int lastFlippedQuestionIndex;
 
-  int xBooster = 0;
+  int xBooster = -1;
   int curFlipIndex;
   int sheetStatus = 0;
   int activeIndex = 0;
-  int bPlusBooster = 0;
+  int bPlusBooster = -1;
   int answerSheetId = 0;
   String language = "1";
+  int totalQuestinCount = 0;
   Map<int, int> answers = {};
   TabController tabController;
 
@@ -77,7 +78,7 @@ class CreateSheetState extends State<CreateSheet>
 
     Quiz quiz = widget.predictionData.quizSet.quiz["0"];
     List<int>.generate(quiz.questions.length - maxQuestionRules, (index) {
-      remainFlipQuestionIndex.add(maxQuestionRules + index + 1);
+      remainFlipQuestionIndex.add(maxQuestionRules + index);
     });
 
     tabController = TabController(
@@ -160,7 +161,7 @@ class CreateSheetState extends State<CreateSheet>
     xBoosterRules = widget.predictionData.rules["0"]["booster"]["b1"]["rule"];
     bPlusBoosterRules =
         widget.predictionData.rules["0"]["booster"]["b1"]["rule"];
-
+    totalQuestinCount = quiz.questions.length;
     xBoosterLeft = xBoosterRules[1];
     bPlusBoosterLeft = bPlusBoosterRules[1];
   }
@@ -174,29 +175,80 @@ class CreateSheetState extends State<CreateSheet>
             flipBooster[flip["from"]] = flip["to"];
           });
         }
+        List<int>.generate(widget.selectedSheet.answers.length, (index) {
+          if (widget.selectedSheet.answers[index] != -1) {
+            answers[index] = widget.selectedSheet.answers[index];
+          }
+        });
+        xBooster = widget.selectedSheet.boosterOne;
+        bPlusBooster = widget.selectedSheet.boosterTwo;
+      } else {
+        List<int>.generate(maxQuestionRules - 1, (index) {
+          if (widget.selectedSheet.answers[index] != -1) {
+            answers[index] = widget.selectedSheet.answers[index];
+          }
+        });
+        xBooster = (widget.selectedSheet.boosterOne != null &&
+                widget.selectedSheet.boosterOne < maxQuestionRules)
+            ? widget.selectedSheet.boosterOne
+            : -1;
+        bPlusBooster = (widget.selectedSheet.boosterTwo != null &&
+                widget.selectedSheet.boosterTwo < maxQuestionRules)
+            ? widget.selectedSheet.boosterTwo
+            : -1;
       }
-      List<int>.generate(widget.selectedSheet.answers.length, (index) {
-        if (widget.selectedSheet.answers[index] != -1) {
-          answers[index] = widget.selectedSheet.answers[index];
-        }
-      });
-      xBooster = widget.selectedSheet.boosterOne;
-      bPlusBooster = widget.selectedSheet.boosterTwo;
+      xBoosterLeft = xBooster == -1 ? xBoosterLeft : 0;
+      bPlusBoosterLeft = bPlusBooster == -1 ? bPlusBoosterLeft : 0;
     }
   }
 
-  saveAnswer({int index, int optionsIndex}) {
+  getFlippedQuestion(int index) {
+    int flippedIndex;
+    flipBooster.keys.forEach((int key) {
+      if (key == index) {
+        flippedIndex = flipBooster[key];
+      } else if (flipBooster[key] == index) {
+        flippedIndex = key;
+      }
+    });
+    return flippedIndex;
+  }
+
+  setAnswer({int index, int oldIndex, int optionsIndex}) {
     if (index != null && optionsIndex != null) {
-      setState(() {
-        answers[index] = optionsIndex;
-      });
+      if (answers[index] != null && answers[index] == optionsIndex) {
+        setState(() {
+          answers.remove(index);
+        });
+      } else {
+        if (isQuestionFlipped(index)) {
+          int flippedIndex = getFlippedQuestion(index);
+          answers.remove(index);
+          answers.remove(flippedIndex);
+        }
+        if (answers[index] != null) {
+          setState(() {
+            if (answers[index] != optionsIndex) {
+              answers[index] = optionsIndex;
+            }
+            resetBoostersFor(index);
+          });
+        } else {
+          setState(() {
+            answers[index] = optionsIndex;
+          });
+        }
+      }
     }
+  }
+
+  saveAnswer() {
     if (answers.keys.length >= minQuestionCount ||
         (flipBooster.keys.length + tmpBooster.keys.length) > 0) {
       List<int> lstAnswers = [];
       List<int>.generate(
           widget.predictionData.quizSet.quiz["0"].questions.length, (curIndex) {
-        answers[curIndex] == null
+        answers[curIndex] == null || answers[flipBooster[curIndex]] != null
             ? lstAnswers.add(-1)
             : lstAnswers.add(answers[curIndex]);
       });
@@ -207,8 +259,8 @@ class CreateSheetState extends State<CreateSheet>
         "id": answerSheetId,
         "status": sheetStatus,
         "answers": lstAnswers,
-        "boosterOne": xBooster,
-        "boosterTwo": bPlusBooster,
+        "boosterOne": xBooster == -1 ? null : xBooster,
+        "boosterTwo": bPlusBooster == -1 ? null : bPlusBooster,
         "answerSheetId": answerSheetId,
         "boosterThree": getFlipObject(),
         "leagueId": widget.predictionData.league.id,
@@ -264,15 +316,19 @@ class CreateSheetState extends State<CreateSheet>
       if (response["status"] == "ERROR") {
         setState(() {
           flipBooster.remove(lastFlippedQuestionIndex);
+          bPlusBooster =
+              bPlusBooster == lastFlippedQuestionIndex ? -1 : bPlusBooster;
+          xBooster = xBooster == lastFlippedQuestionIndex ? -1 : xBooster;
         });
       } else {
         setState(() {
           tmpBooster.keys.forEach((k) {
+            resetBoostersFor(k);
             flipBooster[k] = tmpBooster[k];
           });
         });
-        getFlipBalance();
       }
+      getFlipBalance();
       tmpBooster = {};
       lastFlippedQuestionIndex = null;
       _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -293,28 +349,28 @@ class CreateSheetState extends State<CreateSheet>
   }
 
   getFlippedQuestionIndex(int index) {
-    List<Question> questions =
-        widget.predictionData.quizSet.quiz["0"].questions;
-    if (usedFlips[index] != null) {
-      return usedFlips[index];
+    return totalQuestinCount - flipBalance;
+  }
+
+  resetBoostersFor(int index) {
+    if (xBooster == index) {
+      setState(() {
+        xBooster = -1;
+        xBoosterLeft++;
+      });
     }
-    if (remainFlipQuestionIndex.length != 0) {
-      int questionIndex = remainFlipQuestionIndex[0];
-      remainFlipQuestionIndex.removeAt(0);
-      return questionIndex;
+    if (bPlusBooster == index) {
+      setState(() {
+        bPlusBooster = -1;
+        bPlusBoosterLeft++;
+      });
     }
-    return null;
   }
 
   flipQuestion(int index, Question question) {
     if (!isQuestionFlipped(index)) {
       int flippedQuestionIndex = getFlippedQuestionIndex(index);
-      if (totalFlipBalance <= 0) {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
-          content: Text(
-              "You do not have enough flip balance. Please refer your friend."),
-        ));
-      } else if (flipBalance <= 0) {
+      if (flipBalance <= 0) {
         _scaffoldKey.currentState.showSnackBar(SnackBar(
           content:
               Text("You have already used the maximum flips for this league."),
@@ -331,22 +387,17 @@ class CreateSheetState extends State<CreateSheet>
       lastFlippedQuestionIndex = index;
     } else {
       if (flipBooster[index] == null) {
-        int flippedQuestionId;
+        int flippedQuestionIndex;
         flipBooster.keys.forEach((k) {
           if (flipBooster[k] == index) {
-            flippedQuestionId = k;
+            flippedQuestionIndex = k;
           }
         });
-        flipBooster[index] = flippedQuestionId;
-        setState(() {
-          answers[flippedQuestionId] = -1;
-        });
-        flipBooster.remove(flippedQuestionId);
+        flipBooster[index] = flippedQuestionIndex;
+        flipBooster.remove(flippedQuestionIndex);
+        tmpBooster[index] = flippedQuestionIndex;
       } else {
         flipBooster[flipBooster[index]] = index;
-        setState(() {
-          answers[index] = -1;
-        });
         flipBooster[index] = null;
       }
     }
@@ -392,15 +443,48 @@ class CreateSheetState extends State<CreateSheet>
     return lstTrivia;
   }
 
+  apply2XBooster(int curIndex) {
+    if (answers[curIndex] != null) {
+      setState(() {
+        xBooster = xBooster == curIndex ? -1 : curIndex;
+
+        xBoosterLeft = xBooster == -1
+            ? xBoosterLeft + 1
+            : (xBoosterLeft == 0 ? 0 : xBoosterLeft - 1);
+      });
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text("Booster can not applied on unanswered question."),
+      ));
+    }
+  }
+
+  applyBPlusBooster(int curIndex) {
+    if (answers[curIndex] != null) {
+      setState(() {
+        bPlusBooster = bPlusBooster == curIndex ? -1 : curIndex;
+        bPlusBoosterLeft = bPlusBooster == -1
+            ? bPlusBoosterLeft + 1
+            : (bPlusBoosterLeft == 0 ? 0 : bPlusBoosterLeft - 1);
+      });
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text("Booster can not applied on unanswered question."),
+      ));
+    }
+  }
+
   Widget getQuestionTab(int index) {
     List<Question> questions =
         widget.predictionData.quizSet.quiz["0"].questions;
     Question question = questions[index];
+    int curIndex = index;
     bool bIsQuestionFlipped = false;
     if (isQuestionFlipped(index)) {
       bIsQuestionFlipped = true;
       if (flipBooster[index] != null) {
         question = questions[flipBooster[index]];
+        curIndex = flipBooster[index];
       }
     }
     return Stack(
@@ -455,7 +539,8 @@ class CreateSheetState extends State<CreateSheet>
                           children: List<Widget>.generate(
                               question.options.length, (optionsIndex) {
                             dynamic option = question.options[optionsIndex];
-                            bool bIsSelected = answers[index] == optionsIndex;
+                            bool bIsSelected =
+                                answers[curIndex] == optionsIndex;
                             return Card(
                               elevation: 3.0,
                               clipBehavior: Clip.hardEdge,
@@ -465,9 +550,11 @@ class CreateSheetState extends State<CreateSheet>
                                     : Colors.transparent,
                                 child: FlatButton(
                                   onPressed: () {
-                                    saveAnswer(
-                                        index: index,
-                                        optionsIndex: optionsIndex);
+                                    setAnswer(
+                                      index: curIndex,
+                                      oldIndex: index,
+                                      optionsIndex: optionsIndex,
+                                    );
                                   },
                                   padding: EdgeInsets.all(0.0),
                                   child: Column(
@@ -551,19 +638,10 @@ class CreateSheetState extends State<CreateSheet>
                             IconButton(
                               // padding: EdgeInsets.all(8.0),
                               onPressed: () {
-                                setState(() {
-                                  xBooster = xBooster == index ? 0 : index;
-
-                                  xBoosterLeft = xBooster == 0
-                                      ? xBoosterLeft + 1
-                                      : (xBoosterLeft == 0
-                                          ? 0
-                                          : xBoosterLeft - 1);
-                                  saveAnswer();
-                                });
+                                apply2XBooster(curIndex);
                               },
                               icon: SvgPicture.asset(
-                                index == xBooster
+                                curIndex == xBooster
                                     ? "images/2x_selected.svg"
                                     : "images/2x.svg",
                               ),
@@ -604,19 +682,10 @@ class CreateSheetState extends State<CreateSheet>
                           children: <Widget>[
                             IconButton(
                               onPressed: () {
-                                setState(() {
-                                  bPlusBooster =
-                                      bPlusBooster == index ? 0 : index;
-                                  bPlusBoosterLeft = bPlusBooster == 0
-                                      ? bPlusBoosterLeft + 1
-                                      : (bPlusBoosterLeft == 0
-                                          ? 0
-                                          : bPlusBoosterLeft - 1);
-                                  saveAnswer();
-                                });
+                                applyBPlusBooster(curIndex);
                               },
                               icon: SvgPicture.asset(
-                                index == bPlusBooster
+                                curIndex == bPlusBooster
                                     ? "images/bpos_selected.svg"
                                     : "images/bpos.svg",
                               ),
@@ -658,7 +727,7 @@ class CreateSheetState extends State<CreateSheet>
                             IconButton(
                               onPressed: () {
                                 setState(() {
-                                  flipQuestion(index, question);
+                                  flipQuestion(curIndex, question);
                                 });
                               },
                               icon: SvgPicture.asset(
@@ -829,10 +898,12 @@ class CreateSheetState extends State<CreateSheet>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.save),
+            Icon(Icons.speaker_notes),
             Text(
-              "SAVE",
-              style: Theme.of(context).primaryTextTheme.overline,
+              "summary",
+              style: Theme.of(context).primaryTextTheme.overline.copyWith(
+                    letterSpacing: 0.6,
+                  ),
             ),
           ],
         ),

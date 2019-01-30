@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class ResultPredictionContest extends StatelessWidget {
   final League league;
   final Contest contest;
   final Function onPrizeStructure;
-  final List<MyTeam> myJoinedTeams;
+  final List<MySheet> myJoinedSheets;
 
   ResultPredictionContest({
     this.league,
     this.contest,
-    this.myJoinedTeams,
+    this.myJoinedSheets,
     this.onPrizeStructure,
   });
 
-  MyTeam _getMyBestTeam() {
-    myJoinedTeams.sort((a, b) {
-      int teamARank = a.rank == null ? 0 : a.rank;
-      int teamBRank = b.rank == null ? 0 : b.rank;
-      return teamARank - teamBRank;
+  MySheet _getMyBestSheet() {
+    myJoinedSheets.sort((a, b) {
+      int sheetARank = a.rank == null ? 0 : a.rank;
+      int sheetBRank = b.rank == null ? 0 : b.rank;
+      return sheetARank - sheetBRank;
     });
-    return myJoinedTeams[0];
+    return myJoinedSheets[0];
   }
 
   double _getTotalWinnings() {
     double winnings = 0.0;
-    if (myJoinedTeams != null) {
-      for (MyTeam team in myJoinedTeams) {
-        if (team.contestId == contest.id) {
-          winnings += team.prize;
+    if (myJoinedSheets != null) {
+      for (MySheet sheet in myJoinedSheets) {
+        if (sheet.contestId == contest.id) {
+          winnings += sheet.prize;
         }
       }
     }
@@ -40,7 +40,7 @@ class ResultPredictionContest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MyTeam _myBestTeam = myJoinedTeams == null ? null : _getMyBestTeam();
+    MySheet _myBestSheet = myJoinedSheets == null ? null : _getMyBestSheet();
     double _totalWinnings = _getTotalWinnings();
 
     return Column(
@@ -302,9 +302,9 @@ class ResultPredictionContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    _myBestTeam == null
+                                    _myBestSheet == null
                                         ? "-"
-                                        : _myBestTeam.name,
+                                        : _myBestSheet.name,
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -341,9 +341,9 @@ class ResultPredictionContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    _myBestTeam == null
+                                    _myBestSheet == null
                                         ? "-"
-                                        : _myBestTeam.rank.toString(),
+                                        : _myBestSheet.rank.toString(),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -380,9 +380,9 @@ class ResultPredictionContest extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text(
-                                    _myBestTeam == null
+                                    _myBestSheet == null
                                         ? "-"
-                                        : _myBestTeam.score.toString(),
+                                        : _myBestSheet.score.toString(),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
