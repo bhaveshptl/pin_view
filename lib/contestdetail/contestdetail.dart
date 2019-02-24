@@ -875,7 +875,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                                   Row(
                                                     children: <Widget>[
                                                       Text(
-                                                        "Prizes",
+                                                        "Prize",
                                                         style: TextStyle(
                                                           color: Colors.black54,
                                                           fontSize: Theme.of(

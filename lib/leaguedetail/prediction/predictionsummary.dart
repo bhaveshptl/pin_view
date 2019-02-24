@@ -133,11 +133,13 @@ class PredictionSummaryState extends State<PredictionSummary> {
             ),
           ),
           body: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("images/norwegian_rose.png"),
-                  repeat: ImageRepeat.repeat),
-            ),
+            decoration: AppConfig.of(context).showBackground
+                ? BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("images/norwegian_rose.png"),
+                        repeat: ImageRepeat.repeat),
+                  )
+                : null,
             constraints: BoxConstraints.expand(),
             child: SingleChildScrollView(
               child: Column(
@@ -224,6 +226,7 @@ class PredictionSummaryState extends State<PredictionSummary> {
                         ),
                         PredictionSummaryWidget(
                           answers: widget.answers,
+                          flips: widget.flipBooster,
                           xBooster: widget.xBooster,
                           bPlusBooster: widget.bPlusBooster,
                           predictionData: widget.predictionData,

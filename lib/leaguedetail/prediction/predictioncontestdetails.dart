@@ -362,7 +362,10 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   }
 
   joinPredictionContest(Contest contest) async {
-    Quiz quiz = widget.predictionData.quizSet.quiz["0"];
+    if (predictionData == null) {
+      return null;
+    }
+    Quiz quiz = predictionData.quizSet.quiz["0"];
     if (predictionData.league.qfVisibility == 0 &&
         !(quiz != null &&
             quiz.questions != null &&
@@ -723,7 +726,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                   Row(
                                                     children: <Widget>[
                                                       Text(
-                                                        "Prizes",
+                                                        "Prize",
                                                         style: TextStyle(
                                                           color: Colors.black54,
                                                           fontSize: Theme.of(
@@ -1162,43 +1165,43 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                   ],
                                                 ),
                                               ),
-                                              Container(
-                                                child: InkWell(
-                                                  child: Column(
-                                                    children: <Widget>[
-                                                      Row(
-                                                        children: <Widget>[
-                                                          Icon(
-                                                            Icons.share,
-                                                            color:
-                                                                Colors.black54,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        children: <Widget>[
-                                                          Text(
-                                                            "Share"
-                                                                .toUpperCase(),
-                                                            style: Theme.of(
-                                                                    context)
-                                                                .primaryTextTheme
-                                                                .button
-                                                                .copyWith(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                ),
-                                                          ),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  onTap: () {
-                                                    _shareContestDialog(
-                                                        context);
-                                                  },
-                                                ),
-                                              ),
+                                              // Container(
+                                              //   child: InkWell(
+                                              //     child: Column(
+                                              //       children: <Widget>[
+                                              //         Row(
+                                              //           children: <Widget>[
+                                              //             Icon(
+                                              //               Icons.share,
+                                              //               color:
+                                              //                   Colors.black54,
+                                              //             ),
+                                              //           ],
+                                              //         ),
+                                              //         Row(
+                                              //           children: <Widget>[
+                                              //             Text(
+                                              //               "Share"
+                                              //                   .toUpperCase(),
+                                              //               style: Theme.of(
+                                              //                       context)
+                                              //                   .primaryTextTheme
+                                              //                   .button
+                                              //                   .copyWith(
+                                              //                     color: Colors
+                                              //                         .black54,
+                                              //                   ),
+                                              //             ),
+                                              //           ],
+                                              //         )
+                                              //       ],
+                                              //     ),
+                                              //     onTap: () {
+                                              //       _shareContestDialog(
+                                              //           context);
+                                              //     },
+                                              //   ),
+                                              // ),
                                               Expanded(
                                                 flex: 1,
                                                 child: Text(

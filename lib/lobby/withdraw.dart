@@ -1365,7 +1365,7 @@ class WithdrawState extends State<Withdraw> {
                                           color: Colors.black45,
                                         ),
                                         validator: (value) {
-                                          if (RegExp(r'^[A-Za-z]{4}\d{7}$')
+                                          if (RegExp(r'^[A-Za-z]{4}0[A-Z0-9a-z]{6}$')
                                                   .allMatches(value)
                                                   .length ==
                                               0) {

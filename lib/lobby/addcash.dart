@@ -52,12 +52,12 @@ class AddCashState extends State<AddCash> {
   void initState() {
     super.initState();
     initWebview();
-    // if (widget.depositData.chooseAmountData.lastPaymentArray.length == 0) {
-    //   widget.depositData.chooseAmountData.lastPaymentArray = null;
-    // }
-    // if (widget.depositData.chooseAmountData.lastPaymentArray == null) {
-    //   bRepeatTransaction = false;
-    // }
+    if (!widget.depositData.bAllowRepeatDeposit ||
+        widget.depositData.chooseAmountData.lastPaymentArray == null ||
+        widget.depositData.chooseAmountData.lastPaymentArray.length == 0) {
+      bRepeatTransaction = false;
+    }
+
     setDepositInfo();
 
     AnalyticsManager().setJourney("deposit");
@@ -736,10 +736,7 @@ class AddCashState extends State<AddCash> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Checkbox(
-                                        value: widget
-                                                .depositData.bAllowRepeatDeposit
-                                            ? bRepeatTransaction
-                                            : false,
+                                        value: bRepeatTransaction,
                                         onChanged: widget
                                                 .depositData.bAllowRepeatDeposit
                                             ? (bool checked) {

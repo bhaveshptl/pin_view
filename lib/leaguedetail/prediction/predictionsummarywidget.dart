@@ -5,11 +5,13 @@ import 'package:playfantasy/modal/prediction.dart';
 class PredictionSummaryWidget extends StatelessWidget {
   final int xBooster;
   final int bPlusBooster;
+  final Map<int, int> flips;
   final String language = "1";
   final Map<int, int> answers;
   final Prediction predictionData;
 
   PredictionSummaryWidget({
+    this.flips,
     this.answers,
     this.xBooster,
     this.bPlusBooster,
@@ -30,18 +32,27 @@ class PredictionSummaryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: List<Widget>.generate(
-          predictionData.quizSet.quiz["0"].questions.length, (index) {
-        Question question = predictionData.quizSet.quiz["0"].questions[index];
-        if (answers[index] != null &&
-            answers[index] != -1 &&
-            answers[index] < question.options.length) {
-          var answer = question.options[answers[index]];
-          var positiveScore =
-              index == xBooster ? answer["positive"] * 2 : answer["positive"];
-          var negativeScore =
-              index == xBooster ? answer["negative"] * 2 : answer["negative"];
-          negativeScore = index == bPlusBooster ? 0 : negativeScore;
+      children:
+          List<Widget>.generate(predictionData.rules["0"]["qcount"], (index) {
+        int curIndex = index;
+        Question question =
+            predictionData.quizSet.quiz["0"].questions[curIndex];
+        if ((answers[curIndex] == null || answers[curIndex] == -1) &&
+            (flips[curIndex] != null && flips[curIndex] != -1)) {
+          curIndex = flips[curIndex];
+          question = predictionData.quizSet.quiz["0"].questions[curIndex];
+        }
+        if (answers[curIndex] != null &&
+            answers[curIndex] != -1 &&
+            answers[curIndex] < question.options.length) {
+          var answer = question.options[answers[curIndex]];
+          var positiveScore = curIndex == xBooster
+              ? answer["positive"] * 2
+              : answer["positive"];
+          var negativeScore = curIndex == xBooster
+              ? answer["negative"] * 2
+              : answer["negative"];
+          negativeScore = curIndex == bPlusBooster ? 0 : negativeScore;
 
           return Row(
             children: <Widget>[
@@ -105,7 +116,7 @@ class PredictionSummaryWidget extends StatelessWidget {
                                               ),
                                         ),
                                       ),
-                                      xBooster == index
+                                      xBooster == curIndex
                                           ? RotationTransition(
                                               turns: AlwaysStoppedAnimation(
                                                   -15 / 360),
@@ -119,7 +130,7 @@ class PredictionSummaryWidget extends StatelessWidget {
                                               ),
                                             )
                                           : Container(),
-                                      bPlusBooster == index
+                                      bPlusBooster == curIndex
                                           ? RotationTransition(
                                               turns: AlwaysStoppedAnimation(
                                                   -15 / 360),
@@ -171,7 +182,7 @@ class PredictionSummaryWidget extends StatelessWidget {
                                   )
                                 : Row(
                                     children: <Widget>[
-                                      question.answer == answers[index]
+                                      question.answer == answers[curIndex]
                                           ? Text(
                                               "+" + positiveScore.toString(),
                                               style: Theme.of(context)

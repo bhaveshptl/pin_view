@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/createsheet.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictionsummarywidget.dart';
@@ -58,37 +59,35 @@ class MySheetsState extends State<MySheets> {
     }
   }
 
-  Widget _createMyTeamsWidget(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 72.0),
-                    child: Container(
-                      margin: const EdgeInsets.all(16.0),
-                      child: ExpansionPanelList(
-                        expansionCallback: (int index, bool isExpanded) {
-                          setState(() {
-                            if (index == _selectedItemIndex) {
-                              _selectedItemIndex = -1;
-                            } else {
-                              _selectedItemIndex = index;
-                            }
-                          });
-                        },
-                        children: getExpansionPanel(context),
-                      ),
+  Widget _createMySheetsWidget(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 72.0),
+                  child: Container(
+                    margin: const EdgeInsets.all(16.0),
+                    child: ExpansionPanelList(
+                      expansionCallback: (int index, bool isExpanded) {
+                        setState(() {
+                          if (index == _selectedItemIndex) {
+                            _selectedItemIndex = -1;
+                          } else {
+                            _selectedItemIndex = index;
+                          }
+                        });
+                      },
+                      children: getExpansionPanel(context),
                     ),
                   ),
                 ),
-              ],
-            )
-          ],
-        ),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
@@ -133,8 +132,19 @@ class MySheetsState extends State<MySheets> {
     List<int>.generate(mySheet.answers.length, (index) {
       answers[index] = mySheet.answers[index];
     });
+    Map<int, int> flips = {};
+    if (mySheet.boosterThree != null) {
+      mySheet.boosterThree.forEach((f) {
+        if (f["to"] < f["from"]) {
+          flips[f["to"]] = f["from"];
+        } else {
+          flips[f["from"]] = f["to"];
+        }
+      });
+    }
 
     return PredictionSummaryWidget(
+      flips: flips,
       answers: answers,
       xBooster: mySheet.boosterOne,
       bPlusBooster: mySheet.boosterTwo,
@@ -279,6 +289,50 @@ class MySheetsState extends State<MySheets> {
     );
   }
 
+  Widget _getEmptyMyTeamsWidget(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          "No sheets available for this match.",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Theme.of(context).errorColor,
+              fontSize: Theme.of(context).primaryTextTheme.title.fontSize),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    OutlineButton(
+                      onPressed: () {
+                        _onCreateSheet(context);
+                      },
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColorDark),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(Icons.add),
+                          Text(
+                            "CREATE SHEET",
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -286,18 +340,27 @@ class MySheetsState extends State<MySheets> {
         title: Text("My Sheets"),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("images/norwegian_rose.png"),
-              repeat: ImageRepeat.repeat),
-        ),
+        decoration: AppConfig.of(context).showBackground
+            ? BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("images/norwegian_rose.png"),
+                    repeat: ImageRepeat.repeat),
+              )
+            : null,
         child: Column(
           children: <Widget>[
             LeagueCard(
               widget.league,
               clickable: false,
             ),
-            _createMyTeamsWidget(context)
+            Divider(
+              height: 2.0,
+            ),
+            Expanded(
+              child: widget.mySheets.length > 0
+                  ? _createMySheetsWidget(context)
+                  : _getEmptyMyTeamsWidget(context),
+            )
           ],
         ),
       ),

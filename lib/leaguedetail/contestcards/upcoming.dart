@@ -187,7 +187,7 @@ class UpcomingContest extends StatelessWidget {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    "Prizes",
+                                    "Prize",
                                     style: TextStyle(
                                       color: Colors.black54,
                                       fontSize: Theme.of(context)

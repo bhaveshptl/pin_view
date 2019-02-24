@@ -835,11 +835,13 @@ class CreateSheetState extends State<CreateSheet>
       body: Stack(
         children: <Widget>[
           Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("images/norwegian_rose.png"),
-                  repeat: ImageRepeat.repeat),
-            ),
+            decoration: AppConfig.of(context).showBackground
+                ? BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("images/norwegian_rose.png"),
+                        repeat: ImageRepeat.repeat),
+                  )
+                : null,
             child: TabBarView(
               controller: tabController,
               children: List<Widget>.generate(maxQuestionRules, (index) {
@@ -900,7 +902,7 @@ class CreateSheetState extends State<CreateSheet>
           children: <Widget>[
             Icon(Icons.speaker_notes),
             Text(
-              "summary",
+              "SAVE",
               style: Theme.of(context).primaryTextTheme.overline.copyWith(
                     letterSpacing: 0.6,
                   ),

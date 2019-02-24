@@ -165,6 +165,17 @@ class ViewSheetState extends State<ViewSheet> {
               ? quiz.questions.length
               : predictionData.rules["0"]["qcount"];
     }
+    Map<int, int> flips = {};
+    if (sheet.boosterThree != null) {
+      sheet.boosterThree.forEach((f) {
+        if (f["to"] < f["from"]) {
+          flips[f["to"]] = f["from"];
+        } else {
+          flips[f["from"]] = f["to"];
+        }
+      });
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -225,6 +236,7 @@ class ViewSheetState extends State<ViewSheet> {
                 ),
                 PredictionSummaryWidget(
                   answers: mapAnswers,
+                  flips: flips,
                   xBooster: sheet.boosterOne,
                   bPlusBooster: sheet.boosterTwo,
                   predictionData: widget.predictionData,
