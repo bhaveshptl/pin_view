@@ -60,12 +60,12 @@ class AddCashState extends State<AddCash> {
 
     setDepositInfo();
 
-    AnalyticsManager().setJourney("deposit");
-    AnalyticsManager().addEvent(Event(
-      name: "addcash",
-      source: widget.source,
-      v1: widget.depositData.chooseAmountData.isFirstDeposit ? 1 : 0,
-    ));
+    // AnalyticsManager().setJourney("deposit");
+    // AnalyticsManager().addEvent(Event(
+    //   name: "addcash",
+    //   source: widget.source,
+    //   v1: widget.depositData.chooseAmountData.isFirstDeposit ? 1 : 0,
+    // ));
     customAmountController.addListener(() {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
@@ -659,20 +659,20 @@ class AddCashState extends State<AddCash> {
                                       ),
                                     ),
                                     onTap: () {
-                                      AnalyticsManager().addEvent(
-                                        Event(
-                                          name: "have_promo_code",
-                                          v1: widget
-                                                  .depositData
-                                                  .chooseAmountData
-                                                  .isFirstDeposit
-                                              ? 1
-                                              : 0,
-                                          v2: amount,
-                                          v5: !bShowPromoInput ? 0 : 1,
-                                          s1: promoController.text,
-                                        ),
-                                      );
+                                      // AnalyticsManager().addEvent(
+                                      //   Event(
+                                      //     name: "have_promo_code",
+                                      //     v1: widget
+                                      //             .depositData
+                                      //             .chooseAmountData
+                                      //             .isFirstDeposit
+                                      //         ? 1
+                                      //         : 0,
+                                      //     v2: amount,
+                                      //     v5: !bShowPromoInput ? 0 : 1,
+                                      //     s1: promoController.text,
+                                      //   ),
+                                      // );
                                       setState(() {
                                         promoController.text = "";
                                         bShowPromoInput = !bShowPromoInput;
@@ -851,14 +851,14 @@ class AddCashState extends State<AddCash> {
   }
 
   onProceed({int amount}) async {
-    AnalyticsManager().addEvent(
-      Event(
-        name: "deposit_tile",
-        v1: widget.depositData.chooseAmountData.isFirstDeposit ? 1 : 0,
-        v2: amount,
-        s1: promoController.text,
-      ),
-    );
+    // AnalyticsManager().addEvent(
+    //   Event(
+    //     name: "deposit_tile",
+    //     v1: widget.depositData.chooseAmountData.isFirstDeposit ? 1 : 0,
+    //     v2: amount,
+    //     s1: promoController.text,
+    //   ),
+    // );
     if ((widget.depositData.chooseAmountData.isFirstDeposit && amount == 0) ||
         (!widget.depositData.chooseAmountData.isFirstDeposit &&
             amountController.text == "")) {
@@ -898,8 +898,8 @@ class AddCashState extends State<AddCash> {
     setState(() {
       bShowLoader = true;
     });
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.PAYMENT_MODE));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.PAYMENT_MODE));
     req.body = json.encode({
       "amount": amount,
       "channelId": AppConfig.of(context).channelId,
@@ -1040,9 +1040,7 @@ class AddCashState extends State<AddCash> {
           .then((http.Response res) {
         Map<String, dynamic> response = json.decode(res.body);
         _openRazorpayNative({
-          "name": AppConfig.of(context).channelId == '3'
-              ? "PlayFantasy"
-              : "Smart11",
+          "name": AppConfig.of(context).appName,
           "email": payload["email"],
           "phone": payload["phone"],
           "amount": (payload["depositAmount"] * 100).toString(),
@@ -1052,11 +1050,14 @@ class AddCashState extends State<AddCash> {
               : "card",
           "image": AppConfig.of(context).channelId == '3'
               ? "https://dyrnmb8cbz1ud.cloudfront.net/images/logo.png"
-              : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
+              : (AppConfig.of(context).channelId == '9'
+                  ? "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
+                  : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/howzat_logo.png")
         });
       });
     } else {
-      startInitPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+      startInitPayment(
+          BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
     }
   }
 

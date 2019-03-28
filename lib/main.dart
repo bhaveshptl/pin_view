@@ -12,35 +12,11 @@ disableDeviceRotation() {
   ]);
 }
 
-ThemeData _buildLightTheme() {
-  const Color primaryColor = Color(0xFF0E4F87);
-  const Color secondaryColor = Color(0xFF244f83);
-  final ColorScheme colorScheme = const ColorScheme.light().copyWith(
-    primary: primaryColor,
-    secondary: secondaryColor,
-  );
-  final ThemeData base = ThemeData.light();
-  return base.copyWith(
-    colorScheme: colorScheme,
-    primaryColor: primaryColor,
-    primaryColorDark: secondaryColor,
-    buttonColor: primaryColor,
-    indicatorColor: Colors.white,
-    splashColor: Colors.white24,
-    splashFactory: InkRipple.splashFactory,
-    accentColor: secondaryColor,
-    canvasColor: Colors.white,
-    scaffoldBackgroundColor: Colors.white,
-    backgroundColor: Colors.white,
-    errorColor: const Color(0xFFB00020),
-  );
-}
-
 ///
 /// Bootstraping APP.
 ///
 void main() async {
-  String channelId = "3";
+  String channelId = "10";
   const apiBaseUrl = "https://stg.playfantasy.com";
   String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
 
@@ -48,7 +24,7 @@ void main() async {
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
-    appName: 'PlayFantasy',
+    appName: 'Howzat',
     channelId: channelId,
     showBackground: true,
     apiBaseUrl: apiBaseUrl,
@@ -59,7 +35,11 @@ void main() async {
         fcmSubscribeId: fcmSubscribeId,
       ),
       routes: FantasyRoutes().getRoutes(),
-      theme: _buildLightTheme(),
+      theme: ThemeData(
+        primaryColor: Color.fromRGBO(97, 6, 0, 1),
+        primaryColorLight: Color.fromRGBO(148, 56, 42, 1),
+        primaryColorDark: Color.fromRGBO(57, 0, 0, 1),
+      ),
     ),
   );
 

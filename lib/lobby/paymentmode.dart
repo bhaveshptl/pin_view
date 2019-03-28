@@ -592,9 +592,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         Map<String, dynamic> response = json.decode(res.body);
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           _openRazorpayNative({
-            "name": AppConfig.of(context).channelId == '3'
-                ? "PlayFantasy"
-                : "Smart 11",
+            "name": AppConfig.of(context).appName,
             "email": payload["email"],
             "phone": payload["phone"],
             "amount": (payload["depositAmount"] * 100).toString(),
@@ -604,7 +602,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 : "card",
             "image": AppConfig.of(context).channelId == '3'
                 ? "https://dyrnmb8cbz1ud.cloudfront.net/images/logo.png"
-                : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
+                : (AppConfig.of(context).channelId == '9'
+                    ? "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
+                    : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/howzat_logo.png")
           });
         } else {
           _scaffoldKey.currentState.showSnackBar(
