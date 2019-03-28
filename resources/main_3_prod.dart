@@ -40,7 +40,7 @@ ThemeData _buildLightTheme() {
 /// Bootstraping APP.
 ///
 void main() async {
-  String channelId = "10";
+  String channelId = "3";
   const apiBaseUrl = "https://www.playfantasy.com";
 
   disableDeviceRotation();
