@@ -81,11 +81,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 }
                 System.out.println(show_fg_local);
                 if(show_fg_local){
-                    sendNotification(remoteMessage);
+                   // sendNotification(remoteMessage);
                 }
             }
             catch(Exception e){
-                sendNotification(remoteMessage);
+               // sendNotification(remoteMessage);
             }
         }
 
