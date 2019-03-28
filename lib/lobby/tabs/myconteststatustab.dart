@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -56,11 +57,13 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
   bool bShowJoinContest = false;
   Map<String, dynamic> l1DataObj = {};
   Map<String, List<Contest>> myContests;
+  StreamSubscription _streamSubscription;
 
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
   filterMyContests() {
@@ -82,14 +85,12 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     return mapContests;
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if ((_response["iType"] == RequestType.GET_ALL_L1 ||
-            _response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
-        _response["bSuccessful"] == true) {
-      _l1Data = L1.fromJson(_response["data"]["l1"]);
-      _myTeams = (_response["data"]["myteams"] as List)
+  _onWsMsg(data) {
+    if ((data["iType"] == RequestType.GET_ALL_L1 ||
+            data["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
+        data["bSuccessful"] == true) {
+      _l1Data = L1.fromJson(data["data"]["l1"]);
+      _myTeams = (data["data"]["myteams"] as List)
           .map((i) => MyTeam.fromJson(i))
           .toList();
       if (bShowJoinContest) {
@@ -285,7 +286,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     _curContest = contest;
     bShowJoinContest = true;
     _createL1WSObject(contest);
-    sockets.sendMessage(l1DataObj);
+    FantasyWebSocket().sendMessage(l1DataObj);
   }
 
   _createL1WSObject(Contest contest) {
@@ -298,6 +299,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
     } else {
       l1DataObj["iType"] = RequestType.GET_ALL_L1;
       l1DataObj["bResAvail"] = true;
+      l1DataObj["withPrediction"] = true;
       l1DataObj["id"] = contest.leagueId;
       l1DataObj["sportsId"] = widget.sportsType;
     }
@@ -502,7 +504,7 @@ class _MyContestStatusTabState extends State<MyContestStatusTab> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class MyContestsState extends State<MyContests>
   TabController tabController;
   TabController _sportsController;
   Map<String, int> _mapSportTypes;
+  StreamSubscription _streamSubscription;
   Map<int, List<MyContestStatusTab>> tabs = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapLiveContest = {};
@@ -57,7 +59,8 @@ class MyContestsState extends State<MyContests>
       "KABADDI": 3,
     };
 
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
 
     _getMyContests();
     _leagues = widget.leagues;
@@ -76,24 +79,22 @@ class MyContestsState extends State<MyContests>
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-    if (_response["iType"] == RequestType.GET_ALL_SERIES &&
-        _response["bSuccessful"] == true) {
-      List<dynamic> _mapLeagues = json.decode(_response["data"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.GET_ALL_SERIES &&
+        data["bSuccessful"] == true) {
+      List<dynamic> _mapLeagues = json.decode(data["data"]);
       List<League> leagues =
           _mapLeagues.map((i) => League.fromJson(i)).toList();
       setState(() {
         _leagues = leagues;
       });
-    } else if (_response["iType"] == RequestType.LOBBY_REFRESH_DATA &&
-        _response["bSuccessful"] == true) {
-      if (_response["data"]["bDataModified"] == true &&
-          (_response["data"]["lstModified"] as List).length > 0) {
-        List<League> _modifiedLeagues =
-            (_response["data"]["lstModified"] as List)
-                .map((i) => League.fromJson(i))
-                .toList();
+    } else if (data["iType"] == RequestType.LOBBY_REFRESH_DATA &&
+        data["bSuccessful"] == true) {
+      if (data["data"]["bDataModified"] == true &&
+          (data["data"]["lstModified"] as List).length > 0) {
+        List<League> _modifiedLeagues = (data["data"]["lstModified"] as List)
+            .map((i) => League.fromJson(i))
+            .toList();
         Map<String, List<Contest>> _mapMyAllContests = _mapUpcomingContest;
         _mapMyAllContests.addAll(_mapLiveContest);
         _mapMyAllContests.addAll(_mapResultContest);
@@ -109,12 +110,12 @@ class MyContestsState extends State<MyContests>
           _setContestsByStatus(_mapMyAllContests);
         });
       }
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      _applyContestDataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _update(_response["data"]);
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      _applyContestDataUpdate(data["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _update(data["data"]);
     }
   }
 
@@ -650,7 +651,7 @@ class MyContestsState extends State<MyContests>
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

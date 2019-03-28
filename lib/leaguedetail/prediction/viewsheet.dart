@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -39,13 +40,15 @@ class ViewSheet extends StatefulWidget {
 class ViewSheetState extends State<ViewSheet> {
   Prediction predictionData;
   MySheet sheet = MySheet.fromJson({});
+  StreamSubscription _streamSubscription;
   Map<String, dynamic> l1UpdatePackate = {};
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     getSheet();
     if (widget.predictionData == null) {
       _createL1WSObject();
@@ -63,22 +66,20 @@ class ViewSheetState extends State<ViewSheet> {
     _getL1Data();
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["bReady"] == 1) {
+  _onWsMsg(data) {
+    if (data["bReady"] == 1) {
       // _showLoader(true);
       _getL1Data();
-    } else if (_response["iType"] == RequestType.GET_ALL_L1 &&
-        _response["bSuccessful"] == true) {
+    } else if (data["iType"] == RequestType.GET_ALL_L1 &&
+        data["bSuccessful"] == true) {
       setState(() {
-        if (_response["data"]["prediction"] != null) {
-          predictionData = Prediction.fromJson(_response["data"]["prediction"]);
+        if (data["data"]["prediction"] != null) {
+          predictionData = Prediction.fromJson(data["data"]["prediction"]);
         }
       });
-    } else if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
-        _response["bSuccessful"] == true) {
-      MySheet sheetAdded = MySheet.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+        data["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(data["data"]);
       if (sheetAdded.id == sheet.id) {
         setState(() {
           sheet = sheetAdded;
@@ -110,7 +111,7 @@ class ViewSheetState extends State<ViewSheet> {
 
   _getL1Data() {
     // _showLoader(true);
-    sockets.sendMessage(l1UpdatePackate);
+    FantasyWebSocket().sendMessage(l1UpdatePackate);
   }
 
   void _onEditSheet(BuildContext context) async {
@@ -370,7 +371,7 @@ class ViewSheetState extends State<ViewSheet> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

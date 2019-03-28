@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:package_info/package_info.dart';
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/update.dart';
 
 import 'package:playfantasy/lobby/addcash.dart';
 import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/profilepages/myprofile.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/earncash.dart';
 import 'package:playfantasy/lobby/withdraw.dart';
@@ -88,6 +92,152 @@ class RouteLauncher {
     );
   }
 
+  launchBannerRoute({
+    Map<String, dynamic> banner,
+    GlobalKey<ScaffoldState> scaffoldKey,
+    Function onComplete,
+    BuildContext context,
+  }) async {
+    switch (banner["CTA"]) {
+      case "DEPOSIT":
+        launchAddCash(scaffoldKey.currentContext, onComplete: onComplete);
+        break;
+      case "REFERRAL":
+        launchEarnCash(scaffoldKey, onComplete: onComplete);
+        break;
+      case "WITHDRAW":
+        launchWithdraw(scaffoldKey, onComplete: onComplete);
+        break;
+      case "NA":
+        onComplete();
+        break;
+      case "PROFILE":
+        launchMyProfile(context, onComplete: onComplete);
+        break;
+      case "UPDATE":
+        _performUpdateCheck(context, onComplete: onComplete);
+        break;
+      default:
+    }
+  }
+
+  _performUpdateCheck(BuildContext context, {Function onComplete}) async {
+    PackageInfo _packageInfo = await PackageInfo.fromPlatform();
+    _showUpdateDialog(context);
+
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CHECK_APP_UPDATE));
+    req.body = json.encode({
+      "version": double.parse(_packageInfo.version),
+      "channelId": AppConfig.of(context).channelId,
+    });
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Navigator.of(context).pop();
+        Map<String, dynamic> response = json.decode(res.body);
+        if (response["update"]) {
+          _showUpdatingAppDialog(
+              response["updateUrl"], response["isForceUpdate"],
+              logs: response["updateLogs"],
+              context: context,
+              onComplete: onComplete);
+        } else {
+          _showAppUptoDateDialog(context);
+          if (onComplete != null) {
+            onComplete();
+          }
+        }
+      }
+    });
+  }
+
+  _showUpdateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Text("Checking for an update..."),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  _showUpdatingAppDialog(String url, bool bIsForceUpdate,
+      {List<dynamic> logs, BuildContext context, Function onComplete}) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DownloadAPK(
+          url: url,
+          logs: logs,
+          isForceUpdate: bIsForceUpdate,
+        );
+      },
+      barrierDismissible: !bIsForceUpdate,
+    );
+    if (onComplete != null) {
+      onComplete();
+    }
+  }
+
+  _showAppUptoDateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.update,
+                    size: 48.0,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Text("App is running on latest version"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+          contentPadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(strings.get("OK").toUpperCase()),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   launchWithdraw(GlobalKey<ScaffoldState> _scaffoldKey,
       {Function onComplete}) async {
     http.Request req = http.Request(
@@ -143,6 +293,17 @@ class RouteLauncher {
         }
       },
     );
+  }
+
+  launchMyProfile(BuildContext context, {Function onComplete}) async {
+    await Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (context) => MyProfile(),
+      ),
+    );
+    if (onComplete != null) {
+      onComplete();
+    }
   }
 
   showWithdraw(BuildContext context, Map<String, dynamic> response) {

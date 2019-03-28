@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -26,21 +27,21 @@ class MyTeams extends StatefulWidget {
 class MyTeamsState extends State<MyTeams> {
   List<MyTeam> _myTeams;
   int _selectedItemIndex = -1;
+  StreamSubscription _streamSubscription;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
     _myTeams = widget.myTeams;
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(data["data"]);
       int i = 0;
       for (MyTeam _team in _myTeams) {
         if (_team.id == teamUpdated.id) {
@@ -442,7 +443,7 @@ class MyTeamsState extends State<MyTeams> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 

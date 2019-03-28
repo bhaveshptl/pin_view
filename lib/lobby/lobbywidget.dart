@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
@@ -28,6 +29,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   List<League> liveLeagues = [];
   List<League> upcomingLeagues = [];
   List<League> completedLeagues = [];
+  StreamSubscription _streamSubscription;
   Map<String, dynamic> lobbyUpdatePackate = {};
 
   @override
@@ -35,7 +37,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     super.initState();
     _createLobbyObject();
     _createWSConnection();
-    sockets.sendMessage(lobbyUpdatePackate);
+    FantasyWebSocket().sendMessage(lobbyUpdatePackate);
   }
 
   _createLobbyObject() {
@@ -45,19 +47,18 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   }
 
   _createWSConnection() {
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["bReady"] == 1) {
-      sockets.sendMessage(lobbyUpdatePackate);
-    } else if (_response["sportsId"] == widget.sportType) {
-      if (_response["iType"] == RequestType.GET_ALL_SERIES &&
-          _response["bSuccessful"] == true) {
+  _onWsMsg(data) {
+    if (data["bReady"] == 1) {
+      FantasyWebSocket().sendMessage(lobbyUpdatePackate);
+    } else if (data["sportsId"] == widget.sportType) {
+      if (data["iType"] == RequestType.GET_ALL_SERIES &&
+          data["bSuccessful"] == true) {
         List<League> _leagues = [];
-        List<dynamic> _mapLeagues = json.decode(_response["data"]);
+        List<dynamic> _mapLeagues = json.decode(data["data"]);
 
         for (dynamic league in _mapLeagues) {
           _leagues.add(League.fromJson(league));
@@ -70,11 +71,11 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
         setState(() {
           bShowLoader = false;
         });
-      } else if (_response["iType"] == RequestType.LOBBY_REFRESH_DATA &&
-          _response["bSuccessful"] == true) {
-        if (_response["data"]["bDataModified"] == true &&
-            (_response["data"]["lstAdded"] as List).length > 0) {
-          List<League> _addedLeagues = (_response["data"]["lstAdded"] as List)
+      } else if (data["iType"] == RequestType.LOBBY_REFRESH_DATA &&
+          data["bSuccessful"] == true) {
+        if (data["data"]["bDataModified"] == true &&
+            (data["data"]["lstAdded"] as List).length > 0) {
+          List<League> _addedLeagues = (data["data"]["lstAdded"] as List)
               .map((i) => League.fromJson(i))
               .toList();
 
@@ -86,12 +87,11 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
           setState(() {
             _seperateLeaguesByRunningStatus(_allLeagues);
           });
-        } else if (_response["data"]["bDataModified"] == true &&
-            (_response["data"]["lstRemoved"] as List).length > 0) {
-          List<League> _removedLeagues =
-              (_response["data"]["lstRemoved"] as List)
-                  .map((i) => League.fromJson(i))
-                  .toList();
+        } else if (data["data"]["bDataModified"] == true &&
+            (data["data"]["lstRemoved"] as List).length > 0) {
+          List<League> _removedLeagues = (data["data"]["lstRemoved"] as List)
+              .map((i) => League.fromJson(i))
+              .toList();
           setState(() {
             for (League _league in _removedLeagues) {
               if (_league.status == LeagueStatus.UPCOMING) {
@@ -112,12 +112,11 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
               }
             }
           });
-        } else if (_response["data"]["bDataModified"] == true &&
-            (_response["data"]["lstModified"] as List).length > 0) {
-          List<League> _modifiedLeagues =
-              (_response["data"]["lstModified"] as List)
-                  .map((i) => League.fromJson(i))
-                  .toList();
+        } else if (data["data"]["bDataModified"] == true &&
+            (data["data"]["lstModified"] as List).length > 0) {
+          List<League> _modifiedLeagues = (data["data"]["lstModified"] as List)
+              .map((i) => League.fromJson(i))
+              .toList();
 
           _allLeagues = [];
 
@@ -173,7 +172,10 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     });
 
     _upcomingLeagues.sort((a, b) {
-      return a.matchStartTime - b.matchStartTime;
+      if (a.series.priority == b.series.priority) {
+        return a.matchStartTime - b.matchStartTime;
+      }
+      return b.series.priority - a.series.priority;
     });
 
     _completedLeagues.sort((a, b) {
@@ -192,7 +194,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     if (registeredSportType != widget.sportType) {
       _createLobbyObject();
-      sockets.sendMessage(lobbyUpdatePackate);
+      FantasyWebSocket().sendMessage(lobbyUpdatePackate);
     }
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -231,7 +233,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                                       .primaryTextTheme
                                       .subhead
                                       .copyWith(
-                                        color: Colors.black87,                                        
+                                        color: Colors.black87,
                                       ),
                                 ),
                               ),
@@ -266,6 +268,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
   @override
   void dispose() {
     super.dispose();
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
   }
 }

@@ -51,6 +51,7 @@ class Series {
   final String seriesTypeInfo;
   final int seriesTypeId;
   final int id;
+  final int priority;
   final String name;
   final String info;
   final int startDate;
@@ -62,6 +63,7 @@ class Series {
       this.id,
       this.name,
       this.info,
+      this.priority,
       this.startDate,
       this.endDate,
       this.countryId});
@@ -71,6 +73,7 @@ class Series {
         seriesTypeInfo: json['seriesTypeInfo'],
         seriesTypeId: json['seriesTypeId'],
         id: json['id'],
+        priority: json['priority'],
         name: json['name'],
         info: json['info'],
         startDate: json['startDate'],

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -47,17 +48,18 @@ class PredictionViewState extends State<PredictionView> {
   Contest _curContest;
   bool bShowJoinContest = false;
   bool bWaitingForTeamCreation = false;
+  StreamSubscription _streamSubscription;
 
   @override
   void initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-    if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
-        _response["bSuccessful"] == true) {
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+        data["bSuccessful"] == true) {
       if (bShowJoinContest) {
         onJoinContest(_curContest);
       }
@@ -410,7 +412,7 @@ class PredictionViewState extends State<PredictionView> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

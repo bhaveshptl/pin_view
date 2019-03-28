@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -24,21 +25,22 @@ class MySheets extends StatefulWidget {
 
 class MySheetsState extends State<MySheets> {
   int _selectedItemIndex = -1;
+  StreamSubscription _streamSubscription;
 
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     widget.mySheets.sort((a, b) {
       return a.status - b.status;
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-    if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
-        _response["bSuccessful"] == true) {
-      MySheet sheetAdded = MySheet.fromJson(_response["data"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+        data["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(data["data"]);
       int existingIndex = -1;
       List<int>.generate(widget.mySheets.length, (index) {
         MySheet mySheet = widget.mySheets[index];
@@ -375,7 +377,7 @@ class MySheetsState extends State<MySheets> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

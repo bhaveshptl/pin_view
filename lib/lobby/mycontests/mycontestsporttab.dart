@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -57,6 +58,7 @@ class MyContestSportTabState extends State<MyContestSportTab> {
   Prediction predictionData;
   List<MyTeam> leagueAllMyTeams;
   Map<String, dynamic> l1DataObj = {};
+  StreamSubscription _streamSubscription;
 
   Map<String, MyAllContest> _mapLiveContest = {};
   Map<String, MyAllContest> _mapResultContest = {};
@@ -65,7 +67,8 @@ class MyContestSportTabState extends State<MyContestSportTab> {
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
   League _getLeague(int _leagueId) {
@@ -139,22 +142,19 @@ class MyContestSportTabState extends State<MyContestSportTab> {
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if ((_response["iType"] == RequestType.GET_ALL_L1 ||
-            _response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
-        _response["bSuccessful"] == true) {
-      l1Data = L1.fromJson(_response["data"]["l1"]);
-      leagueAllMyTeams = (_response["data"]["myteams"] as List)
+  _onWsMsg(data) {
+    if ((data["iType"] == RequestType.GET_ALL_L1 ||
+            data["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
+        data["bSuccessful"] == true) {
+      l1Data = L1.fromJson(data["data"]["l1"]);
+      leagueAllMyTeams = (data["data"]["myteams"] as List)
           .map((i) => MyTeam.fromJson(i))
           .toList();
-      if (_response["data"]["prediction"] != null) {
-        predictionData = Prediction.fromJson(_response["data"]["prediction"]);
+      if (data["data"]["prediction"] != null) {
+        predictionData = Prediction.fromJson(data["data"]["prediction"]);
       }
-      if (_response["data"]["mySheets"] != null &&
-          _response["data"]["mySheets"] != "") {
-        mySheets = (_response["data"]["mySheets"] as List<dynamic>).map((f) {
+      if (data["data"]["mySheets"] != null && data["data"]["mySheets"] != "") {
+        mySheets = (data["data"]["mySheets"] as List<dynamic>).map((f) {
           return MySheet.fromJson(f);
         }).toList();
       }
@@ -210,14 +210,14 @@ class MyContestSportTabState extends State<MyContestSportTab> {
     _curContest = contest;
     bShowJoinContest = true;
     _createL1WSObject(contest);
-    sockets.sendMessage(l1DataObj);
+    FantasyWebSocket().sendMessage(l1DataObj);
   }
 
   _onJoinPredictionContest(Contest contest) async {
     _curPredictionContest = contest;
     bShowJoinPredictionContest = true;
     _createL1WSObject(contest);
-    sockets.sendMessage(l1DataObj);
+    FantasyWebSocket().sendMessage(l1DataObj);
   }
 
   joinPredictionContest(Contest contest) async {
@@ -537,7 +537,7 @@ class MyContestSportTabState extends State<MyContestSportTab> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

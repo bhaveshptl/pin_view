@@ -216,7 +216,7 @@ void main() async {
   var configuredApp = AppConfig(
     appName: 'PlayFantasy',
     channelId: channelId,
-    showBackground: false,
+    showBackground: true,
     apiBaseUrl: apiBaseUrl,
     websocketUrl: websocketUrl,
     staticPageUrls: staticPageUrls,

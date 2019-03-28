@@ -183,7 +183,7 @@ class CreateSheetState extends State<CreateSheet>
         xBooster = widget.selectedSheet.boosterOne;
         bPlusBooster = widget.selectedSheet.boosterTwo;
       } else {
-        List<int>.generate(maxQuestionRules - 1, (index) {
+        List<int>.generate(maxQuestionRules, (index) {
           if (widget.selectedSheet.answers[index] != -1) {
             answers[index] = widget.selectedSheet.answers[index];
           }
@@ -816,7 +816,11 @@ class CreateSheetState extends State<CreateSheet>
           tabController.index = 0;
         });
       } else if (response["finish"] != null && response["finish"]) {
-        Navigator.of(context).pop("Sheet created successfully!!");
+        if (widget.mode == SheetCreationMode.EDIT_SHEET) {
+          Navigator.of(context).pop("Sheet updated successfully!!");
+        } else {
+          Navigator.of(context).pop("Sheet created successfully!!");
+        }
       }
     }
   }

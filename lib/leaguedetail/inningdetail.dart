@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -40,6 +41,7 @@ class InningDetailsState extends State<InningDetails> {
   L1.L1 inningsData;
   List<MyTeam> _myTeams;
   bool bShowLoader = false;
+  StreamSubscription _streamSubscription;
   Map<String, dynamic> inningsDataObj = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<String, List<Contest>> _mapMyContests = {};
@@ -48,7 +50,8 @@ class InningDetailsState extends State<InningDetails> {
   @override
   void initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
 
     _getInningsData();
   }
@@ -63,7 +66,7 @@ class InningDetailsState extends State<InningDetails> {
     inningsDataObj["iType"] = RequestType.REQ_L1_INNINGS_ALL_DATA;
 
     _getMyContests();
-    sockets.sendMessage(inningsDataObj);
+    FantasyWebSocket().sendMessage(inningsDataObj);
   }
 
   _getSportsType() async {
@@ -131,36 +134,34 @@ class InningDetailsState extends State<InningDetails> {
     }
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA &&
-        _response["bSuccessful"] == true) {
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA &&
+        data["bSuccessful"] == true) {
       setState(() {
-        inningsData = L1.L1.fromJson(_response["data"]["l1"]);
-        _myTeams = (_response["data"]["myteams"] as List)
+        inningsData = L1.L1.fromJson(data["data"]["l1"]);
+        _myTeams = (data["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
       });
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      if (_response["diffData"]["ld"].length > 0) {
-        _applyL1DataUpdate(_response["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      if (data["diffData"]["ld"].length > 0) {
+        _applyL1DataUpdate(data["diffData"]["ld"]);
       }
-      if (_response["diffData"]["ld1"].length > 0) {
-        _applyL1DataUpdate(_response["diffData"]["ld1"]);
+      if (data["diffData"]["ld1"].length > 0) {
+        _applyL1DataUpdate(data["diffData"]["ld1"]);
       }
-      if (_response["diffData"]["ld2"].length > 0) {
-        _applyL1DataUpdate(_response["diffData"]["ld2"]);
+      if (data["diffData"]["ld2"].length > 0) {
+        _applyL1DataUpdate(data["diffData"]["ld2"]);
       }
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _updateJoinCount(_response["data"]);
-      _updateContestTeams(_response["data"]);
-    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
-        _response["bSuccessful"] == true &&
-        widget.team.inningsId == _response["data"]["inningsId"]) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _updateJoinCount(data["data"]);
+      _updateContestTeams(data["data"]);
+    } else if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+        data["bSuccessful"] == true &&
+        widget.team.inningsId == data["data"]["inningsId"]) {
+      MyTeam teamAdded = MyTeam.fromJson(data["data"]);
       bool bFound = false;
       for (MyTeam _myTeam in _myTeams) {
         if (_myTeam.id == teamAdded.id) {
@@ -172,9 +173,9 @@ class InningDetailsState extends State<InningDetails> {
           _myTeams.add(teamAdded);
         });
       }
-    } else if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(data["data"]);
       int i = 0;
       for (MyTeam _team in _myTeams) {
         if (_team.id == teamUpdated.id) {
@@ -542,7 +543,7 @@ class InningDetailsState extends State<InningDetails> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

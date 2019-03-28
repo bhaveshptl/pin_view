@@ -17,7 +17,9 @@ class Prediction {
     return Prediction(
       rules: json["rules"],
       league: PredictionLeague.fromJson(json['league']),
-      quizSet: QuizSet.fromJson(json["quizSet"]),
+      quizSet: json["quizSet"] == null
+          ? QuizSet.fromJson({})
+          : QuizSet.fromJson(json["quizSet"]),
       contests:
           (json["contests"] as List).map((i) => Contest.fromJson(i)).toList(),
     );
@@ -208,7 +210,9 @@ class QuizSet {
 
   factory QuizSet.fromJson(Map<String, dynamic> json) {
     Map<String, Quiz> quiz = {};
-    (json["quiz"] as Map<String, dynamic>).keys.forEach((k) {
+    (json["quiz"] == null ? {} : (json["quiz"] as Map<String, dynamic>))
+        .keys
+        .forEach((k) {
       quiz[k] = Quiz.fromJson(json["quiz"][k]);
     });
     return QuizSet(

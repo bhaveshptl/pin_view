@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -49,6 +50,7 @@ class ContestsState extends State<Contests> {
   Contest _curContest;
   bool bShowJoinContest = false;
   bool bWaitingForTeamCreation = false;
+  StreamSubscription _streamSubscription;
 
   @override
   void initState() {
@@ -56,7 +58,8 @@ class ContestsState extends State<Contests> {
     _l1Data = widget.l1Data;
     _myTeams = widget.myTeams;
     setContestsByCategory(widget.l1Data.contests);
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
   setContestsByCategory(List<Contest> contests) {
@@ -96,12 +99,10 @@ class ContestsState extends State<Contests> {
     _contests.addAll(practiseContests);
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(data["data"]);
       setState(() {
         bool bFound = false;
         for (MyTeam _myTeam in _myTeams) {
@@ -117,19 +118,19 @@ class ContestsState extends State<Contests> {
         }
         bWaitingForTeamCreation = false;
       });
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _updateJoinCount(_response["data"]);
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      if (_response["diffData"]["ld"].length > 0) {
-        _applyL1DataUpdate(_response["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _updateJoinCount(data["data"]);
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      if (data["diffData"]["ld"].length > 0) {
+        _applyL1DataUpdate(data["diffData"]["ld"]);
       }
-      if (_response["diffData"]["ld1"].length > 0) {
-        _applyL1DataUpdate(_response["diffData"]["ld1"]);
+      if (data["diffData"]["ld1"].length > 0) {
+        _applyL1DataUpdate(data["diffData"]["ld1"]);
       }
-      if (_response["diffData"]["ld2"].length > 0) {
-        _applyL1DataUpdate(_response["diffData"]["ld2"]);
+      if (data["diffData"]["ld2"].length > 0) {
+        _applyL1DataUpdate(data["diffData"]["ld2"]);
       }
     }
   }
@@ -456,7 +457,6 @@ class ContestsState extends State<Contests> {
           content: Text(result),
         ),
       );
-      Navigator.of(context).pop();
     }
     bWaitingForTeamCreation = false;
   }
@@ -656,7 +656,7 @@ class ContestsState extends State<Contests> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

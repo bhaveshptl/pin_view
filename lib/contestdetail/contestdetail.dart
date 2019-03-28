@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:playfantasy/modal/mysheet.dart';
 import 'package:share/share.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -51,10 +51,11 @@ class ContestDetail extends StatefulWidget {
 class ContestDetailState extends State<ContestDetail> with RouteAware {
   L1 _l1Data;
   String cookie;
+  Timer pollTimer;
   int _sportType = 1;
   List<MyTeam> _myTeams;
   int _curPageOffset = 0;
-  String _downloadTeamURL;
+
   bool bShowLoader = false;
   final int rowsPerPage = 25;
   TeamsDataSource _teamsDataSource;
@@ -63,13 +64,20 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   Map<String, dynamic> l1UpdatePackate = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  MyTeam teamToView;
   bool bShowJoinContest = false;
   bool bWaitingForTeamCreation = false;
+  bool waitToLoadL1ForViewTeam = false;
+
+  StreamSubscription _streamSubscription;
+
+  Duration pollTime;
 
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
 
     _createAndReqL1WS();
     if (widget.mapContestTeams == null) {
@@ -89,9 +97,10 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     Future<dynamic> futureInitData =
         SharedPrefHelper().getFromSharedPref(ApiUtil.KEY_INIT_DATA);
     await futureInitData.then((onValue) {
-      setState(() {
-        _downloadTeamURL = json.decode(onValue)["downloadUrl"];
-      });
+      pollTime = Duration(seconds: json.decode(onValue)["pollTime"]);
+      if (widget.league.status == LeagueStatus.LIVE) {
+        _startPolling();
+      }
     });
   }
 
@@ -107,6 +116,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     } else {
       l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
       l1UpdatePackate["bResAvail"] = true;
+      l1UpdatePackate["withPrediction"] = true;
       l1UpdatePackate["sportsId"] = _sportType;
       l1UpdatePackate["id"] = widget.league.leagueId;
     }
@@ -119,8 +129,21 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     }
   }
 
+  _startPolling() {
+    if (pollTime != null) {
+      pollTimer = Timer(
+        pollTime,
+        () async {
+          await _getContestMyTeams();
+          await _getContestTeams(_curPageOffset);
+          _startPolling();
+        },
+      );
+    }
+  }
+
   _getL1Data() {
-    sockets.sendMessage(l1UpdatePackate);
+    FantasyWebSocket().sendMessage(l1UpdatePackate);
   }
 
   _getSportsType() async {
@@ -160,25 +183,32 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if ((_response["iType"] == RequestType.GET_ALL_L1 ||
-            _response["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
-        _response["bSuccessful"] == true) {
-      setState(() {
-        _l1Data = L1.fromJson(_response["data"]["l1"]);
-        _myTeams = (_response["data"]["myteams"] as List)
+  _onWsMsg(data) {
+    if ((data["iType"] == RequestType.GET_ALL_L1 ||
+            data["iType"] == RequestType.REQ_L1_INNINGS_ALL_DATA) &&
+        data["bSuccessful"] == true) {
+      if (waitToLoadL1ForViewTeam) {
+        _l1Data = L1.fromJson(data["data"]["l1"]);
+        _myTeams = (data["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
         _teamsDataSource.updateMyAllTeams(_myTeams);
-      });
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      _applyL1DataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+        _onViewTeam(teamToView);
+      } else {
+        setState(() {
+          _l1Data = L1.fromJson(data["data"]["l1"]);
+          _myTeams = (data["data"]["myteams"] as List)
+              .map((i) => MyTeam.fromJson(i))
+              .toList();
+          _teamsDataSource.updateMyAllTeams(_myTeams);
+        });
+      }
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      _applyL1DataUpdate(data["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(data["data"]);
       setState(() {
         bool bFound = false;
         for (MyTeam _myTeam in _myTeams) {
@@ -195,10 +225,10 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         }
         bWaitingForTeamCreation = false;
       });
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _updateJoinCount(_response["data"]);
-      _updateContestTeams(_response["data"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _updateJoinCount(data["data"]);
+      _updateContestTeams(data["data"]);
     }
   }
 
@@ -488,17 +518,24 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   }
 
   void _onViewTeam(MyTeam _team) {
-    Navigator.of(context).push(
-      FantasyPageRoute(
-          pageBuilder: (context) => ViewTeam(
-                team: _team,
-                l1Data: _l1Data,
-                myTeam: _myTeams,
-                league: widget.league,
-                contest: widget.contest,
-              ),
-          fullscreenDialog: true),
-    );
+    if (_l1Data == null) {
+      teamToView = _team;
+      waitToLoadL1ForViewTeam = true;
+    } else {
+      teamToView = null;
+      waitToLoadL1ForViewTeam = false;
+      Navigator.of(context).push(
+        FantasyPageRoute(
+            pageBuilder: (context) => ViewTeam(
+                  team: _team,
+                  l1Data: _l1Data,
+                  myTeam: _myTeams,
+                  league: widget.league,
+                  contest: widget.contest,
+                ),
+            fullscreenDialog: true),
+      );
+    }
   }
 
   void _onCreateTeam(BuildContext context, Contest contest) async {
@@ -506,7 +543,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 
     bWaitingForTeamCreation = true;
 
-    Navigator.of(context).pop();
+    Navigator.pop(context);
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
@@ -526,7 +563,6 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           _onJoinContest(curContest);
         }
       }
-      Navigator.of(context).pop();
     }
     bWaitingForTeamCreation = false;
   }
@@ -1500,7 +1536,10 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
+    if (pollTimer != null) {
+      pollTimer.cancel();
+    }
     super.dispose();
   }
 
@@ -1549,6 +1588,8 @@ class TeamsDataSource extends DataTableSource {
   List<MyTeam> _myAllTeams = [];
   List<MyTeam> _myUniqueTeams = [];
 
+  bool bShowSwitchTeam = false;
+
   TeamsDataSource(League _league, Contest _contest, List<MyTeam> myAllTeams,
       Function _onViewTeam, Function _onSwitchTeam) {
     league = _league;
@@ -1558,6 +1599,10 @@ class TeamsDataSource extends DataTableSource {
     onSwitchTeam = _onSwitchTeam;
     this._myAllTeams = myAllTeams;
     _leagueStatus = _league.status;
+
+    if (myAllTeams != null && myAllTeams.length > 0) {
+      bShowSwitchTeam = true;
+    }
   }
 
   setMyContestTeams(Contest contest, List<MyTeam> _myContestTeams) {
@@ -1595,6 +1640,8 @@ class TeamsDataSource extends DataTableSource {
 
     setUniqueTeams();
     notifyListeners();
+
+    bShowSwitchTeam = true;
   }
 
   changeLeagueStatus(int _status) {
@@ -1692,7 +1739,7 @@ class TeamsDataSource extends DataTableSource {
                   ? Row(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        bIsMyJoinedTeam
+                        bIsMyJoinedTeam && bShowSwitchTeam
                             ? Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
                                 child: Container(

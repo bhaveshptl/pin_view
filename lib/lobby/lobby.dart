@@ -45,7 +45,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   List<League> _leagues;
   bool bShowLoader = false;
   TabController _controller;
-  List<String> _carousel = [];
+  List<dynamic> _carousel = [];
   Map<String, int> _mapSportTypes;
   bool bUpdateAppConfirmationShown = false;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -54,7 +54,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   initState() {
     super.initState();
     _controller = TabController(vsync: this, length: 3);
-    _getInitData();
+    getBanners();
     _getSportsType();
     _controller.addListener(() {
       if (!_controller.indexIsChanging) {
@@ -85,20 +85,37 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     );
   }
 
-  _getInitData() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.INIT_DATA));
-    req.body = json.encode({
-      "version": double.parse(packageInfo.version),
-      "channelId": HttpManager.channelId,
-    });
+  // _getInitData() async {
+  //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  //   http.Request req =
+  //       http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.INIT_DATA));
+  //   req.body = json.encode({
+  //     "version": double.parse(packageInfo.version),
+  //     "channelId": HttpManager.channelId,
+  //   });
+  //   await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+  //     if (res.statusCode >= 200 && res.statusCode <= 299) {
+  //       final initData = json.decode(res.body);
+  //       setState(() {
+  //         _carousel = (initData["carousel"] as List).map((dynamic value) {
+  //           return value.toString();
+  //         }).toList();
+  //       });
+  //     }
+  //   });
+  // }
+  getBanners() async {
+    http.Request req = http.Request(
+        "GET",
+        Uri.parse(
+          BaseUrl.apiUrl + ApiUtil.GET_BANNERS + "/4",
+        ));
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        final initData = json.decode(res.body);
+        final banners = json.decode(res.body)["banners"];
         setState(() {
-          _carousel = (initData["carousel"] as List).map((dynamic value) {
-            return value.toString();
+          _carousel = (banners as List).map((dynamic value) {
+            return value;
           }).toList();
         });
       }
@@ -226,7 +243,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (sockets.isConnected() == false) {
-      sockets.connect(AppConfig.of(context).websocketUrl);
+      FantasyWebSocket().connect(AppConfig.of(context).websocketUrl);
     }
     if (widget.updateAvailable != null &&
         widget.updateAvailable &&
@@ -271,40 +288,56 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                     Row(
                       children: <Widget>[
                         Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Container(
-                              height: 76.0,
-                              child: _carousel.length > 0
-                                  ? CarouselSlider(
-                                      items:
-                                          _carousel.map<Widget>((String img) {
-                                        return Container(
-                                            height: 102.0,
-                                            margin: EdgeInsets.only(
-                                                right: 5.0, left: 5.0),
-                                            child: Stack(
-                                              children: <Widget>[
-                                                ClipRRect(
-                                                  clipBehavior: Clip.hardEdge,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                    Radius.circular(8.0),
-                                                  ),
-                                                  child: Image.network(
-                                                    img,
-                                                    fit: BoxFit.cover,
-                                                    width: 1000.0,
-                                                  ),
-                                                ),
-                                              ],
-                                            ));
-                                      }).toList(),
-                                      autoPlay: true,
-                                      reverse: false,
-                                    )
-                                  : Container(),
+                          child: Container(
+                            padding: EdgeInsets.only(
+                              left: 8.0,
+                              right: 8.0,
+                              bottom: 4.0,
+                              top: 4.0,
                             ),
+                            height: 84.0,
+                            child: _carousel.length > 0
+                                ? CarouselSlider(
+                                    enlargeCenterPage: false,
+                                    aspectRatio: 16 / 3,
+                                    autoPlayInterval: Duration(seconds: 5),
+                                    items:
+                                        _carousel.map<Widget>((dynamic banner) {
+                                      return FlatButton(
+                                        padding: EdgeInsets.all(0.0),
+                                        onPressed: () {
+                                          if (banner["CTA"] != "" &&
+                                              banner["CTA"] != "NA") {
+                                            showLoader(true);
+                                          }
+                                          routeLauncher.launchBannerRoute(
+                                              banner: banner,
+                                              context: context,
+                                              scaffoldKey: scaffoldKey,
+                                              onComplete: () {
+                                                showLoader(false);
+                                              });
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            child: Image.network(
+                                              banner["banner"],
+                                              fit: BoxFit.cover,
+                                              width: 1000.0,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    autoPlay:
+                                        _carousel.length <= 2 ? false : true,
+                                    reverse: false,
+                                  )
+                                : Container(),
                           ),
                         ),
                       ],

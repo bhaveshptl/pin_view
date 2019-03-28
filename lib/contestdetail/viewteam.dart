@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -35,10 +36,13 @@ class _ViewTeamState extends State<ViewTeam> {
   MyTeam _myTeamWithPlayers = MyTeam.fromJson({});
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  StreamSubscription _streamSubscription;
+
   @override
   void initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _getTeamPlayers();
 
     _fanTeamRules = widget.l1Data.league.fanTeamRules;
@@ -58,9 +62,11 @@ class _ViewTeamState extends State<ViewTeam> {
     );
     HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        Map<String, dynamic> respose = json.decode(res.body);
+        Map<String, dynamic> response = json.decode(res.body);
+        response["id"] =
+            response["id"] == null ? widget.team.id : response["id"];
         setState(() {
-          _myTeamWithPlayers = MyTeam.fromJson(respose);
+          _myTeamWithPlayers = MyTeam.fromJson(response);
         });
       }
     });
@@ -77,12 +83,10 @@ class _ViewTeamState extends State<ViewTeam> {
     return _team;
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(data["data"]);
 
       if (widget.team.id == teamUpdated.id) {
         setState(() {
@@ -393,7 +397,7 @@ class _ViewTeamState extends State<ViewTeam> {
                           children: <Widget>[
                             Expanded(
                               child: Text(
-                                _myTeamWithPlayers.rank.toString(),
+                                widget.team.rank.toString(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: Colors.white54,
@@ -456,7 +460,7 @@ class _ViewTeamState extends State<ViewTeam> {
                                       .fontSize),
                             ),
                       Text(
-                        _myTeamWithPlayers.prize.toStringAsFixed(2),
+                        widget.team.prize.toStringAsFixed(2),
                         style: TextStyle(
                             color: Colors.white54,
                             fontSize: Theme.of(context)
@@ -475,7 +479,7 @@ class _ViewTeamState extends State<ViewTeam> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

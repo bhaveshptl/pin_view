@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -48,6 +48,7 @@ class CreateContestState extends State<CreateContest> {
   bool bWaitingForTeamCreation = false;
 
   List<PrizeStructure> prizeStructure;
+  StreamSubscription _streamSubscription;
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -64,7 +65,8 @@ class CreateContestState extends State<CreateContest> {
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
 
     prizeStructure = [];
     _l1Data = widget.l1data;
@@ -107,23 +109,21 @@ class CreateContestState extends State<CreateContest> {
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["iType"] == RequestType.GET_ALL_L1 &&
-        _response["bSuccessful"] == true) {
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.GET_ALL_L1 &&
+        data["bSuccessful"] == true) {
       setState(() {
-        _l1Data = L1.fromJson(_response["data"]["l1"]);
-        _myTeams = (_response["data"]["myteams"] as List)
+        _l1Data = L1.fromJson(data["data"]["l1"]);
+        _myTeams = (data["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
       });
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      _applyL1DataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      _applyL1DataUpdate(data["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(data["data"]);
       setState(() {
         bool bFound = false;
         for (MyTeam _myTeam in _myTeams) {
@@ -491,7 +491,7 @@ class CreateContestState extends State<CreateContest> {
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 

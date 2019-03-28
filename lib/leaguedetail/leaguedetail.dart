@@ -52,6 +52,7 @@ class LeagueDetailState extends State<LeagueDetail>
   List<MySheet> _mySheets;
   Prediction predictionData;
   List<int> predictionContestIds;
+  StreamSubscription _streamSubscription;
   Map<String, dynamic> l1UpdatePackate = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<int, List<MySheet>> _mapContestSheets = {};
@@ -64,7 +65,8 @@ class LeagueDetailState extends State<LeagueDetail>
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _sportType = widget.sportType;
     _createL1WSObject();
 
@@ -77,15 +79,13 @@ class LeagueDetailState extends State<LeagueDetail>
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["bReady"] == 1) {
+  _onWsMsg(data) {
+    if (data["bReady"] == 1) {
       // _showLoader(true);
       _getL1Data();
-    } else if (_response["iType"] == RequestType.GET_ALL_L1 &&
-        _response["bSuccessful"] == true) {
-      List<dynamic> contestIds = _response["data"]["myPredictionContestIds"]
+    } else if (data["iType"] == RequestType.GET_ALL_L1 &&
+        data["bSuccessful"] == true) {
+      List<dynamic> contestIds = data["data"]["myPredictionContestIds"]
           [widget.league.leagueId.toString()];
       predictionContestIds = contestIds != null
           ? contestIds.map((f) => (f as int).toInt()).toList()
@@ -93,31 +93,31 @@ class LeagueDetailState extends State<LeagueDetail>
       getMyContestMySheets(predictionContestIds);
 
       setState(() {
-        l1Data = L1.fromJson(_response["data"]["l1"]);
-        _myTeams = (_response["data"]["myteams"] as List)
+        l1Data = L1.fromJson(data["data"]["l1"]);
+        _myTeams = (data["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
-        if (_response["data"]["prediction"] != null) {
-          predictionData = Prediction.fromJson(_response["data"]["prediction"]);
+        if (data["data"]["prediction"] != null) {
+          predictionData = Prediction.fromJson(data["data"]["prediction"]);
         }
-        if (_response["data"]["mySheets"] != null &&
-            _response["data"]["mySheets"] != "") {
-          _mySheets = (_response["data"]["mySheets"] as List<dynamic>).map((f) {
+        if (data["data"]["mySheets"] != null &&
+            data["data"]["mySheets"] != "") {
+          _mySheets = (data["data"]["mySheets"] as List<dynamic>).map((f) {
             return MySheet.fromJson(f);
           }).toList();
         }
       });
       // _showLoader(false);
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      _applyL1DataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _updateJoinCount(_response["data"]);
-      _updateContestTeams(_response["data"]);
-    } else if (_response["iType"] == RequestType.MY_TEAMS_ADDED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamAdded = MyTeam.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      _applyL1DataUpdate(data["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _updateJoinCount(data["data"]);
+      _updateContestTeams(data["data"]);
+    } else if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(data["data"]);
       bool bFound = false;
       for (MyTeam _myTeam in _myTeams) {
         if (_myTeam.id == teamAdded.id) {
@@ -129,9 +129,9 @@ class LeagueDetailState extends State<LeagueDetail>
           _myTeams.add(teamAdded);
         });
       }
-    } else if (_response["iType"] == RequestType.MY_TEAM_MODIFIED &&
-        _response["bSuccessful"] == true) {
-      MyTeam teamUpdated = MyTeam.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(data["data"]);
       int i = 0;
       for (MyTeam _team in _myTeams) {
         if (_team.id == teamUpdated.id) {
@@ -141,13 +141,13 @@ class LeagueDetailState extends State<LeagueDetail>
         }
         i++;
       }
-    } else if (_response["iType"] == RequestType.PREDICTION_DATA_UPDATE) {
-      if (_response["leagueId"] == widget.league.leagueId) {
-        _applyPredictionUpdate(_response["diffData"]);
+    } else if (data["iType"] == RequestType.PREDICTION_DATA_UPDATE) {
+      if (data["leagueId"] == widget.league.leagueId) {
+        _applyPredictionUpdate(data["diffData"]);
       }
-    } else if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
-        _response["bSuccessful"] == true) {
-      MySheet sheetAdded = MySheet.fromJson(_response["data"]);
+    } else if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+        data["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(data["data"]);
       int existingIndex = -1;
       List<int>.generate(_mySheets.length, (index) {
         MySheet mySheet = _mySheets[index];
@@ -497,7 +497,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _getL1Data() {
     // _showLoader(true);
-    sockets.sendMessage(l1UpdatePackate);
+    FantasyWebSocket().sendMessage(l1UpdatePackate);
   }
 
   _getSportsType() async {
@@ -809,7 +809,7 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 

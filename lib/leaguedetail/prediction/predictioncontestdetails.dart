@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -59,15 +60,19 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
 
   SheetDataSource _sheetDataSource;
 
+  MySheet sheetToView;
   Prediction predictionData;
   List<MySheet> _mapContestSheets = [];
+  StreamSubscription _streamSubscription;
   Map<String, dynamic> l1UpdatePackate = {};
+  bool waitForPredictionDataToViewSheet = false;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   initState() {
     super.initState();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _createAndReqL1WS();
     createDataSource();
     _mapContestSheets =
@@ -114,43 +119,63 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   }
 
   onViewSheet(MySheet sheet) {
-    Navigator.of(context).push(
-      FantasyPageRoute(
-          pageBuilder: (context) => ViewSheet(
-                sheet: sheet,
-                league: widget.league,
-                contest: widget.contest,
-                mySheet: widget.mySheets,
-                predictionData: predictionData,
-              ),
-          fullscreenDialog: true),
-    );
+    if (predictionData == null) {
+      sheetToView = sheet;
+      waitForPredictionDataToViewSheet = true;
+    } else {
+      sheetToView = null;
+      waitForPredictionDataToViewSheet = false;
+      Navigator.of(context).push(
+        FantasyPageRoute(
+            pageBuilder: (context) => ViewSheet(
+                  sheet: sheet,
+                  league: widget.league,
+                  contest: widget.contest,
+                  mySheet: widget.mySheets,
+                  predictionData: predictionData,
+                ),
+            fullscreenDialog: true),
+      );
+    }
   }
 
   _getL1Data() {
-    sockets.sendMessage(l1UpdatePackate);
+    FantasyWebSocket().sendMessage(l1UpdatePackate);
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-
-    if (_response["iType"] == RequestType.GET_ALL_L1 &&
-        _response["bSuccessful"] == true) {
-      setState(() {
-        if (_response["data"]["prediction"] != null) {
-          predictionData = Prediction.fromJson(_response["data"]["prediction"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.GET_ALL_L1 &&
+        data["bSuccessful"] == true) {
+      if (waitForPredictionDataToViewSheet) {
+        if (data["data"]["prediction"] != null) {
+          predictionData = Prediction.fromJson(data["data"]["prediction"]);
         }
-        if (_response["data"]["mySheets"] != null &&
-            _response["data"]["mySheets"] != "") {
-          mySheets = (_response["data"]["mySheets"] as List<dynamic>).map((f) {
+        if (data["data"]["mySheets"] != null &&
+            data["data"]["mySheets"] != "") {
+          mySheets = (data["data"]["mySheets"] as List<dynamic>).map((f) {
             return MySheet.fromJson(f);
           }).toList();
           _sheetDataSource.updateMyAllSheets(mySheets);
         }
-      });
-    } else if (_response["iType"] == RequestType.MY_SHEET_ADDED &&
-        _response["bSuccessful"] == true) {
-      MySheet sheetAdded = MySheet.fromJson(_response["data"]);
+
+        onViewSheet(sheetToView);
+      } else {
+        setState(() {
+          if (data["data"]["prediction"] != null) {
+            predictionData = Prediction.fromJson(data["data"]["prediction"]);
+          }
+          if (data["data"]["mySheets"] != null &&
+              data["data"]["mySheets"] != "") {
+            mySheets = (data["data"]["mySheets"] as List<dynamic>).map((f) {
+              return MySheet.fromJson(f);
+            }).toList();
+            _sheetDataSource.updateMyAllSheets(mySheets);
+          }
+        });
+      }
+    } else if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+        data["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(data["data"]);
       int existingIndex = -1;
       List<int>.generate(mySheets.length, (index) {
         MySheet mySheet = mySheets[index];
@@ -175,10 +200,10 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
       } else if (bWaitingForSheetCreation) {
         bWaitingForSheetCreation = false;
       }
-    } else if (_response["iType"] == RequestType.PREDICTION_DATA_UPDATE) {
-      if (_response["leagueId"] == widget.league.leagueId &&
+    } else if (data["iType"] == RequestType.PREDICTION_DATA_UPDATE) {
+      if (data["leagueId"] == widget.league.leagueId &&
           predictionData != null) {
-        _applyPredictionUpdate(_response["diffData"]);
+        _applyPredictionUpdate(data["diffData"]);
       }
       getMyContestMySheets();
     }
@@ -1342,7 +1367,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

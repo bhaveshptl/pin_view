@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -41,6 +42,7 @@ class NewMyContestsState extends State<NewMyContests>
   int selectedSegment = 0;
   bool bShowLoader = false;
   TabController _sportsController;
+  StreamSubscription _streamSubscription;
   Map<int, List<MyTeam>> _mapContestTeams = {};
   Map<int, List<MySheet>> _mapContestSheets = {};
   Map<int, Map<String, MyAllContest>> myContests = {};
@@ -51,7 +53,8 @@ class NewMyContestsState extends State<NewMyContests>
   void initState() {
     super.initState();
     _getSportsType();
-    sockets.register(_onWsMsg);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _getMyContests();
     allLeagues = widget.leagues;
     _sportsController =
@@ -174,24 +177,23 @@ class NewMyContestsState extends State<NewMyContests>
     });
   }
 
-  _onWsMsg(onData) {
-    Map<String, dynamic> _response = json.decode(onData);
-    if (_response["iType"] == RequestType.GET_ALL_SERIES &&
-        _response["bSuccessful"] == true) {
-      List<dynamic> _mapLeagues = json.decode(_response["data"]);
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.GET_ALL_SERIES &&
+        data["bSuccessful"] == true &&
+        data["sportsId"] == _sportType) {
+      List<dynamic> _mapLeagues = json.decode(data["data"]);
       List<League> leagues =
           _mapLeagues.map((i) => League.fromJson(i)).toList();
       setState(() {
         allLeagues = leagues;
       });
-    } else if (_response["iType"] == RequestType.LOBBY_REFRESH_DATA &&
-        _response["bSuccessful"] == true) {
-      if (_response["data"]["bDataModified"] == true &&
-          (_response["data"]["lstModified"] as List).length > 0) {
-        List<League> _modifiedLeagues =
-            (_response["data"]["lstModified"] as List)
-                .map((i) => League.fromJson(i))
-                .toList();
+    } else if (data["iType"] == RequestType.LOBBY_REFRESH_DATA &&
+        data["bSuccessful"] == true) {
+      if (data["data"]["bDataModified"] == true &&
+          (data["data"]["lstModified"] as List).length > 0) {
+        List<League> _modifiedLeagues = (data["data"]["lstModified"] as List)
+            .map((i) => League.fromJson(i))
+            .toList();
 
         for (League _league in _modifiedLeagues) {
           int index = getLeagueIndex(allLeagues, _league);
@@ -200,12 +202,12 @@ class NewMyContestsState extends State<NewMyContests>
           }
         }
       }
-    } else if (_response["iType"] == RequestType.L1_DATA_REFRESHED &&
-        _response["bSuccessful"] == true) {
-      _applyContestDataUpdate(_response["diffData"]["ld"]);
-    } else if (_response["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
-        _response["bSuccessful"] == true) {
-      _update(_response["data"]);
+    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      _applyContestDataUpdate(data["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _update(data["data"]);
     }
   }
 
@@ -213,141 +215,147 @@ class NewMyContestsState extends State<NewMyContests>
     if (_data["lstModified"] != null && _data["lstModified"].length >= 1) {
       List<dynamic> _modifiedContests = _data["lstModified"];
       for (Map<String, dynamic> _changedContest in _modifiedContests) {
-        myContests[_sportType].forEach(
-          (String key, MyAllContest _contests) {
-            for (Contest _contest in _contests.normal) {
-              if (_contest.id == _changedContest["id"]) {
-                setState(() {
-                  if (_changedContest["name"] != null &&
-                      _contest.name != _changedContest["name"]) {
-                    _contest.name = _changedContest["name"];
-                  }
-                  if (_changedContest["templateId"] != null &&
-                      _contest.templateId != _changedContest["templateId"]) {
-                    _contest.templateId = _changedContest["templateId"];
-                  }
-                  if (_changedContest["size"] != null &&
-                      _contest.size != _changedContest["size"]) {
-                    _contest.size = _changedContest["size"];
-                  }
-                  if (_changedContest["prizeType"] != null &&
-                      _contest.prizeType != _changedContest["prizeType"]) {
-                    _contest.prizeType = _changedContest["prizeType"];
-                  }
-                  if (_changedContest["entryFee"] != null &&
-                      _contest.entryFee != _changedContest["entryFee"]) {
-                    _contest.entryFee = _changedContest["entryFee"];
-                  }
-                  if (_changedContest["minUsers"] != null &&
-                      _contest.minUsers != _changedContest["minUsers"]) {
-                    _contest.minUsers = _changedContest["minUsers"];
-                  }
-                  if (_changedContest["serviceFee"] != null &&
-                      _contest.serviceFee != _changedContest["serviceFee"]) {
-                    _contest.serviceFee = _changedContest["serviceFee"];
-                  }
-                  if (_changedContest["teamsAllowed"] != null &&
-                      _contest.teamsAllowed !=
-                          _changedContest["teamsAllowed"]) {
-                    _contest.teamsAllowed = _changedContest["teamsAllowed"];
-                  }
-                  if (_changedContest["leagueId"] != null &&
-                      _contest.leagueId != _changedContest["leagueId"]) {
-                    _contest.leagueId = _changedContest["leagueId"];
-                  }
-                  if (_changedContest["releaseTime"] != null &&
-                      _contest.releaseTime != _changedContest["releaseTime"]) {
-                    _contest.releaseTime = _changedContest["releaseTime"];
-                  }
-                  if (_changedContest["regStartTime"] != null &&
-                      _contest.regStartTime !=
-                          _changedContest["regStartTime"]) {
-                    _contest.regStartTime = _changedContest["regStartTime"];
-                  }
-                  if (_changedContest["startTime"] != null &&
-                      _contest.startTime != _changedContest["startTime"]) {
-                    _contest.startTime = _changedContest["startTime"];
-                  }
-                  if (_changedContest["endTime"] != null &&
-                      _contest.endTime != _changedContest["endTime"]) {
-                    _contest.endTime = _changedContest["endTime"];
-                  }
-                  if (_changedContest["status"] != null &&
-                      _contest.status != _changedContest["status"]) {
-                    _contest.status = _changedContest["status"];
-                  }
-                  if (_changedContest["visibilityId"] != null &&
-                      _contest.visibilityId !=
-                          _changedContest["visibilityId"]) {
-                    _contest.visibilityId = _changedContest["visibilityId"];
-                  }
-                  if (_changedContest["visibilityInfo"] != null &&
-                      _contest.visibilityInfo !=
-                          _changedContest["visibilityInfo"]) {
-                    _contest.visibilityInfo = _changedContest["visibilityInfo"];
-                  }
-                  if (_changedContest["contestJoinCode"] != null &&
-                      _contest.contestJoinCode !=
-                          _changedContest["contestJoinCode"]) {
-                    _contest.contestJoinCode =
-                        _changedContest["contestJoinCode"];
-                  }
-                  if (_changedContest["joined"] != null &&
-                      _contest.joined != _changedContest["joined"]) {
-                    _contest.joined = _changedContest["joined"];
-                  }
-                  if (_changedContest["bonusAllowed"] != null &&
-                      _contest.bonusAllowed !=
-                          _changedContest["bonusAllowed"]) {
-                    _contest.bonusAllowed = _changedContest["bonusAllowed"];
-                  }
-                  if (_changedContest["guaranteed"] != null &&
-                      _contest.guaranteed != _changedContest["guaranteed"]) {
-                    _contest.guaranteed = _changedContest["guaranteed"];
-                  }
-                  if (_changedContest["recommended"] != null &&
-                      _contest.recommended != _changedContest["recommended"]) {
-                    _contest.recommended = _changedContest["recommended"];
-                  }
-                  if (_changedContest["deleted"] != null &&
-                      _contest.deleted != _changedContest["deleted"]) {
-                    _contest.deleted = _changedContest["deleted"];
-                  }
-                  if (_changedContest["brand"] != null &&
-                      _changedContest["brand"]["info"] != null &&
-                      _contest.brand["info"] !=
-                          _changedContest["brand"]["info"]) {
-                    _contest.brand["info"] = _changedContest["brand"]["info"];
-                  }
-                  if ((_changedContest["lstAdded"] as List).length > 0) {
-                    for (dynamic _prize in _changedContest["lstAdded"]) {
-                      _contest.prizeDetails.add(_prize);
+        if (myContests[_sportType] != null) {
+          myContests[_sportType].forEach(
+            (String key, MyAllContest _contests) {
+              for (Contest _contest in _contests.normal) {
+                if (_contest.id == _changedContest["id"]) {
+                  setState(() {
+                    if (_changedContest["name"] != null &&
+                        _contest.name != _changedContest["name"]) {
+                      _contest.name = _changedContest["name"];
                     }
-                  }
-                  if ((_changedContest["lstModified"] as List).length > 0) {
-                    for (dynamic _modifiedPrize
-                        in _changedContest["lstModified"]) {
-                      for (dynamic _prize in _contest.prizeDetails) {
-                        if (_prize["id"] == _modifiedPrize["id"]) {
-                          if (_modifiedPrize["label"] != null) {
-                            _prize["label"] = _modifiedPrize["label"];
-                          }
-                          if (_modifiedPrize["noOfPrizes"] != null) {
-                            _prize["noOfPrizes"] = _modifiedPrize["noOfPrizes"];
-                          }
-                          if (_modifiedPrize["totalPrizeAmount"] != null) {
-                            _prize["totalPrizeAmount"] =
-                                _modifiedPrize["totalPrizeAmount"];
+                    if (_changedContest["templateId"] != null &&
+                        _contest.templateId != _changedContest["templateId"]) {
+                      _contest.templateId = _changedContest["templateId"];
+                    }
+                    if (_changedContest["size"] != null &&
+                        _contest.size != _changedContest["size"]) {
+                      _contest.size = _changedContest["size"];
+                    }
+                    if (_changedContest["prizeType"] != null &&
+                        _contest.prizeType != _changedContest["prizeType"]) {
+                      _contest.prizeType = _changedContest["prizeType"];
+                    }
+                    if (_changedContest["entryFee"] != null &&
+                        _contest.entryFee != _changedContest["entryFee"]) {
+                      _contest.entryFee = _changedContest["entryFee"];
+                    }
+                    if (_changedContest["minUsers"] != null &&
+                        _contest.minUsers != _changedContest["minUsers"]) {
+                      _contest.minUsers = _changedContest["minUsers"];
+                    }
+                    if (_changedContest["serviceFee"] != null &&
+                        _contest.serviceFee != _changedContest["serviceFee"]) {
+                      _contest.serviceFee = _changedContest["serviceFee"];
+                    }
+                    if (_changedContest["teamsAllowed"] != null &&
+                        _contest.teamsAllowed !=
+                            _changedContest["teamsAllowed"]) {
+                      _contest.teamsAllowed = _changedContest["teamsAllowed"];
+                    }
+                    if (_changedContest["leagueId"] != null &&
+                        _contest.leagueId != _changedContest["leagueId"]) {
+                      _contest.leagueId = _changedContest["leagueId"];
+                    }
+                    if (_changedContest["releaseTime"] != null &&
+                        _contest.releaseTime !=
+                            _changedContest["releaseTime"]) {
+                      _contest.releaseTime = _changedContest["releaseTime"];
+                    }
+                    if (_changedContest["regStartTime"] != null &&
+                        _contest.regStartTime !=
+                            _changedContest["regStartTime"]) {
+                      _contest.regStartTime = _changedContest["regStartTime"];
+                    }
+                    if (_changedContest["startTime"] != null &&
+                        _contest.startTime != _changedContest["startTime"]) {
+                      _contest.startTime = _changedContest["startTime"];
+                    }
+                    if (_changedContest["endTime"] != null &&
+                        _contest.endTime != _changedContest["endTime"]) {
+                      _contest.endTime = _changedContest["endTime"];
+                    }
+                    if (_changedContest["status"] != null &&
+                        _contest.status != _changedContest["status"]) {
+                      _contest.status = _changedContest["status"];
+                    }
+                    if (_changedContest["visibilityId"] != null &&
+                        _contest.visibilityId !=
+                            _changedContest["visibilityId"]) {
+                      _contest.visibilityId = _changedContest["visibilityId"];
+                    }
+                    if (_changedContest["visibilityInfo"] != null &&
+                        _contest.visibilityInfo !=
+                            _changedContest["visibilityInfo"]) {
+                      _contest.visibilityInfo =
+                          _changedContest["visibilityInfo"];
+                    }
+                    if (_changedContest["contestJoinCode"] != null &&
+                        _contest.contestJoinCode !=
+                            _changedContest["contestJoinCode"]) {
+                      _contest.contestJoinCode =
+                          _changedContest["contestJoinCode"];
+                    }
+                    if (_changedContest["joined"] != null &&
+                        _contest.joined != _changedContest["joined"]) {
+                      _contest.joined = _changedContest["joined"];
+                    }
+                    if (_changedContest["bonusAllowed"] != null &&
+                        _contest.bonusAllowed !=
+                            _changedContest["bonusAllowed"]) {
+                      _contest.bonusAllowed = _changedContest["bonusAllowed"];
+                    }
+                    if (_changedContest["guaranteed"] != null &&
+                        _contest.guaranteed != _changedContest["guaranteed"]) {
+                      _contest.guaranteed = _changedContest["guaranteed"];
+                    }
+                    if (_changedContest["recommended"] != null &&
+                        _contest.recommended !=
+                            _changedContest["recommended"]) {
+                      _contest.recommended = _changedContest["recommended"];
+                    }
+                    if (_changedContest["deleted"] != null &&
+                        _contest.deleted != _changedContest["deleted"]) {
+                      _contest.deleted = _changedContest["deleted"];
+                    }
+                    if (_changedContest["brand"] != null &&
+                        _changedContest["brand"]["info"] != null &&
+                        _contest.brand["info"] !=
+                            _changedContest["brand"]["info"]) {
+                      _contest.brand["info"] = _changedContest["brand"]["info"];
+                    }
+                    if ((_changedContest["lstAdded"] as List).length > 0) {
+                      for (dynamic _prize in _changedContest["lstAdded"]) {
+                        _contest.prizeDetails.add(_prize);
+                      }
+                    }
+                    if ((_changedContest["lstModified"] as List).length > 0) {
+                      for (dynamic _modifiedPrize
+                          in _changedContest["lstModified"]) {
+                        for (dynamic _prize in _contest.prizeDetails) {
+                          if (_prize["id"] == _modifiedPrize["id"]) {
+                            if (_modifiedPrize["label"] != null) {
+                              _prize["label"] = _modifiedPrize["label"];
+                            }
+                            if (_modifiedPrize["noOfPrizes"] != null) {
+                              _prize["noOfPrizes"] =
+                                  _modifiedPrize["noOfPrizes"];
+                            }
+                            if (_modifiedPrize["totalPrizeAmount"] != null) {
+                              _prize["totalPrizeAmount"] =
+                                  _modifiedPrize["totalPrizeAmount"];
+                            }
                           }
                         }
                       }
                     }
-                  }
-                });
+                  });
+                }
               }
-            }
-          },
-        );
+            },
+          );
+        }
       }
     }
   }
@@ -469,7 +477,7 @@ class NewMyContestsState extends State<NewMyContests>
 
   @override
   void dispose() {
-    sockets.unRegister(_onWsMsg);
+    _streamSubscription.cancel();
     super.dispose();
   }
 }

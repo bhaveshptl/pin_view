@@ -857,11 +857,23 @@ class CreateTeamState extends State<CreateTeam>
   }
 
   void _onSaveCaptains(Player captain, Player viceCaptain) {
-    Navigator.of(context).pop();
-
     _captain = captain;
     _vCaptain = viceCaptain;
 
+    if (_captain == null) {
+      _showErrorMessage(
+        "Please select captain to make your dream team.",
+      );
+      return;
+    }
+    if (_vCaptain == null) {
+      _showErrorMessage(
+        "Please select vice captain to make your dream team.",
+      );
+      return;
+    }
+
+    Navigator.pop(context);
     if (widget.mode == TeamCreationMode.EDIT_TEAM) {
       _updateTeam(_getTeamToSave());
     } else {
