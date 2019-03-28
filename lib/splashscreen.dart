@@ -75,18 +75,18 @@ class SplashScreenState extends State<SplashScreen>
       print("here");
 
       setLoadingPercentage(99.0);
-      // Navigator.of(context).pushReplacement(
-      //   FantasyPageRoute(
-      //     pageBuilder: (context) => Lobby(),
-      //   ),
-      // );
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => Lobby(),
+        ),
+      );
     } else {
       setLoadingPercentage(99.0);
-      // Navigator.of(context).pushReplacement(
-      //   FantasyPageRoute(
-      //     pageBuilder: (context) => LandingPage(),
-      //   ),
-      // );
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => LandingPage(),
+        ),
+      );
     }
   }
 
