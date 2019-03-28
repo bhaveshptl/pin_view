@@ -18,6 +18,8 @@ disableDeviceRotation() {
 void main() async {
   String channelId = "10";
   const apiBaseUrl = "https://www.playfantasy.com";
+  String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
+
 
   disableDeviceRotation();
 
@@ -31,6 +33,7 @@ void main() async {
       home: SplashScreen(
         apiBaseUrl: apiBaseUrl,
         channelId: channelId,
+         fcmSubscribeId: fcmSubscribeId,
       ),
       routes: FantasyRoutes().getRoutes(),
       theme: ThemeData(

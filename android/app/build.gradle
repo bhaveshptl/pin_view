@@ -154,7 +154,7 @@ android {
 
     defaultConfig {
         applicationId "com.algorin.playfantasy"
-        minSdkVersion 19
+        minSdkVersion 20
         targetSdkVersion 26
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -192,6 +192,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'io.branch.sdk.android:library:3.+'
     implementation 'com.razorpay:checkout:1.4.9'
+    implementation 'com.google.firebase:firebase-messaging:17.4.0'
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
 }
 
 apply plugin: 'com.google.gms.google-services'
