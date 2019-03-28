@@ -12,6 +12,30 @@ disableDeviceRotation() {
   ]);
 }
 
+ThemeData _buildLightTheme() {
+  const Color primaryColor = Color(0xFF0E4F87);
+  const Color secondaryColor = Color(0xFF244f83);
+  final ColorScheme colorScheme = const ColorScheme.light().copyWith(
+    primary: primaryColor,
+    secondary: secondaryColor,
+  );
+  final ThemeData base = ThemeData.light();
+  return base.copyWith(
+    colorScheme: colorScheme,
+    primaryColor: primaryColor,
+    primaryColorDark: secondaryColor,
+    buttonColor: primaryColor,
+    indicatorColor: Colors.white,
+    splashColor: Colors.white24,
+    splashFactory: InkRipple.splashFactory,
+    accentColor: secondaryColor,
+    canvasColor: Colors.white,
+    scaffoldBackgroundColor: Colors.white,
+    backgroundColor: Colors.white,
+    errorColor: const Color(0xFFB00020),
+  );
+}
+
 ///
 /// Bootstraping APP.
 ///
@@ -24,7 +48,7 @@ void main() async {
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
-    appName: 'Howzat',
+    appName: 'PlayFantasy',
     channelId: channelId,
     showBackground: true,
     apiBaseUrl: apiBaseUrl,
@@ -35,11 +59,7 @@ void main() async {
         fcmSubscribeId: fcmSubscribeId,
       ),
       routes: FantasyRoutes().getRoutes(),
-      theme: ThemeData(
-        primaryColor: Color.fromRGBO(97, 6, 0, 1),
-        primaryColorLight: Color.fromRGBO(148, 56, 42, 1),
-        primaryColorDark: Color.fromRGBO(57, 0, 0, 1),
-      ),
+      theme: _buildLightTheme(),
     ),
   );
 

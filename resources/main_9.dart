@@ -24,7 +24,7 @@ void main() async {
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
-    appName: 'Howzat',
+    appName: 'Smart11',
     channelId: channelId,
     showBackground: true,
     apiBaseUrl: apiBaseUrl,

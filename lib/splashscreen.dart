@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
 import 'package:playfantasy/lobby/lobby.dart';
@@ -75,18 +75,18 @@ class SplashScreenState extends State<SplashScreen>
       print("here");
 
       setLoadingPercentage(99.0);
-      Navigator.of(context).pushReplacement(
-        FantasyPageRoute(
-          pageBuilder: (context) => Lobby(),
-        ),
-      );
+      // Navigator.of(context).pushReplacement(
+      //   FantasyPageRoute(
+      //     pageBuilder: (context) => Lobby(),
+      //   ),
+      // );
     } else {
       setLoadingPercentage(99.0);
-      Navigator.of(context).pushReplacement(
-        FantasyPageRoute(
-          pageBuilder: (context) => LandingPage(),
-        ),
-      );
+      // Navigator.of(context).pushReplacement(
+      //   FantasyPageRoute(
+      //     pageBuilder: (context) => LandingPage(),
+      //   ),
+      // );
     }
   }
 
@@ -222,6 +222,20 @@ class SplashScreenState extends State<SplashScreen>
     return Scaffold(
       body: Stack(
         children: <Widget>[
+          Container(
+            decoration: AppConfig.of(context).channelId == '3'
+                ? BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromRGBO(198, 57, 39, 1),
+                        Color.fromRGBO(26, 43, 93, 1)
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  )
+                : null,
+          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -260,6 +274,56 @@ class SplashScreenState extends State<SplashScreen>
               ),
             ],
           ),
+          AppConfig.of(context).channelId == '3'
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 32.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.all(4.0),
+                            child: Image.asset("images/pci.png"),
+                            height: 40.0,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(4.0),
+                            child: Image.asset("images/paytm.png"),
+                            height: 40.0,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(4.0),
+                            child: Image.asset("images/visa.png"),
+                            height: 40.0,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.all(4.0),
+                            child: Image.asset("images/master.png"),
+                            height: 40.0,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(4.0),
+                            child: Image.asset("images/amex.png"),
+                            height: 40.0,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(4.0),
+                            child: Image.asset("images/cashfree.png"),
+                            height: 40.0,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
