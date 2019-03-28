@@ -67,7 +67,7 @@ class RouteLauncher {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.DEPOSIT_INFO,
+        BaseUrl().apiUrl + ApiUtil.DEPOSIT_INFO,
       ),
     );
     return await HttpManager(http.Client()).sendRequest(req).then(
@@ -126,7 +126,7 @@ class RouteLauncher {
     _showUpdateDialog(context);
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CHECK_APP_UPDATE));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CHECK_APP_UPDATE));
     req.body = json.encode({
       "version": double.parse(_packageInfo.version),
       "channelId": AppConfig.of(context).channelId,
@@ -243,7 +243,7 @@ class RouteLauncher {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.AUTH_WITHDRAW,
+        BaseUrl().apiUrl + ApiUtil.AUTH_WITHDRAW,
       ),
     );
     return HttpManager(http.Client()).sendRequest(req).then(
@@ -361,7 +361,7 @@ class RouteLauncher {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_REFERRAL_CODE,
+        BaseUrl().apiUrl + ApiUtil.GET_REFERRAL_CODE,
       ),
     );
     return HttpManager(http.Client()).sendRequest(req).then(
@@ -407,7 +407,7 @@ class RouteLauncher {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_ACCOUNT_DETAILS,
+        BaseUrl().apiUrl + ApiUtil.GET_ACCOUNT_DETAILS,
       ),
     );
     return HttpManager(http.Client()).sendRequest(req).then(

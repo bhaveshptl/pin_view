@@ -158,7 +158,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 
   _getContestMyTeams() async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
     req.body = json.encode([widget.contest.id]);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -679,7 +679,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     String contestVisibility =
         widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
     String contestCode = widget.contest.contestJoinCode;
-    String contestShareUrl = AppConfig.of(context).contestShareUrl;
+    String contestShareUrl = BaseUrl().contestShareUrl;
     String inviteMsg = AppConfig.of(context).appName.toUpperCase() +
         " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
 
@@ -698,7 +698,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl +
+        BaseUrl().apiUrl +
             ApiUtil.GET_CONTEST_TEAMS +
             widget.contest.id.toString() +
             "/teams/" +
@@ -860,7 +860,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,
@@ -1560,7 +1560,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 _getPrizeStructure(Contest contest) async {
   http.Request req = http.Request(
     "GET",
-    Uri.parse(BaseUrl.apiUrl +
+    Uri.parse(BaseUrl().apiUrl +
         ApiUtil.GET_PRIZESTRUCTURE +
         contest.id.toString() +
         "/prizestructure"),

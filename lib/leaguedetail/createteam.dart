@@ -883,7 +883,7 @@ class CreateTeamState extends State<CreateTeam>
 
   void createTeam(Map<String, dynamic> team) async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CREATE_TEAM));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_TEAM));
     req.body = json.encode(team);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -909,7 +909,7 @@ class CreateTeamState extends State<CreateTeam>
 
     return new http.Client()
         .put(
-      BaseUrl.apiUrl + ApiUtil.EDIT_TEAM + widget.selectedTeam.id.toString(),
+      BaseUrl().apiUrl + ApiUtil.EDIT_TEAM + widget.selectedTeam.id.toString(),
       headers: {
         'Content-type': 'application/json',
         "cookie": cookie,

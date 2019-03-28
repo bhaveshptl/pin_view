@@ -88,7 +88,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   // _getInitData() async {
   //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   //   http.Request req =
-  //       http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.INIT_DATA));
+  //       http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.INIT_DATA));
   //   req.body = json.encode({
   //     "version": double.parse(packageInfo.version),
   //     "channelId": HttpManager.channelId,
@@ -108,7 +108,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     http.Request req = http.Request(
         "GET",
         Uri.parse(
-          BaseUrl.apiUrl + ApiUtil.GET_BANNERS + "/4",
+          BaseUrl().apiUrl + ApiUtil.GET_BANNERS + "/4",
         ));
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -243,7 +243,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (sockets.isConnected() == false) {
-      FantasyWebSocket().connect(AppConfig.of(context).websocketUrl);
+      FantasyWebSocket().connect(BaseUrl().websocketUrl);
     }
     if (widget.updateAvailable != null &&
         widget.updateAvailable &&
@@ -394,7 +394,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                   decoration: AppConfig.of(context).showBackground
                       ? BoxDecoration(
                           image: DecorationImage(
-                              image: AssetImage("images/norwegian_rose.png"),
+                              image: AssetImage("images/background.png"),
                               repeat: ImageRepeat.repeat),
                         )
                       : null,

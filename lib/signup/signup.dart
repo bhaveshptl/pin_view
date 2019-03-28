@@ -142,7 +142,7 @@ class SignupState extends State<Signup> {
     }
 
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SIGN_UP));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
     req.body = json.encode(_payload);
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
@@ -232,7 +232,7 @@ class SignupState extends State<Signup> {
   _sendTokenToAuthenticate(String token, int authFor) async {
     http.Client()
         .post(
-      BaseUrl.apiUrl +
+      BaseUrl().apiUrl +
           (authFor == 1
               ? ApiUtil.GOOGLE_LOGIN_URL
               : (authFor == 2
@@ -625,7 +625,8 @@ class SignupState extends State<Signup> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 16.0),
-                    child: AppConfig.of(context).channelId != '3'
+                    child: AppConfig.of(context).channelId != '3' &&
+                            AppConfig.of(context).channelId != '10'
                         ? Column(
                             children: <Widget>[
                               Row(

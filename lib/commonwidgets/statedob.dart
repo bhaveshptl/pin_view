@@ -39,7 +39,7 @@ class StateDobState extends State<StateDob> {
 
       return new http.Client()
           .put(
-        BaseUrl.apiUrl + ApiUtil.UPDATE_DOB_STATE,
+        BaseUrl().apiUrl + ApiUtil.UPDATE_DOB_STATE,
         headers: {
           'Content-type': 'application/json',
           "cookie": cookie,
@@ -80,7 +80,7 @@ class StateDobState extends State<StateDob> {
   _getStateList() async {
     http.Request req = http.Request(
       "GET",
-      Uri.parse(BaseUrl.apiUrl + ApiUtil.STATE_LIST),
+      Uri.parse(BaseUrl().apiUrl + ApiUtil.STATE_LIST),
     );
     return HttpManager(http.Client())
         .sendRequest(req)

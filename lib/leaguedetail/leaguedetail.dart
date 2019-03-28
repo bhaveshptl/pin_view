@@ -514,7 +514,7 @@ class LeagueDetailState extends State<LeagueDetail>
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+        BaseUrl().apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
       ),
     );
     HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
@@ -536,8 +536,8 @@ class LeagueDetailState extends State<LeagueDetail>
         _contestIds.add(contest.id);
       }
 
-      http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+      http.Request req = http.Request("POST",
+          Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
       req.body = json.encode(_contestIds);
       return HttpManager(http.Client())
           .sendRequest(req)
@@ -561,8 +561,8 @@ class LeagueDetailState extends State<LeagueDetail>
 
   getMyContestMySheets(List<int> contests) {
     if (contests != null && contests.length > 0) {
-      http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
+      http.Request req = http.Request("POST",
+          Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
       req.body = json.encode(contests);
       return HttpManager(http.Client())
           .sendRequest(req)
@@ -848,7 +848,7 @@ class LeagueDetailState extends State<LeagueDetail>
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,

@@ -18,7 +18,7 @@ class PartnerState extends State<Partner> {
 
   submitForm() async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PARTNER_REQUEST));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.PARTNER_REQUEST));
     req.body = json.encode({
       "email": _emailController.text,
       "mobile": _mobileController.text,

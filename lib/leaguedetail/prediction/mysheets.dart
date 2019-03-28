@@ -345,7 +345,7 @@ class MySheetsState extends State<MySheets> {
         decoration: AppConfig.of(context).showBackground
             ? BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage("images/norwegian_rose.png"),
+                    image: AssetImage("images/background.png"),
                     repeat: ImageRepeat.repeat),
               )
             : null,

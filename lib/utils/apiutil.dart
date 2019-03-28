@@ -1,10 +1,13 @@
 class BaseUrl {
-  static String apiUrl;
-  static String websocketUrl;
-  static Duration pollTime;
+  String apiUrl;
+  Duration pollTime;
+  String websocketUrl;
+  String contestShareUrl;
+  Map<String, dynamic> staticPageUrls;
 
   BaseUrl._internal();
-  factory BaseUrl() => BaseUrl._internal();
+  static final BaseUrl baseUrl = BaseUrl._internal();
+  factory BaseUrl() => baseUrl;
 
   setApiUrl(String url) {
     apiUrl = url;
@@ -16,6 +19,14 @@ class BaseUrl {
 
   setWebSocketUrl(String url) {
     websocketUrl = url;
+  }
+
+  setStaticPageUrl(Map<String, dynamic> urls) {
+    staticPageUrls = urls;
+  }
+
+  setContestShareUrl(String url) {
+    contestShareUrl = url;
   }
 }
 

@@ -62,7 +62,7 @@ class VerificationState extends State<Verification> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
+        BaseUrl().apiUrl + ApiUtil.KYC_DOC_LIST,
       ),
     );
     return HttpManager(http.Client())
@@ -109,7 +109,7 @@ class VerificationState extends State<Verification> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.VERIFICATION_STATUS,
+        BaseUrl().apiUrl + ApiUtil.VERIFICATION_STATUS,
       ),
     );
     return HttpManager(http.Client())
@@ -201,7 +201,7 @@ class VerificationState extends State<Verification> {
     });
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_VERIFICATION_MAIL));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SEND_VERIFICATION_MAIL));
     req.body = json.encode({
       "email": _emailController.text.toString(),
       "isChanged": email.toString() != _emailController.text.toString(),
@@ -228,7 +228,7 @@ class VerificationState extends State<Verification> {
     });
 
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_OTP));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SEND_OTP));
     req.body = json.encode({
       "phone": _mobileController.text.toString(),
       "isChanged": mobile.toString() != _mobileController.text.toString(),
@@ -251,7 +251,7 @@ class VerificationState extends State<Verification> {
 
   _verifyOTP() {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VERIFY_OTP));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.VERIFY_OTP));
     req.body = json.encode({
       "otp": _otpController.text.toString(),
     });
@@ -314,7 +314,7 @@ class VerificationState extends State<Verification> {
 
       // string to uri
       var uri = Uri.parse(
-          BaseUrl.apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
+          BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
 
       // get length for http post
       var panLength = await _panImage.length();

@@ -137,7 +137,7 @@ class LandingPageState extends State<LandingPage> {
 
   updateStringTable(Map<String, dynamic> language) async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.UPDATE_LANGUAGE_TABLE));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.UPDATE_LANGUAGE_TABLE));
     req.body = json.encode({
       "language": int.parse(language["id"]),
     });
@@ -178,7 +178,7 @@ class LandingPageState extends State<LandingPage> {
     showLoader(true);
 
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.LOGIN_URL));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.LOGIN_URL));
     req.body = json.encode({
       "context": {
         "channel_id": HttpManager.channelId,
@@ -257,7 +257,7 @@ class LandingPageState extends State<LandingPage> {
   _sendTokenToAuthenticate(String token, int authFor) async {
     http.Client()
         .post(
-      BaseUrl.apiUrl +
+      BaseUrl().apiUrl +
           (authFor == 1
               ? ApiUtil.GOOGLE_LOGIN_URL
               : (authFor == 2
@@ -324,12 +324,15 @@ class LandingPageState extends State<LandingPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Padding(
+                      Container(
                         padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
-                        child: Image(
-                          height: 80.0,
-                          fit: BoxFit.scaleDown,
-                          image: new AssetImage("images/logo.png"),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5.0),
+                          child: Image(
+                            height: 80.0,
+                            fit: BoxFit.scaleDown,
+                            image: new AssetImage("images/logo.png"),
+                          ),
                         ),
                       ),
                     ],
@@ -646,7 +649,8 @@ class LandingPageState extends State<LandingPage> {
                   //     )
                   //   ],
                   // ),
-                  AppConfig.of(context).channelId != '3'
+                  AppConfig.of(context).channelId != '3' &&
+                          AppConfig.of(context).channelId != '10'
                       ? Column(
                           children: <Widget>[
                             Row(

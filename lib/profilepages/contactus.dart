@@ -40,7 +40,7 @@ class ContactUsState extends State<ContactUs> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.CONTACTUS_FORM,
+        BaseUrl().apiUrl + ApiUtil.CONTACTUS_FORM,
       ),
     );
     return HttpManager(http.Client()).sendRequest(req).then(
@@ -94,7 +94,7 @@ class ContactUsState extends State<ContactUs> {
 
   submitForm() async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CONTACTUS_SUBMIT));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CONTACTUS_SUBMIT));
     req.body = json.encode({
       "category": selectedCategorie,
       "subCategory": selectedSubCategory,

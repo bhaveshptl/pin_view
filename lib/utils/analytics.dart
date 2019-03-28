@@ -42,7 +42,7 @@ class AnalyticsManager {
       clientTimestamp: 0,
       creativeId: 0,
       deviceId: firebasedeviceid,
-      domain: Uri.parse(BaseUrl.apiUrl).host,
+      domain: Uri.parse(BaseUrl().apiUrl).host,
       googleAddId: "string",
       id: 0,
       manufacturer: androidInfo.manufacturer,

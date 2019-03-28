@@ -246,7 +246,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
 
   getMyContestMySheets() {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
     req.body = json.encode([widget.contest.id]);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -526,7 +526,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   _getPrizeStructure(Contest contest) async {
     http.Request req = http.Request(
       "GET",
-      Uri.parse(BaseUrl.apiUrl +
+      Uri.parse(BaseUrl().apiUrl +
           ApiUtil.GET_PREDICTION_PRIZESTRUCTURE +
           contest.id.toString()),
     );
@@ -545,7 +545,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     String contestVisibility =
         widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
     String contestCode = widget.contest.contestJoinCode;
-    String contestShareUrl = AppConfig.of(context).contestShareUrl;
+    String contestShareUrl = BaseUrl().contestShareUrl;
     String inviteMsg = AppConfig.of(context).appName.toUpperCase() +
         " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
 
@@ -564,7 +564,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl +
+        BaseUrl().apiUrl +
             ApiUtil.GET_CONTEST_SHEETS +
             widget.contest.id.toString() +
             "/answer-sheets/" +
@@ -700,7 +700,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,

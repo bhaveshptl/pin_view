@@ -44,7 +44,7 @@ class MyProfileState extends State<MyProfile> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_USER_PROFILE,
+        BaseUrl().apiUrl + ApiUtil.GET_USER_PROFILE,
       ),
     );
     return HttpManager(http.Client()).sendRequest(req).then(
@@ -195,7 +195,7 @@ class MyProfileState extends State<MyProfile> {
     http.Request req = http.Request(
       "PUT",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.CHANGE_TEAM_NAME,
+        BaseUrl().apiUrl + ApiUtil.CHANGE_TEAM_NAME,
       ),
     );
     req.body = json.encode({
@@ -463,7 +463,7 @@ class MyProfileState extends State<MyProfile> {
     http.Request req = http.Request(
       "PUT",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.UPDATE_USER_PROFILE,
+        BaseUrl().apiUrl + ApiUtil.UPDATE_USER_PROFILE,
       ),
     );
     req.body = json.encode(getUserProfileObject());

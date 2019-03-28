@@ -96,7 +96,7 @@ class AddCashState extends State<AddCash> {
 
   initWebview() {
     flutterWebviewPlugin.launch(
-      BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
+      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
     );
   }
@@ -125,7 +125,7 @@ class AddCashState extends State<AddCash> {
       bShowLoader = false;
     });
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SUCCESS_PAY));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -899,7 +899,7 @@ class AddCashState extends State<AddCash> {
       bShowLoader = true;
     });
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.PAYMENT_MODE));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.PAYMENT_MODE));
     req.body = json.encode({
       "amount": amount,
       "channelId": AppConfig.of(context).channelId,
@@ -920,7 +920,7 @@ class AddCashState extends State<AddCash> {
 
   validatePromo(int amount) async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VALIDATE_PROMO));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.VALIDATE_PROMO));
     req.body = json.encode({
       "amount": amount,
       "channelId": AppConfig.of(context).channelId,
@@ -1032,7 +1032,7 @@ class AddCashState extends State<AddCash> {
     if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
-          Uri.parse(BaseUrl.apiUrl +
+          Uri.parse(BaseUrl().apiUrl +
               ApiUtil.INIT_PAYMENT_SEAMLESS +
               querParamString));
       return HttpManager(http.Client())
@@ -1056,7 +1056,7 @@ class AddCashState extends State<AddCash> {
         });
       });
     } else {
-      startInitPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+      startInitPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
     }
   }
 
@@ -1168,7 +1168,7 @@ class AddCashState extends State<AddCash> {
         decoration: AppConfig.of(context).showBackground
             ? BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage("images/norwegian_rose.png"),
+                  image: AssetImage("images/background.png"),
                   repeat: ImageRepeat.repeat,
                 ),
               )

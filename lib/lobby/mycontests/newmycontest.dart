@@ -94,7 +94,7 @@ class NewMyContestsState extends State<NewMyContests>
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + _sportType.toString(),
+        BaseUrl().apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + _sportType.toString(),
       ),
     );
     return HttpManager(http.Client())
@@ -124,7 +124,7 @@ class NewMyContestsState extends State<NewMyContests>
     });
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
     req.body = json.encode(_contestIds);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -155,7 +155,7 @@ class NewMyContestsState extends State<NewMyContests>
     });
 
     http.Request req = http.Request("POST",
-        Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_CONTEST_MY_ANSWER_SHEETS));
+        Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_CONTEST_MY_ANSWER_SHEETS));
     req.body = json.encode(_contestIds);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -432,7 +432,7 @@ class NewMyContestsState extends State<NewMyContests>
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,

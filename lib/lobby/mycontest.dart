@@ -312,7 +312,7 @@ class MyContestsState extends State<MyContests>
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + _sportType.toString(),
+        BaseUrl().apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + _sportType.toString(),
       ),
     );
     return HttpManager(http.Client())
@@ -428,7 +428,7 @@ class MyContestsState extends State<MyContests>
     });
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
     req.body = json.encode(_contestIds);
     return HttpManager(http.Client())
         .sendRequest(req)

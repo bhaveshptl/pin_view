@@ -47,7 +47,7 @@ class SwitchTeamState extends State<SwitchTeam> {
     };
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SWITCH_CONTEST_TEAM));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SWITCH_CONTEST_TEAM));
     req.body = json.encode(payload);
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {

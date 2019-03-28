@@ -395,7 +395,7 @@ class CreateContestState extends State<CreateContest> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl +
+        BaseUrl().apiUrl +
             ApiUtil.RECOMMENDED_PRIZE_STRUCTURE +
             _numberOfParticipants.toString() +
             "/" +

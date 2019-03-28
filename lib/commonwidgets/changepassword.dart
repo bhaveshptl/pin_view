@@ -46,7 +46,7 @@ class ChangePasswordState extends State<ChangePassword> {
 
   _onChangePassword() async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CHANGE_PASSWORD));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CHANGE_PASSWORD));
     req.body = json.encode({
       "newPassword": _newPasswordController.text,
       "oldPassword": _currentPasswordController.text,

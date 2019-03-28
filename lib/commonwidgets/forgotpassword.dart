@@ -56,7 +56,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     _authName = _authNameController.text;
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.FORGOT_PASSWORD));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.FORGOT_PASSWORD));
     req.body = json.encode({
       "username": _authName,
       "isEmail": _authName.indexOf("@") != -1,
@@ -116,7 +116,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   _submitNewPassword() async {
     http.Client()
         .post(
-      BaseUrl.apiUrl + ApiUtil.RESET_PASSWORD,
+      BaseUrl().apiUrl + ApiUtil.RESET_PASSWORD,
       headers: {'Content-type': 'application/json', "cookie": _otpCookie},
       body: json.encode({
         "username": _authName,

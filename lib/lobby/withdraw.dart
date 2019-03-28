@@ -80,7 +80,7 @@ class WithdrawState extends State<Withdraw> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.KYC_DOC_LIST,
+        BaseUrl().apiUrl + ApiUtil.KYC_DOC_LIST,
       ),
     );
     return HttpManager(http.Client())
@@ -599,7 +599,7 @@ class WithdrawState extends State<Withdraw> {
 
       // string to uri
       var uri = Uri.parse(
-          BaseUrl.apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
+          BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
 
       // get length for http post
       var panLength = await _panImage.length();
@@ -659,7 +659,7 @@ class WithdrawState extends State<Withdraw> {
     });
 
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEND_OTP));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SEND_OTP));
     req.body = json.encode({
       "phone": mobileController.text.toString(),
       "isChanged": mobile.toString() != mobileController.text.toString(),
@@ -682,7 +682,7 @@ class WithdrawState extends State<Withdraw> {
 
   _verifyOTP() {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.VERIFY_OTP));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.VERIFY_OTP));
     req.body = json.encode({
       "otp": otpController.text.toString(),
     });
@@ -777,7 +777,7 @@ class WithdrawState extends State<Withdraw> {
   makeWithdrawRequest(BuildContext context,
       {int withdrawType, double amount}) async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.WITHDRAW));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.WITHDRAW));
     req.body = json.encode({
       "amount": amount,
       "bankDetails": {

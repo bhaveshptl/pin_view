@@ -53,6 +53,11 @@ task copyImages(type: Copy) {
             from "../../resources/images-smart11"
             into "../../images"
         }
+    } else if (channelId == '10') {
+        copy {
+            from "../../resources/images-howzat"
+            into "../../images"
+        }
     }
 }
 
@@ -68,6 +73,11 @@ task copyRes(type: Copy) {
     } else if (channelId == '9') {
         copy {
             from "../../resources/res-smart11"
+            into "../../android/app/src/main/res"
+        }
+    } else if (channelId == '10') {
+        copy {
+            from "../../resources/res-howzat"
             into "../../android/app/src/main/res"
         }
     }
@@ -93,6 +103,14 @@ task copyFlutterInitialization(type: Copy) {
                 fileName.replace('_9', '')
             }
         }
+    } else if (channelId == '10' && buildType == 'stg') {
+        copy {
+            from "../../resources/main_10.dart"
+            into "../../lib"            
+            rename { String fileName ->
+                fileName.replace('_10', '')
+            }
+        }
     } else if (channelId == '3' && buildType == 'prod') {
         copy {
             from "../../resources/main_3_prod.dart"
@@ -107,6 +125,14 @@ task copyFlutterInitialization(type: Copy) {
             into "../../lib"            
             rename { String fileName ->
                 fileName.replace('_9_prod', '')
+            }
+        }
+    } else if (channelId == '10' && buildType == 'prod') {
+        copy {
+            from "../../resources/main_10_prod.dart"
+            into "../../lib"            
+            rename { String fileName ->
+                fileName.replace('_10_prod', '')
             }
         }
     }

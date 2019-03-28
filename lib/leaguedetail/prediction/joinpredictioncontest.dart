@@ -52,7 +52,7 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
       );
     } else {
       http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.JOIN_PREDICTION_CONTEST));
+          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_PREDICTION_CONTEST));
       req.body = json.encode({
         "answerSheetId": _selectedSheetId,
         "contestId": widget.contest.id,
@@ -91,7 +91,7 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
 
   _getUserBalance() async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.QUIZ_USER_BALANCE));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.QUIZ_USER_BALANCE));
     req.body = json.encode({
       "leagueId": widget.contest.leagueId,
       "contestId": widget.contest == null ? "" : widget.contest.id
@@ -115,7 +115,7 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
   getMyContestMySheets(List<int> contests) {
     if (contests != null && contests.length > 0) {
       http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
+          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
       req.body = json.encode(contests);
       return HttpManager(http.Client())
           .sendRequest(req)

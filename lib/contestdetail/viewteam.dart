@@ -53,7 +53,7 @@ class _ViewTeamState extends State<ViewTeam> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl +
+        BaseUrl().apiUrl +
             ApiUtil.GET_TEAM_INFO +
             widget.contest.id.toString() +
             "/teams/" +

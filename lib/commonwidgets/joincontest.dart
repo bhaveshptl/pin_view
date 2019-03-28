@@ -48,7 +48,7 @@ class JoinContestState extends State<JoinContest> {
       );
     } else {
       http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.JOIN_CONTEST));
+          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_CONTEST));
       req.body = json.encode({
         "teamId": _selectedTeamId,
         "context": {"channel_id": HttpManager.channelId},
@@ -93,7 +93,7 @@ class JoinContestState extends State<JoinContest> {
       payload["fanTeamId"] = _selectedTeamId;
 
       http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
+          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
       req.body = json.encode(payload);
       await HttpManager(http.Client()).sendRequest(req).then(
         (http.Response res) {
@@ -140,7 +140,7 @@ class JoinContestState extends State<JoinContest> {
 
   getMyContestTeams() async {
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
     req.body = json.encode([widget.contest.id]);
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
@@ -162,7 +162,7 @@ class JoinContestState extends State<JoinContest> {
 
   _getUserBalance() async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.USER_BALANCE));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.USER_BALANCE));
     req.body = json.encode({
       "contestId": widget.contest == null ? "" : widget.contest.id,
       "leagueId": widget.contest == null

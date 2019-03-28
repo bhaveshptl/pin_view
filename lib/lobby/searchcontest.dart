@@ -38,7 +38,7 @@ class SearchContestState extends State<SearchContest> {
   _onSearchContest() async {
     if (_formKey.currentState.validate()) {
       http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SEARCH_CONTEST));
+          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SEARCH_CONTEST));
       req.body = json.encode({
         "contestId": _contestCodeController.text,
       });

@@ -83,7 +83,7 @@ class InningDetailsState extends State<InningDetails> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
+        BaseUrl().apiUrl + ApiUtil.GET_MY_CONTESTS + _sportType.toString(),
       ),
     );
     HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
@@ -111,8 +111,8 @@ class InningDetailsState extends State<InningDetails> {
         _contestIds.add(contest.id);
       }
 
-      http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+      http.Request req = http.Request("POST",
+          Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
       req.body = json.encode(_contestIds);
       return HttpManager(http.Client())
           .sendRequest(req)
@@ -502,7 +502,7 @@ class InningDetailsState extends State<InningDetails> {
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,

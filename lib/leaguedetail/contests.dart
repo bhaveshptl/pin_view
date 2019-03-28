@@ -479,7 +479,7 @@ class ContestsState extends State<Contests> {
   _getPrizeStructure(Contest contest) async {
     http.Request req = http.Request(
       "GET",
-      Uri.parse(BaseUrl.apiUrl +
+      Uri.parse(BaseUrl().apiUrl +
           ApiUtil.GET_PRIZESTRUCTURE +
           contest.id.toString() +
           "/prizestructure"),

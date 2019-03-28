@@ -106,7 +106,7 @@ class CreateSheetState extends State<CreateSheet>
   getFlipBalance() {
     http.Request req = http.Request(
         "GET",
-        Uri.parse(BaseUrl.apiUrl +
+        Uri.parse(BaseUrl().apiUrl +
             ApiUtil.GET_FLIP_BALANCE +
             widget.league.leagueId.toString()));
     return HttpManager(http.Client())
@@ -125,7 +125,7 @@ class CreateSheetState extends State<CreateSheet>
   getFlips() async {
     http.Request req = http.Request(
         "GET",
-        Uri.parse(BaseUrl.apiUrl +
+        Uri.parse(BaseUrl().apiUrl +
             ApiUtil.GET_LEAGUE_FLIPS +
             widget.league.leagueId.toString()));
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
@@ -285,7 +285,7 @@ class CreateSheetState extends State<CreateSheet>
 
   createAnswerSheet(Map<String, dynamic> payload) async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SAVE_SHEET));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SAVE_SHEET));
     req.body = json.encode(payload);
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -842,7 +842,7 @@ class CreateSheetState extends State<CreateSheet>
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,

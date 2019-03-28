@@ -16,7 +16,7 @@ class AuthResult {
 
   setWSCookie() async {
     Request req =
-        Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_COOKIE_URL));
+        Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_COOKIE_URL));
     req.body = json.encode({});
     return HttpManager(http.Client())
         .sendRequest(req)

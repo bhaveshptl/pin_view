@@ -103,7 +103,7 @@ class PredictionSummaryState extends State<PredictionSummary> {
 
   createAnswerSheet(Map<String, dynamic> payload, BuildContext context) async {
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SAVE_SHEET));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SAVE_SHEET));
     req.body = json.encode(payload);
     await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -136,7 +136,7 @@ class PredictionSummaryState extends State<PredictionSummary> {
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,

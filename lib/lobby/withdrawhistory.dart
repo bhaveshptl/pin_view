@@ -25,7 +25,7 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.WITHDRAW_HISTORY,
+        BaseUrl().apiUrl + ApiUtil.WITHDRAW_HISTORY,
       ),
     );
     return HttpManager(http.Client()).sendRequest(req).then(
@@ -42,7 +42,7 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
   onCancelTransaction(Map<String, dynamic> transaction) async {
     http.Request req = http.Request(
         "POST",
-        Uri.parse(BaseUrl.apiUrl +
+        Uri.parse(BaseUrl().apiUrl +
             ApiUtil.CANCEL_WITHDRAW +
             transaction["id"].toString()));
     req.body = json.encode({});

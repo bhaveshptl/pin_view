@@ -92,7 +92,7 @@ class ViewSheetState extends State<ViewSheet> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl +
+        BaseUrl().apiUrl +
             ApiUtil.GET_ANSWER_SHEET_DETAILS +
             widget.sheet.id.toString(),
       ),

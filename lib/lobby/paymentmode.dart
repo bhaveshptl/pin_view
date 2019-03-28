@@ -48,7 +48,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     super.initState();
     setPaymentModeList();
     flutterWebviewPlugin.launch(
-      BaseUrl.apiUrl + ApiUtil.COOKIE_PAGE,
+      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
     );
 
@@ -79,7 +79,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       bShowLoader = false;
     });
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.SUCCESS_PAY));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -583,7 +583,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     if (paymentModeDetails["info"]["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
-          Uri.parse(BaseUrl.apiUrl +
+          Uri.parse(BaseUrl().apiUrl +
               ApiUtil.INIT_PAYMENT_SEAMLESS +
               querParamString));
       return HttpManager(http.Client())
@@ -615,7 +615,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         }
       });
     } else {
-      initPayment(BaseUrl.apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+      initPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
     }
   }
 
@@ -680,7 +680,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         decoration: AppConfig.of(context).showBackground
             ? BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage("images/norwegian_rose.png"),
+                  image: AssetImage("images/background.png"),
                   repeat: ImageRepeat.repeat,
                 ),
               )

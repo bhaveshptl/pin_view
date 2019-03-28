@@ -68,7 +68,7 @@ class MyContestLeagueCardState extends State<MyContestLeagueCard>
   getAllMySheets() {
     http.Request req = http.Request(
       "POST",
-      Uri.parse(BaseUrl.apiUrl + ApiUtil.GET_CONTEST_MY_ANSWER_SHEETS),
+      Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_CONTEST_MY_ANSWER_SHEETS),
     );
     HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
@@ -100,7 +100,7 @@ class MyContestLeagueCardState extends State<MyContestLeagueCard>
   _getPredictionPrizeStructure(Contest contest) async {
     http.Request req = http.Request(
       "GET",
-      Uri.parse(BaseUrl.apiUrl +
+      Uri.parse(BaseUrl().apiUrl +
           ApiUtil.GET_PREDICTION_PRIZESTRUCTURE +
           contest.id.toString()),
     );
@@ -133,7 +133,7 @@ class MyContestLeagueCardState extends State<MyContestLeagueCard>
   _getPrizeStructure(Contest contest) async {
     http.Request req = http.Request(
       "GET",
-      Uri.parse(BaseUrl.apiUrl +
+      Uri.parse(BaseUrl().apiUrl +
           ApiUtil.GET_PRIZESTRUCTURE +
           contest.id.toString() +
           "/prizestructure"),

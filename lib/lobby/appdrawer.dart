@@ -45,7 +45,7 @@ class AppDrawerState extends State<AppDrawer> {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl.apiUrl + ApiUtil.AUTH_CHECK_URL,
+        BaseUrl().apiUrl + ApiUtil.AUTH_CHECK_URL,
       ),
     );
     HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
@@ -78,7 +78,7 @@ class AppDrawerState extends State<AppDrawer> {
   _doLogout() {
     sockets.reset();
     http.Client().get(
-      BaseUrl.apiUrl + ApiUtil.LOGOUT_URL,
+      BaseUrl().apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {});
   }
@@ -106,28 +106,27 @@ class AppDrawerState extends State<AppDrawer> {
     switch (name) {
       case "SCORING":
         title = "SCORING SYSTEM";
-        url =
-            AppConfig.of(context).staticPageUrls["SCORING"] + "#ScoringSystem";
+        url = BaseUrl().staticPageUrls["SCORING"] + "#ScoringSystem";
         break;
       case "HELP":
         title = "HELP";
-        url = AppConfig.of(context).staticPageUrls["HOW_TO_PLAY"];
+        url = BaseUrl().staticPageUrls["HOW_TO_PLAY"];
         break;
       case "FORUM":
         title = "FORUM";
-        url = AppConfig.of(context).staticPageUrls["FORUM"];
+        url = BaseUrl().staticPageUrls["FORUM"];
         break;
       case "BLOG":
         title = "BLOG";
-        url = AppConfig.of(context).staticPageUrls["BLOG"];
+        url = BaseUrl().staticPageUrls["BLOG"];
         break;
       case "T&C":
         title = "TERMS AND CONDITIONS";
-        url = AppConfig.of(context).staticPageUrls["TERMS"];
+        url = BaseUrl().staticPageUrls["TERMS"];
         break;
       case "PRIVACY":
         title = "PRIVACY POLICY";
-        url = AppConfig.of(context).staticPageUrls["PRIVACY"];
+        url = BaseUrl().staticPageUrls["PRIVACY"];
         break;
     }
     Navigator.of(context).push(
@@ -272,7 +271,7 @@ class AppDrawerState extends State<AppDrawer> {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl.apiUrl + ApiUtil.CHECK_APP_UPDATE));
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CHECK_APP_UPDATE));
     req.body = json.encode({
       "version": double.parse(packageInfo.version),
       "channelId": AppConfig.of(context).channelId,
@@ -337,7 +336,7 @@ class AppDrawerState extends State<AppDrawer> {
             decoration: AppConfig.of(context).showBackground
                 ? BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage("images/norwegian_rose.png"),
+                        image: AssetImage("images/background.png"),
                         repeat: ImageRepeat.repeat),
                   )
                 : null,
@@ -709,7 +708,7 @@ class AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                       Divider(height: 2.0),
-                      AppConfig.of(context).staticPageUrls["BLOG"] != null
+                      BaseUrl().staticPageUrls["BLOG"] != null
                           ? Column(
                               children: <Widget>[
                                 ListTile(
@@ -722,7 +721,7 @@ class AppDrawerState extends State<AppDrawer> {
                               ],
                             )
                           : Container(),
-                      AppConfig.of(context).staticPageUrls["FORUM"] != null
+                      BaseUrl().staticPageUrls["FORUM"] != null
                           ? Column(
                               children: <Widget>[
                                 ListTile(

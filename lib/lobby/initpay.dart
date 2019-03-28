@@ -30,7 +30,7 @@ class InitPayState extends State<InitPay> {
     flutterWebviewPlugin.onStateChanged.listen(
       (WebViewStateChanged state) {
         Uri uri = Uri.dataFromString(state.url);
-        if (uri.path.indexOf(BaseUrl.apiUrl + ApiUtil.PAYMENT_SUCCESS) != -1 &&
+        if (uri.path.indexOf(BaseUrl().apiUrl + ApiUtil.PAYMENT_SUCCESS) != -1 &&
             uri.hasQuery) {
           if (depositResponse == null) {
             depositResponse = uri.queryParameters;
