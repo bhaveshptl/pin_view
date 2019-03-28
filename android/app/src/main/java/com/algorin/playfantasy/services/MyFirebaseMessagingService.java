@@ -64,7 +64,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
 
-        Boolean isAppOnForeground = isAppOnForeground(this, "com.algorintechlabs.justkhel");
+        Boolean isAppOnForeground = isAppOnForeground(this, "com.algorin.playfantasy");
         if (!isAppOnForeground) {
             sendNotification(remoteMessage);
         }
@@ -169,7 +169,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 
         } catch (Exception e) {
-System.out.print(e.toString());
+             System.out.print(e.toString());
         }
 
     }
