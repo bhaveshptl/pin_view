@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
@@ -7,7 +6,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/landingpage/landingpage.dart';
 import 'package:playfantasy/lobby/lobby.dart';
-
+import 'package:flutter/services.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authcheck.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -38,12 +37,17 @@ class SplashScreenState extends State<SplashScreen>
   String maintenanceMsg = "";
   double loadingPercent = 0.0;
   bool bUnderMaintenence = false;
+  static const firebase_fcm_platform =
+      const MethodChannel('com.algorin.pf.fcm');
 
   @override
   void initState() {
     getRequiredData();
     super.initState();
     initFirebaseConfiguration();
+
+     _getFirebaseToken();
+    _subscribeToFirebaseTopic(widget.fcmSubscribeId);
   }
 
   getRequiredData() async {
@@ -108,27 +112,59 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   initFirebaseConfiguration() async {
-    FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-    await _firebaseMessaging.getToken().then((token) {
-      print("Token is .........................");
-      print(token);
-      SharedPrefHelper.internal()
-          .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, token);
-    });
+    // FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+    // await _firebaseMessaging.getToken().then((token) {
+    //   print("Token is .........................");
+    //   print(token);
+    //   SharedPrefHelper.internal()
+    //       .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, token);
+    // });
 
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) {
-        print('on message $message');
-      },
-      onResume: (Map<String, dynamic> message) {
-        print('on resume $message');
-      },
-      onLaunch: (Map<String, dynamic> message) {
-        print('on launch $message');
-      },
-    );
-    _firebaseMessaging.subscribeToTopic('news');
-    _firebaseMessaging.subscribeToTopic(widget.fcmSubscribeId);
+    // _firebaseMessaging.configure(
+    //   onMessage: (Map<String, dynamic> message) {
+    //     print('on message $message');
+    //   },
+    //   onResume: (Map<String, dynamic> message) {
+    //     print('on resume $message');
+    //   },
+    //   onLaunch: (Map<String, dynamic> message) {
+    //     print('on launch $message');
+    //   },
+    // );
+    // _firebaseMessaging.subscribeToTopic('news');
+    // _firebaseMessaging.subscribeToTopic(widget.fcmSubscribeId);
+  }
+
+
+  Future<String> _getFirebaseToken() async {
+    String value;
+    try {
+      value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken');
+      SharedPrefHelper.internal()
+          .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, value);
+          print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      print("Firebase token in splashscreen");
+      print(value);
+    } catch (e) {
+       print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      print(e);
+    }
+    return value;
+  }
+
+  Future<String> _subscribeToFirebaseTopic(String topicName) async {
+    String result;
+    try {
+      result = await firebase_fcm_platform.invokeMethod(
+          '_subscribeToFirebaseTopic', topicName);
+           print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      print("Subscribed to topic");
+      print(result);
+    } catch (e) {
+       print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      print(e);
+    }
+    return result;
   }
 
   updateStringTable() async {
