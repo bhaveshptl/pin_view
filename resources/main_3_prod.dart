@@ -42,6 +42,7 @@ ThemeData _buildLightTheme() {
 void main() async {
   String channelId = "3";
   const apiBaseUrl = "https://www.playfantasy.com";
+  String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
   disableDeviceRotation();
 
@@ -55,6 +56,7 @@ void main() async {
       home: SplashScreen(
         apiBaseUrl: apiBaseUrl,
         channelId: channelId,
+        fcmSubscribeId: fcmSubscribeId,
       ),
       routes: FantasyRoutes().getRoutes(),
       theme: _buildLightTheme(),
