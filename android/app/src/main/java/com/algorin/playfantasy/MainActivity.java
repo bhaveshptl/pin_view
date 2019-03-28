@@ -330,7 +330,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             }
         }
 
-        String fmChannelName="channelId_10_news_stage";
+        String fmChannelName="news";
         FirebaseMessaging.getInstance().subscribeToTopic(fmChannelName)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override

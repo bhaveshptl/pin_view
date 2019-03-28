@@ -146,7 +146,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             bigPictureStyle.setBigContentTitle(body);
 
             int smallimage=this.getResources().getIdentifier("push_logo", "drawable", "com.algorin.playfantasy");
-            
             notificationBuilder
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)
