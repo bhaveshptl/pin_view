@@ -28,6 +28,7 @@ void main() async {
     channelId: channelId,
     showBackground: true,
     apiBaseUrl: apiBaseUrl,
+    carouselSlideTime: Duration(seconds: 5),
     child: MaterialApp(
       home: SplashScreen(
         apiBaseUrl: apiBaseUrl,

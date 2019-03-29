@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -376,33 +377,37 @@ class ContestsState extends State<Contests> {
               .showSnackBar(SnackBar(content: Text("$result")));
         }
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(strings.get("ALERT").toUpperCase()),
-              content: Text(
-                strings.get("CREATE_TEAM_WARNING"),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    strings.get("CANCEL").toUpperCase(),
-                  ),
+        if (AppConfig.of(context).channelId == "10") {
+          _onCreateTeam(context, contest);
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(strings.get("ALERT").toUpperCase()),
+                content: Text(
+                  strings.get("CREATE_TEAM_WARNING"),
                 ),
-                FlatButton(
-                  onPressed: () {
-                    _onCreateTeam(context, contest);
-                  },
-                  child: Text(strings.get("CREATE").toUpperCase()),
-                )
-              ],
-            );
-          },
-        );
+                actions: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      strings.get("CANCEL").toUpperCase(),
+                    ),
+                  ),
+                  FlatButton(
+                    onPressed: () {
+                      _onCreateTeam(context, contest);
+                    },
+                    child: Text(strings.get("CREATE").toUpperCase()),
+                  )
+                ],
+              );
+            },
+          );
+        }
       }
     }
   }

@@ -7,7 +7,7 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 2.07+4
+version: 2.08+4
 
 environment:
   sdk: '>=2.0.0-dev.68.0 <3.0.0'
@@ -22,7 +22,7 @@ dependencies:
   package_info: ^0.3.2
   image_picker: ^0.4.10
   google_sign_in: ^3.2.4
-  carousel_slider: ^1.0.1
+  carousel_slider: ^1.0.1  
   animated_text_kit: ^1.2.0
   shared_preferences: ^0.4.2
   web_socket_channel: ^1.0.9
@@ -96,3 +96,11 @@ flutter:
     - family: MyFlutterApp
       fonts:
         - asset: fonts/MyFlutterApp.ttf
+    - family: Muli
+      fonts:
+        - asset: fonts/MuliRegular.ttf
+        - asset: fonts/MuliSemiBold.ttf
+          weight: 600
+        - asset: fonts/MuliBold.ttf
+          weight: 700
+        

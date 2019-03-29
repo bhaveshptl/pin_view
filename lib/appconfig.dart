@@ -8,12 +8,14 @@ class AppConfig extends InheritedWidget {
     @required this.apiBaseUrl,
     @required this.showBackground,
     @required Widget child,
+    @required Duration carouselSlideTime,
   }) : super(child: child);
 
   final String appName;
   final String channelId;
   final String apiBaseUrl;
   final bool showBackground;
+  final Duration carouselSlideTime = Duration(seconds: 5);
 
   static AppConfig of(BuildContext context) {
     return context.inheritFromWidgetOfExactType(AppConfig);

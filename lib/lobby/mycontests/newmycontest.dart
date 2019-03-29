@@ -19,8 +19,9 @@ class NewMyContests extends StatefulWidget {
   final List<League> leagues;
   final Function onSportChange;
   final double tabBarHeight = 32.0;
+  final Map<String, int> mapSportTypes;
 
-  NewMyContests({this.leagues, this.onSportChange});
+  NewMyContests({this.leagues, this.onSportChange, this.mapSportTypes});
 
   @override
   NewMyContestsState createState() {
@@ -30,12 +31,6 @@ class NewMyContests extends StatefulWidget {
 
 class NewMyContestsState extends State<NewMyContests>
     with SingleTickerProviderStateMixin {
-  Map<String, int> _mapSportTypes = {
-    "CRICKET": 1,
-    "FOOTBALL": 2,
-    "KABADDI": 3,
-  };
-
   String cookie;
   int _sportType = 1;
   List<League> allLeagues;
@@ -58,7 +53,7 @@ class NewMyContestsState extends State<NewMyContests>
     _getMyContests();
     allLeagues = widget.leagues;
     _sportsController =
-        TabController(vsync: this, length: _mapSportTypes.keys.length);
+        TabController(vsync: this, length: widget.mapSportTypes.keys.length);
     _sportsController.addListener(() {
       if (!_sportsController.indexIsChanging) {
         setState(() {
@@ -417,7 +412,7 @@ class NewMyContestsState extends State<NewMyContests>
                       isScrollable: true,
                       indicator: UnderlineTabIndicator(),
                       indicatorSize: TabBarIndicatorSize.label,
-                      tabs: _mapSportTypes.keys.map<Tab>((page) {
+                      tabs: widget.mapSportTypes.keys.map<Tab>((page) {
                         return Tab(
                           text: page,
                         );
@@ -437,37 +432,18 @@ class NewMyContestsState extends State<NewMyContests>
                   )
                 : null,
             child: TabBarView(
-              controller: _sportsController,
-              children: <Widget>[
-                MyContestSportTab(
-                  leagues: allLeagues,
-                  showLoader: showLoader,
-                  sportsType: _sportType,
-                  scaffoldKey: _scaffoldKey,
-                  mapMyTeams: _mapContestTeams,
-                  mapMySheets: _mapContestSheets,
-                  myContests: myContests[_mapSportTypes["CRICKET"]],
-                ),
-                MyContestSportTab(
-                  leagues: allLeagues,
-                  showLoader: showLoader,
-                  sportsType: _sportType,
-                  scaffoldKey: _scaffoldKey,
-                  mapMyTeams: _mapContestTeams,
-                  mapMySheets: _mapContestSheets,
-                  myContests: myContests[_mapSportTypes["FOOTBALL"]],
-                ),
-                MyContestSportTab(
-                  leagues: allLeagues,
-                  showLoader: showLoader,
-                  sportsType: _sportType,
-                  scaffoldKey: _scaffoldKey,
-                  mapMyTeams: _mapContestTeams,
-                  mapMySheets: _mapContestSheets,
-                  myContests: myContests[_mapSportTypes["KABADDI"]],
-                )
-              ],
-            ),
+                controller: _sportsController,
+                children: widget.mapSportTypes.keys.map((f) {
+                  return MyContestSportTab(
+                    leagues: allLeagues,
+                    showLoader: showLoader,
+                    sportsType: widget.mapSportTypes[f],
+                    scaffoldKey: _scaffoldKey,
+                    mapMyTeams: _mapContestTeams,
+                    mapMySheets: _mapContestSheets,
+                    myContests: myContests[widget.mapSportTypes[f]],
+                  );
+                }).toList()),
           ),
         ),
         bShowLoader ? Loader() : Container(),

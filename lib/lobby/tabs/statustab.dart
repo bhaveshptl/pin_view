@@ -12,6 +12,7 @@ class StatusTab extends StatelessWidget {
   final Function onSportChange;
   final List<League> allLeagues;
   final List<League> statusLeagues;
+  final Map<String, int> mapSportTypes;
 
   StatusTab({
     this.sportType,
@@ -19,6 +20,7 @@ class StatusTab extends StatelessWidget {
     this.leagueStatus,
     this.statusLeagues,
     this.onSportChange,
+    this.mapSportTypes,
   });
 
   onLeagueSelect(BuildContext context, League league) {
@@ -29,6 +31,7 @@ class StatusTab extends StatelessWidget {
               leagues: allLeagues,
               sportType: sportType,
               onSportChange: onSportChange,
+              mapSportTypes: mapSportTypes,
             ),
       ),
     );

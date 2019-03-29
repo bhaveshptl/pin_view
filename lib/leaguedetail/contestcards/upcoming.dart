@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/gradientbutton.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -150,25 +151,54 @@ class UpcomingContest extends StatelessWidget {
                         color: Colors.black45,
                       ),
                 ),
-                contest.bonusAllowed > 0
-                    ? Tooltip(
-                        message: strings.get("USE_BONUS").replaceAll(
-                            "\$bonusPercent", contest.bonusAllowed.toString()),
-                        child: CircleAvatar(
-                          backgroundColor: Theme.of(context).primaryColorDark,
-                          maxRadius: 10.0,
-                          child: Text(
-                            "B",
-                            style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .fontSize),
-                          ),
-                        ),
-                      )
-                    : Container(),
+                Row(
+                  children: <Widget>[
+                    contest.teamsAllowed > 1
+                        ? Tooltip(
+                            message: strings.get("MAXIMUM_ENTRY").replaceAll(
+                                "\$count", contest.teamsAllowed.toString()),
+                            child: CircleAvatar(
+                              backgroundColor:
+                                  Theme.of(context).primaryColorDark,
+                              maxRadius: 10.0,
+                              child: Text(
+                                "M",
+                                style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .fontSize),
+                              ),
+                            ),
+                          )
+                        : Container(),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: contest.bonusAllowed > 0
+                          ? Tooltip(
+                              message: strings.get("USE_BONUS").replaceAll(
+                                  "\$bonusPercent",
+                                  contest.bonusAllowed.toString()),
+                              child: CircleAvatar(
+                                backgroundColor:
+                                    Theme.of(context).primaryColorDark,
+                                maxRadius: 10.0,
+                                child: Text(
+                                  "B",
+                                  style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .caption
+                                          .fontSize),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -347,36 +377,48 @@ class UpcomingContest extends StatelessWidget {
                 flex: 2,
                 child: Column(
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 4.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(right: 4.0),
-                            child: Text(
-                              "Entry",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Colors.black87,
+                    AppConfig.of(context).channelId == "10"
+                        ? Container()
+                        : Padding(
+                            padding: EdgeInsets.only(bottom: 4.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(right: 4.0),
+                                  child: Text(
+                                    "Entry",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(
+                                          color: Colors.black87,
+                                        ),
                                   ),
-                            ),
-                          ),
-                          contest.prizeType == 1
-                              ? Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 2.0),
-                                  child: Image.asset(
-                                    strings.chips,
-                                    width: 10.0,
-                                    height: 10.0,
-                                    fit: BoxFit.contain,
-                                  ))
-                              : Text(
-                                  strings.rupee,
+                                ),
+                                contest.prizeType == 1
+                                    ? Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 2.0),
+                                        child: Image.asset(
+                                          strings.chips,
+                                          width: 10.0,
+                                          height: 10.0,
+                                          fit: BoxFit.contain,
+                                        ))
+                                    : Text(
+                                        strings.rupee,
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .caption
+                                            .copyWith(
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                Text(
+                                  contest.entryFee.toString(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .caption
@@ -385,19 +427,9 @@ class UpcomingContest extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
-                          Text(
-                            contest.entryFee.toString(),
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .copyWith(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -436,16 +468,64 @@ class UpcomingContest extends StatelessWidget {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: <Widget>[
-                                          Text(
-                                            "JOIN",
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .subhead
-                                                  .fontSize,
-                                            ),
-                                          ),
+                                          AppConfig.of(context).channelId ==
+                                                  "10"
+                                              ? Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    contest.prizeType == 1
+                                                        ? Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        2.0),
+                                                            child: Image.asset(
+                                                              strings.chips,
+                                                              width: 10.0,
+                                                              height: 10.0,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            ))
+                                                        : Text(
+                                                            strings.rupee,
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .primaryTextTheme
+                                                                .button
+                                                                .copyWith(
+                                                                  color: Colors
+                                                                      .white70,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                          ),
+                                                    Text(
+                                                      contest.entryFee
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .primaryTextTheme
+                                                          .button
+                                                          .copyWith(
+                                                            color:
+                                                                Colors.white70,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Text(
+                                                  "JOIN",
+                                                  style: TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .button
+                                                        .fontSize,
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     ],

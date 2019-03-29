@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/commonwidgets/epoc.dart';
@@ -107,57 +108,65 @@ class LeagueCard extends StatelessWidget {
                                         // flex: 2,
                                         child: Column(
                                           children: <Widget>[
-                                            Text(
-                                              _league.matchName,
-                                              style: TextStyle(
-                                                fontSize: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .caption
-                                                    .fontSize,
-                                                color: Colors.black54,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
                                             Padding(
-                                              padding: EdgeInsets.only(
-                                                  top: 6.0, bottom: 6.0),
+                                              padding:
+                                                  EdgeInsets.only(bottom: 4.0),
                                               child: Text(
-                                                "vs",
-                                                textAlign: TextAlign.center,
+                                                _league.matchName,
                                                 style: TextStyle(
                                                   fontSize: Theme.of(context)
                                                       .primaryTextTheme
-                                                      .title
+                                                      .caption
                                                       .fontSize,
-                                                  color: Colors.black87,
+                                                  color: Colors.black54,
                                                 ),
+                                                textAlign: TextAlign.center,
                                               ),
                                             ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      right: 8.0),
-                                                  child: Icon(
-                                                    Icons.alarm,
-                                                    size: 16.0,
-                                                    color: Colors.black54,
+                                            AppConfig.of(context).channelId ==
+                                                    "10"
+                                                ? Container()
+                                                : Text(
+                                                    "vs",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          Theme.of(context)
+                                                              .primaryTextTheme
+                                                              .title
+                                                              .fontSize,
+                                                      color: Colors.black87,
+                                                    ),
                                                   ),
-                                                ),
-                                                _league.status ==
-                                                        LeagueStatus.UPCOMING
-                                                    ? EPOC(
-                                                        timeInMiliseconds:
-                                                            _league
-                                                                .matchStartTime,
-                                                      )
-                                                    : (_league.status ==
-                                                            LeagueStatus.LIVE
-                                                        ? Text("LIVE")
-                                                        : Text("COMPLETED")),
-                                              ],
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 4.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        right: 8.0),
+                                                    child: Icon(
+                                                      Icons.alarm,
+                                                      size: 16.0,
+                                                      color: Colors.black54,
+                                                    ),
+                                                  ),
+                                                  _league.status ==
+                                                          LeagueStatus.UPCOMING
+                                                      ? EPOC(
+                                                          timeInMiliseconds:
+                                                              _league
+                                                                  .matchStartTime,
+                                                        )
+                                                      : (_league.status ==
+                                                              LeagueStatus.LIVE
+                                                          ? Text("LIVE")
+                                                          : Text("COMPLETED")),
+                                                ],
+                                              ),
                                             ),
                                           ],
                                         ),

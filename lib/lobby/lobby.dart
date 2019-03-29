@@ -67,7 +67,6 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     _mapSportTypes = {
       "CRICKET": 1,
       "FOOTBALL": 2,
-      "KABADDI": 3,
     };
   }
 
@@ -159,6 +158,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
             FantasyPageRoute(
               pageBuilder: (context) => NewMyContests(
                     leagues: _leagues,
+                    mapSportTypes: _mapSportTypes,
                     onSportChange: _onSportSelectionChaged,
                   ),
             ),
@@ -264,17 +264,21 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
               elevation: 3.0,
               title: Container(
                 height: kToolbarHeight,
+                padding: EdgeInsets.only(top: 6.0, bottom: 6.0),
                 child: Row(
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 16.0),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0),
                       child: Image.asset(
                         "images/logo.png",
                         width: 48.0,
                       ),
                     ),
-                    Text(
-                      AppConfig.of(context).appName.toUpperCase(),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        AppConfig.of(context).appName.toUpperCase(),
+                      ),
                     ),
                   ],
                 ),
@@ -300,7 +304,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                                 ? CarouselSlider(
                                     enlargeCenterPage: false,
                                     aspectRatio: 16 / 3,
-                                    autoPlayInterval: Duration(seconds: 5),
+                                    autoPlayInterval: Duration(seconds: 10),
                                     items:
                                         _carousel.map<Widget>((dynamic banner) {
                                       return FlatButton(
@@ -411,6 +415,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                                       _leagues = value;
                                     },
                                     onSportChange: _onSportSelectionChaged,
+                                    mapSportTypes: _mapSportTypes,
                                   ),
                                 ),
                               ],

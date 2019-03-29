@@ -33,8 +33,15 @@ class LeagueDetail extends StatefulWidget {
   final int sportType;
   final List<League> leagues;
   final Function onSportChange;
+  final Map<String, int> mapSportTypes;
 
-  LeagueDetail(this.league, {this.sportType, this.leagues, this.onSportChange});
+  LeagueDetail(
+    this.league, {
+    this.sportType,
+    this.leagues,
+    this.onSportChange,
+    this.mapSportTypes,
+  });
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -48,7 +55,7 @@ class LeagueDetailState extends State<LeagueDetail>
   List<MyTeam> _myTeams;
   String title = "Match";
   bool bShowLoader = false;
-  bool bShowInnings = true;
+  bool bShowInnings = false;
   List<MySheet> _mySheets;
   Prediction predictionData;
   List<int> predictionContestIds;
@@ -71,6 +78,7 @@ class LeagueDetailState extends State<LeagueDetail>
     _createL1WSObject();
 
     _getMyContests();
+    bShowInnings = widget.league.prediction == 1;
     tabController = TabController(length: 2, vsync: this);
     tabController.addListener(() {
       setState(() {
@@ -617,6 +625,7 @@ class LeagueDetailState extends State<LeagueDetail>
           FantasyPageRoute(
             pageBuilder: (context) => NewMyContests(
                   leagues: widget.leagues,
+                  mapSportTypes: widget.mapSportTypes,
                   onSportChange: widget.onSportChange,
                 ),
           ),
@@ -815,7 +824,8 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   Widget build(BuildContext context) {
-    bShowInnings = AppConfig.of(context).channelId == "3" ? true : false;
+    bShowInnings =
+        AppConfig.of(context).channelId == "9" ? false : bShowInnings;
     return Stack(
       children: <Widget>[
         Scaffold(

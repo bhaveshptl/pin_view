@@ -20,23 +20,24 @@ void main() async {
   const apiBaseUrl = "https://www.playfantasy.com";
   String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
-
   disableDeviceRotation();
 
   HttpManager.channelId = channelId;
   var configuredApp = AppConfig(
     appName: 'Howzat',
     channelId: channelId,
-    showBackground: true,
+    showBackground: false,
     apiBaseUrl: apiBaseUrl,
+    carouselSlideTime: Duration(seconds: 10),
     child: MaterialApp(
       home: SplashScreen(
         apiBaseUrl: apiBaseUrl,
         channelId: channelId,
-         fcmSubscribeId: fcmSubscribeId,
+        fcmSubscribeId: fcmSubscribeId,
       ),
       routes: FantasyRoutes().getRoutes(),
       theme: ThemeData(
+        fontFamily: 'Muli',
         primaryColor: Color.fromRGBO(97, 6, 0, 1),
         primaryColorLight: Color.fromRGBO(148, 56, 42, 1),
         primaryColorDark: Color.fromRGBO(57, 0, 0, 1),
