@@ -44,9 +44,8 @@ class SplashScreenState extends State<SplashScreen>
   void initState() {
     getRequiredData();
     super.initState();
-    initFirebaseConfiguration();
 
-     _getFirebaseToken();
+    _getFirebaseToken();
     _subscribeToFirebaseTopic(widget.fcmSubscribeId);
   }
 
@@ -76,7 +75,6 @@ class SplashScreenState extends State<SplashScreen>
             await SharedPrefHelper().saveWSCookieToStorage(wsCookie["cookie"]);
         print(result);
       }
-      print("here");
 
       setLoadingPercentage(99.0);
       Navigator.of(context).pushReplacement(
@@ -111,44 +109,13 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  initFirebaseConfiguration() async {
-    // FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-    // await _firebaseMessaging.getToken().then((token) {
-    //   print("Token is .........................");
-    //   print(token);
-    //   SharedPrefHelper.internal()
-    //       .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, token);
-    // });
-
-    // _firebaseMessaging.configure(
-    //   onMessage: (Map<String, dynamic> message) {
-    //     print('on message $message');
-    //   },
-    //   onResume: (Map<String, dynamic> message) {
-    //     print('on resume $message');
-    //   },
-    //   onLaunch: (Map<String, dynamic> message) {
-    //     print('on launch $message');
-    //   },
-    // );
-    // _firebaseMessaging.subscribeToTopic('news');
-    // _firebaseMessaging.subscribeToTopic(widget.fcmSubscribeId);
-  }
-
-
   Future<String> _getFirebaseToken() async {
     String value;
     try {
       value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken');
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, value);
-          print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      print("Firebase token in splashscreen");
-      print(value);
-    } catch (e) {
-       print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      print(e);
-    }
+    } catch (e) {}
     return value;
   }
 
@@ -157,11 +124,7 @@ class SplashScreenState extends State<SplashScreen>
     try {
       result = await firebase_fcm_platform.invokeMethod(
           '_subscribeToFirebaseTopic', topicName);
-           print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      print("Subscribed to topic");
-      print(result);
     } catch (e) {
-       print("@@@@@@@@@@@@@@@@@@@@FCM 1@@@@@@@@@@@@@@@@@@@@@@@@@@@");
       print(e);
     }
     return result;
@@ -249,7 +212,7 @@ class SplashScreenState extends State<SplashScreen>
           isForceUpdate: isForceUpdate,
         );
       },
-      barrierDismissible: !isForceUpdate,
+      barrierDismissible: false,
     );
   }
 
@@ -270,7 +233,9 @@ class SplashScreenState extends State<SplashScreen>
                       end: Alignment.bottomCenter,
                     ),
                   )
-                : null,
+                : (AppConfig.of(context).channelId == "10"
+                    ? BoxDecoration(color: Theme.of(context).primaryColor)
+                    : null),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -288,13 +253,13 @@ class SplashScreenState extends State<SplashScreen>
                           children: <Widget>[
                             Container(
                               constraints: BoxConstraints(
-                                maxHeight:
-                                    MediaQuery.of(context).size.height * 0.50,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.80,
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(5.0),
                                 child: Image.asset(
-                                  "images/logo.png",
+                                  "images/logo_with_name.png",
                                   height:
                                       MediaQuery.of(context).devicePixelRatio *
                                           80.0,
@@ -367,7 +332,7 @@ class SplashScreenState extends State<SplashScreen>
               Padding(
                 padding: EdgeInsets.only(bottom: 4.0, left: 8.0, right: 8.0),
                 child: Text(
-                  "LOADING..." + loadingPercent.toStringAsFixed(0) + "%",
+                  "LOADING...",
                   style: TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.bold,

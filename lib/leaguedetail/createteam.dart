@@ -647,7 +647,9 @@ class CreateTeamState extends State<CreateTeam>
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                  color: Theme.of(context).accentColor, fontSize: 24.0),
+                color: Theme.of(context).errorColor,
+                fontSize: 24.0,
+              ),
             ),
           ),
         );
@@ -812,7 +814,12 @@ class CreateTeamState extends State<CreateTeam>
                         },
                       )
                     : FloatingActionButton.extended(
-                        label: Text("Choose Captain"),
+                        backgroundColor: AppConfig.of(context).channelId == "10"
+                            ? Colors.green
+                            : null,
+                        label: Text(AppConfig.of(context).channelId == "10"
+                            ? "Next Choose your Captain!"
+                            : "Choose Captain"),
                         icon: Icon(
                           Icons.save,
                           size: 0.0,

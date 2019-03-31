@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/leaguedetail/contestcards/upcoming_howzat.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -60,17 +62,27 @@ class ContestCard extends StatelessWidget {
           onPressed: () {
             onClick(contest, league);
           },
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(0.0),
           child: leagueStatus == LeagueStatus.UPCOMING
-              ? UpcomingContest(
-                  league: league,
-                  onJoin: onJoin,
-                  contest: contest,
-                  isMyContest: isMyContest,
-                  myJoinedTeams: myJoinedTeams,
-                  bShowBrandInfo: bShowBrandInfo,
-                  onPrizeStructure: onPrizeStructure,
-                )
+              ? AppConfig.of(context).channelId == "10"
+                  ? UpcomingHowzatContest(
+                      league: league,
+                      onJoin: onJoin,
+                      contest: contest,
+                      isMyContest: isMyContest,
+                      myJoinedTeams: myJoinedTeams,
+                      bShowBrandInfo: bShowBrandInfo,
+                      onPrizeStructure: onPrizeStructure,
+                    )
+                  : UpcomingContest(
+                      league: league,
+                      onJoin: onJoin,
+                      contest: contest,
+                      isMyContest: isMyContest,
+                      myJoinedTeams: myJoinedTeams,
+                      bShowBrandInfo: bShowBrandInfo,
+                      onPrizeStructure: onPrizeStructure,
+                    )
               : leagueStatus == LeagueStatus.LIVE
                   ? LiveContest(
                       league: league,

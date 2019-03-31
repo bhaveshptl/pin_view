@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -52,6 +53,8 @@ class LiveContest extends StatelessWidget {
         title = "Second";
       }
     }
+    final formatCurrency =
+        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
 
     return Column(
       children: <Widget>[
@@ -129,8 +132,8 @@ class LiveContest extends StatelessWidget {
                                             .fontSize),
                                   ),
                             Text(
-                              contest.prizeDetails[0]["totalPrizeAmount"]
-                                  .toString(),
+                              formatCurrency.format(
+                                  contest.prizeDetails[0]["totalPrizeAmount"]),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Theme.of(context).primaryColorDark,

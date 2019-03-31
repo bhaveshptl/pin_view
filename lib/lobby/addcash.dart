@@ -431,7 +431,20 @@ class AddCashState extends State<AddCash> {
   onRepeatTransaction() async {
     int amount =
         amountController.text != "" ? int.parse(amountController.text) : 0;
-    if (promoController.text == "") {
+
+    if (amount < widget.depositData.chooseAmountData.minAmount ||
+        amount > widget.depositData.chooseAmountData.depositLimit) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Enter amount between Min " +
+              strings.rupee +
+              widget.depositData.chooseAmountData.minAmount.toString() +
+              " and Max " +
+              strings.rupee +
+              widget.depositData.chooseAmountData.depositLimit.toString()),
+        ),
+      );
+    } else if (promoController.text == "") {
       initRepeatDeposit();
     } else {
       final result = await validatePromo(amount);
@@ -876,12 +889,16 @@ class AddCashState extends State<AddCash> {
         );
       } else {
         amount = amount == null ? int.parse(amountController.text) : amount;
-        if (amount < widget.depositData.chooseAmountData.minAmount) {
+        if (amount < widget.depositData.chooseAmountData.minAmount ||
+            amount > widget.depositData.chooseAmountData.depositLimit) {
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
-              content: Text("Please enter more than " +
+              content: Text("Enter amount between Min " +
+                  strings.rupee +
                   widget.depositData.chooseAmountData.minAmount.toString() +
-                  " to deposit."),
+                  " and Max " +
+                  strings.rupee +
+                  widget.depositData.chooseAmountData.depositLimit.toString()),
             ),
           );
         } else {
@@ -1128,20 +1145,18 @@ class AddCashState extends State<AddCash> {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
           : customAmountController.text);
-      if (customAmount > widget.depositData.chooseAmountData.depositLimit) {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
-          content: Text("You can not deposit more than " +
-              strings.rupee +
-              widget.depositData.chooseAmountData.depositLimit.toString() +
-              " in single transaction."),
-        ));
-      } else if (customAmount < widget.depositData.chooseAmountData.minAmount) {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
-          content: Text("Minimum  " +
-              strings.rupee +
-              widget.depositData.chooseAmountData.minAmount.toString() +
-              " should be deposit in a transaction."),
-        ));
+      if (amount < widget.depositData.chooseAmountData.minAmount ||
+          amount > widget.depositData.chooseAmountData.depositLimit) {
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text("Enter amount between Min " +
+                strings.rupee +
+                widget.depositData.chooseAmountData.minAmount.toString() +
+                " and Max " +
+                strings.rupee +
+                widget.depositData.chooseAmountData.depositLimit.toString()),
+          ),
+        );
       } else {
         onProceed(amount: customAmount);
       }

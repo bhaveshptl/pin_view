@@ -118,82 +118,92 @@ class DownloadAPKState extends State<DownloadAPK> {
               title: Text("Update available"),
               titlePadding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
               contentPadding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
-              content: downloadStarted
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              CircleAvatar(
-                                maxRadius: 32.0,
-                                child: Icon(
-                                  Icons.file_download,
-                                  size: 48.0,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 16.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: EdgeInsets.only(bottom: 8.0),
-                                        child: Row(
-                                          children: <Widget>[
-                                            Text(
-                                              downloadProgress.toString() + "%",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      LinearProgressIndicator(
-                                        value: (downloadProgress / 100),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Row(
+              content: SingleChildScrollView(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: downloadStarted
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text(
-                              "Change logs",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .title
-                                  .copyWith(
-                                    color: Colors.black54,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Column(
-                            children: widget.logs.map((text) {
-                              return Row(
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
+                                  CircleAvatar(
+                                    maxRadius: 32.0,
+                                    child: Icon(
+                                      Icons.file_download,
+                                      size: 48.0,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
                                   Expanded(
-                                    child: Text(text),
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 16.0),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding:
+                                                EdgeInsets.only(bottom: 8.0),
+                                            child: Row(
+                                              children: <Widget>[
+                                                Text(
+                                                  downloadProgress.toString() +
+                                                      "%",
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          LinearProgressIndicator(
+                                            value: (downloadProgress / 100),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ],
-                              );
-                            }).toList(),
-                          ),
+                              ),
+                            ),
+                          ],
                         )
-                      ],
-                    ),
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  "Change logs",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .copyWith(
+                                        color: Colors.black54,
+                                      ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Column(
+                                children: widget.logs.map((text) {
+                                  return Container(
+                                    padding: EdgeInsets.only(bottom: 4.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(text),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            )
+                          ],
+                        ),
+                ),
+              ),
               actions: <Widget>[
                 bShowCancelButton
                     ? FlatButton(

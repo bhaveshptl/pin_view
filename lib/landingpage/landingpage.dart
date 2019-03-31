@@ -93,7 +93,7 @@ class LandingPageState extends State<LandingPage> {
           isForceUpdate: widget.isForceUpdate,
         );
       },
-      barrierDismissible: !widget.isForceUpdate,
+      barrierDismissible: false,
     );
   }
 

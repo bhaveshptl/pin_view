@@ -28,6 +28,7 @@ class VerificationState extends State<Verification> {
   File _panImage;
   File _addressImage;
   bool _bIsOTPSent = false;
+  bool _bDisableOTP = false;
   bool _bIsMailSent = false;
   int _selectedItemIndex = -1;
   List<Widget> _messageList = [];
@@ -250,6 +251,9 @@ class VerificationState extends State<Verification> {
   }
 
   _verifyOTP() {
+    setState(() {
+      _bDisableOTP = true;
+    });
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.VERIFY_OTP));
     req.body = json.encode({
@@ -262,6 +266,7 @@ class VerificationState extends State<Verification> {
         setState(() {
           _bIsMobileVerified = true;
         });
+        _getVerificationStatus();
       } else {
         Map<String, dynamic> response = json.decode(res.body);
         scaffoldKey.currentState.showSnackBar(
@@ -577,7 +582,7 @@ class VerificationState extends State<Verification> {
                                 ),
                                 Form(
                                   key: formKey,
-                                  child: !_bIsMobileVerified
+                                  child: _bIsMobileVerified
                                       ? Column(
                                           children: <Widget>[
                                             ListTile(
@@ -585,16 +590,18 @@ class VerificationState extends State<Verification> {
                                                 controller: _mobileController,
                                                 keyboardType:
                                                     TextInputType.phone,
+                                                enabled: !_bDisableOTP,
                                                 decoration: InputDecoration(
-                                                    labelText:
-                                                        "Enter mobile number",
-                                                    hintText: "9999999999",
-                                                    prefix: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 4.0),
-                                                      child: Text("+91"),
-                                                    )),
+                                                  labelText:
+                                                      "Enter mobile number",
+                                                  hintText: "9999999999",
+                                                  prefix: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 4.0),
+                                                    child: Text("+91"),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                             _bIsOTPSent

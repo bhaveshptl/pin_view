@@ -10,6 +10,7 @@ class SharedPrefHelper {
   static SharedPrefHelper _instance = new SharedPrefHelper.internal();
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  static String wsCookie;
 
   saveCookieToStorage(String cookie) async {
     final pref = await _prefs;
@@ -22,6 +23,7 @@ class SharedPrefHelper {
   }
 
   saveWSCookieToStorage(String cookie) async {
+    wsCookie = cookie;
     final pref = await _prefs;
     pref.setString(ApiUtil.WS_SHARED_PREFERENCE_KEY, cookie);
   }
@@ -32,6 +34,7 @@ class SharedPrefHelper {
   }
 
   removeCookie() async {
+    wsCookie = null;
     final pref = await _prefs;
     return pref.remove(ApiUtil.SHARED_PREFERENCE_KEY);
   }

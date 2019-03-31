@@ -92,8 +92,8 @@ class JoinContestState extends State<JoinContest> {
       Map<String, dynamic> payload = widget.createContestPayload;
       payload["fanTeamId"] = _selectedTeamId;
 
-      http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
+      http.Request req = http.Request("POST",
+          Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
       req.body = json.encode(payload);
       await HttpManager(http.Client()).sendRequest(req).then(
         (http.Response res) {
@@ -161,8 +161,8 @@ class JoinContestState extends State<JoinContest> {
   }
 
   _getUserBalance() async {
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.USER_BALANCE));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.USER_BALANCE));
     req.body = json.encode({
       "contestId": widget.contest == null ? "" : widget.contest.id,
       "leagueId": widget.contest == null

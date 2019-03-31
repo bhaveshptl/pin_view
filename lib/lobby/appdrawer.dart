@@ -218,7 +218,7 @@ class AppDrawerState extends State<AppDrawer> {
           isForceUpdate: bIsForceUpdate,
         );
       },
-      barrierDismissible: !bIsForceUpdate,
+      barrierDismissible: false,
     );
   }
 
@@ -754,6 +754,7 @@ class AppDrawerState extends State<AppDrawer> {
                         title: Text('Log Out'),
                         onTap: () async {
                           _doLogout();
+                          HttpManager.cookie = null;
                           SharedPrefHelper.internal().removeCookie();
                           Navigator.pop(context);
                           Navigator.of(context)

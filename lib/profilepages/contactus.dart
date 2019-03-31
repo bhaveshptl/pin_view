@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -163,6 +164,29 @@ class ContactUsState extends State<ContactUs> {
       return true;
   }
 
+  _launchStaticPage(String name) {
+    String url = "";
+    String title = "";
+    switch (name) {
+      case "FAQ":
+        title = "FAQ";
+        url = BaseUrl().staticPageUrls["FAQ"];
+        break;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              clearCache: true,
+              appBar: AppBar(
+                title: Text(title),
+              ),
+            ),
+        fullscreenDialog: true,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -297,7 +321,32 @@ class ContactUsState extends State<ContactUs> {
                   ),
                 ],
               ),
-            )
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: OutlineButton(
+                      onPressed: () {
+                        _launchStaticPage("FAQ");
+                      },
+                      borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      highlightedBorderColor: Theme.of(context).primaryColor,
+                      child: Text(
+                        "FAQ",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

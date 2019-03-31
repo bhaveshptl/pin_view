@@ -80,7 +80,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
           isForceUpdate: widget.isForceUpdate,
         );
       },
-      barrierDismissible: !widget.isForceUpdate,
+      barrierDismissible: false,
     );
   }
 
@@ -188,7 +188,6 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     showLoader(true);
     routeLauncher.launchAddCash(
       context,
-      onSuccess: (result) {},
       onComplete: () {
         showLoader(false);
       },
@@ -204,9 +203,13 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   Future<bool> _onWillPop() {
     return showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
             title: Text(strings.get("APP_CLOSE_TITLE")),
-            content: Text(strings.get("DO_U_W_EXIT")),
+            content: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Text(strings.get("DO_U_W_EXIT")),
+            ),
             actions: <Widget>[
               FlatButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -238,6 +241,12 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
         fullscreenDialog: true,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    FantasyWebSocket().stopPingPong();
+    super.dispose();
   }
 
   @override
@@ -405,6 +414,7 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                   child: _sportType >= 0
                       ? TabBarView(
                           controller: _controller,
+                          // physics: NeverScrollableScrollPhysics(),
                           children: _mapSportTypes.keys.map<Widget>((page) {
                             return Row(
                               children: <Widget>[

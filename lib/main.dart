@@ -41,6 +41,7 @@ void main() async {
         primaryColor: Color.fromRGBO(97, 6, 0, 1),
         primaryColorLight: Color.fromRGBO(148, 56, 42, 1),
         primaryColorDark: Color.fromRGBO(57, 0, 0, 1),
+        accentColor: Color.fromRGBO(211, 37, 24, 1),
       ),
     ),
   );

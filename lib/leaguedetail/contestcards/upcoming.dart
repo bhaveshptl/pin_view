@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/gradientbutton.dart';
 
@@ -50,6 +51,9 @@ class UpcomingContest extends StatelessWidget {
         title = "Second";
       }
     }
+
+    final formatCurrency =
+        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
 
     return Container(
       child: Column(
@@ -249,8 +253,8 @@ class UpcomingContest extends StatelessWidget {
                                                   .fontSize),
                                         ),
                                   Text(
-                                    contest.prizeDetails[0]["totalPrizeAmount"]
-                                        .toString(),
+                                    formatCurrency.format(contest
+                                        .prizeDetails[0]["totalPrizeAmount"]),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: contest.prizeType == 1

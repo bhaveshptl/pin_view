@@ -34,6 +34,7 @@ class TransactionFailed extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
+            width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
             child: RichText(
               text: TextSpan(

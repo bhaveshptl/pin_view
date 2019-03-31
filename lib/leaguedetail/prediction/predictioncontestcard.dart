@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/leaguedetail/prediction/contestcards/live.dart';
 import 'package:playfantasy/leaguedetail/prediction/contestcards/result.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/upcoming_howzat.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -65,16 +67,25 @@ class PredictionContestCard extends StatelessWidget {
           onPressed: () {
             onClick(contest, league);
           },
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(0.0),
           child: leagueStatus == LeagueStatus.UPCOMING
-              ? UpcomingPredictionContest(
-                  league: league,
-                  onJoin: onJoin,
-                  contest: contest,
-                  myJoinedSheets: myJoinedSheets,
-                  bShowBrandInfo: bShowBrandInfo,
-                  onPrizeStructure: onPrizeStructure,
-                )
+              ? AppConfig.of(context).channelId == "10"
+                  ? UpcomingHowzatPredictionContest(
+                      league: league,
+                      onJoin: onJoin,
+                      contest: contest,
+                      myJoinedSheets: myJoinedSheets,
+                      bShowBrandInfo: bShowBrandInfo,
+                      onPrizeStructure: onPrizeStructure,
+                    )
+                  : UpcomingPredictionContest(
+                      league: league,
+                      onJoin: onJoin,
+                      contest: contest,
+                      myJoinedSheets: myJoinedSheets,
+                      bShowBrandInfo: bShowBrandInfo,
+                      onPrizeStructure: onPrizeStructure,
+                    )
               : leagueStatus == LeagueStatus.LIVE
                   ? LivePredictionContest(
                       league: league,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
@@ -433,33 +434,37 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
             .showSnackBar(SnackBar(content: Text(response["message"])));
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(strings.get("ALERT").toUpperCase()),
-            content: Text(
-              "No sheet created for this match. Please create one to join contest.",
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  strings.get("CANCEL").toUpperCase(),
-                ),
+      if (AppConfig.of(context).channelId == "10") {
+        _onCreateSheet(context, contest);
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(strings.get("ALERT").toUpperCase()),
+              content: Text(
+                "No sheet created for this match. Please create one to join contest.",
               ),
-              FlatButton(
-                onPressed: () {
-                  _onCreateSheet(context, contest);
-                },
-                child: Text(strings.get("CREATE").toUpperCase()),
-              )
-            ],
-          );
-        },
-      );
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    strings.get("CANCEL").toUpperCase(),
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    _onCreateSheet(context, contest);
+                  },
+                  child: Text(strings.get("CREATE").toUpperCase()),
+                )
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -477,7 +482,10 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     final curContest = contest;
     bWaitingForSheetCreation = true;
 
-    Navigator.of(context).pop();
+    if (AppConfig.of(context).channelId != "10") {
+      Navigator.of(context).pop();
+    }
+
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateSheet(
@@ -683,6 +691,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
             widget.contest.teamsAllowed <= _mapContestSheets.length) ||
         widget.league.status == LeagueStatus.LIVE ||
         widget.league.status == LeagueStatus.COMPLETED;
+    final formatCurrency =
+        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
 
     _sheetDataSource.setWidth(width);
     _sheetDataSource.setContext(context);
@@ -751,7 +761,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                   Row(
                                                     children: <Widget>[
                                                       Text(
-                                                        "Prize",
+                                                        "Prize pool",
                                                         style: TextStyle(
                                                           color: Colors.black54,
                                                           fontSize: Theme.of(
@@ -793,29 +803,12 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                         (widget.contest
                                                                     .prizeDetails !=
                                                                 null
-                                                            ? (widget
+                                                            ? formatCurrency
+                                                                .format((widget
                                                                         .contest
-                                                                        .prizeDetails[
-                                                                                0]
-                                                                            [
-                                                                            "totalPrizeAmount"]
-                                                                        .toString()
-                                                                        .indexOf(
-                                                                            ".") ==
-                                                                    -1
-                                                                ? widget
-                                                                    .contest
-                                                                    .prizeDetails[
-                                                                            0][
-                                                                        "totalPrizeAmount"]
-                                                                    .toString()
-                                                                : (widget.contest
-                                                                                .prizeDetails[0]
-                                                                            [
-                                                                            "totalPrizeAmount"]
-                                                                        as double)
-                                                                    .toStringAsFixed(
-                                                                        2))
+                                                                        .prizeDetails[0]
+                                                                    [
+                                                                    "totalPrizeAmount"]))
                                                             : 0.toString()),
                                                         style: TextStyle(
                                                             color: Theme.of(
@@ -960,8 +953,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                                   ),
                                                             ),
                                                       Text(
-                                                        widget.contest.entryFee
-                                                            .toString(),
+                                                        formatCurrency.format(
+                                                            widget.contest
+                                                                .entryFee),
                                                         style: Theme.of(context)
                                                             .primaryTextTheme
                                                             .caption
@@ -987,68 +981,153 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                     child: Padding(
                                                       padding: EdgeInsets.only(
                                                           left: 16.0),
-                                                      child: GradientButton(
-                                                        disabled:
-                                                            bIsContestFull,
-                                                        button: RaisedButton(
-                                                          onPressed: () {
-                                                            if (!bIsContestFull) {
-                                                              joinPredictionContest(
-                                                                  widget
-                                                                      .contest);
-                                                            }
-                                                          },
-                                                          color: Colors
-                                                              .transparent,
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  0.0),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: <Widget>[
-                                                              _mapContestSheets !=
-                                                                          null &&
-                                                                      _mapContestSheets
-                                                                              .length >
-                                                                          0
-                                                                  ? Icon(
-                                                                      Icons.add,
-                                                                      color: Colors
-                                                                          .white70,
-                                                                      size: Theme.of(
-                                                                              context)
-                                                                          .primaryTextTheme
-                                                                          .subhead
-                                                                          .fontSize,
-                                                                    )
-                                                                  : Container(),
-                                                              Row(
+                                                      child: AppConfig.of(
+                                                                      context)
+                                                                  .channelId ==
+                                                              "10"
+                                                          ? RaisedButton(
+                                                              onPressed:
+                                                                  (bIsContestFull &&
+                                                                          joinPredictionContest ==
+                                                                              null)
+                                                                      ? null
+                                                                      : () {
+                                                                          joinPredictionContest(
+                                                                              widget.contest);
+                                                                        },
+                                                              elevation: 0.0,
+                                                              shape:
+                                                                  RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            5.0),
+                                                              ),
+                                                              color:
+                                                                  Colors.green,
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(0.0),
+                                                              child: Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
                                                                         .center,
                                                                 children: <
                                                                     Widget>[
-                                                                  Text(
-                                                                    "JOIN",
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: Colors
-                                                                          .white70,
-                                                                      fontSize: Theme.of(
-                                                                              context)
-                                                                          .primaryTextTheme
-                                                                          .subhead
-                                                                          .fontSize,
-                                                                    ),
+                                                                  _mapContestSheets !=
+                                                                              null &&
+                                                                          _mapContestSheets.length >
+                                                                              0
+                                                                      ? Icon(
+                                                                          Icons
+                                                                              .add,
+                                                                          color:
+                                                                              Colors.white70,
+                                                                          size: Theme.of(context)
+                                                                              .primaryTextTheme
+                                                                              .subhead
+                                                                              .fontSize,
+                                                                        )
+                                                                      : Container(),
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: <
+                                                                        Widget>[
+                                                                      Row(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.center,
+                                                                        children: <
+                                                                            Widget>[
+                                                                          widget.contest.prizeType == 1
+                                                                              ? Padding(
+                                                                                  padding: EdgeInsets.symmetric(horizontal: 2.0),
+                                                                                  child: Image.asset(
+                                                                                    strings.chips,
+                                                                                    width: 10.0,
+                                                                                    height: 10.0,
+                                                                                    fit: BoxFit.contain,
+                                                                                  ))
+                                                                              : Text(
+                                                                                  strings.rupee,
+                                                                                  style: Theme.of(context).primaryTextTheme.button.copyWith(
+                                                                                        color: Colors.white70,
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                      ),
+                                                                                ),
+                                                                          Text(
+                                                                            widget.contest.entryFee.toString(),
+                                                                            style: Theme.of(context).primaryTextTheme.button.copyWith(
+                                                                                  color: Colors.white70,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                ),
+                                                                          ),
+                                                                        ],
+                                                                      )
+                                                                    ],
                                                                   ),
                                                                 ],
                                                               ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
+                                                            )
+                                                          : GradientButton(
+                                                              disabled:
+                                                                  bIsContestFull,
+                                                              button:
+                                                                  RaisedButton(
+                                                                onPressed: () {
+                                                                  if (!bIsContestFull) {
+                                                                    joinPredictionContest(
+                                                                        widget
+                                                                            .contest);
+                                                                  }
+                                                                },
+                                                                color: Colors
+                                                                    .transparent,
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(
+                                                                            0.0),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: <
+                                                                      Widget>[
+                                                                    _mapContestSheets !=
+                                                                                null &&
+                                                                            _mapContestSheets.length >
+                                                                                0
+                                                                        ? Icon(
+                                                                            Icons.add,
+                                                                            color:
+                                                                                Colors.white70,
+                                                                            size:
+                                                                                Theme.of(context).primaryTextTheme.subhead.fontSize,
+                                                                          )
+                                                                        : Container(),
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Text(
+                                                                          "JOIN",
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                Colors.white70,
+                                                                            fontSize:
+                                                                                Theme.of(context).primaryTextTheme.subhead.fontSize,
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
                                                     ),
                                                   ),
                                                 ),
@@ -1061,7 +1140,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                               bottom: 8.0),
                                           child: Row(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.center,
+                                                CrossAxisAlignment.start,
                                             children: <Widget>[
                                               Expanded(
                                                 flex: 2,
@@ -1095,8 +1174,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                                     child:
                                                                         CircleAvatar(
                                                                       backgroundColor:
-                                                                          Theme.of(context)
-                                                                              .primaryColorDark,
+                                                                          Colors
+                                                                              .green,
                                                                       maxRadius:
                                                                           10.0,
                                                                       child:
@@ -1154,8 +1233,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                                                                     child:
                                                                         CircleAvatar(
                                                                       backgroundColor:
-                                                                          Theme.of(context)
-                                                                              .primaryColorDark,
+                                                                          Colors
+                                                                              .indigo,
                                                                       maxRadius:
                                                                           10.0,
                                                                       child:

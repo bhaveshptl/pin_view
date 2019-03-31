@@ -438,7 +438,9 @@ class ContestsState extends State<Contests> {
     final curContest = contest;
 
     bWaitingForTeamCreation = true;
-    Navigator.of(context).pop();
+    if (AppConfig.of(context).channelId != "10") {
+      Navigator.of(context).pop();
+    }
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
@@ -574,7 +576,9 @@ class ContestsState extends State<Contests> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return StateDob();
+              return StateDob(
+                onSuccess: (String msg) {},
+              );
             },
           );
           break;

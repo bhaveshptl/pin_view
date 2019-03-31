@@ -188,7 +188,7 @@ class RouteLauncher {
           isForceUpdate: bIsForceUpdate,
         );
       },
-      barrierDismissible: !bIsForceUpdate,
+      barrierDismissible: false,
     );
     if (onComplete != null) {
       onComplete();

@@ -422,10 +422,15 @@ class CreateSheetState extends State<CreateSheet>
       lstTrivia.add(Padding(
         padding: EdgeInsets.only(bottom: 4.0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Icon(
-              Icons.chevron_right,
-              color: Colors.black45,
+            Container(
+              height: 20.0,
+              padding: EdgeInsets.only(right: 8.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.black87,
+                radius: 4.0,
+              ),
             ),
             Expanded(
               child: Text(
@@ -667,6 +672,7 @@ class CreateSheetState extends State<CreateSheet>
                                       xBoosterLeft.toString(),
                                       style: TextStyle(
                                         fontSize: 8.0,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -711,6 +717,7 @@ class CreateSheetState extends State<CreateSheet>
                                       bPlusBoosterLeft.toString(),
                                       style: TextStyle(
                                         fontSize: 8.0,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -757,6 +764,7 @@ class CreateSheetState extends State<CreateSheet>
                                       flipBalance.toString(),
                                       style: TextStyle(
                                         fontSize: 8.0,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),

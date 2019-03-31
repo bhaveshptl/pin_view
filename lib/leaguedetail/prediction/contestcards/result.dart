@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
@@ -42,6 +43,9 @@ class ResultPredictionContest extends StatelessWidget {
   Widget build(BuildContext context) {
     MySheet _myBestSheet = myJoinedSheets == null ? null : _getMyBestSheet();
     double _totalWinnings = _getTotalWinnings();
+
+    final formatCurrency =
+        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
 
     return Column(
       children: <Widget>[
@@ -108,8 +112,8 @@ class ResultPredictionContest extends StatelessWidget {
                                             .fontSize),
                                   ),
                             Text(
-                              contest.prizeDetails[0]["totalPrizeAmount"]
-                                  .toString(),
+                              formatCurrency.format(
+                                  contest.prizeDetails[0]["totalPrizeAmount"]),
                               style: TextStyle(
                                   color: Theme.of(context).primaryColorDark,
                                   fontSize: Theme.of(context)

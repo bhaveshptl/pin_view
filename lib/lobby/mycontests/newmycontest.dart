@@ -55,12 +55,15 @@ class NewMyContestsState extends State<NewMyContests>
     _sportsController =
         TabController(vsync: this, length: widget.mapSportTypes.keys.length);
     _sportsController.addListener(() {
+      showLoader(true);
       if (!_sportsController.indexIsChanging) {
+        _sportType = _sportsController.index + 1;
+        widget.onSportChange(_sportType);
+        _getMyContests(checkForPrevSelection: false);
         setState(() {
-          _sportType = _sportsController.index + 1;
-          widget.onSportChange(_sportType);
-          _getMyContests(checkForPrevSelection: false);
+          _sportType = _sportType;
         });
+        print(_sportType.toString());
       }
     });
   }
@@ -86,23 +89,26 @@ class NewMyContestsState extends State<NewMyContests>
 
   _getMyContests({bool checkForPrevSelection = true}) async {
     showLoader(true);
+    int sport = _sportType;
+    print(sport);
     http.Request req = http.Request(
       "GET",
       Uri.parse(
-        BaseUrl().apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + _sportType.toString(),
+        BaseUrl().apiUrl + ApiUtil.GET_MY_ALL_CONTESTS + sport.toString(),
       ),
     );
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
+        print(res.body);
         Map<String, dynamic> response = json.decode(res.body);
         setState(() {
-          myContests[_sportType] = NewMyContest.fromJson(response).leagues;
+          myContests[sport] = NewMyContest.fromJson(response).leagues;
         });
         showLoader(false);
-        _getMyContestMyTeams(myContests[_sportType]);
-        _getMyContestMySheets(myContests[_sportType]);
+        _getMyContestMyTeams(myContests[sport]);
+        _getMyContestMySheets(myContests[sport]);
       }
     }).whenComplete(() {
       showLoader(false);
@@ -173,6 +179,7 @@ class NewMyContestsState extends State<NewMyContests>
   }
 
   _onWsMsg(data) {
+    print(data);
     if (data["iType"] == RequestType.GET_ALL_SERIES &&
         data["bSuccessful"] == true &&
         data["sportsId"] == _sportType) {
@@ -433,6 +440,7 @@ class NewMyContestsState extends State<NewMyContests>
                 : null,
             child: TabBarView(
                 controller: _sportsController,
+                physics: NeverScrollableScrollPhysics(),
                 children: widget.mapSportTypes.keys.map((f) {
                   return MyContestSportTab(
                     leagues: allLeagues,

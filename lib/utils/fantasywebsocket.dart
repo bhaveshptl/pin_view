@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -50,7 +49,11 @@ class FantasyWebSocket {
     bConnectionProcessInProgress = true;
     String futureCookie;
 
-    futureCookie = await SharedPrefHelper.internal().getWSCookie();
+    if (SharedPrefHelper.wsCookie == null) {
+      futureCookie = await SharedPrefHelper().getWSCookie();
+    } else {
+      futureCookie = SharedPrefHelper.wsCookie;
+    }
 
     if (futureCookie != null) {
       _channel = null;
@@ -110,6 +113,11 @@ class FantasyWebSocket {
       _pingPongTimer.cancel();
       _startPingPong();
     });
+  }
+
+  stopPingPong() {
+    _pingPongTimer.cancel();
+    reset();
   }
 
   StreamController<dynamic> subscriber() {

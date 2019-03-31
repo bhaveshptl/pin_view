@@ -58,7 +58,8 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
       FantasyWebSocket().sendMessage(lobbyUpdatePackate);
     } else if (data["sportsId"] == widget.sportType) {
       if (data["iType"] == RequestType.GET_ALL_SERIES &&
-          data["bSuccessful"] == true) {
+          data["bSuccessful"] == true &&
+          widget.sportType == data["sportsId"]) {
         List<League> _leagues = [];
         List<dynamic> _mapLeagues = json.decode(data["data"]);
 
@@ -194,10 +195,6 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if (registeredSportType != widget.sportType) {
-      _createLobbyObject();
-      FantasyWebSocket().sendMessage(lobbyUpdatePackate);
-    }
     return Scaffold(
       backgroundColor: Colors.transparent,
       key: _scaffoldKey,

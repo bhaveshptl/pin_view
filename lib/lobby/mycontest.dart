@@ -45,6 +45,7 @@ class MyContestsState extends State<MyContests>
   StreamSubscription _streamSubscription;
   Map<int, List<MyContestStatusTab>> tabs = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
+  Map<String, dynamic> lobbyUpdatePackate = {};
   Map<String, List<Contest>> _mapLiveContest = {};
   Map<String, List<Contest>> _mapResultContest = {};
   Map<String, List<Contest>> _mapUpcomingContest = {};
@@ -63,6 +64,7 @@ class MyContestsState extends State<MyContests>
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
 
     _getMyContests();
+    _createLobbyObject();
     _leagues = widget.leagues;
     _sportsController =
         TabController(vsync: this, length: _mapSportTypes.keys.length);
@@ -75,8 +77,15 @@ class MyContestsState extends State<MyContests>
           _getMyContests(checkForPrevSelection: false);
         });
         SharedPrefHelper().saveSportsType(_sportType.toString());
+        _createLobbyObject();
+        FantasyWebSocket().sendMessage(lobbyUpdatePackate);
       }
     });
+  }
+
+  _createLobbyObject() {
+    lobbyUpdatePackate["sportsId"] = _sportType;
+    lobbyUpdatePackate["iType"] = RequestType.GET_ALL_SERIES;
   }
 
   _onWsMsg(data) {

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/leaguedetail/createteam.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet.dart';
 import 'package:playfantasy/lobby/mycontests/newmycontest.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -816,6 +818,111 @@ class LeagueDetailState extends State<LeagueDetail>
     );
   }
 
+  _onBottomButtonClick(int index) async {
+    var result;
+    switch (index) {
+      case 0:
+        if (activeTabIndex == 0) {
+          if (squadStatus()) {
+            result = await Navigator.of(context).push(
+              FantasyPageRoute(
+                pageBuilder: (context) => CreateContest(
+                      league: widget.league,
+                      l1data: l1Data,
+                      myTeams: _myTeams,
+                    ),
+              ),
+            );
+          }
+        } else {
+          _showComingSoonDialog();
+        }
+        break;
+      case 1:
+        if (activeTabIndex == 0) {
+          if (squadStatus()) {
+            result = await Navigator.of(context).push(
+              FantasyPageRoute(
+                pageBuilder: (context) => MyTeams(
+                      league: widget.league,
+                      l1Data: l1Data,
+                      myTeams: _myTeams,
+                    ),
+              ),
+            );
+          }
+        } else {
+          launchMySheet();
+        }
+        break;
+      case 2:
+        result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => NewMyContests(
+                  leagues: widget.leagues,
+                  mapSportTypes: widget.mapSportTypes,
+                  onSportChange: widget.onSportChange,
+                ),
+          ),
+        );
+        break;
+      case 3:
+        if (activeTabIndex == 0) {
+          if (squadStatus()) {
+            result = await Navigator.of(context).push(
+              FantasyPageRoute(
+                pageBuilder: (context) => CreateTeam(
+                      league: widget.league,
+                      l1Data: l1Data,
+                      mode: TeamCreationMode.CREATE_TEAM,
+                    ),
+              ),
+            );
+          }
+        } else {
+          launchCreateSheet();
+        }
+        break;
+    }
+    if (result != null) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(result),
+          duration: Duration(
+            seconds: 3,
+          ),
+        ),
+      );
+    }
+  }
+
+  launchCreateSheet() async {
+    Quiz quiz = predictionData.quizSet.quiz["0"];
+    if (predictionData.league.qfVisibility != 0 &&
+        quiz != null &&
+        quiz.questions != null &&
+        quiz.questions.length > 0) {
+      final result = await Navigator.of(context).push(
+        FantasyPageRoute(
+          pageBuilder: (context) => CreateSheet(
+                league: widget.league,
+                predictionData: predictionData,
+                mode: SheetCreationMode.CREATE_SHEET,
+              ),
+        ),
+      );
+      if (result != null) {
+        _scaffoldKey.currentState
+            .showSnackBar(SnackBar(content: Text("$result")));
+      }
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text(
+            "Questions are not yet set for this prediction. Please try again later!!"),
+      ));
+    }
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
@@ -843,14 +950,13 @@ class LeagueDetailState extends State<LeagueDetail>
                 ),
               ),
               Tooltip(
-                message: strings.get("CONTEST_FILTER"),
-                child: IconButton(
-                  icon: Icon(Icons.filter_list),
-                  onPressed: () {
-                    _showFilterDialog();
-                  },
-                ),
-              )
+                  message: strings.get("CONTEST_FILTER"),
+                  child: IconButton(
+                    icon: Icon(Icons.account_balance_wallet),
+                    onPressed: () {
+                      _launchAddCash();
+                    },
+                  ))
             ],
           ),
           body: Container(
@@ -957,9 +1063,107 @@ class LeagueDetailState extends State<LeagueDetail>
               ],
             ),
           ),
-          bottomNavigationBar: activeTabIndex == 0
-              ? LobbyBottomNavigation(_onNavigationSelectionChange, 1)
-              : LobbyBottomNavigation(_onNavigationSelectionChange, 2),
+          bottomNavigationBar: Container(
+            height: 64.0,
+            color: Theme.of(context).primaryColor,
+            child: (activeTabIndex == 0 &&
+                        _myTeams != null &&
+                        _myTeams.length > 0) ||
+                    (activeTabIndex == 1 &&
+                        _mySheets != null &&
+                        _mySheets.length > 0)
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      activeTabIndex != 0
+                          ? Container()
+                          : Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4.0),
+                              child: RaisedButton(
+                                color: Color.fromRGBO(21, 156, 84, 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                onPressed: () {
+                                  _onBottomButtonClick(0);
+                                },
+                                elevation: 0.0,
+                                child: Text(
+                                  "Create contest",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .button
+                                      .copyWith(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        child: RaisedButton(
+                          color: Color.fromRGBO(21, 156, 84, 1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          onPressed: () {
+                            _onBottomButtonClick(1);
+                          },
+                          elevation: 0.0,
+                          child: Text(
+                            activeTabIndex == 0 ? "My teams" : "My predictions",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .button
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        child: RaisedButton(
+                          color: Color.fromRGBO(21, 156, 84, 1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          onPressed: () {
+                            _onBottomButtonClick(2);
+                          },
+                          elevation: 0.0,
+                          child: Text(
+                            "My contests",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .button
+                                .copyWith(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      RaisedButton(
+                        color: Color.fromRGBO(21, 156, 84, 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        onPressed: () {
+                          _onBottomButtonClick(3);
+                        },
+                        elevation: 0.0,
+                        child: Text(
+                          activeTabIndex == 0
+                              ? "Create team"
+                              : "Create prediction",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .button
+                              .copyWith(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
         ),
         bShowLoader ? Loader() : Container(),
       ],
