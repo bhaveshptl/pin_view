@@ -1145,21 +1145,8 @@ class AddCashState extends State<AddCash> {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
           : customAmountController.text);
-      if (amount < widget.depositData.chooseAmountData.minAmount ||
-          amount > widget.depositData.chooseAmountData.depositLimit) {
-        _scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text("Enter amount between Min " +
-                strings.rupee +
-                widget.depositData.chooseAmountData.minAmount.toString() +
-                " and Max " +
-                strings.rupee +
-                widget.depositData.chooseAmountData.depositLimit.toString()),
-          ),
-        );
-      } else {
-        onProceed(amount: customAmount);
-      }
+
+      onProceed(amount: customAmount);
     }
   }
 

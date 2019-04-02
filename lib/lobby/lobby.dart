@@ -365,25 +365,6 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
                               tabs: _mapSportTypes.keys.map<Tab>((page) {
                                 return Tab(
                                   text: page,
-                                  // child: Row(
-                                  //   children: <Widget>[
-                                  //     SvgPicture.asset(
-                                  //       _sportType == _mapSportTypes[page]
-                                  //           ? "images/" +
-                                  //               page.toLowerCase() +
-                                  //               ".svg"
-                                  //           : "images/" +
-                                  //               page.toLowerCase() +
-                                  //               "light" +
-                                  //               ".svg",
-                                  //       width: 18.0,
-                                  //     ),
-                                  //     Padding(
-                                  //       padding: EdgeInsets.only(left: 6.0),
-                                  //       child: Text(page),
-                                  //     ),
-                                  //   ],
-                                  // ),
                                 );
                               }).toList(),
                             )
