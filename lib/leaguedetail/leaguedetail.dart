@@ -941,9 +941,9 @@ class LeagueDetailState extends State<LeagueDetail>
               ],
             ),
           ),
-          bShowInnings
-              ? Expanded(
-                  child: TabBarView(
+          Expanded(
+            child: bShowInnings
+                ? TabBarView(
                     controller: tabController,
                     children: <Widget>[
                       l1Data == null
@@ -968,18 +968,18 @@ class LeagueDetailState extends State<LeagueDetail>
                               mapContestSheets: _mapContestSheets,
                             ),
                     ],
-                  ),
-                )
-              : l1Data == null
-                  ? Container()
-                  : Contests(
-                      l1Data: l1Data,
-                      myTeams: _myTeams,
-                      league: widget.league,
-                      showLoader: showLoader,
-                      scaffoldKey: _scaffoldKey,
-                      mapContestTeams: _mapContestTeams,
-                    ),
+                  )
+                : l1Data == null
+                    ? Container()
+                    : Contests(
+                        l1Data: l1Data,
+                        myTeams: _myTeams,
+                        league: widget.league,
+                        showLoader: showLoader,
+                        scaffoldKey: _scaffoldKey,
+                        mapContestTeams: _mapContestTeams,
+                      ),
+          ),
         ],
       ),
       // bottomNavigationBar: Container(
