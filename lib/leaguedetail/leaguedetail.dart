@@ -912,35 +912,38 @@ class LeagueDetailState extends State<LeagueDetail>
               ],
             ),
           ),
-          Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: tabController,
-              labelColor: Theme.of(context).primaryColor,
-              unselectedLabelColor: Colors.black,
-              labelStyle: Theme.of(context).primaryTextTheme.body2.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-              indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  width: 4.0,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              tabs: <Widget>[
-                Tab(
-                  child: Text(
-                    "Contest".toUpperCase(),
-                  ),
-                ),
-                Tab(
-                  child: Text(
-                    "Prediction".toUpperCase(),
+          bShowInnings
+              ? Container(
+                  color: Colors.white,
+                  child: TabBar(
+                    controller: tabController,
+                    labelColor: Theme.of(context).primaryColor,
+                    unselectedLabelColor: Colors.black,
+                    labelStyle:
+                        Theme.of(context).primaryTextTheme.body2.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                    indicator: UnderlineTabIndicator(
+                      borderSide: BorderSide(
+                        width: 4.0,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    tabs: <Widget>[
+                      Tab(
+                        child: Text(
+                          "Contest".toUpperCase(),
+                        ),
+                      ),
+                      Tab(
+                        child: Text(
+                          "Prediction".toUpperCase(),
+                        ),
+                      )
+                    ],
                   ),
                 )
-              ],
-            ),
-          ),
+              : Container(),
           Expanded(
             child: bShowInnings
                 ? TabBarView(
