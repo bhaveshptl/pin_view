@@ -471,7 +471,7 @@ class ContestsState extends State<Contests> {
   void _showPrizeStructure(Contest contest) async {
     List<dynamic> prizeStructure = await _getPrizeStructure(contest);
     if (prizeStructure != null) {
-      showDialog(
+      showBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return PrizeStructure(

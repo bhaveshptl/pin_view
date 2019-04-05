@@ -993,7 +993,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                                 child: InkWell(
                                                   // padding: EdgeInsets.all(0.0),
                                                   onTap: () {
-                                                    _showPrizeStructure();
+                                                    _showPrizeStructure(
+                                                        context);
                                                   },
                                                   child: Column(
                                                     children: <Widget>[
@@ -1633,9 +1634,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     super.dispose();
   }
 
-  void _showPrizeStructure() async {
+  void _showPrizeStructure(BuildContext context) async {
     List<dynamic> prizeStructure = await _getPrizeStructure(widget.contest);
-    showDialog(
+    showBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return PrizeStructure(

@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -39,6 +43,22 @@ class JoinContestState extends State<JoinContest> {
   double _cashBalance = 0.0;
   double _bonusBalance = 0.0;
   double _playableBonus = 0.0;
+
+  TapGestureRecognizer termsGesture = TapGestureRecognizer();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.contest != null) {
+      getMyContestTeams();
+    } else {
+      setUniqueTeams([]);
+    }
+    _getUserBalance();
+    termsGesture.onTap = () {
+      _launchStaticPage("T&C");
+    };
+  }
 
   _joinContest(BuildContext context) async {
     if (_selectedTeamId == null || _selectedTeamId == -1) {
@@ -214,15 +234,27 @@ class JoinContestState extends State<JoinContest> {
     return listTeams;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.contest != null) {
-      getMyContestTeams();
-    } else {
-      setUniqueTeams([]);
+  _launchStaticPage(String name) {
+    String url = "";
+    String title = "";
+    switch (name.toUpperCase()) {
+      case "T&C":
+        title = "TERMS AND CONDITIONS";
+        url = BaseUrl().staticPageUrls["TERMS"];
+        break;
     }
-    _getUserBalance();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              clearCache: true,
+              appBar: AppBar(
+                title: Text(title),
+              ),
+            ),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   @override
@@ -236,231 +268,254 @@ class JoinContestState extends State<JoinContest> {
             ? (bonusUsable > _playableBonus ? _playableBonus : bonusUsable)
             : _bonusBalance;
 
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 2,
+    );
+
     return AlertDialog(
-      title: Text(strings.get("CONFIRMATION").toUpperCase()),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      elevation: 0.0,
+      title: Row(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          strings.get("CASH").toUpperCase() + " ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .body2
-                                .fontSize,
-                          ),
-                        ),
-                        Text(
-                          strings.rupee + _cashBalance.toStringAsFixed(2),
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          strings.get("BONUS").toUpperCase() + " ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .body2
-                                .fontSize,
-                          ),
-                        ),
-                        Text(
-                          strings.rupee + _bonusBalance.toStringAsFixed(2),
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                )
-              ],
+          Expanded(
+            child: Text(
+              strings.get("CONFIRMATION").toUpperCase(),
+              style: Theme.of(context).primaryTextTheme.title.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w800,
+                  ),
+              textAlign: TextAlign.center,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  strings.get("ENTRY_FEE"),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
+        ],
+      ),
+      contentPadding: EdgeInsets.all(0.0),
+      content: Container(
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Padding(
+              padding:
+                  const EdgeInsets.only(top: 24.0, left: 24.0, right: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Current Balance:",
+                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: Theme.of(context).primaryColor,
+                        ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    (widget.contest == null &&
-                                widget.createContestPayload["prizeType"] ==
-                                    1) ||
-                            (widget.contest != null &&
-                                widget.contest.prizeType == 1)
-                        ? Image.asset(
-                            strings.chips,
-                            width: 16.0,
-                            height: 12.0,
-                            fit: BoxFit.contain,
-                          )
-                        : Text(strings.rupee),
-                    Text(
-                      widget.contest == null
-                          ? widget.createContestPayload["entryFee"]
-                              .toStringAsFixed(2)
-                          : widget.contest.entryFee.toStringAsFixed(2),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.body2.fontSize,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      (widget.contest == null &&
+                                  widget.createContestPayload["prizeType"] ==
+                                      1) ||
+                              (widget.contest != null &&
+                                  widget.contest.prizeType == 1)
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Container(),
+                      Text(
+                        formatCurrency.format(_cashBalance),
+                        textAlign: TextAlign.right,
+                        style:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Divider(
+                color: Colors.black26,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Joining Amount:",
+                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                        ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      (widget.contest == null &&
+                                  widget.createContestPayload["prizeType"] ==
+                                      1) ||
+                              (widget.contest != null &&
+                                  widget.contest.prizeType == 1)
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Container(),
+                      Text(
+                        widget.contest == null
+                            ? formatCurrency
+                                .format(widget.createContestPayload["entryFee"])
+                            : formatCurrency.format(widget.contest.entryFee),
+                        textAlign: TextAlign.right,
+                        style:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      "Usable Cash Bonus: " +
+                          formatCurrency.format(_playableBonus) +
+                          " OR " +
+                          widget.contest.bonusAllowed.toString() +
+                          "% of the total Entry* per match(whichever is higher)",
+                      style:
+                          Theme.of(context).primaryTextTheme.caption.copyWith(
+                                color: Colors.black38,
+                                fontWeight: FontWeight.w800,
+                              ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        style:
+                            Theme.of(context).primaryTextTheme.caption.copyWith(
+                                  color: Colors.black38,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                        children: [
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text:
+                                    "By joining this contest, you accept Howzat's",
+                              ),
+                              TextSpan(
+                                text: " T&C ",
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  color: Colors.blue,
+                                ),
+                                recognizer: termsGesture,
+                              ),
+                              TextSpan(
+                                text:
+                                    "and confirm that you are not a resident of Assam, Odisha, Telangana, Nagaland or Sikkim.",
+                              )
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  strings.get("BONUS_USABLE"),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                   ),
-                ),
-                Text(
-                  strings.rupee + usableBonus.toStringAsFixed(2),
-                  style: TextStyle(
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            color: Colors.black12,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                strings.get("CASH_TO_PAY"),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                ),
+                ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  (widget.contest == null &&
-                              widget.createContestPayload["prizeType"] == 1) ||
-                          (widget.contest != null &&
-                              widget.contest.prizeType == 1)
-                      ? Image.asset(
-                          strings.chips,
-                          width: 16.0,
-                          height: 12.0,
-                          fit: BoxFit.contain,
-                        )
-                      : Text(strings.rupee),
                   Text(
-                    ((widget.contest == null
-                                ? widget.createContestPayload["entryFee"]
-                                : widget.contest.entryFee) -
-                            usableBonus)
-                        .toStringAsFixed(2),
+                    strings.get("TEAM"),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize:
                           Theme.of(context).primaryTextTheme.body2.fontSize,
                     ),
-                    textAlign: TextAlign.right,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      DropdownButton(
+                        value: _selectedTeamId,
+                        isDense: false,
+                        items: _getTeamList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedTeamId = value;
+                          });
+                        },
+                      )
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          Divider(
-            color: Colors.black12,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                strings.get("TEAM"),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  DropdownButton(
-                    value: _selectedTeamId,
-                    isDense: false,
-                    items: _getTeamList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedTeamId = value;
-                      });
+                  ColorButton(
+                    onPressed: () {
+                      if (widget.contest != null) {
+                        _joinContest(context);
+                      } else if (widget.createContestPayload != null) {
+                        _createAndJoinContest(context);
+                      }
                     },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 20.0),
+                      child: Text(
+                        "Join now".toUpperCase(),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .title
+                            .copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800),
+                      ),
+                    ),
                   )
                 ],
               ),
-            ],
-          ),
-        ],
+            )
+          ],
+        ),
       ),
-      actions: <Widget>[
-        FlatButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text(strings.get("CANCEL").toUpperCase()),
-        ),
-        FlatButton(
-          onPressed: () {
-            if (widget.contest != null) {
-              _joinContest(context);
-            } else if (widget.createContestPayload != null) {
-              _createAndJoinContest(context);
-            }
-          },
-          child: Text(strings.get("JOIN").toUpperCase()),
-        ),
-      ],
     );
   }
 }

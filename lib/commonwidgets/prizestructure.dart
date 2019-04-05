@@ -18,9 +18,11 @@ class PrizeStructure extends StatefulWidget {
 }
 
 class PrizeStructureState extends State<PrizeStructure> {
+  String winners = "";
+
   List<Widget> _getPrizeList() {
-    final formatCurrency =
-        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
+    final formatCurrency = NumberFormat.currency(
+        locale: "hi_IN", symbol: strings.rupee, decimalDigits: 0);
 
     List<Widget> _prizeRows = [];
     if (widget.prizeStructure.length == 0) {
@@ -36,7 +38,10 @@ class PrizeStructureState extends State<PrizeStructure> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
-                    _prize["rank"],
+                    "RANK: " + _prize["rank"],
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   Row(
                     children: <Widget>[
@@ -47,10 +52,15 @@ class PrizeStructureState extends State<PrizeStructure> {
                               height: 12.0,
                               fit: BoxFit.contain,
                             )
-                          : Text(strings.rupee),
+                          : Container(),
                       Text(
-                        formatCurrency
-                            .format(double.parse(_prize["amount"].toString())),
+                        formatCurrency.format(
+                          double.parse(_prize["amount"].toString()),
+                        ),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black38,
+                        ),
                       )
                     ],
                   )
@@ -67,135 +77,172 @@ class PrizeStructureState extends State<PrizeStructure> {
 
   @override
   Widget build(BuildContext context) {
-    final formatCurrency =
-        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
+    final formatCurrency = NumberFormat.currency(
+        locale: "hi_IN", symbol: strings.rupee, decimalDigits: 0);
 
-    return AlertDialog(
-      title: Text(strings.get("PRIZE_STRUCTURE")),
-      contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          color: Theme.of(context).primaryColor,
+          height: 40.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(),
+              Text(
+                "Prize breakup".toUpperCase(),
+                style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+              Icon(
+                Icons.close,
+                color: Colors.white54,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          constraints: BoxConstraints(
+            maxHeight:
+                (MediaQuery.of(context).size.height - kToolbarHeight) * 0.80,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
               children: <Widget>[
-                Text(
-                  "Winnings ",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Theme.of(context).primaryColorDark,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.headline.fontSize),
-                ),
-                widget.contest.prizeType == 1
-                    ? Image.asset(
-                        strings.chips,
-                        width: 16.0,
-                        height: 12.0,
-                        fit: BoxFit.contain,
-                      )
-                    : Text(
-                        strings.rupee,
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "Prize Pool".toUpperCase(),
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColorDark,
+                        style:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  color: Colors.black38,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                      ),
+                      Text(
+                        "Winners".toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  color: Colors.black38,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          widget.contest.prizeType == 1
+                              ? Image.asset(
+                                  strings.chips,
+                                  width: 16.0,
+                                  height: 12.0,
+                                  fit: BoxFit.contain,
+                                )
+                              : Container(),
+                          Text(
+                            formatCurrency.format(widget.contest.prizeDetails[0]
+                                ["totalPrizeAmount"]),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body2
+                                .copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        widget.contest.prizeDetails[0]["noOfPrizes"].toString(),
+                        style:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          children: _getPrizeList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Divider(
+                    color: Colors.black12,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          strings.get("NOTES") +
+                              ": " +
+                              strings.get("PRIZE_STRUCTURE_TEXT_1") +
+                              " " +
+                              strings.get("PRIZE_STRUCTURE_TEXT_2") +
+                              " " +
+                              strings.get("PRIZE_STRUCTURE_TEXT_3"),
+                          style: TextStyle(
                             fontSize: Theme.of(context)
                                 .primaryTextTheme
-                                .headline
-                                .fontSize),
+                                .caption
+                                .fontSize,
+                            color: Colors.black54,
+                          ),
+                          textAlign: TextAlign.justify,
+                        ),
                       ),
-                Text(
-                  formatCurrency.format(
-                      widget.contest.prizeDetails[0]["totalPrizeAmount"]),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Theme.of(context).primaryColorDark,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.headline.fontSize),
-                ),
-              ],
-            ),
-            Divider(
-              color: Colors.black12,
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: Text(
-                      strings.get("RANK").toUpperCase(),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: Text(
-                      strings.get("PRIZE").toUpperCase(),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Divider(
-              color: Colors.black12,
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    children: _getPrizeList(),
+                    ],
                   ),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Divider(
-                color: Colors.black12,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      strings.get("NOTES") +
-                          ": " +
-                          strings.get("PRIZE_STRUCTURE_TEXT_1") +
-                          " " +
-                          strings.get("PRIZE_STRUCTURE_TEXT_2") +
-                          " " +
-                          strings.get("PRIZE_STRUCTURE_TEXT_3"),
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.caption.fontSize,
-                        color: Colors.black54,
-                      ),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        FlatButton(
-          child: Text(
-            strings.get("CLOSE").toUpperCase(),
           ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        )
+        ),
       ],
     );
+    // AlertDialog(
+    //   title: Text(strings.get("PRIZE_STRUCTURE")),
+    //   contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+    //   content: ,
+    //   // actions: <Widget>[
+    //   //   FlatButton(
+    //   //     child: Text(
+    //   //       strings.get("CLOSE").toUpperCase(),
+    //   //     ),
+    //   //     onPressed: () {
+    //   //       Navigator.of(context).pop();
+    //   //     },
+    //   //   )
+    //   // ],
+    // );
   }
 }
