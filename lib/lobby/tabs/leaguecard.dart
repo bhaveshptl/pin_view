@@ -6,14 +6,13 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/commonwidgets/epoc.dart';
 
-const double TEAM_LOGO_HEIGHT = 32.0;
+const double TEAM_LOGO_HEIGHT = 48.0;
 
 class LeagueCard extends StatelessWidget {
-  final TabBar tabBar;
   final League _league;
   final bool clickable;
   final Function onClick;
-  LeagueCard(this._league, {this.onClick, this.tabBar, this.clickable = true});
+  LeagueCard(this._league, {this.onClick, this.clickable = true});
 
   @override
   Widget build(BuildContext context) {
@@ -35,214 +34,188 @@ class LeagueCard extends StatelessWidget {
                     onClick(_league);
                   }
                 },
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 8.0, bottom: 8.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Column(
-                                        children: <Widget>[
-                                          Row(
-                                            children: <Widget>[
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                  left: 12.0,
-                                                  right: 16.0,
-                                                ),
-                                                child: Column(
-                                                  children: <Widget>[
-                                                    ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              2.0),
-                                                      child: CachedNetworkImage(
-                                                        imageUrl:
-                                                            _league.teamA !=
-                                                                    null
-                                                                ? _league.teamA
-                                                                    .logoUrl
-                                                                : "",
-                                                        placeholder: Container(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  4.0),
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            strokeWidth: 2.0,
-                                                          ),
-                                                          width:
-                                                              TEAM_LOGO_HEIGHT,
-                                                          height:
-                                                              TEAM_LOGO_HEIGHT,
-                                                        ),
-                                                        height:
-                                                            TEAM_LOGO_HEIGHT,
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 8.0),
-                                                      child: Text(
-                                                        _league.teamA.name,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              _league.matchName,
+                              style: TextStyle(
+                                fontSize: Theme.of(context)
+                                    .primaryTextTheme
+                                    .caption
+                                    .fontSize,
+                                color: Colors.black54,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.all(2.0),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 1.0,
+                                          spreadRadius: 0.5,
+                                          offset: Offset(0.0, 2.0),
+                                        )
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      clipBehavior: Clip.hardEdge,
+                                      borderRadius: BorderRadius.circular(
+                                        TEAM_LOGO_HEIGHT,
                                       ),
-                                      Expanded(
-                                        // flex: 2,
-                                        child: Column(
-                                          children: <Widget>[
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(bottom: 4.0),
-                                              child: Text(
-                                                _league.matchName,
-                                                style: TextStyle(
-                                                  fontSize: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .caption
-                                                      .fontSize,
-                                                  color: Colors.black54,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            AppConfig.of(context).channelId ==
-                                                    "10"
-                                                ? Container()
-                                                : Text(
-                                                    "vs",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                      fontSize:
-                                                          Theme.of(context)
-                                                              .primaryTextTheme
-                                                              .title
-                                                              .fontSize,
-                                                      color: Colors.black87,
-                                                    ),
-                                                  ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 4.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        right: 8.0),
-                                                    child: Icon(
-                                                      Icons.alarm,
-                                                      size: 16.0,
-                                                      color: Colors.black54,
-                                                    ),
-                                                  ),
-                                                  _league.status ==
-                                                          LeagueStatus.UPCOMING
-                                                      ? EPOC(
-                                                          timeInMiliseconds:
-                                                              _league
-                                                                  .matchStartTime,
-                                                        )
-                                                      : (_league.status ==
-                                                              LeagueStatus.LIVE
-                                                          ? Text("LIVE")
-                                                          : Text("COMPLETED")),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+                                      child: CachedNetworkImage(
+                                        imageUrl: _league.teamA != null
+                                            ? _league.teamA.logoUrl
+                                            : "",
+                                        fit: BoxFit.fitHeight,
+                                        placeholder: Container(
+                                          padding: EdgeInsets.all(4.0),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                          ),
+                                          width: TEAM_LOGO_HEIGHT,
+                                          height: TEAM_LOGO_HEIGHT,
                                         ),
+                                        height: TEAM_LOGO_HEIGHT,
+                                        width: TEAM_LOGO_HEIGHT,
                                       ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                              right: 12.0,
-                                              left: 16.0,
-                                            ),
-                                            child: Column(
-                                              children: <Widget>[
-                                                ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          2.0),
-                                                  child: CachedNetworkImage(
-                                                    imageUrl: _league.teamB !=
-                                                            null
-                                                        ? _league.teamB.logoUrl
-                                                        : null,
-                                                    placeholder: Container(
-                                                      padding:
-                                                          EdgeInsets.all(4.0),
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                        strokeWidth: 2.0,
-                                                      ),
-                                                      width: TEAM_LOGO_HEIGHT,
-                                                      height: TEAM_LOGO_HEIGHT,
-                                                    ),
-                                                    height: TEAM_LOGO_HEIGHT,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 8.0),
-                                                  child: Text(
-                                                    _league.teamB.name,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      _league.teamA.name,
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body2
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w900,
                                           ),
-                                        ],
-                                      )
-                                    ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 32.0,
+                            height: 32.0,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black45,
+                                width: 1.0,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "vs".toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .fontSize,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black87,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    tabBar != null
-                        ? Row(
+                          Column(
                             children: <Widget>[
-                              Expanded(
-                                child: Container(
-                                  height: 0.5,
-                                  color: Colors.black12,
-                                ),
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 8.0),
+                                    child: Text(
+                                      _league.teamB.name,
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body2
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(2.0),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 1.0,
+                                          spreadRadius: 0.5,
+                                          offset: Offset(0.0, 2.0),
+                                        )
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      clipBehavior: Clip.hardEdge,
+                                      borderRadius: BorderRadius.circular(
+                                        TEAM_LOGO_HEIGHT,
+                                      ),
+                                      child: CachedNetworkImage(
+                                        imageUrl: _league.teamA != null
+                                            ? _league.teamB.logoUrl
+                                            : "",
+                                        fit: BoxFit.fitHeight,
+                                        placeholder: Container(
+                                          padding: EdgeInsets.all(4.0),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                          ),
+                                          width: TEAM_LOGO_HEIGHT,
+                                          height: TEAM_LOGO_HEIGHT,
+                                        ),
+                                        height: TEAM_LOGO_HEIGHT,
+                                        width: TEAM_LOGO_HEIGHT,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child: EPOC(
+                              timeInMiliseconds: _league.matchStartTime,
+                            ),
                           )
-                        : Container(),
-                    tabBar != null
-                        ? Row(
-                            children: <Widget>[Expanded(child: tabBar)],
-                          )
-                        : Container(),
-                  ],
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
               _league.prediction == 1

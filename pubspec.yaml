@@ -22,6 +22,7 @@ dependencies:
   flutter_svg: ^0.8.2
   package_info: ^0.3.2
   image_picker: ^0.4.10
+  flutter_redux: ^0.5.3
   google_sign_in: ^3.2.4
   carousel_slider: ^1.0.1  
   animated_text_kit: ^1.2.0

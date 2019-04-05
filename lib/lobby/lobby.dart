@@ -1,27 +1,26 @@
-import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
-import 'package:package_info/package_info.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:playfantasy/lobby/mycontests/newmycontest.dart';
-
-import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
-import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/commonwidgets/update.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/lobby/bottomnavigation.dart';
+import 'package:playfantasy/lobby/mycontests/newmycontest.dart';
+import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
@@ -43,7 +42,6 @@ class Lobby extends StatefulWidget {
 class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   int _sportType = 0;
   List<League> _leagues;
-  bool bShowLoader = false;
   TabController _controller;
   List<dynamic> _carousel = [];
   Map<String, int> _mapSportTypes;
@@ -84,25 +82,6 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
     );
   }
 
-  // _getInitData() async {
-  //   PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  //   http.Request req =
-  //       http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.INIT_DATA));
-  //   req.body = json.encode({
-  //     "version": double.parse(packageInfo.version),
-  //     "channelId": HttpManager.channelId,
-  //   });
-  //   await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
-  //     if (res.statusCode >= 200 && res.statusCode <= 299) {
-  //       final initData = json.decode(res.body);
-  //       setState(() {
-  //         _carousel = (initData["carousel"] as List).map((dynamic value) {
-  //           return value.toString();
-  //         }).toList();
-  //       });
-  //     }
-  //   });
-  // }
   getBanners() async {
     http.Request req = http.Request(
         "GET",
@@ -195,9 +174,9 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
   }
 
   showLoader(bool bShow) {
-    setState(() {
-      bShowLoader = bShow;
-    });
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   Future<bool> _onWillPop() {
@@ -265,164 +244,157 @@ class LobbyState extends State<Lobby> with SingleTickerProviderStateMixin {
 
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Stack(
-        children: <Widget>[
-          Scaffold(
-            key: scaffoldKey,
-            appBar: AppBar(
-              elevation: 3.0,
-              title: Container(
-                height: kToolbarHeight,
-                padding: EdgeInsets.only(top: 6.0, bottom: 6.0),
-                child: Row(
+      child: ScaffoldPage(
+          scaffoldKey: scaffoldKey,
+          appBar: AppBar(
+            elevation: 0.0,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  height: 32.0,
+                  width: 32.0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5.0),
+                    child: Image.asset(
+                      "images/logo.png",
+                      width: 48.0,
+                    ),
+                  ),
+                ),
+                Container(),
+                Container(
+                  height: 32.0,
+                  width: 32.0,
+                  color: Colors.white,
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.black87,
+                    size: 32.0,
+                  ),
+                ),
+              ],
+            ),
+            automaticallyImplyLeading: false,
+          ),
+          body: _sportType >= 0
+              ? Column(
                   children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(5.0),
-                      child: Image.asset(
-                        "images/logo.png",
-                        width: 48.0,
+                    Container(
+                      color: Colors.white,
+                      child: TabBar(
+                        controller: _controller,
+                        labelColor: Theme.of(context).primaryColor,
+                        unselectedLabelColor: Colors.black,
+                        labelStyle:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                        indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                            width: 4.0,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        tabs: _mapSportTypes.keys.map<Tab>((page) {
+                          return Tab(
+                            text: page,
+                          );
+                        }).toList(),
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        AppConfig.of(context).appName.toUpperCase(),
-                      ),
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: _carousel.length > 0
+                          ? CarouselSlider(
+                              enlargeCenterPage: false,
+                              aspectRatio: 16 / 3,
+                              autoPlayInterval: Duration(seconds: 10),
+                              items: _carousel.map<Widget>((dynamic banner) {
+                                return FlatButton(
+                                  padding: EdgeInsets.all(0.0),
+                                  onPressed: () {
+                                    if (banner["CTA"] != "" &&
+                                        banner["CTA"] != "NA") {
+                                      showLoader(true);
+                                    }
+                                    routeLauncher.launchBannerRoute(
+                                        banner: banner,
+                                        context: context,
+                                        scaffoldKey: scaffoldKey,
+                                        onComplete: () {
+                                          showLoader(false);
+                                        });
+                                  },
+                                  child: Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(4.0),
+                                      child: Image.network(
+                                        banner["banner"],
+                                        fit: BoxFit.cover,
+                                        width: 1000.0,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              autoPlay: _carousel.length <= 2 ? false : true,
+                              reverse: false,
+                            )
+                          : Container(),
                     ),
-                  ],
-                ),
-              ),
-              automaticallyImplyLeading: false,
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(122.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
                     Row(
                       children: <Widget>[
                         Expanded(
                           child: Container(
-                            padding: EdgeInsets.only(
-                              left: 8.0,
-                              right: 8.0,
-                              bottom: 4.0,
-                              top: 4.0,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.0,
                             ),
-                            height: 84.0,
-                            child: _carousel.length > 0
-                                ? CarouselSlider(
-                                    enlargeCenterPage: false,
-                                    aspectRatio: 16 / 3,
-                                    autoPlayInterval: Duration(seconds: 10),
-                                    items:
-                                        _carousel.map<Widget>((dynamic banner) {
-                                      return FlatButton(
-                                        padding: EdgeInsets.all(0.0),
-                                        onPressed: () {
-                                          if (banner["CTA"] != "" &&
-                                              banner["CTA"] != "NA") {
-                                            showLoader(true);
-                                          }
-                                          routeLauncher.launchBannerRoute(
-                                              banner: banner,
-                                              context: context,
-                                              scaffoldKey: scaffoldKey,
-                                              onComplete: () {
-                                                showLoader(false);
-                                              });
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 8.0),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.network(
-                                              banner["banner"],
-                                              fit: BoxFit.cover,
-                                              width: 1000.0,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                    autoPlay:
-                                        _carousel.length <= 2 ? false : true,
-                                    reverse: false,
-                                  )
-                                : Container(),
+                            child: Text(
+                              "Upcoming Matches",
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .subhead
+                                  .copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    Container(
-                      height: 48.0,
-                      child: _sportType >= 0
-                          ? TabBar(
-                              controller: _controller,
-                              isScrollable: true,
-                              indicator: UnderlineTabIndicator(),
-                              tabs: _mapSportTypes.keys.map<Tab>((page) {
-                                return Tab(
-                                  text: page,
-                                );
-                              }).toList(),
-                            )
-                          : Container(),
-                    ),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.account_balance_wallet),
-                  onPressed: () {
-                    _launchAddCash();
-                  },
-                )
-              ],
-            ),
-            body: Stack(
-              children: <Widget>[
-                Container(
-                  decoration: AppConfig.of(context).showBackground
-                      ? BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage("images/background.png"),
-                              repeat: ImageRepeat.repeat),
-                        )
-                      : null,
-                  child: _sportType >= 0
-                      ? TabBarView(
-                          controller: _controller,
-                          // physics: NeverScrollableScrollPhysics(),
-                          children: _mapSportTypes.keys.map<Widget>((page) {
-                            return Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: LobbyWidget(
-                                    sportType: _mapSportTypes[page],
-                                    onLeagues: (value) {
-                                      _leagues = value;
-                                    },
-                                    onSportChange: _onSportSelectionChaged,
-                                    mapSportTypes: _mapSportTypes,
-                                  ),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _controller,
+                        children: _mapSportTypes.keys.map<Widget>((page) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(
+                                child: LobbyWidget(
+                                  sportType: _mapSportTypes[page],
+                                  onLeagues: (value) {
+                                    _leagues = value;
+                                  },
+                                  onSportChange: _onSportSelectionChaged,
+                                  mapSportTypes: _mapSportTypes,
                                 ),
-                              ],
-                            );
-                          }).toList(),
-                        )
-                      : Container(),
-                ),
-              ],
-            ),
-            bottomNavigationBar:
-                LobbyBottomNavigation(_onNavigationSelectionChange, 0),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    )
+                  ],
+                )
+              : Container()
+
+          // bottomNavigationBar:
+          //     LobbyBottomNavigation(_onNavigationSelectionChange, 0),
           ),
-          bShowLoader ? Loader() : Container(),
-        ],
-      ),
     );
   }
 }

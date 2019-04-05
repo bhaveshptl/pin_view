@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/leaguedetail/contestcards/upcoming_howzat.dart';
@@ -51,54 +52,97 @@ class ContestCard extends StatelessWidget {
                 : LeagueStatus.COMPLETED));
     return Tooltip(
       message: "", //contest.id.toString() + " - " + contest.name,
-      child: Card(
-        elevation: 3.0,
-        shape: radius != null
-            ? RoundedRectangleBorder(borderRadius: radius)
-            : null,
-        margin: margin == null ? EdgeInsets.all(0.0) : margin,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        child: FlatButton(
-          onPressed: () {
-            onClick(contest, league);
-          },
-          padding: EdgeInsets.all(0.0),
-          child: leagueStatus == LeagueStatus.UPCOMING
-              ? AppConfig.of(context).channelId == "10"
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              children: <Widget>[
+                contest.brand != null && bShowBrandInfo
+                    ? Column(
+                        children: <Widget>[
+                          CachedNetworkImage(
+                            imageUrl: contest.brand["brandLogoUrl"],
+                            width: 32.0,
+                            placeholder: Container(
+                              padding: EdgeInsets.all(4.0),
+                              width: 32.0,
+                              height: 32.0,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container(),
+                Expanded(
+                  child: contest.brand != null && bShowBrandInfo
+                      ? Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    contest.brand["info"],
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Container(),
+                ),
+              ],
+            ),
+          ),
+          Card(
+            elevation: 3.0,
+            shape: radius != null
+                ? RoundedRectangleBorder(borderRadius: radius)
+                : null,
+            margin: margin == null ? EdgeInsets.all(0.0) : margin,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            child: FlatButton(
+              onPressed: () {
+                onClick(contest, league);
+              },
+              padding: EdgeInsets.all(0.0),
+              child: leagueStatus == LeagueStatus.UPCOMING
                   ? UpcomingHowzatContest(
                       league: league,
                       onJoin: onJoin,
                       contest: contest,
                       isMyContest: isMyContest,
                       myJoinedTeams: myJoinedTeams,
-                      bShowBrandInfo: bShowBrandInfo,
                       onPrizeStructure: onPrizeStructure,
                     )
-                  : UpcomingContest(
-                      league: league,
-                      onJoin: onJoin,
-                      contest: contest,
-                      isMyContest: isMyContest,
-                      myJoinedTeams: myJoinedTeams,
-                      bShowBrandInfo: bShowBrandInfo,
-                      onPrizeStructure: onPrizeStructure,
-                    )
-              : leagueStatus == LeagueStatus.LIVE
-                  ? LiveContest(
-                      league: league,
-                      contest: contest,
-                      isMyContest: isMyContest,
-                      myJoinedTeams: myJoinedTeams,
-                      onPrizeStructure: onPrizeStructure,
-                    )
-                  : ResultContest(
-                      league: league,
-                      contest: contest,
-                      isMyContest: isMyContest,
-                      myJoinedTeams: myJoinedTeams,
-                      onPrizeStructure: onPrizeStructure,
-                    ),
-        ),
+                  : leagueStatus == LeagueStatus.LIVE
+                      ? LiveContest(
+                          league: league,
+                          contest: contest,
+                          isMyContest: isMyContest,
+                          myJoinedTeams: myJoinedTeams,
+                          onPrizeStructure: onPrizeStructure,
+                        )
+                      : ResultContest(
+                          league: league,
+                          contest: contest,
+                          isMyContest: isMyContest,
+                          myJoinedTeams: myJoinedTeams,
+                          onPrizeStructure: onPrizeStructure,
+                        ),
+            ),
+          ),
+        ],
       ),
     );
   }

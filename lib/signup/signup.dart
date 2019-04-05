@@ -7,12 +7,17 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
+import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -25,10 +30,9 @@ class SignupState extends State<Signup> {
   String _deviceId;
   String _pfRefCode;
   bool _obscureText = true;
-  bool bShowLoader = false;
-  String _installAndroid_link;
+
   bool _bShowReferralInput = false;
-  String _installReferring_link = "";
+  String _installReferringLink = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   final formKey = new GlobalKey<FormState>();
@@ -44,18 +48,15 @@ class SignupState extends State<Signup> {
   @override
   void initState() {
     super.initState();
-    Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
-    firebasedeviceid.then((value) {
-      _deviceId = value;
-    });
 
+    _getFirebaseId();
     _initBranchStuff();
   }
 
-/////////////////////
-  ///Branch///////////
-///////////////////
+  _getFirebaseId() async {
+    _deviceId = await SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
+  }
 
   _initBranchStuff() {
     _getBranchRefCode().then((String refcode) {
@@ -65,17 +66,17 @@ class SignupState extends State<Signup> {
       });
     });
 
-    _getInstallReferringLink().then((String installReferring_link) {
+    _getInstallReferringLink().then((String installReferringLink) {
       setState(() {
-        _installReferring_link = installReferring_link;
+        _installReferringLink = installReferringLink;
       });
     });
   }
 
   showLoader(bool bShow) {
-    setState(() {
-      bShowLoader = bShow;
-    });
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   Future<String> _getBranchRefCode() async {
@@ -129,8 +130,8 @@ class SignupState extends State<Signup> {
         "googleaddid": "",
         "serial": androidInfo.androidId,
       };
-      if (_installReferring_link.length > 0) {
-        var uri = Uri.parse(_installReferring_link);
+      if (_installReferringLink.length > 0) {
+        var uri = Uri.parse(_installReferringLink);
         uri.queryParameters.forEach((k, v) {
           try {
             _payload["context"][k] = v;
@@ -261,401 +262,358 @@ class SignupState extends State<Signup> {
     });
   }
 
+  _launchSignIn() {
+    Navigator.of(context).pushReplacement(FantasyPageRoute(
+      pageBuilder: (context) => SignInPage(),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            title: Text(
-              strings.get("SIGNUP"),
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
+      appBar: AppBar(
+        title: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Image.asset("images/logo_with_name.png"),
+        ),
+        actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: ColorButton(
+              onPressed: () {
+                _launchSignIn();
+              },
+              child: Text(
+                "Login".toUpperCase(),
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              color: Color.fromRGBO(243, 180, 81, 1),
             ),
-          ),
-          body: Center(
-            child: SingleChildScrollView(
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Image.asset("images/referal.png"),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      "Register now, It's Free",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w900,
+                        fontSize:
+                            Theme.of(context).primaryTextTheme.subhead.fontSize,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 48.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Image(
-                          height: 80.0,
-                          fit: BoxFit.scaleDown,
-                          image: new AssetImage("images/logo.png"),
-                        ),
-                      ),
-                    ],
-                  ),
-                  ListTile(
-                    leading: Column(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              "Welcome to " +
-                                  AppConfig.of(context).appName +
-                                  ",",
-                              style: TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .headline
-                                      .fontSize),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
-                              child: Text(
-                                strings.get("FEW_SEC_AWAY"),
-                                style: TextStyle(
-                                    color: Colors.black38,
-                                    fontSize: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .fontSize),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    leading: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: RaisedButton(
-                              onPressed: () {
-                                _doGoogleLogin(context);
-                              },
-                              color: Colors.red,
-                              textColor: Colors.white70,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(gplus_squared),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 4.0),
-                                    child: Text(
-                                      strings.get("GOOGLE").toUpperCase(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 4.0),
-                            child: RaisedButton(
-                              onPressed: () {
-                                _doFacebookLogin(context);
-                              },
-                              color: Colors.blue,
-                              textColor: Colors.white70,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(facebook_squared),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                      strings.get("FACEBOOK").toUpperCase(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Row(
                     children: <Widget>[
                       Expanded(
-                        flex: 1,
-                        child: Container(),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Divider(
-                                color: Colors.black54,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                strings.get("OR").toUpperCase(),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.black54,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Container(),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: Form(
-                            key: formKey,
-                            child: Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(top: 8.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextFormField(
-                                          onSaved: (val) => _authName = val,
-                                          decoration: InputDecoration(
-                                            labelText:
-                                                strings.get("EMAIL_OR_MOBILE"),
-                                            contentPadding: EdgeInsets.all(0.0),
-                                            prefixIcon: Icon(
-                                              Icons.face,
-                                              size: 16.0,
-                                            ),
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Colors.black38,
-                                              ),
-                                            ),
-                                          ),
-                                          validator: (value) {
-                                            if (value.isEmpty) {
-                                              return strings
-                                                  .get("EMAIL_OR_MOBILE_ERROR");
-                                            }
-                                          },
-                                          keyboardType:
-                                              TextInputType.emailAddress,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 16.0),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: TextFormField(
-                                          onSaved: (val) => _password = val,
-                                          decoration: InputDecoration(
-                                            labelText: strings.get("PASSWORD"),
-                                            hintText: strings
-                                                .get("MIN_CHARS_PASSWORD"),
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Colors.black38,
-                                              ),
-                                            ),
-                                            contentPadding: EdgeInsets.all(0.0),
-                                            prefixIcon: Icon(
-                                              Icons.lock,
-                                              size: 16.0,
-                                            ),
-                                            suffixIcon: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _obscureText = !_obscureText;
-                                                });
-                                              },
-                                              child: Icon(
-                                                _obscureText
-                                                    ? Icons.visibility
-                                                    : Icons.visibility_off,
-                                                size: 16.0,
-                                              ),
-                                            ),
-                                          ),
-                                          validator: (value) {
-                                            if (value.isEmpty) {
-                                              return strings
-                                                  .get("PASSWORD_ERROR");
-                                            }
-                                          },
-                                          obscureText: _obscureText,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16.0, top: 16.0),
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          strings.get("HAVE_REFERRAL_CODE"),
-                        ),
-                        Container(
-                          height: 16.0,
-                          child: FlatButton(
-                            child: Text(
-                              strings.get("APPLY_NOW").toUpperCase(),
-                            ),
-                            onPressed: () {
-                              _showReferralInput();
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  _bShowReferralInput
-                      ? Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-                          child: Row(
+                        child: Form(
+                          key: formKey,
+                          child: Column(
                             children: <Widget>[
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _referralCodeController,
-                                  decoration: InputDecoration(
-                                    labelText: strings.get("REFERRAL_CODE"),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.black38,
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: SimpleTextBox(
+                                      onSaved: (val) => _authName = val,
+                                      labelText: strings.get("EMAIL_OR_MOBILE"),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return strings
+                                              .get("EMAIL_OR_MOBILE_ERROR");
+                                        }
+                                      },
+                                      keyboardType: TextInputType.emailAddress,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: SimpleTextBox(
+                                        onSaved: (val) => _password = val,
+                                        labelText: strings.get("PASSWORD"),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return strings
+                                                .get("PASSWORD_ERROR");
+                                          }
+                                        },
+                                        obscureText: _obscureText,
                                       ),
-                                    ),
-                                    contentPadding: EdgeInsets.all(12.0),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      : Container(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 16.0, 0.0, 8.0),
-                    child: ListTile(
-                      leading: Column(
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Text(
-                                strings.get("BY_REGISTERING"),
-                                style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .fontSize,
+                                    )
+                                  ],
                                 ),
                               ),
-                              Container(
-                                height: 18.0,
-                                child: FlatButton(
-                                  padding:
-                                      EdgeInsets.fromLTRB(4.0, 0.0, 0.0, 0.0),
-                                  child: Text(
-                                    strings.get("TERMS_AND_CONDITION"),
-                                    style: TextStyle(
-                                      fontSize: Theme.of(context)
-                                          .primaryTextTheme
-                                          .caption
-                                          .fontSize,
-                                    ),
-                                  ),
-                                  onPressed: () {},
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: SimpleTextBox(
+                                        controller: _referralCodeController,
+                                        labelText: strings.get("REFERRAL_CODE"),
+                                      ),
+                                    )
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: RaisedButton(
-                                    onPressed: () {
-                                      if (formKey.currentState.validate()) {
-                                        formKey.currentState.save();
-                                        _doSignUp();
-                                      }
-                                    },
-                                    color: Theme.of(context).primaryColor,
-                                    child: Container(
-                                      child: Text(
-                                        strings.get("SIGNUP").toUpperCase(),
-                                        style: TextStyle(color: Colors.white70),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: ColorButton(
+                                      onPressed: () {
+                                        if (formKey.currentState.validate()) {
+                                          formKey.currentState.save();
+                                          _doSignUp();
+                                        }
+                                      },
+                                      child: Container(
+                                        child: Text(
+                                          "Register for Free",
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .button
+                                              .copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: AppConfig.of(context).channelId != '3' &&
-                            AppConfig.of(context).channelId != '10'
-                        ? Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text("powered by"),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Image.asset(
-                                    "images/playfantasy.png",
-                                    height: 64.0,
-                                    width: 64.0,
-                                  ),
-                                ],
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(),
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Divider(
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                          CircleAvatar(
+                                            radius: 12.0,
+                                            backgroundColor: Colors.white,
+                                            child: Text(
+                                              strings.get("OR").toUpperCase(),
+                                              textAlign: TextAlign.center,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .caption
+                                                  .copyWith(
+                                                    color: Colors.black54,
+                                                  ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Divider(
+                                              color: Colors.black54,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: ColorButton(
+                                        onPressed: () {
+                                          _doGoogleLogin(context);
+                                        },
+                                        color: Colors.white,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Icon(
+                                                gplus_squared,
+                                                color: Colors.black,
+                                                size: 32.0,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16.0),
+                                                child: Container(
+                                                  height: 32.0,
+                                                  width: 1.0,
+                                                  color: Colors.black26,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  "Continue with Google",
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: ColorButton(
+                                        onPressed: () {
+                                          _doFacebookLogin(context);
+                                        },
+                                        color: Color.fromRGBO(59, 89, 153, 1),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Icon(
+                                                facebook_squared,
+                                                color: Colors.white,
+                                                size: 32.0,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 16.0),
+                                                child: Container(
+                                                  height: 32.0,
+                                                  width: 1.0,
+                                                  color: Colors.black26,
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  "Continue with Facebook",
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
-                          )
-                        : Container(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "By registering you accept you are 18+ and agree to our ",
+                  style: TextStyle(
+                    fontSize:
+                        Theme.of(context).primaryTextTheme.caption.fontSize,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                InkWell(
+                  child: Text(
+                    "T&C.",
+                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w900,
+                          decoration: TextDecoration.underline,
+                        ),
+                  ),
+                  onTap: () {},
+                )
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Already a Member? ",
+                    style: TextStyle(
+                      fontSize:
+                          Theme.of(context).primaryTextTheme.button.fontSize,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  InkWell(
+                    child: Text(
+                      " Login Now.",
+                      style: Theme.of(context).primaryTextTheme.button.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w900,
+                            decoration: TextDecoration.underline,
+                          ),
+                    ),
+                    onTap: () {
+                      _launchSignIn();
+                    },
                   )
                 ],
               ),
             ),
-          ),
+          ],
         ),
-        bShowLoader ? Loader() : Container(),
-      ],
+      ),
     );
   }
 }

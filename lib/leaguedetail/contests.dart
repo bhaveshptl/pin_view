@@ -622,30 +622,13 @@ class ContestsState extends State<Contests> {
                     ? !((_contests[index - 1]).brand["info"] ==
                         _contests[index].brand["info"])
                     : true;
-                bool bShowBottomBorder = index == _contests.length - 1
-                    ? true
-                    : !((_contests[index + 1]).brand["info"] ==
-                        _contests[index].brand["info"]);
+
                 return Padding(
-                  padding: bShowBrandInfo
-                      ? EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0)
-                      : EdgeInsets.only(right: 8.0, left: 8.0, top: 0.3),
+                  padding: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
                   child: ContestCard(
-                    radius: !bShowBottomBorder && !bShowBrandInfo
-                        ? BorderRadius.all(Radius.circular(0.0))
-                        : (bShowBottomBorder
-                            ? BorderRadius.only(
-                                bottomLeft: Radius.circular(5.0),
-                                bottomRight: Radius.circular(5.0),
-                              )
-                            : (bShowBrandInfo
-                                ? BorderRadius.only(
-                                    topLeft: Radius.circular(5.0),
-                                    topRight: Radius.circular(5.0),
-                                  )
-                                : BorderRadius.all(
-                                    Radius.circular(0.0),
-                                  ))),
+                    radius: BorderRadius.circular(
+                      5.0,
+                    ),
                     l1Data: widget.l1Data,
                     league: widget.league,
                     onJoin: onJoinContest,

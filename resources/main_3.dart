@@ -1,9 +1,14 @@
+import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+
 import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/splashscreen.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/redux/reducers/loader.dart';
+import 'package:playfantasy/redux/models/loader_model.dart';
 
 disableDeviceRotation() {
   SystemChrome.setPreferredOrientations([
@@ -47,20 +52,29 @@ void main() async {
   disableDeviceRotation();
 
   HttpManager.channelId = channelId;
+  final store = Store<LoaderModel>(
+    showLoader,
+    initialState: LoaderModel(isLoading: false),
+  );
+
   var configuredApp = AppConfig(
+    store: store,
     appName: 'PlayFantasy',
     channelId: channelId,
     showBackground: true,
     apiBaseUrl: apiBaseUrl,
     carouselSlideTime: Duration(seconds: 5),
-    child: MaterialApp(
-      home: SplashScreen(
-        apiBaseUrl: apiBaseUrl,
-        channelId: channelId,
-        fcmSubscribeId: fcmSubscribeId,
+    child: StoreProvider(
+      store: store,
+      child: MaterialApp(
+        home: SplashScreen(
+          apiBaseUrl: apiBaseUrl,
+          channelId: channelId,
+          fcmSubscribeId: fcmSubscribeId,
+        ),
+        routes: FantasyRoutes().getRoutes(),
+        theme: _buildLightTheme(),
       ),
-      routes: FantasyRoutes().getRoutes(),
-      theme: _buildLightTheme(),
     ),
   );
 

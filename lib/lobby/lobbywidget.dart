@@ -24,7 +24,6 @@ class LobbyWidget extends StatefulWidget {
 }
 
 class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool bShowLoader = true;
   int registeredSportType;
   List<League> _allLeagues;
@@ -195,74 +194,62 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      key: _scaffoldKey,
-      body: Stack(
-        children: <Widget>[
-          bShowLoader
-              ? Container(
-                  color: Colors.black12.withAlpha(10),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              "Loading...",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .title
-                                  .copyWith(
-                                      color: Theme.of(context).primaryColor),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  "To me, cricket is a simple game.  Keep it simple and just go out and play - Shane Warne",
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .copyWith(
-                                        color: Colors.black87,
-                                      ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
+    return bShowLoader
+        ? Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      "Loading...",
+                      style: Theme.of(context)
+                          .primaryTextTheme
+                          .title
+                          .copyWith(color: Theme.of(context).primaryColor),
                     ),
-                  ),
-                )
-              : Container(
-                  padding: EdgeInsets.only(top: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: StatusTab(
-                          allLeagues: _allLeagues,
-                          sportType: widget.sportType,
-                          statusLeagues: upcomingLeagues,
-                          onSportChange: widget.onSportChange,
-                          leagueStatus: LeagueStatus.UPCOMING,
-                          mapSportTypes: widget.mapSportTypes,
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "To me, cricket is a simple game.  Keep it simple and just go out and play - Shane Warne",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.black87,
+                              ),
                         ),
                       ),
-                    ],
+                    ),
+                  ],
+                )
+              ],
+            ),
+          )
+        : Container(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: StatusTab(
+                    allLeagues: _allLeagues,
+                    sportType: widget.sportType,
+                    statusLeagues: upcomingLeagues,
+                    onSportChange: widget.onSportChange,
+                    leagueStatus: LeagueStatus.UPCOMING,
+                    mapSportTypes: widget.mapSportTypes,
                   ),
                 ),
-        ],
-      ),
-    );
+              ],
+            ),
+          );
   }
 
   @override

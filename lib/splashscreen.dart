@@ -1,18 +1,19 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
+
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/landingpage/landingpage.dart';
 import 'package:playfantasy/lobby/lobby.dart';
-import 'package:flutter/services.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/authcheck.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
@@ -86,7 +87,7 @@ class SplashScreenState extends State<SplashScreen>
       setLoadingPercentage(99.0);
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
-          pageBuilder: (context) => LandingPage(),
+          pageBuilder: (context) => SignInPage(),
         ),
       );
     }

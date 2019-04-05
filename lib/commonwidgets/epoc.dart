@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 class EPOC extends StatefulWidget {
   final int timeInMiliseconds;
-  EPOC({this.timeInMiliseconds});
+  final TextStyle style;
+  EPOC({this.timeInMiliseconds, this.style});
 
   @override
   EPOCState createState() => EPOCState();
@@ -60,10 +61,11 @@ class EPOCState extends State<EPOC> {
           "m : " +
           (leftSeconds >= 0 ? leftSeconds.toString() : "0") +
           "s",
-      style: TextStyle(
-        color: Colors.black45,
-        fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-      ),
+      style: widget.style ??
+          Theme.of(context).primaryTextTheme.body1.copyWith(
+                color: Theme.of(context).primaryColor,
+              ),
+      textAlign: TextAlign.center,
     );
   }
 }
