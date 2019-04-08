@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:device_info/device_info.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:package_info/package_info.dart';
 
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
@@ -29,12 +30,19 @@ class SignupState extends State<Signup> {
   String _password;
   String _deviceId;
   String _pfRefCode;
+  String googleAddId = "";
   bool _obscureText = true;
+  bool bShowLoader = false;
+  String _installAndroid_link;
 
   bool _bShowReferralInput = false;
+  String _installReferring_link = "";
+  Map<String, dynamic> androidDeviceInfoMap;
   String _installReferringLink = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const firebase_fcm_platform =
+      const MethodChannel('com.algorin.pf.fcm');
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -49,8 +57,79 @@ class SignupState extends State<Signup> {
   void initState() {
     super.initState();
 
-    _getFirebaseId();
-    _initBranchStuff();
+    getLocalStorageValues();
+    getAndroidDeviceInfo().then((String value) {});
+  }
+
+  getLocalStorageValues() {
+    Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
+    firebasedeviceid.then((value) {
+      if (value.length > 0) {
+        _deviceId = value;
+      } else {
+        _getFirebaseToken();
+      }
+    });
+    Future<dynamic> installReferringlinkFromBranch = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
+    installReferringlinkFromBranch.then((value) {
+      if (value.length > 0) {
+        _installReferring_link = value;
+      } else {
+        _getInstallReferringLink().then((String link) {
+          _installReferring_link = link;
+          setState(() {
+            _installReferring_link = link;
+          });
+        });
+      }
+    });
+    Future<dynamic> pfRefCodeFromBranch = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
+    pfRefCodeFromBranch.then((value) {
+      if (value.length > 0) {
+        _pfRefCode = value;
+        setState(() {
+          _referralCodeController.text = _pfRefCode;
+        });
+      } else {
+        _getBranchRefCode().then((String refcode) {
+          _pfRefCode = refcode;
+          setState(() {
+            _referralCodeController.text = _pfRefCode;
+          });
+        });
+      }
+    });
+    Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
+    googleAddId_from_local.then((value) {
+      if (value.length > 0) {
+        googleAddId = value;
+      } else {
+        _getGoogleAddId().then((String value) {
+          googleAddId = value;
+        });
+      }
+    });
+  }
+
+  Future<String> _getGoogleAddId() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
+    } catch (e) {}
+    return value;
+  }
+
+  Future<String> _getFirebaseToken() async {
+    String value;
+    try {
+      value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken');
+      _deviceId = value;
+    } catch (e) {}
+    return value;
   }
 
   _getFirebaseId() async {
@@ -83,9 +162,18 @@ class SignupState extends State<Signup> {
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
+    return value;
+  }
+
+  
+
+  Future<String> getAndroidDeviceInfo() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getAndroidDeviceInfo');
+      androidDeviceInfoMap = json.decode(value);
+    } catch (e) {}
     return value;
   }
 
@@ -93,9 +181,7 @@ class SignupState extends State<Signup> {
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return value;
   }
 
@@ -106,8 +192,10 @@ class SignupState extends State<Signup> {
   }
 
   _doSignUp() async {
-    showLoader(true);
+     showLoader(true);
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String app_version_flutter = packageInfo.version;
 
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
@@ -123,15 +211,15 @@ class SignupState extends State<Signup> {
         "refCode": _referralCodeController.text,
         "channel_id": HttpManager.channelId,
         "deviceId": _deviceId,
-        "uid": "",
         "model": androidInfo.model,
-        "platformType": androidInfo.version.baseOS,
         "manufacturer": androidInfo.manufacturer,
-        "googleaddid": "",
+        "googleaddid": googleAddId,
         "serial": androidInfo.androidId,
+        "branchinstallReferringlink": _installReferring_link,
+        "app_version_flutter": app_version_flutter
       };
-      if (_installReferringLink.length > 0) {
-        var uri = Uri.parse(_installReferringLink);
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
         uri.queryParameters.forEach((k, v) {
           try {
             _payload["context"][k] = v;
@@ -140,7 +228,27 @@ class SignupState extends State<Signup> {
           }
         });
       }
+
+      try {
+        _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+        _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
+        _payload["context"]["network_operator"] =
+            androidDeviceInfoMap["network_operator"];
+        _payload["context"]["firstInstallTime"] =
+            androidDeviceInfoMap["firstInstallTime"];
+        _payload["context"]["lastUpdateTime"] =
+            androidDeviceInfoMap["lastUpdateTime"];
+        _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
+        _payload["context"]["network_type"] =
+            androidDeviceInfoMap["network_type"];
+        _payload["context"]["googleEmailList"] =
+            json.encode(androidDeviceInfoMap["googleEmailList"]);
+      } catch (e) {}
     }
+
+    print(
+        "<<<<<<<<<<<<<<<<<<<Signup Context non socila>>>>>>>>>>>>>>>>>>>>>>>");
+    print(_payload["context"].toString());
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
@@ -231,6 +339,54 @@ class SignupState extends State<Signup> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
+     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String app_version_flutter = packageInfo.version;
+    Map<String, dynamic> _payload = {};
+    _payload["accessToken"] = token;
+    _payload["context"] = {
+      "refCode": _pfRefCode,
+      "channel_id": HttpManager.channelId,
+      "deviceId": _deviceId,
+      "uid": "",
+      "model": androidInfo.model,
+      "platformType": androidInfo.version.baseOS,
+      "manufacturer": androidInfo.manufacturer,
+      "googleaddid": googleAddId,
+      "serial": androidInfo.androidId,
+      "branchinstallReferringlink": _installReferring_link,
+      "app_version_flutter": app_version_flutter
+    };
+
+    if (_installReferring_link.length > 0) {
+      var uri = Uri.parse(_installReferring_link);
+      uri.queryParameters.forEach((k, v) {
+        try {
+          _payload["context"][k] = v;
+        } catch (e) {
+          print(e);
+        }
+      });
+    }
+    try {
+      _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
+      _payload["context"]["network_operator"] =
+          androidDeviceInfoMap["network_operator"];
+      _payload["context"]["firstInstallTime"] =
+          androidDeviceInfoMap["firstInstallTime"];
+      _payload["context"]["lastUpdateTime"] =
+          androidDeviceInfoMap["lastUpdateTime"];
+      _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
+      _payload["context"]["network_type"] =
+          androidDeviceInfoMap["network_type"];
+      _payload["context"]["googleEmailList"] =
+          json.encode(androidDeviceInfoMap["googleEmailList"]);
+    } catch (e) {}
+
+    print("<<<<<<<<<<<<<<<<<<<Signup Context>>>>>>>>>>>>>>>>>>>>>>>");
+    print(_payload["context"].toString());
     http.Client()
         .post(
       BaseUrl().apiUrl +
@@ -240,12 +396,7 @@ class SignupState extends State<Signup> {
                   ? ApiUtil.FACEBOOK_LOGIN_URL
                   : ApiUtil.GOOGLE_LOGIN_URL)),
       headers: {'Content-type': 'application/json'},
-      body: json.encode({
-        "context": {
-          "channel_id": HttpManager.channelId,
-        },
-        "accessToken": token
-      }),
+      body: json.encode(_payload),
     )
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {

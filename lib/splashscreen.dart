@@ -40,6 +40,10 @@ class SplashScreenState extends State<SplashScreen>
   bool bUnderMaintenence = false;
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
+  static const branch_io_platform =
+      const MethodChannel('com.algorin.pf.branch');
+  String _installReferring_link = "";
+  String _pfRefCode = "";    
 
   @override
   void initState() {
@@ -47,6 +51,9 @@ class SplashScreenState extends State<SplashScreen>
     super.initState();
 
     _getFirebaseToken();
+     _initBranchStuff();
+    _getGoogleAddId();
+    _getBranchRefCode();
     _subscribeToFirebaseTopic(widget.fcmSubscribeId);
   }
 
@@ -108,6 +115,52 @@ class SplashScreenState extends State<SplashScreen>
     setState(() {
       loadingPercent = percent;
     });
+  }
+
+  _initBranchStuff() {
+    _getInstallReferringLink().then((String link) {
+      _installReferring_link = link;
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
+          _installReferring_link);
+    });
+    _getBranchRefCode().then((String refcode) {
+      _pfRefCode = refcode;
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, _pfRefCode);
+    });
+
+    _getGoogleAddId().then((String googleaddid) {
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, googleaddid);
+    });
+  }
+
+  Future<String> _getGoogleAddId() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
+    } catch (e) {
+    }
+    return value;
+  }
+
+  Future<String> _getBranchRefCode() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getBranchRefCode');
+    } catch (e) {
+    }
+    return value;
+  }
+
+  Future<String> _getInstallReferringLink() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
+    } catch (e) {
+    }
+    return value;
   }
 
   Future<String> _getFirebaseToken() async {
