@@ -6,17 +6,15 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/lobby/initpay.dart';
+import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/analytics.dart';
-import 'package:playfantasy/modal/analytics.dart';
-import 'package:playfantasy/lobby/paymentmode.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/deposit/paymentmode.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 
 class AddCash extends StatefulWidget {
   final String source;

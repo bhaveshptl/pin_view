@@ -10,8 +10,8 @@ import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
-import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;

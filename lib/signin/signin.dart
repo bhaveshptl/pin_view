@@ -7,17 +7,17 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
-import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-import 'package:playfantasy/commonwidgets/textbox.dart';
-import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
+import 'package:playfantasy/signin/forgotpassword.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/commonwidgets/forgotpassword.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class SignInPage extends StatefulWidget {

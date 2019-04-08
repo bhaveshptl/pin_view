@@ -6,13 +6,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/lobby/initpay.dart';
+import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/transactionfailed.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;

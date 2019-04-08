@@ -6,8 +6,8 @@ import 'package:playfantasy/modal/profile.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/profilepages/changepassword.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/changepassword.dart';
 
 class MyProfile extends StatefulWidget {
   @override

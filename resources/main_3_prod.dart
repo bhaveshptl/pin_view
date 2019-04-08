@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:playfantasy/routes.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/splashscreen.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -72,7 +71,6 @@ void main() async {
           channelId: channelId,
           fcmSubscribeId: fcmSubscribeId,
         ),
-        routes: FantasyRoutes().getRoutes(),
         theme: _buildLightTheme(),
       ),
     ),

@@ -11,10 +11,10 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/withdraw.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/lobby/withdrawhistory.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/profilepages/verification.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/withdraw/withdrawhistory.dart';
 
 class Withdraw extends StatefulWidget {
   final Map<String, dynamic> data;

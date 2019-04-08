@@ -1,31 +1,30 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/joincontest.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
-import 'package:playfantasy/commonwidgets/prizestructure.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-import 'package:playfantasy/commonwidgets/statedob.dart';
-import 'package:playfantasy/contestdetail/contestdetailscard.dart';
-import 'package:playfantasy/contestdetail/switchteam.dart';
-import 'package:playfantasy/contestdetail/viewteam.dart';
-import 'package:playfantasy/leaguedetail/createteam.dart';
+import 'package:flutter_share_me/flutter_share_me.dart';
+
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/profilepages/statedob.dart';
+import 'package:playfantasy/createteam/createteam.dart';
+import 'package:playfantasy/contestdetail/viewteam.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/joincontest/joincontest.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/prizestructure/prizestructure.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/contestdetail/contestdetailscard.dart';
 
 const TABLE_COLUMN_PADDING = 28;
 

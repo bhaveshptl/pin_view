@@ -1,34 +1,34 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-import 'package:playfantasy/leaguedetail/contests.dart';
-import 'package:playfantasy/leaguedetail/createteam.dart';
+import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/modal/prediction.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
-import 'package:playfantasy/leaguedetail/prediction/createsheet.dart';
+import 'package:playfantasy/mycontests/mycontest.dart';
+import 'package:playfantasy/createteam/createteam.dart';
+import 'package:playfantasy/leaguedetail/contests.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/createcontest/createcontest.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 import 'package:playfantasy/leaguedetail/prediction/prediction.dart';
-import 'package:playfantasy/lobby/createcontest.dart';
-import 'package:playfantasy/lobby/mycontests/mycontest.dart';
-import 'package:playfantasy/lobby/searchcontest.dart';
-import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/modal/league.dart';
-import 'package:playfantasy/modal/mysheet.dart';
-import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/modal/prediction.dart';
-import 'package:playfantasy/redux/actions/loader_actions.dart';
-import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
-import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League league;
