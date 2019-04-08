@@ -6,12 +6,12 @@ import 'package:package_info/package_info.dart';
 
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
+import 'package:playfantasy/profilepages/update.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/authcheck.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/commonwidgets/update.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
