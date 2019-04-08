@@ -36,6 +36,9 @@ class ApiUtil {
   static const SHARED_PREFERENCE_USER_KEY = "fantasy_user";
   static const SHARED_PREFERENCE_SPORT_SELECTION = "fantasy_sport_selection";
   static const SHARED_PREFERENCE_FIREBASE_TOKEN = "deviceId";
+  static const SHARED_PREFERENCE_REFCODE_BRANCH = "refcode_branch";
+  static const SHARED_PREFERENCE_GOOGLE_ADDID ="google_addid";
+  static const SHARED_PREFERENCE_INSTALLREFERRING_BRANCH = "installReferring";
   static const WS_SHARED_PREFERENCE_KEY = "ws_fantasy_cookie";
   static const LANGUAGE_TABLE = "fantasy_language_table";
   static const KEY_INIT_DATA = "fantasy_init_data";
