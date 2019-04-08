@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.algorin.playfantasy">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.algorin.playfantasy">
 
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -37,7 +37,7 @@
             </intent-filter>
 
         </activity>
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data tools:replace="android:value" android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
 
         /**
         * Add your API key

@@ -1,42 +1,44 @@
 class League {
-  final int matchId;
-  final String matchName;
   final int status;
-  final int prediction;
-  final int leagueId;
-  final int matchStartTime;
-  final int matchEndTime;
-  final Series series;
   final Team teamA;
   final Team teamB;
+  final int matchId;
+  final int leagueId;
+  final Series series;
+  final int prediction;
+  final int matchEndTime;
+  final String matchName;
+  final int matchStartTime;
 
-  League(
-      {this.matchId,
-      this.matchName,
-      this.status,
-      this.prediction,
-      this.leagueId,
-      this.matchStartTime,
-      this.matchEndTime,
-      this.series,
-      this.teamA,
-      this.teamB});
+  League({
+    this.teamA,
+    this.teamB,
+    this.status,
+    this.series,
+    this.matchId,
+    this.leagueId,
+    this.matchName,
+    this.prediction,
+    this.matchEndTime,
+    this.matchStartTime,
+  });
 
   factory League.fromJson(Map<String, dynamic> json) {
     if (json == null) {
       return League();
     } else {
       return League(
-          matchId: json['matchId'],
-          matchName: json['matchName'],
-          status: json['status'],
-          prediction: json['prediction'],
-          leagueId: json['leagueId'],
-          matchStartTime: json['matchStartTime'],
-          matchEndTime: json['matchEndTime'],
-          series: Series.fromJson(json['series']),
-          teamA: Team.fromJson(json['teamA']),
-          teamB: Team.fromJson(json['teamB']));
+        status: json['status'],
+        matchId: json['matchId'],
+        leagueId: json['leagueId'],
+        matchName: json['matchName'],
+        prediction: json['prediction'],
+        matchEndTime: json['matchEndTime'],
+        teamA: Team.fromJson(json['teamA']),
+        teamB: Team.fromJson(json['teamB']),
+        matchStartTime: json['matchStartTime'],
+        series: Series.fromJson(json['series']),
+      );
     }
   }
 }
@@ -48,37 +50,39 @@ class LeagueStatus {
 }
 
 class Series {
-  final String seriesTypeInfo;
-  final int seriesTypeId;
   final int id;
-  final int priority;
   final String name;
   final String info;
-  final int startDate;
+  final int priority;
   final int endDate;
+  final int startDate;
   final int countryId;
-  Series(
-      {this.seriesTypeInfo,
-      this.seriesTypeId,
-      this.id,
-      this.name,
-      this.info,
-      this.priority,
-      this.startDate,
-      this.endDate,
-      this.countryId});
+  final int seriesTypeId;
+  final String seriesTypeInfo;
+  Series({
+    this.id,
+    this.name,
+    this.info,
+    this.endDate,
+    this.startDate,
+    this.countryId,
+    this.seriesTypeId,
+    this.priority = 0,
+    this.seriesTypeInfo,
+  });
 
   factory Series.fromJson(Map<String, dynamic> json) {
     return Series(
-        seriesTypeInfo: json['seriesTypeInfo'],
-        seriesTypeId: json['seriesTypeId'],
-        id: json['id'],
-        priority: json['priority'],
-        name: json['name'],
-        info: json['info'],
-        startDate: json['startDate'],
-        endDate: json['endDate'],
-        countryId: json['countryId']);
+      id: json['id'],
+      name: json['name'],
+      info: json['info'],
+      endDate: json['endDate'],
+      priority: json['priority'] == null ? 0 : json['priority'],
+      startDate: json['startDate'],
+      countryId: json['countryId'],
+      seriesTypeId: json['seriesTypeId'],
+      seriesTypeInfo: json['seriesTypeInfo'],
+    );
   }
 }
 
@@ -86,18 +90,18 @@ class Team {
   final int id;
   final String name;
   final int sportType;
+  final int inningsId;
+  final String logoUrl;
   final String sportDesc;
   final String colorCode;
-  final String logoUrl;
   final String jerseyUrl;
-  final int inningsId;
   Team({
     this.id,
     this.name,
+    this.logoUrl,
     this.sportType,
     this.sportDesc,
     this.colorCode,
-    this.logoUrl,
     this.jerseyUrl,
     this.inningsId,
   });
@@ -106,10 +110,10 @@ class Team {
     return Team(
         id: json['id'],
         name: json['name'],
+        logoUrl: json['logoUrl'],
         sportType: json['sportType'],
         sportDesc: json['sportDesc'],
         colorCode: json['colorCode'],
-        logoUrl: json['logoUrl'],
         jerseyUrl: json['jerseyUrl'],
         inningsId: json['inningsId']);
   }

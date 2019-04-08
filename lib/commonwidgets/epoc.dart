@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class EPOC extends StatefulWidget {
-  final int timeInMiliseconds;
   final TextStyle style;
+  final int timeInMiliseconds;
   EPOC({this.timeInMiliseconds, this.style});
 
   @override
@@ -12,11 +12,13 @@ class EPOC extends StatefulWidget {
 }
 
 class EPOCState extends State<EPOC> {
+  Timer _timer;
   int leftDays = 0;
   int leftHours = 0;
   int leftMinutes = 0;
   int leftSeconds = 0;
-  Timer _timer;
+
+  bool bIsTimerClosed = false;
 
   @override
   void initState() {
@@ -40,7 +42,13 @@ class EPOCState extends State<EPOC> {
     });
 
     _timer = Timer(Duration(seconds: 1), () {
-      startTimerToCalculateEPOC();
+      if (remainingTime.inMilliseconds > 0) {
+        startTimerToCalculateEPOC();
+      } else {
+        setState(() {
+          bIsTimerClosed = true;
+        });
+      }
     });
   }
 
@@ -53,14 +61,16 @@ class EPOCState extends State<EPOC> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      leftDays.toString() +
-          "d : " +
-          (leftHours >= 0 ? leftHours.toString() : "0") +
-          "h : " +
-          (leftMinutes >= 0 ? leftMinutes.toString() : "0") +
-          "m : " +
-          (leftSeconds >= 0 ? leftSeconds.toString() : "0") +
-          "s",
+      bIsTimerClosed
+          ? "CLOSED"
+          : (leftDays.toString() +
+              "d : " +
+              (leftHours >= 0 ? leftHours.toString() : "0") +
+              "h : " +
+              (leftMinutes >= 0 ? leftMinutes.toString() : "0") +
+              "m : " +
+              (leftSeconds >= 0 ? leftSeconds.toString() : "0") +
+              "s"),
       style: widget.style ??
           Theme.of(context).primaryTextTheme.body1.copyWith(
                 color: Theme.of(context).primaryColor,

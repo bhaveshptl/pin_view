@@ -9,24 +9,27 @@ class ScaffoldPage extends StatelessWidget {
   final Widget body;
   final Widget title;
   final Widget action;
-  final AppBar appBar;
   final GlobalKey scaffoldKey;
-  final Widget floatingActionButton;
   final Color backgroundColor;
+  final Widget bottomNavigationBar;
+  final PreferredSizeWidget appBar;
+  final Widget floatingActionButton;
 
   ScaffoldPage({
-    this.scaffoldKey,
     this.body,
     this.title,
     this.action,
     this.appBar,
+    this.scaffoldKey,
     this.backgroundColor,
+    this.bottomNavigationBar,
     this.floatingActionButton,
   });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
+      alignment: Alignment.bottomCenter,
       children: <Widget>[
         Container(
           color: backgroundColor ?? Color.fromRGBO(237, 237, 237, 1),
@@ -45,16 +48,18 @@ class ScaffoldPage extends StatelessWidget {
               : appBar,
           body: body,
           backgroundColor: Colors.transparent,
+          bottomNavigationBar: bottomNavigationBar,
         ),
         StoreConnector<LoaderModel, LoaderModel>(
-            converter: (store) => store.state,
-            builder: (context, loader) {
-              return Stack(
-                children: <Widget>[
-                  (loader.isLoading ? LoaderWidget() : Container()),
-                ],
-              );
-            })
+          converter: (store) => store.state,
+          builder: (context, loader) {
+            return Stack(
+              children: <Widget>[
+                (loader.isLoading ? LoaderWidget() : Container()),
+              ],
+            );
+          },
+        ),
       ],
     );
   }

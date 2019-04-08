@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/prizestructure.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/statedob.dart';
@@ -122,33 +123,37 @@ class PredictionViewState extends State<PredictionView> {
             .showSnackBar(SnackBar(content: Text(response["message"])));
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(strings.get("ALERT").toUpperCase()),
-            content: Text(
-              "No sheet created for this match. Please create one to join contest.",
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  strings.get("CANCEL").toUpperCase(),
-                ),
+      if (AppConfig.of(context).channelId == "10") {
+        _onCreateSheet(context, contest);
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(strings.get("ALERT").toUpperCase()),
+              content: Text(
+                "No sheet created for this match. Please create one to join contest.",
               ),
-              FlatButton(
-                onPressed: () {
-                  _onCreateSheet(context, contest);
-                },
-                child: Text(strings.get("CREATE").toUpperCase()),
-              )
-            ],
-          );
-        },
-      );
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    strings.get("CANCEL").toUpperCase(),
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    _onCreateSheet(context, contest);
+                  },
+                  child: Text(strings.get("CREATE").toUpperCase()),
+                )
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -263,8 +268,11 @@ class PredictionViewState extends State<PredictionView> {
 
   void _onCreateSheet(BuildContext context, Contest contest) async {
     final curContest = contest;
+
     bWaitingForTeamCreation = true;
-    Navigator.of(context).pop();
+    if (AppConfig.of(context).channelId != "10") {
+      Navigator.of(context).pop();
+    }
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateSheet(
@@ -294,9 +302,11 @@ class PredictionViewState extends State<PredictionView> {
   }
 
   void _showPrizeStructure(Contest contest) async {
+    widget.showLoader(true);
     List<dynamic> prizeStructure = await _getPrizeStructure(contest);
+    widget.showLoader(false);
     if (prizeStructure != null) {
-      showDialog(
+      showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return PrizeStructure(
@@ -367,31 +377,13 @@ class PredictionViewState extends State<PredictionView> {
                     ? !((widget.prediction.contests[index - 1]).brand["info"] ==
                         widget.prediction.contests[index].brand["info"])
                     : true;
-                bool bShowBottomBorder = index ==
-                        widget.prediction.contests.length - 1
-                    ? true
-                    : !((widget.prediction.contests[index + 1]).brand["info"] ==
-                        widget.prediction.contests[index].brand["info"]);
+
                 return Padding(
-                  padding: bShowBrandInfo
-                      ? EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0)
-                      : EdgeInsets.only(right: 8.0, left: 8.0, top: 0.3),
+                  padding: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
                   child: PredictionContestCard(
-                    radius: !bShowBottomBorder && !bShowBrandInfo
-                        ? BorderRadius.all(Radius.circular(0.0))
-                        : (bShowBottomBorder
-                            ? BorderRadius.only(
-                                bottomLeft: Radius.circular(5.0),
-                                bottomRight: Radius.circular(5.0),
-                              )
-                            : (bShowBrandInfo
-                                ? BorderRadius.only(
-                                    topLeft: Radius.circular(5.0),
-                                    topRight: Radius.circular(5.0),
-                                  )
-                                : BorderRadius.all(
-                                    Radius.circular(0.0),
-                                  ))),
+                    radius: BorderRadius.circular(
+                      5.0,
+                    ),
                     league: widget.league,
                     onJoin: onJoinContest,
                     onClick: _onContestClick,

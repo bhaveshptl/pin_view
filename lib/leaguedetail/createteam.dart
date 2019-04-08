@@ -1,11 +1,17 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/epoc.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -37,6 +43,7 @@ class CreateTeamState extends State<CreateTeam>
   int _sportType = 1;
   double _usedCredits = 0.0;
   int _selectedPlayersCount = 0;
+  final double TEAM_LOGO_HEIGHT = 48.0;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   Player _captain;
@@ -51,6 +58,16 @@ class CreateTeamState extends State<CreateTeam>
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
   Map<int, List<Player>> _selectedPlayersByStyleId = {};
+
+  Map<int, String> mapSportLabel = {
+    1: "WK",
+    2: "BAT",
+    3: "BOWL",
+    4: "AR",
+  };
+
+  int teamAPlayerCount = 0;
+  int teamBPlayerCount = 0;
 
   @override
   void initState() {
@@ -106,6 +123,12 @@ class CreateTeamState extends State<CreateTeam>
         });
       }
     });
+  }
+
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   _addPlayerTeamId() {
@@ -207,8 +230,18 @@ class CreateTeamState extends State<CreateTeam>
           return;
         }
         _selectedPlayers.add(player);
+        if (player.teamId == widget.league.teamA.id) {
+          teamAPlayerCount++;
+        } else {
+          teamBPlayerCount++;
+        }
       } else {
         _selectedPlayers.removeAt(_selectedPlayerIndex);
+        if (player.teamId == widget.league.teamA.id) {
+          teamAPlayerCount--;
+        } else {
+          teamBPlayerCount--;
+        }
       }
 
       _seperatePlayersByPlayingStyle();
@@ -426,27 +459,40 @@ class CreateTeamState extends State<CreateTeam>
   /// and vice captain selection.
   ///
   void _showChooseCaptain() {
-    _scaffoldKey.currentState.showBottomSheet((context) {
-      return Container(
-        decoration: new BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black,
-              blurRadius: 20.0,
+    Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (context) => ChooseCaptain(
+              captain: _captain,
+              league: widget.league,
+              viceCaptain: _vCaptain,
+              onSave: _onSaveCaptains,
+              fanTeamRules: _fanTeamRules,
+              mapSportLabel: mapSportLabel,
+              selectedPlayers: _selectedPlayers,
             ),
-          ],
-        ),
-        height: 550.0,
-        child: ChooseCaptain(
-          fanTeamRules: _fanTeamRules,
-          selectedPlayers: _selectedPlayers,
-          onSave: _onSaveCaptains,
-          captain: _captain,
-          viceCaptain: _vCaptain,
-        ),
-      );
-    });
+      ),
+    );
+    // _scaffoldKey.currentState.showBottomSheet((context) {
+    //   return Container(
+    //     decoration: new BoxDecoration(
+    //       color: Colors.white,
+    //       boxShadow: [
+    //         new BoxShadow(
+    //           color: Colors.black,
+    //           blurRadius: 20.0,
+    //         ),
+    //       ],
+    //     ),
+    //     height: 550.0,
+    //     child: ChooseCaptain(
+    //       fanTeamRules: _fanTeamRules,
+    //       selectedPlayers: _selectedPlayers,
+    //       onSave: _onSaveCaptains,
+    //       captain: _captain,
+    //       viceCaptain: _vCaptain,
+    //     ),
+    //   );
+    // });
   }
 
   ///
@@ -460,124 +506,29 @@ class CreateTeamState extends State<CreateTeam>
     List<Widget> tabs = [];
     for (PlayingStyle style in _playingStyles) {
       tabs.add(
-        Padding(
-          padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-          child: Tab(
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Stack(
-                    children: <Widget>[
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                height: 24.0,
-                                width: 24.0,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                        ('images/' +
-                                                style.label +
-                                                " " +
-                                                _sportType.toString() +
-                                                ".png")
-                                            .toLowerCase()
-                                            .replaceAll(" ", "-"),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(top: 6.0),
-                                child: Text(
-                                  strings.get("PICK") +
-                                      " " +
-                                      (style.rule.length > 0 &&
-                                              style.rule[0] == style.rule[1]
-                                          ? style.rule[0].toString()
-                                          : style.rule[0].toString() +
-                                              "-" +
-                                              style.rule[1].toString()),
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .copyWith(
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              CircleAvatar(
-                                maxRadius: 8.0,
-                                backgroundColor: Colors.white,
-                                child:
-                                    _selectedPlayersByStyleId[style.id] == null
-                                        ? Text(
-                                            0.toString(),
-                                            style: Theme.of(context)
-                                                .primaryTextTheme
-                                                .caption
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .primaryColor
-                                                        .withAlpha(200)),
-                                          )
-                                        : Text(
-                                            _selectedPlayersByStyleId[style.id]
-                                                .length
-                                                .toString(),
-                                            style: Theme.of(context)
-                                                .primaryTextTheme
-                                                .caption
-                                                .copyWith(
-                                                    color: Theme.of(context)
-                                                        .primaryColor
-                                                        .withAlpha(200)),
-                                          ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
+        Tab(
+          text: mapSportLabel[style.id] +
+              "(" +
+              (_selectedPlayersByStyleId[style.id] == null
+                  ? 0.toString()
+                  : _selectedPlayersByStyleId[style.id].length.toString()) +
+              ")",
         ),
       );
     }
 
     return Container(
-      color: Theme.of(context).primaryColor,
+      color: Colors.white,
       child: TabBar(
         tabs: tabs,
-        indicatorWeight: 4.0,
+        indicatorWeight: 2.0,
         controller: tabController,
-        indicatorColor: Colors.white,
-        labelColor: Theme.of(context).primaryColorDark,
-        unselectedLabelColor: Theme.of(context).primaryColorDark,
+        unselectedLabelColor: Colors.black45,
+        labelColor: Theme.of(context).primaryColor,
+        indicatorColor: Theme.of(context).primaryColor,
+        labelStyle: Theme.of(context).primaryTextTheme.subhead.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
       ),
     );
   }
@@ -590,8 +541,10 @@ class CreateTeamState extends State<CreateTeam>
           style: style,
           onSort: onSort,
           sortedBy: _sortedBy,
+          league: widget.league,
           l1Data: widget.l1Data,
           allPlayers: allPlayers,
+          mapSportLabel: mapSportLabel,
           onPlayerSelect: _selectPlayer,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
         ),
@@ -657,189 +610,6 @@ class CreateTeamState extends State<CreateTeam>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    String title = widget.league.teamA.name + " vs " + widget.league.teamB.name;
-    if (widget.l1Data.league.inningsId != 0 && _sportType == 1) {
-      if (widget.league.teamA.inningsId == widget.l1Data.league.inningsId) {
-        title = widget.league.teamA.name + " inning";
-      } else {
-        title = widget.league.teamB.name + " inning";
-      }
-    } else if (widget.l1Data.league.inningsId != 0) {
-      if (widget.league.teamA.inningsId == widget.l1Data.league.inningsId) {
-        title = "First" + " half";
-      } else {
-        title = "Second" + " half";
-      }
-    }
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 10.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            strings.get("PLAYERS").toUpperCase(),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text(
-                              _selectedPlayersCount.toString() +
-                                  "/" +
-                                  (widget.l1Data != null
-                                      ? widget.l1Data.league.fanTeamRules
-                                          .playersTotal
-                                          .toString()
-                                      : ""),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .fontSize),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            strings.get("CREDITS").toUpperCase(),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text(
-                              (widget.l1Data.league.fanTeamRules.credits -
-                                          _usedCredits)
-                                      .toStringAsFixed(2) +
-                                  "/" +
-                                  (widget.l1Data != null
-                                      ? widget
-                                          .l1Data.league.fanTeamRules.credits
-                                          .toString()
-                                      : ""),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .fontSize),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            strings.get("AVG_CREDITS"),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.0),
-                            child: Text(
-                              _avgCredits.toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .fontSize),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Scaffold(
-              body: TabBarView(
-                controller: tabController,
-                children: _getTabsBodyBasedOnPlayingStyle(),
-              ),
-              bottomNavigationBar: _createTabsBasedOnPlayingStyle(),
-              floatingActionButton: Container(
-                child: showNextButton
-                    ? FloatingActionButton(
-                        child: Icon(Icons.navigate_next),
-                        onPressed: () {
-                          tabController.index++;
-                        },
-                      )
-                    : FloatingActionButton.extended(
-                        backgroundColor: AppConfig.of(context).channelId == "10"
-                            ? Colors.green
-                            : null,
-                        label: Text(AppConfig.of(context).channelId == "10"
-                            ? "Next Choose your Captain!"
-                            : "Choose Captain"),
-                        icon: Icon(
-                          Icons.save,
-                          size: 0.0,
-                        ),
-                        onPressed: () {
-                          if (_isValidTeam()) {
-                            _showChooseCaptain();
-                          }
-                        },
-                      ),
-              ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.endFloat,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   _getTeamToSave() {
     Map<String, dynamic> team = {
       "matchId": widget.league.matchId,
@@ -889,6 +659,7 @@ class CreateTeamState extends State<CreateTeam>
   }
 
   void createTeam(Map<String, dynamic> team) async {
+    showLoader(true);
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_TEAM));
     req.body = json.encode(team);
@@ -904,11 +675,14 @@ class CreateTeamState extends State<CreateTeam>
           strings.get("SAVE_TEAM_ERROR"),
         );
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
   void _updateTeam(Map<String, dynamic> team) async {
     String cookie;
+    showLoader(true);
     Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
     await futureCookie.then((value) {
       cookie = value;
@@ -933,6 +707,460 @@ class CreateTeamState extends State<CreateTeam>
           strings.get("UPDATE_TEAM_ERROR"),
         );
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Color colorA = Color.fromRGBO(133, 15, 15, 1);
+    Color colorB = Color.fromRGBO(122, 11, 10, 1);
+
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight + 128.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          colorA,
+                          colorB,
+                        ],
+                        stops: [0.5, 0.5],
+                        tileMode: TileMode.repeated,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width * 0.1),
+                    child: Transform(
+                      transform: Matrix4.skewX(-0.2),
+                      origin: Offset(0.0, 0.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              colorA,
+                              colorB,
+                            ],
+                            stops: [0.5, 0.5],
+                            tileMode: TileMode.repeated,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    children: <Widget>[
+                      AppBar(
+                        title: EPOC(
+                          timeInMiliseconds: widget.league.matchStartTime,
+                          style:
+                              Theme.of(context).primaryTextTheme.body2.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                        ),
+                        elevation: 0.0,
+                        centerTitle: true,
+                        backgroundColor: Colors.transparent,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            "Max " +
+                                _fanTeamRules.playersPerTeam.toString() +
+                                " players from a team",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body2
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  strings.get("PLAYERS"),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.white54,
+                                      ),
+                                ),
+                                Text(
+                                  _selectedPlayersCount.toString() +
+                                      "/" +
+                                      (widget.l1Data != null
+                                          ? widget.l1Data.league.fanTeamRules
+                                              .playersTotal
+                                              .toString()
+                                          : ""),
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .fontSize,
+                                    color: Colors.white54,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 16.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(2.0),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 1.0,
+                                              spreadRadius: 0.5,
+                                              offset: Offset(0.0, 2.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          clipBehavior: Clip.hardEdge,
+                                          borderRadius: BorderRadius.circular(
+                                            TEAM_LOGO_HEIGHT,
+                                          ),
+                                          child: CachedNetworkImage(
+                                            imageUrl: widget.league.teamA !=
+                                                    null
+                                                ? widget.league.teamA.logoUrl
+                                                : "",
+                                            fit: BoxFit.fitHeight,
+                                            placeholder: Container(
+                                              padding: EdgeInsets.all(4.0),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                              ),
+                                              width: TEAM_LOGO_HEIGHT,
+                                              height: TEAM_LOGO_HEIGHT,
+                                            ),
+                                            height: TEAM_LOGO_HEIGHT,
+                                            width: TEAM_LOGO_HEIGHT,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              widget.league.teamA != null
+                                                  ? widget.league.teamA.name
+                                                  : "",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.white54,
+                                                  ),
+                                            ),
+                                            Text(
+                                              teamAPlayerCount.toString(),
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.white54,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 16.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 8.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              widget.league.teamB != null
+                                                  ? widget.league.teamB.name
+                                                  : "",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.white54,
+                                                  ),
+                                            ),
+                                            Text(
+                                              teamBPlayerCount.toString(),
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.white54,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(2.0),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 1.0,
+                                              spreadRadius: 0.5,
+                                              offset: Offset(0.0, 2.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          clipBehavior: Clip.hardEdge,
+                                          borderRadius: BorderRadius.circular(
+                                            TEAM_LOGO_HEIGHT,
+                                          ),
+                                          child: CachedNetworkImage(
+                                            imageUrl: widget.league.teamB !=
+                                                    null
+                                                ? widget.league.teamB.logoUrl
+                                                : "",
+                                            fit: BoxFit.fitHeight,
+                                            placeholder: Container(
+                                              padding: EdgeInsets.all(4.0),
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.0,
+                                              ),
+                                              width: TEAM_LOGO_HEIGHT,
+                                              height: TEAM_LOGO_HEIGHT,
+                                            ),
+                                            height: TEAM_LOGO_HEIGHT,
+                                            width: TEAM_LOGO_HEIGHT,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                Text(
+                                  strings.get("CREDITS"),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.white54,
+                                      ),
+                                ),
+                                Text(
+                                  (widget.l1Data.league.fanTeamRules.credits -
+                                          _usedCredits)
+                                      .toStringAsFixed(2),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .fontSize,
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
+                        child: Row(
+                          children: List.generate(_fanTeamRules.playersTotal,
+                              (index) {
+                            if (index < _selectedPlayersCount) {
+                              return Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: Container(
+                                  height: 16.0,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    (index + 1).toString(),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(2.0),
+                                    color: Colors.green,
+                                  ),
+                                  width: ((MediaQuery.of(context).size.width -
+                                              32.0) /
+                                          _fanTeamRules.playersTotal) -
+                                      8.0,
+                                ),
+                              );
+                            } else {
+                              return Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: Container(
+                                  height: 16.0,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(2.0),
+                                    color: Colors.white,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child:
+                                      (index + 1) == _fanTeamRules.playersTotal
+                                          ? Text(
+                                              (index + 1).toString(),
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .caption
+                                                  .copyWith(
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                            )
+                                          : Container(),
+                                  width: ((MediaQuery.of(context).size.width -
+                                              32.0) /
+                                          _fanTeamRules.playersTotal) -
+                                      8.0,
+                                ),
+                              );
+                            }
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: <Widget>[
+          _createTabsBasedOnPlayingStyle(),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: _getTabsBodyBasedOnPlayingStyle(),
+            ),
+          ),
+          Container(
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10.0,
+                  spreadRadius: 3.0,
+                  color: Colors.black12,
+                ),
+              ],
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 40.0, right: 8.0),
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        color: Colors.orange,
+                        child: Text(
+                          "Team Preview",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 40.0, left: 8.0),
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        child: Text(
+                          "Continue",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        onPressed: _selectedPlayers.length !=
+                                _fanTeamRules.playersTotal
+                            ? null
+                            : () {
+                                if (_isValidTeam()) {
+                                  _showChooseCaptain();
+                                }
+                              },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

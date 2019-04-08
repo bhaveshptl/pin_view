@@ -4,8 +4,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/epoc.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
@@ -15,9 +16,8 @@ import 'package:playfantasy/leaguedetail/prediction/createsheet.dart';
 import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 import 'package:playfantasy/leaguedetail/prediction/prediction.dart';
 import 'package:playfantasy/lobby/createcontest.dart';
-import 'package:playfantasy/lobby/mycontests/newmycontest.dart';
+import 'package:playfantasy/lobby/mycontests/mycontest.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
@@ -39,8 +39,8 @@ class LeagueDetail extends StatefulWidget {
 
   LeagueDetail(
     this.league, {
-    this.sportType,
     this.leagues,
+    this.sportType,
     this.onSportChange,
     this.mapSportTypes,
   });
@@ -57,10 +57,12 @@ class LeagueDetailState extends State<LeagueDetail>
   List<MyTeam> _myTeams;
   String title = "Contest".toUpperCase();
 
-  bool bShowInnings = false;
   List<MySheet> _mySheets;
+  bool bShowInnings = false;
   Prediction predictionData;
+  int joinedContestCount = 0;
   List<int> predictionContestIds;
+  int joinedPredictionContestCount = 0;
   StreamSubscription _streamSubscription;
   Map<String, dynamic> l1UpdatePackate = {};
   Map<int, List<MyTeam>> _mapContestTeams = {};
@@ -91,7 +93,6 @@ class LeagueDetailState extends State<LeagueDetail>
 
   _onWsMsg(data) {
     if (data["bReady"] == 1) {
-      // _showLoader(true);
       _getL1Data();
     } else if (data["iType"] == RequestType.GET_ALL_L1 &&
         data["bSuccessful"] == true) {
@@ -107,6 +108,13 @@ class LeagueDetailState extends State<LeagueDetail>
         _myTeams = (data["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
+        joinedContestCount = (data["data"]["mycontestid"]
+                    [widget.league.leagueId.toString()] ==
+                null)
+            ? 0
+            : data["data"]["mycontestid"][widget.league.leagueId.toString()]
+                .length;
+        joinedPredictionContestCount = predictionContestIds.length;
         if (data["data"]["prediction"] != null) {
           predictionData = Prediction.fromJson(data["data"]["prediction"]);
         }
@@ -117,7 +125,6 @@ class LeagueDetailState extends State<LeagueDetail>
           }).toList();
         }
       });
-      // _showLoader(false);
     } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
         data["bSuccessful"] == true) {
       _applyL1DataUpdate(data["diffData"]["ld"]);
@@ -506,7 +513,6 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _getL1Data() {
-    // _showLoader(true);
     FantasyWebSocket().sendMessage(l1UpdatePackate);
   }
 
@@ -794,8 +800,10 @@ class LeagueDetailState extends State<LeagueDetail>
       case 2:
         result = await Navigator.of(context).push(
           FantasyPageRoute(
-            pageBuilder: (context) => NewMyContests(
+            pageBuilder: (context) => MyContests(
                   leagues: widget.leagues,
+                  sportsId: _sportType,
+                  leagueId: widget.league.leagueId,
                   mapSportTypes: widget.mapSportTypes,
                   onSportChange: widget.onSportChange,
                 ),
@@ -878,39 +886,8 @@ class LeagueDetailState extends State<LeagueDetail>
       ),
       body: Column(
         children: <Widget>[
-          Container(
-            height: kToolbarHeight,
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.black12,
-                  width: 0.5,
-                ),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  widget.league.teamA.name.toUpperCase() +
-                      " VS " +
-                      widget.league.teamB.name.toUpperCase(),
-                  style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w900,
-                      ),
-                ),
-                EPOC(
-                  timeInMiliseconds: widget.league.matchStartTime,
-                  style: Theme.of(context).primaryTextTheme.body1.copyWith(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w900,
-                      ),
-                ),
-              ],
-            ),
+          LeagueTitle(
+            league: widget.league,
           ),
           bShowInnings
               ? Container(
@@ -983,107 +960,230 @@ class LeagueDetailState extends State<LeagueDetail>
                         mapContestTeams: _mapContestTeams,
                       ),
           ),
+          Container(
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10.0,
+                  spreadRadius: 3.0,
+                  color: Colors.black12,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                (activeTabIndex == 0 &&
+                            _myTeams != null &&
+                            _myTeams.length > 0) ||
+                        (activeTabIndex == 1 &&
+                            _mySheets != null &&
+                            _mySheets.length > 0)
+                    ? Expanded(
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 72.0,
+                                child: FlatButton(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 24.0,
+                                            height: 24.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.orange,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              activeTabIndex == 0
+                                                  ? (_myTeams == null
+                                                      ? "0"
+                                                      : _myTeams.length
+                                                          .toString())
+                                                  : (_mySheets == null
+                                                      ? "0"
+                                                      : _mySheets.length
+                                                          .toString()),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              activeTabIndex == 0
+                                                  ? "My Teams"
+                                                  : "My Sheets",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    _onBottomButtonClick(1);
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Container(
+                                width: 1.0,
+                                height: 72.0,
+                                color: Colors.black12,
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                height: 72.0,
+                                child: FlatButton(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 24.0,
+                                            height: 24.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.orange,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              activeTabIndex == 0
+                                                  ? joinedContestCount
+                                                      .toString()
+                                                  : joinedPredictionContestCount
+                                                      .toString(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text("Joined Contest"),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    _onBottomButtonClick(2);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(
+                        height: 48.0,
+                        width: MediaQuery.of(context).size.width / 2,
+                        child: ColorButton(
+                          color: Colors.orange,
+                          child: Text(
+                            (activeTabIndex == 0
+                                    ? "Create team"
+                                    : "Create prediction")
+                                .toUpperCase(),
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                          onPressed: () {
+                            _onBottomButtonClick(3);
+                          },
+                        ),
+                      )
+              ],
+            ),
+          )
         ],
       ),
-      // bottomNavigationBar: Container(
-      //   height: 64.0,
-      //   color: Theme.of(context).primaryColor,
-      //   child: (activeTabIndex == 0 &&
-      //               _myTeams != null &&
-      //               _myTeams.length > 0) ||
-      //           (activeTabIndex == 1 &&
-      //               _mySheets != null &&
-      //               _mySheets.length > 0)
-      //       ? Row(
-      //           mainAxisAlignment: MainAxisAlignment.center,
-      //           children: <Widget>[
-      //             activeTabIndex != 0
-      //                 ? Container()
-      //                 : Padding(
-      //                     padding: EdgeInsets.symmetric(horizontal: 4.0),
-      //                     child: RaisedButton(
-      //                       color: Color.fromRGBO(21, 156, 84, 1),
-      //                       shape: RoundedRectangleBorder(
-      //                         borderRadius: BorderRadius.circular(10.0),
-      //                       ),
-      //                       onPressed: () {
-      //                         _onBottomButtonClick(0);
-      //                       },
-      //                       elevation: 0.0,
-      //                       child: Text(
-      //                         "Create contest",
-      //                         style: Theme.of(context)
-      //                             .primaryTextTheme
-      //                             .button
-      //                             .copyWith(color: Colors.white),
-      //                       ),
-      //                     ),
-      //                   ),
-      //             Padding(
-      //               padding: EdgeInsets.symmetric(horizontal: 4.0),
-      //               child: RaisedButton(
-      //                 color: Color.fromRGBO(21, 156, 84, 1),
-      //                 shape: RoundedRectangleBorder(
-      //                   borderRadius: BorderRadius.circular(10.0),
-      //                 ),
-      //                 onPressed: () {
-      //                   _onBottomButtonClick(1);
-      //                 },
-      //                 elevation: 0.0,
-      //                 child: Text(
-      //                   activeTabIndex == 0 ? "My teams" : "My predictions",
-      //                   style: Theme.of(context)
-      //                       .primaryTextTheme
-      //                       .button
-      //                       .copyWith(color: Colors.white),
-      //                 ),
-      //               ),
-      //             ),
-      //             Padding(
-      //               padding: EdgeInsets.symmetric(horizontal: 4.0),
-      //               child: RaisedButton(
-      //                 color: Color.fromRGBO(21, 156, 84, 1),
-      //                 shape: RoundedRectangleBorder(
-      //                   borderRadius: BorderRadius.circular(10.0),
-      //                 ),
-      //                 onPressed: () {
-      //                   _onBottomButtonClick(2);
-      //                 },
-      //                 elevation: 0.0,
-      //                 child: Text(
-      //                   "My contests",
-      //                   style: Theme.of(context)
-      //                       .primaryTextTheme
-      //                       .button
-      //                       .copyWith(color: Colors.white),
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         )
-      //       : Row(
-      //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //           children: <Widget>[
-      //             RaisedButton(
-      //               color: Color.fromRGBO(21, 156, 84, 1),
-      //               shape: RoundedRectangleBorder(
-      //                 borderRadius: BorderRadius.circular(10.0),
-      //               ),
-      //               onPressed: () {
-      //                 _onBottomButtonClick(3);
-      //               },
-      //               elevation: 0.0,
-      //               child: Text(
-      //                 activeTabIndex == 0 ? "Create team" : "Create prediction",
-      //                 style: Theme.of(context)
-      //                     .primaryTextTheme
-      //                     .button
-      //                     .copyWith(color: Colors.white),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      // ),
     );
   }
 }
+
+// Row(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: <Widget>[
+//                           activeTabIndex != 0
+//                               ? Container()
+//                               : ColorButton(
+//                                   onPressed: () {
+//                                     _onBottomButtonClick(0);
+//                                   },
+//                                   elevation: 0.0,
+//                                   child: Text(
+//                                     "Create contest",
+//                                     style: Theme.of(context)
+//                                         .primaryTextTheme
+//                                         .button
+//                                         .copyWith(color: Colors.white),
+//                                   ),
+//                                 ),
+//                           ColorButton(
+//                             onPressed: () {
+//                               _onBottomButtonClick(1);
+//                             },
+//                             elevation: 0.0,
+//                             child: Text(
+//                               activeTabIndex == 0
+//                                   ? "My teams"
+//                                   : "My predictions",
+//                               style: Theme.of(context)
+//                                   .primaryTextTheme
+//                                   .button
+//                                   .copyWith(color: Colors.white),
+//                             ),
+//                           ),
+//                           Container(
+//                             child: ColorButton(
+//                               onPressed: () {
+//                                 _onBottomButtonClick(2);
+//                               },
+//                               elevation: 0.0,
+//                               child: Text(
+//                                 "My contests",
+//                                 style: Theme.of(context)
+//                                     .primaryTextTheme
+//                                     .button
+//                                     .copyWith(color: Colors.white),
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       )

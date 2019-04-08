@@ -87,20 +87,34 @@ class PrizeStructureState extends State<PrizeStructure> {
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           color: Theme.of(context).primaryColor,
           height: 40.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Stack(
+            alignment: Alignment.center,
             children: <Widget>[
-              Container(),
-              Text(
-                "Prize breakup".toUpperCase(),
-                style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Prize breakup".toUpperCase(),
+                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                ],
               ),
-              Icon(
-                Icons.close,
-                color: Colors.white54,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.white54,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -180,44 +194,12 @@ class PrizeStructureState extends State<PrizeStructure> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 8.0),
+                  padding: EdgeInsets.only(top: 16.0, bottom: 32.0),
                   child: Row(
                     children: <Widget>[
                       Expanded(
                         child: Column(
                           children: _getPrizeList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Divider(
-                    color: Colors.black12,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          strings.get("NOTES") +
-                              ": " +
-                              strings.get("PRIZE_STRUCTURE_TEXT_1") +
-                              " " +
-                              strings.get("PRIZE_STRUCTURE_TEXT_2") +
-                              " " +
-                              strings.get("PRIZE_STRUCTURE_TEXT_3"),
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                            color: Colors.black54,
-                          ),
-                          textAlign: TextAlign.justify,
                         ),
                       ),
                     ],
@@ -229,20 +211,5 @@ class PrizeStructureState extends State<PrizeStructure> {
         ),
       ],
     );
-    // AlertDialog(
-    //   title: Text(strings.get("PRIZE_STRUCTURE")),
-    //   contentPadding: EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
-    //   content: ,
-    //   // actions: <Widget>[
-    //   //   FlatButton(
-    //   //     child: Text(
-    //   //       strings.get("CLOSE").toUpperCase(),
-    //   //     ),
-    //   //     onPressed: () {
-    //   //       Navigator.of(context).pop();
-    //   //     },
-    //   //   )
-    //   // ],
-    // );
   }
 }

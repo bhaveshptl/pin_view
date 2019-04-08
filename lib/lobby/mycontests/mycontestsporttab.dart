@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/joincontest.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
@@ -12,7 +12,7 @@ import 'package:playfantasy/leaguedetail/createteam.dart';
 import 'package:playfantasy/leaguedetail/prediction/createsheet.dart';
 import 'package:playfantasy/leaguedetail/prediction/joinpredictioncontest.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
-import 'package:playfantasy/lobby/mycontests/newmyconteststatustab.dart';
+import 'package:playfantasy/lobby/mycontests/myconteststatustab.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
@@ -24,10 +24,12 @@ import 'package:playfantasy/utils/stringtable.dart';
 
 class MyContestSportTab extends StatefulWidget {
   final int sportsType;
+  final int currentStauts;
+  final bool showStatusBar;
   final Function showLoader;
   final List<League> leagues;
-  final Map<int, List<MySheet>> mapMySheets;
   final Map<int, List<MyTeam>> mapMyTeams;
+  final Map<int, List<MySheet>> mapMySheets;
   final Map<String, MyAllContest> myContests;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
@@ -39,6 +41,8 @@ class MyContestSportTab extends StatefulWidget {
     this.mapMyTeams,
     this.mapMySheets,
     this.scaffoldKey,
+    this.currentStauts,
+    this.showStatusBar = true,
   });
 
   @override
@@ -58,17 +62,21 @@ class MyContestSportTabState extends State<MyContestSportTab> {
   Prediction predictionData;
   List<MyTeam> leagueAllMyTeams;
   Map<String, dynamic> l1DataObj = {};
-  StreamSubscription _streamSubscription;
 
   Map<String, MyAllContest> _mapLiveContest = {};
   Map<String, MyAllContest> _mapResultContest = {};
   Map<String, MyAllContest> _mapUpcomingContest = {};
+
+  StreamSubscription _streamSubscription;
 
   @override
   initState() {
     super.initState();
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
+    if (!widget.showStatusBar) {
+      selectedSegment = widget.currentStauts - 1;
+    }
   }
 
   League _getLeague(int _leagueId) {
@@ -79,6 +87,8 @@ class MyContestSportTabState extends State<MyContestSportTab> {
     }
     return null;
   }
+
+  getLeagueStatus(int leagueId) {}
 
   setContestsByStatus(Map<String, MyAllContest> _mapMyContests) {
     Map<String, MyAllContest> mapLiveContest = {};
@@ -238,8 +248,12 @@ class MyContestSportTabState extends State<MyContestSportTab> {
       );
 
       if (result != null) {
-        widget.scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
+        final response = json.decode(result);
+        widget.scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text(response["message"]),
+          ),
+        );
       }
     } else {
       showDialog(
@@ -495,29 +509,126 @@ class MyContestSportTabState extends State<MyContestSportTab> {
     double width = MediaQuery.of(context).size.width;
     return Column(
       children: <Widget>[
+        widget.showStatusBar
+            ? Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Container(
+                  height: 40.0,
+                  width: width * 0.8,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedSegment = 0;
+                            });
+                          },
+                          child: Container(
+                            height: 40.0,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: selectedSegment == 0
+                                  ? Theme.of(context).primaryColor
+                                  : null,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Text(
+                              "Upcoming",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:
+                                    selectedSegment == 0 ? Colors.white : null,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedSegment = 1;
+                            });
+                          },
+                          child: Container(
+                            height: 40.0,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: selectedSegment == 1
+                                  ? Theme.of(context).primaryColor
+                                  : null,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Text(
+                              "Live",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:
+                                    selectedSegment == 1 ? Colors.white : null,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              selectedSegment = 2;
+                            });
+                          },
+                          child: Container(
+                            height: 40.0,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: selectedSegment == 2
+                                  ? Theme.of(context).primaryColor
+                                  : null,
+                              borderRadius: BorderRadius.circular(24.0),
+                            ),
+                            child: Text(
+                              "Completed",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:
+                                    selectedSegment == 2 ? Colors.white : null,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Container(),
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: SizedBox(
-            width: width,
-            child: CupertinoSegmentedControl<int>(
-              children: {
-                0: Text(strings.get("UPCOMING").toUpperCase()),
-                1: Text(strings.get("LIVE").toUpperCase()),
-                2: Text(strings.get("RESULT").toUpperCase()),
-              },
-              borderColor: Theme.of(context).primaryColorDark,
-              selectedColor: Theme.of(context).primaryColorDark.withAlpha(240),
-              onValueChanged: (int newValue) {
-                setState(() {
-                  selectedSegment = newValue;
-                });
-              },
-              groupValue: selectedSegment,
-            ),
+          padding: EdgeInsets.all(16.0),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  selectedSegment == 0
+                      ? "Upcoming Matches"
+                      : selectedSegment == 1
+                          ? "Live Matches"
+                          : "Completed Matches",
+                  style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+              )
+            ],
           ),
         ),
         Expanded(
-          child: NewMyContestStatusTab(
+          child: MyContestStatusTab(
             leagues: widget.leagues,
             mapContests: selectedSegment == 0
                 ? _mapUpcomingContest
@@ -527,6 +638,7 @@ class MyContestSportTabState extends State<MyContestSportTab> {
             mapMySheets: widget.mapMySheets,
             onContestDetails: _onContestClick,
             onJoinNormalContest: _onJoinContest,
+            leagueContests: !widget.showStatusBar,
             onJoinPredictionContest: _onJoinPredictionContest,
             onPredictionContestDetails: _onPredictionContestClick,
           ),

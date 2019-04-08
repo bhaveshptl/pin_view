@@ -1,14 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/leaguedetail/contestcards/upcoming_howzat.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/leaguedetail/contestcards/live.dart';
 import 'package:playfantasy/leaguedetail/contestcards/result.dart';
-import 'package:playfantasy/leaguedetail/contestcards/upcoming.dart';
+import 'package:playfantasy/leaguedetail/contestcards/upcoming_howzat.dart';
 
 class ContestCard extends StatelessWidget {
   final L1 l1Data;

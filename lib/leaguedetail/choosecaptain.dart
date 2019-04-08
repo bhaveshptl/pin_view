@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/commonwidgets/epoc.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
-const double TEAM_LOGO_HEIGHT = 18.0;
-
 class ChooseCaptain extends StatefulWidget {
+  final League league;
+  final Player captain;
+  final Function onSave;
+  final Player viceCaptain;
   final FanTeamRule fanTeamRules;
   final List<Player> selectedPlayers;
-  final Function onSave;
-  final Player captain;
-  final Player viceCaptain;
+  final Map<int, String> mapSportLabel;
 
-  ChooseCaptain(
-      {this.fanTeamRules,
-      this.selectedPlayers,
-      this.onSave,
-      this.captain,
-      this.viceCaptain});
+  ChooseCaptain({
+    this.league,
+    this.onSave,
+    this.captain,
+    this.viceCaptain,
+    this.fanTeamRules,
+    this.mapSportLabel,
+    this.selectedPlayers,
+  });
 
   @override
   State<StatefulWidget> createState() => ChooseCaptainState();
@@ -27,6 +34,7 @@ class ChooseCaptain extends StatefulWidget {
 class ChooseCaptainState extends State<ChooseCaptain> {
   Player _captain;
   Player _vCaptain;
+  double teamLogoHeight = 40.0;
 
   @override
   void initState() {
@@ -66,124 +74,116 @@ class ChooseCaptainState extends State<ChooseCaptain> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
+    return ScaffoldPage(
+      appBar: AppBar(
+        title: EPOC(
+          timeInMiliseconds: widget.league.matchStartTime,
+          style: Theme.of(context).primaryTextTheme.title.copyWith(
+                color: Colors.white,
+              ),
+        ),
+        centerTitle: true,
+      ),
+      body: Column(
         children: <Widget>[
           Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: OutlineButton(
-                    padding: EdgeInsets.all(0.0),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      strings.get("CANCEL").toUpperCase(),
-                    ),
-                  ),
+            decoration: BoxDecoration(
+              color: Colors.black.withAlpha(10),
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.black26,
+                  width: 1.0,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: RaisedButton(
-                    color: Theme.of(context).primaryColor,
-                    textColor: Colors.white70,
-                    padding: EdgeInsets.all(0.0),
-                    onPressed: () {
-                      if ((widget.fanTeamRules.captainMult != 0 &&
-                              _captain == null) &&
-                          (widget.fanTeamRules.vcMult != 0.0 &&
-                              _vCaptain == null)) {
-                        _showErrorMessage(
-                          strings.get("CAPTAIN_VCAPTAIN_SELECTION"),
-                        );
-                      } else if ((widget.fanTeamRules.captainMult != 0 &&
-                          _captain == null)) {
-                        _showErrorMessage("Captain selection is necessary to save team.");
-                      } else {
-                        widget.onSave(_captain, _vCaptain);
-                      }
-                    },
-                    child: Text(
-                      strings.get("SAVE_TEAM").toUpperCase(),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-          Divider(
-            height: 12.0,
-            color: Colors.black45,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Row(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Column(
               children: <Widget>[
-                Expanded(
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        "Choose your Captain and Vice Captain",
+                        textAlign: TextAlign.center,
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 8.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Expanded(
-                        flex: 3,
-                        child: Text(""),
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          "NAME",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Series Score",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .caption
-                              .copyWith(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text(
-                          strings.get("CAPTAIN") +
-                              " (" +
-                              widget.fanTeamRules.captainMult.toString() +
-                              "X)",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .caption
-                              .copyWith(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight
-                                      .bold), //TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      widget.fanTeamRules.vcMult != 0.0
-                          ? Expanded(
-                              flex: 3,
-                              child: Text(
-                                "V.Captain" +
-                                    " (" +
-                                    widget.fanTeamRules.vcMult.toString() +
-                                    "X)",
-                                textAlign: TextAlign.center,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .copyWith(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.bold),
+                      Row(
+                        children: <Widget>[
+                          Container(
+                            width: 32.0,
+                            height: 32.0,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.black26,
                               ),
-                            )
-                          : Container(),
+                            ),
+                            child: Text(
+                              "C",
+                              style: TextStyle(
+                                color: Colors.black45,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Gets 2X Points",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 32.0,
+                              height: 32.0,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.black26,
+                                ),
+                              ),
+                              child: Text(
+                                "VC",
+                                style: TextStyle(
+                                  color: Colors.black45,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                "Gets 1.5X Points",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -198,109 +198,194 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     itemCount: widget.selectedPlayers.length,
                     itemBuilder: (context, index) {
                       final _player = widget.selectedPlayers[index];
-                      final style = _getPlayerStyle(_player);
+                      final _prevPlayer = index == 0
+                          ? _player
+                          : widget.selectedPlayers[index - 1];
 
-                      return Container(
-                        padding: EdgeInsets.all(4.0),
-                        height: 40.0,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 3,
-                              child: CircleAvatar(
-                                minRadius: 16.0,
-                                backgroundColor: Colors.black12,
-                                child: CachedNetworkImage(
-                                  imageUrl: _player.jerseyUrl,
-                                  placeholder: Container(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                    ),
-                                    width: TEAM_LOGO_HEIGHT,
-                                    height: TEAM_LOGO_HEIGHT,
-                                  ),
-                                  height: TEAM_LOGO_HEIGHT,
-                                ),
+                      return Padding(
+                        padding:
+                            _prevPlayer.playingStyleId == _player.playingStyleId
+                                ? EdgeInsets.all(0.0)
+                                : EdgeInsets.only(top: 16.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.black12,
                               ),
                             ),
-                            Expanded(
-                              flex: 9,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(_player.name),
-                                  Container(
-                                    height: 18.0,
-                                    width: 26.0,
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                            ('images/' +
-                                                    style.label +
-                                                    " " +
-                                                    _player.sportsId
-                                                        .toString() +
-                                                    "-black" +
-                                                    ".png")
-                                                .toLowerCase()
-                                                .replaceAll(" ", "-"),
-                                          ),
-                                        ),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.0,
+                            vertical: 8.0,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 3,
+                                child: CircleAvatar(
+                                  minRadius: 24.0,
+                                  backgroundColor: Colors.black12,
+                                  child: CachedNetworkImage(
+                                    imageUrl: _player.jerseyUrl,
+                                    placeholder: Container(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
                                       ),
+                                      width: teamLogoHeight,
+                                      height: teamLogoHeight,
+                                    ),
+                                    height: teamLogoHeight,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 9,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      _player.name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 4.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Text(
+                                            _player.teamId ==
+                                                    widget.league.teamA.id
+                                                ? widget.league.teamA.name
+                                                : widget.league.teamB.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          Text(
+                                            " - " +
+                                                widget.mapSportLabel[
+                                                    _player.playingStyleId],
+                                            style: TextStyle(
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Text(
+                                    _player.seriesScore.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  Text(
+                                    " Points",
+                                    style: TextStyle(
+                                      color: Colors.black45,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                _player.seriesScore.toString(),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Checkbox(
-                                value: _captain == null
-                                    ? false
-                                    : _captain.id == _player.id,
-                                onChanged: (bool value) {
-                                  setState(() {
-                                    if (_captain == _player) {
-                                      _captain = null;
-                                    } else if (!(_vCaptain != null &&
-                                        _vCaptain.id == _player.id)) {
-                                      _captain = _player;
-                                    }
-                                  });
-                                },
-                              ),
-                            ),
-                            widget.fanTeamRules.vcMult != 0.0
-                                ? Expanded(
-                                    flex: 3,
-                                    child: Checkbox(
-                                      value: _vCaptain == null
-                                          ? false
-                                          : _vCaptain.id == _player.id,
-                                      onChanged: (bool value) {
-                                        setState(() {
-                                          if (_vCaptain == _player) {
-                                            _vCaptain = null;
-                                          } else if (!(_captain != null &&
-                                              _captain.id == _player.id)) {
-                                            _vCaptain = _player;
-                                          }
-                                        });
-                                      },
+                              Expanded(
+                                flex: 3,
+                                child: InkWell(
+                                  child: Container(
+                                    width: 32.0,
+                                    height: 32.0,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.black26,
+                                        ),
+                                        color: _captain != null &&
+                                                _captain.id == _player.id
+                                            ? Colors.orange
+                                            : Colors.white),
+                                    child: Text(
+                                      _captain == null
+                                          ? "C"
+                                          : _captain.id == _player.id
+                                              ? "2X"
+                                              : "C",
+                                      style: TextStyle(
+                                        color: _captain != null &&
+                                                _captain.id == _player.id
+                                            ? Colors.white
+                                            : Colors.black45,
+                                        fontWeight: FontWeight.w800,
+                                      ),
                                     ),
-                                  )
-                                : Container(),
-                          ],
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      if (_captain == _player) {
+                                        _captain = null;
+                                      } else if (!(_vCaptain != null &&
+                                          _vCaptain.id == _player.id)) {
+                                        _captain = _player;
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                              widget.fanTeamRules.vcMult != 0.0
+                                  ? Expanded(
+                                      flex: 3,
+                                      child: InkWell(
+                                        child: Container(
+                                          width: 32.0,
+                                          height: 32.0,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: Colors.black26,
+                                              ),
+                                              color: _vCaptain != null &&
+                                                      _vCaptain.id == _player.id
+                                                  ? Colors.orange
+                                                  : Colors.white),
+                                          child: Text(
+                                            _vCaptain == null
+                                                ? "VC"
+                                                : _vCaptain.id == _player.id
+                                                    ? "1.5X"
+                                                    : "VC",
+                                            style: TextStyle(
+                                              color: _vCaptain != null &&
+                                                      _vCaptain.id == _player.id
+                                                  ? Colors.white
+                                                  : Colors.black45,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                        ),
+                                        onTap: () {
+                                          setState(() {
+                                            if (_vCaptain == _player) {
+                                              _vCaptain = null;
+                                            } else if (!(_captain != null &&
+                                                _captain.id == _player.id)) {
+                                              _vCaptain = _player;
+                                            }
+                                          });
+                                        },
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -309,6 +394,77 @@ class ChooseCaptainState extends State<ChooseCaptain> {
               ],
             ),
           ),
+          Container(
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 10.0,
+                  spreadRadius: 3.0,
+                  color: Colors.black12,
+                ),
+              ],
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 40.0, right: 8.0),
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        color: Colors.orange,
+                        child: Text(
+                          "Team Preview",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 40.0, left: 8.0),
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        child: Text(
+                          "Save Team",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        onPressed: () {
+                          if ((widget.fanTeamRules.captainMult != 0 &&
+                                  _captain == null) ||
+                              (widget.fanTeamRules.vcMult != 0.0 &&
+                                  _vCaptain == null)) {
+                            _showErrorMessage(
+                              strings.get("CAPTAIN_VCAPTAIN_SELECTION"),
+                            );
+                          } else {
+                            widget.onSave(_captain, _vCaptain);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );

@@ -1,9 +1,11 @@
-import 'package:share/share.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_share_me/flutter_share_me.dart';
 
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 
 class EarnCash extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -22,7 +24,14 @@ class EarnCashState extends State<EarnCash> {
   String cookie = "";
   String refCode = "";
   String inviteUrl = "";
+  String inviteMsg = "";
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  static const _kFontFam = 'MyFlutterApp';
+  static const IconData gplus_squared =
+      const IconData(0xf0d4, fontFamily: _kFontFam);
+  static const IconData facebook_squared =
+      const IconData(0xf308, fontFamily: _kFontFam);
 
   @override
   void initState() {
@@ -51,7 +60,7 @@ class EarnCashState extends State<EarnCash> {
   }
 
   _shareNow() {
-    String inviteMsg =
+    inviteMsg =
         "I'm having super fun playing Fantasy sports daily. Join me at " +
             AppConfig.of(context).appName +
             " and win cash prizes in every match. Take this bonus of " +
@@ -67,216 +76,416 @@ class EarnCashState extends State<EarnCash> {
             " app and use my code " +
             refCode +
             " to register.";
-    Share.share(inviteMsg);
+    FlutterShareMe().shareToSystem(msg: inviteMsg);
+  }
+
+  _shareNowWhatsApp() {
+    inviteMsg =
+        "I'm having super fun playing Fantasy sports daily. Join me at " +
+            AppConfig.of(context).appName +
+            " and win cash prizes in every match. Take this bonus of " +
+            strings.rupee +
+            refBAmount.toString() +
+            " and join me at " +
+            AppConfig.of(context).appName +
+            ". " +
+            "Click " +
+            inviteUrl +
+            " to download " +
+            AppConfig.of(context).appName +
+            " app and use my code " +
+            refCode +
+            " to register.";
+    FlutterShareMe().shareToWhatsApp(msg: inviteMsg);
+  }
+
+  _shareNowFacebook() {
+    inviteMsg =
+        "I'm having super fun playing Fantasy sports daily. Join me at " +
+            AppConfig.of(context).appName +
+            " and win cash prizes in every match. Take this bonus of " +
+            strings.rupee +
+            refBAmount.toString() +
+            " and join me at " +
+            AppConfig.of(context).appName +
+            ". " +
+            "Click " +
+            inviteUrl +
+            " to download " +
+            AppConfig.of(context).appName +
+            " app and use my code " +
+            refCode +
+            " to register.";
+    FlutterShareMe().shareToFacebook(msg: inviteMsg);
+  }
+
+  _shareNowGmail() {
+    inviteMsg =
+        "I'm having super fun playing Fantasy sports daily. Join me at " +
+            AppConfig.of(context).appName +
+            " and win cash prizes in every match. Take this bonus of " +
+            strings.rupee +
+            refBAmount.toString() +
+            " and join me at " +
+            AppConfig.of(context).appName +
+            ". " +
+            "Click " +
+            inviteUrl +
+            " to download " +
+            AppConfig.of(context).appName +
+            " app and use my code " +
+            refCode +
+            " to register.";
+    FlutterShareMe().shareToSystem(msg: inviteMsg);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(strings.get("EARN_CASH_TITLE")),
+        title: Text(
+          "REFER & EARN",
+        ),
       ),
       body: Column(
         children: <Widget>[
+          Image.asset("images/referal.png"),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(top: 16.0),
             child: Row(
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    strings.get("EARN_RS") + refAAmount.toString(),
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.display1.fontSize,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                    ),
+                    "Invite your friends and play Howzat",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.headline.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                        ),
                   ),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+            padding: EdgeInsets.only(top: 8.0),
             child: Row(
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    "- As a first thing you need to verify your Mobile.",
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Theme.of(context)
-                            .primaryTextTheme
-                            .subhead
-                            .fontSize),
+                    ("For every friends that plays, you both will earn " +
+                        strings.rupee +
+                        refAAmount.toString()),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                        ),
                   ),
                 ),
               ],
             ),
           ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                  child: Text(
-                    "- Share you invite code with your friends.",
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Theme.of(context)
-                            .primaryTextTheme
-                            .subhead
-                            .fontSize),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                  child: Text(
-                    "- Make sure your friend also verifies his Mobile.",
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Theme.of(context)
-                            .primaryTextTheme
-                            .subhead
-                            .fontSize),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
-                  child: Text(
-                    "- You gets " +
-                        strings.rupee +
-                        refAAmount.toString() +
-                        " and your friend gets " +
-                        strings.rupee +
-                        refBAmount.toString() +
-                        " as soon as your friend verifies his/her mobile number.",
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Theme.of(context)
-                            .primaryTextTheme
-                            .subhead
-                            .fontSize),
-                  ),
-                ),
-              ),
-            ],
-          ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Row(
+                Expanded(
+                  child: Card(
+                    child: Column(
                       children: <Widget>[
-                        Text(
-                          strings.get("REFERRAL_CODE"),
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                            color: Colors.green,
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Send your referral code",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                              ),
+                            ],
                           ),
-                        )
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                refCode,
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: 32.0, right: 32.0, bottom: 16.0, top: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Container(
+                                width: 56.0,
+                                height: 56.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    _shareNowWhatsApp();
+                                  },
+                                  child: Icon(
+                                    facebook_squared,
+                                    size: 32.0,
+                                    color: Colors.blue.shade900,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 56.0,
+                                height: 56.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: 1.0,
+                                    color: Colors.black26,
+                                  ),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    _shareNowFacebook();
+                                  },
+                                  child: Icon(
+                                    facebook_squared,
+                                    size: 32.0,
+                                    color: Colors.blue.shade900,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 56.0,
+                                height: 56.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: 1.0,
+                                    color: Colors.black26,
+                                  ),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    _shareNowGmail();
+                                  },
+                                  child: Icon(
+                                    gplus_squared,
+                                    size: 32.0,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 56.0,
+                                height: 56.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    width: 1.0,
+                                    color: Colors.black26,
+                                  ),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    _copyCode();
+                                  },
+                                  child: Icon(
+                                    Icons.content_copy,
+                                    size: 32.0,
+                                    color: Colors.black45,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: 32.0, right: 32.0, bottom: 16.0, top: 16.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  height: 56.0,
+                                  child: ColorButton(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: EdgeInsets.only(right: 8.0),
+                                          child: Icon(
+                                            Icons.share,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Share".toUpperCase(),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .headline
+                                              .copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                    elevation: 0.0,
+                                    onPressed: () {
+                                      _shareNow();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          refCode,
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .title
-                                .fontSize,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                )
+                  ),
+                ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            padding: EdgeInsets.only(left: 16.0, top: 16.0, right: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                RaisedButton(
-                  onPressed: () {
-                    _copyCode();
-                  },
-                  color: Colors.orange,
-                  child: Row(
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Icon(
-                          Icons.content_copy,
-                          color: Colors.white70,
+                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        child: Text(
+                          "Terms and Conditions",
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                         ),
                       ),
-                      Text(
-                        strings.get("COPY_CODE").toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Container(
+                                width: 8.0,
+                                height: 8.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                "You need to verify your mobile Number.",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .body2
+                                    .copyWith(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Container(
+                                width: 8.0,
+                                height: 8.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                "Share your invite code with your friends.",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .body2
+                                    .copyWith(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Container(
+                                width: 8.0,
+                                height: 8.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                "Your friends should also verify their mobile number.",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .body2
+                                    .copyWith(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                RaisedButton(
-                  onPressed: () {
-                    _shareNow();
-                  },
-                  color: Colors.green,
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Icon(Icons.share, color: Colors.white70),
-                      ),
-                      Text(
-                        strings.get("SHARE_NOW").toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

@@ -26,7 +26,7 @@ class ColorButton extends StatelessWidget {
       child: child,
       onPressed: onPressed,
       color: color ?? Color.fromRGBO(70, 165, 12, 1),
-      disabledColor: Colors.white,
+      disabledColor: Colors.black26,
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius ?? BorderRadius.circular(4.0),
       ),

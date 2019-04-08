@@ -196,10 +196,8 @@ class UpcomingPredictionContest extends StatelessWidget {
                                         .prizeDetails[0]["totalPrizeAmount"]),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                        color: contest.prizeType == 1
-                                            ? Colors.blue.shade900
-                                            : Theme.of(context)
-                                                .primaryColorDark,
+                                        color:
+                                            Theme.of(context).primaryColorDark,
                                         fontSize: Theme.of(context)
                                             .primaryTextTheme
                                             .title

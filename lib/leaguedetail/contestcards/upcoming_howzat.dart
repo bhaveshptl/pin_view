@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:playfantasy/appconfig.dart';
+import 'package:flutter/material.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -31,7 +30,10 @@ class UpcomingHowzatContest extends StatelessWidget {
             contest.size == contest.joined);
 
     final formatCurrency = NumberFormat.currency(
-        locale: "hi_IN", symbol: strings.rupee, decimalDigits: 0);
+      locale: "hi_IN",
+      symbol: contest.prizeType == 1 ? "" : strings.rupee,
+      decimalDigits: 0,
+    );
 
     return Column(
       children: <Widget>[
@@ -55,18 +57,31 @@ class UpcomingHowzatContest extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    formatCurrency
-                        .format(contest.prizeDetails[0]["totalPrizeAmount"]),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: contest.prizeType == 1
-                          ? Colors.blue.shade900
-                          : Theme.of(context).primaryColorDark,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.title.fontSize,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  Row(
+                    children: <Widget>[
+                      contest.prizeType == 1
+                          ? Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 2.0),
+                              child: Image.asset(
+                                strings.chips,
+                                width: 10.0,
+                                height: 10.0,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : Container(),
+                      Text(
+                        formatCurrency.format(
+                            contest.prizeDetails[0]["totalPrizeAmount"]),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColorDark,
+                          fontSize:
+                              Theme.of(context).primaryTextTheme.title.fontSize,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
                   ),
                   RaisedButton(
                     onPressed: (bIsContestFull || onJoin == null)

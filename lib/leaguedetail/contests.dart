@@ -180,7 +180,9 @@ class ContestsState extends State<Contests> {
         }
       }
       for (int i = _removedContestIndexes.length - 1; i >= 0; i--) {
-        _l1Data.contests.removeAt(_removedContestIndexes[i]);
+        if (_l1Data.contests.length > _removedContestIndexes[i]) {
+          _l1Data.contests.removeAt(_removedContestIndexes[i]);
+        }
       }
       setState(() {
         setContestsByCategory(_l1Data.contests);
@@ -469,9 +471,11 @@ class ContestsState extends State<Contests> {
   }
 
   void _showPrizeStructure(Contest contest) async {
+    widget.showLoader(true);
     List<dynamic> prizeStructure = await _getPrizeStructure(contest);
+    widget.showLoader(false);
     if (prizeStructure != null) {
-      showBottomSheet(
+      showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
           return PrizeStructure(

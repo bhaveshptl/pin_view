@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
@@ -26,7 +27,6 @@ import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/commonwidgets/gradientbutton.dart';
 import 'package:playfantasy/commonwidgets/prizestructure.dart';
-import 'package:share/share.dart';
 
 class PredictionContestDetail extends StatefulWidget {
   final League league;
@@ -520,7 +520,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
 
   void _showPrizeStructure() async {
     List<dynamic> prizeStructure = await _getPrizeStructure(widget.contest);
-    showDialog(
+    showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return PrizeStructure(
@@ -557,7 +557,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     String inviteMsg = AppConfig.of(context).appName.toUpperCase() +
         " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
 
-    Share.share(inviteMsg);
+    FlutterShareMe().shareToSystem(msg: inviteMsg);
   }
 
   _getContestSheets(int offset) async {

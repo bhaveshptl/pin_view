@@ -1,7 +1,6 @@
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/commonwidgets/epoc.dart';
@@ -17,7 +16,7 @@ class LeagueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(5.0, 2.0, 5.0, 2.0),
+      padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
       child: Tooltip(
         message: _league != null && _league.matchId != null
             ? _league.matchId.toString() + " - " + _league.matchName

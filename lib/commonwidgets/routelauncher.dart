@@ -342,18 +342,17 @@ class RouteLauncher {
   launchEarnCash(GlobalKey<ScaffoldState> scaffoldKey,
       {Function onComplete}) async {
     Map<String, dynamic> response = await getEarnCashData(scaffoldKey);
+    if (onComplete != null) {
+      onComplete();
+    }
     if (response != null) {
       await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => EarnCash(
                 data: response,
               ),
-          fullscreenDialog: true,
         ),
       );
-    }
-    if (onComplete != null) {
-      onComplete();
     }
   }
 

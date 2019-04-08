@@ -2,18 +2,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/commonwidgets/prizestructure.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
+import 'package:playfantasy/commonwidgets/epoc.dart';
+import 'package:playfantasy/commonwidgets/prizestructure.dart';
+import 'package:playfantasy/leaguedetail/contestcard.dart';
+import 'package:playfantasy/leaguedetail/prediction/predictioncontestcard.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/commonwidgets/epoc.dart';
-import 'package:playfantasy/leaguedetail/contestcard.dart';
-import 'package:playfantasy/leaguedetail/prediction/predictioncontestcard.dart';
 
 const double TEAM_LOGO_HEIGHT = 24.0;
 

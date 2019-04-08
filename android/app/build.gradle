@@ -156,6 +156,7 @@ android {
         applicationId "com.algorin.playfantasy"
         minSdkVersion 20
         targetSdkVersion 26
+        multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
