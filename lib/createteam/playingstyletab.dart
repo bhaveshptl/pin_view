@@ -310,14 +310,11 @@ class PlayingStyleTab extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: Icon(
+                          child: Image.asset(
                             bIsPlayerSelected
-                                ? Icons.remove_circle_outline
-                                : Icons.add_circle_outline,
-                            color: bIsPlayerSelected
-                                ? Colors.orangeAccent
-                                : Colors.green,
-                            size: 32.0,
+                                ? "images/remove-player.png"
+                                : "images/add-player.png",
+                            height: 32.0,
                           ),
                         ),
                       ],

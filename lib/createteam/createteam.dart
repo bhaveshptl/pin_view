@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -171,8 +172,19 @@ class CreateTeamState extends State<CreateTeam>
   /// to edit or clone team.
   ///
   _editOrCloneTeam() {
+    setPlayerCount();
     _seperatePlayersByPlayingStyle();
     calculatePlayerCredits(_selectedPlayers);
+  }
+
+  setPlayerCount() {
+    _selectedPlayers.forEach((player) {
+      if (player.teamId == widget.league.teamA.id) {
+        teamAPlayerCount++;
+      } else {
+        teamBPlayerCount++;
+      }
+    });
   }
 
   ///
@@ -1123,7 +1135,17 @@ class CreateTeamState extends State<CreateTeam>
                                 fontWeight: FontWeight.w900,
                               ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            FantasyPageRoute(
+                              pageBuilder: (BuildContext context) =>
+                                  TeamPreview(
+                                    fanTeamRules: _fanTeamRules,
+                                    selectedPlayers: _selectedPlayers,
+                                  ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

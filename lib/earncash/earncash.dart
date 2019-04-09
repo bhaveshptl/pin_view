@@ -248,10 +248,9 @@ class EarnCashState extends State<EarnCash> {
                                   onTap: () {
                                     _shareNowWhatsApp();
                                   },
-                                  child: Icon(
-                                    facebook_squared,
-                                    size: 32.0,
-                                    color: Colors.blue.shade900,
+                                  child: Image.asset(
+                                    "images/watsapp.png",
+                                    height: 32.0,
                                   ),
                                 ),
                               ),
@@ -269,10 +268,9 @@ class EarnCashState extends State<EarnCash> {
                                   onTap: () {
                                     _shareNowFacebook();
                                   },
-                                  child: Icon(
-                                    facebook_squared,
-                                    size: 32.0,
-                                    color: Colors.blue.shade900,
+                                  child: Image.asset(
+                                    "images/facebook.png",
+                                    height: 32.0,
                                   ),
                                 ),
                               ),
@@ -290,10 +288,9 @@ class EarnCashState extends State<EarnCash> {
                                   onTap: () {
                                     _shareNowGmail();
                                   },
-                                  child: Icon(
-                                    gplus_squared,
-                                    size: 32.0,
-                                    color: Colors.red,
+                                  child: Image.asset(
+                                    "images/gmail.png",
+                                    height: 32.0,
                                   ),
                                 ),
                               ),

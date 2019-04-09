@@ -11,10 +11,9 @@ class LoaderWidget extends StatelessWidget {
         color: Colors.black26,
         child: Center(
           child: Container(
-            height: 56.0,
             padding: EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-                color: Theme.of(context).primaryColorDark,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(5.0),
                 boxShadow: [
                   BoxShadow(
@@ -23,26 +22,33 @@ class LoaderWidget extends StatelessWidget {
                     color: Colors.black12,
                   )
                 ]),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(right: 16.0),
-                  child: Container(
-                    height: 24.0,
-                    width: 24.0,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.0,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: Container(
+                      width: 32.0,
+                      height: 32.0,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  "Loading...",
-                  style: TextStyle(
-                    color: Colors.white,
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      "Loading...",
+                      style:
+                          Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                color: Colors.black54,
+                              ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

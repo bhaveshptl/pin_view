@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
@@ -23,7 +25,14 @@ class StatusTab extends StatelessWidget {
     this.mapSportTypes,
   });
 
+  showLoader(bool bShow, BuildContext context) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
+  }
+
   onLeagueSelect(BuildContext context, League league) {
+    showLoader(true, context);
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => LeagueDetail(

@@ -14,9 +14,9 @@ class LobbyBottomNavigation extends StatelessWidget {
     List<BottomNavigationBarItem> items = [];
     items.add(
       BottomNavigationBarItem(
-        icon: Icon(
-          Icons.home,
-          size: 32.0,
+        icon: Image.asset(
+          activeIndex == 0 ? "images/home-select.png" : "images/home.png",
+          height: 32.0,
         ),
         title: Text(
           "Home",
@@ -30,9 +30,11 @@ class LobbyBottomNavigation extends StatelessWidget {
     );
     items.add(
       BottomNavigationBarItem(
-        icon: Icon(
-          Icons.panorama_horizontal,
-          size: 32.0,
+        icon: Image.asset(
+          activeIndex == 1
+              ? "images/my-matches-select.png"
+              : "images/my-matches.png",
+          height: 32.0,
         ),
         title: Text(
           "My Matches",
@@ -47,9 +49,11 @@ class LobbyBottomNavigation extends StatelessWidget {
 
     items.add(
       BottomNavigationBarItem(
-        icon: Icon(
-          Icons.account_balance_wallet,
-          size: 32.0,
+        icon: Image.asset(
+          activeIndex == 2
+              ? "images/add-cash-select.png"
+              : "images/add-cash.png",
+          height: 32.0,
         ),
         title: Text(
           "Add Cash",
@@ -64,9 +68,11 @@ class LobbyBottomNavigation extends StatelessWidget {
 
     items.add(
       BottomNavigationBarItem(
-        icon: Icon(
-          Icons.people,
-          size: 32.0,
+        icon: Image.asset(
+          activeIndex == 3
+              ? "images/raf-earn-select.png"
+              : "images/refer-earn.png",
+          height: 32.0,
         ),
         title: Text(
           "Refer & Earn",

@@ -129,7 +129,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 
   void _scrollListener() async {
     int offset = curPage * rowsPerPage;
-    if (controller.position.extentAfter < 10 &&
+    if (controller.position.extentAfter < 100 &&
         !bIsAllTeamsRequestInProgress &&
         offset < widget.contest.joined) {
       final teams = await _getContestTeams(offset, rowsPerPage);
@@ -856,12 +856,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                 padding: EdgeInsets.all(8.0),
                                 child: CircleAvatar(
                                   radius: 24.0,
-                                  child: Icon(
-                                    Icons.person,
-                                    size: 40.0,
-                                    color: Theme.of(context).primaryColor,
+                                  child: Image.asset(
+                                    "images/person-icon.png",
                                   ),
-                                  backgroundColor: Colors.black.withAlpha(10),
                                 ),
                               ),
                               Column(

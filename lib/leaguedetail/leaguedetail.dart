@@ -96,6 +96,7 @@ class LeagueDetailState extends State<LeagueDetail>
       _getL1Data();
     } else if (data["iType"] == RequestType.GET_ALL_L1 &&
         data["bSuccessful"] == true) {
+      showLoader(false);
       List<dynamic> contestIds = data["data"]["myPredictionContestIds"]
           [widget.league.leagueId.toString()];
       predictionContestIds = contestIds != null

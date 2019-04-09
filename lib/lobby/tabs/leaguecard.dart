@@ -16,7 +16,7 @@ class LeagueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+      padding: EdgeInsets.fromLTRB(8.0, 2.0, 8.0, 2.0),
       child: Tooltip(
         message: _league != null && _league.matchId != null
             ? _league.matchId.toString() + " - " + _league.matchName
@@ -34,7 +34,8 @@ class LeagueCard extends StatelessWidget {
                   }
                 },
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  margin:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                   child: Column(
                     children: <Widget>[
                       Row(
