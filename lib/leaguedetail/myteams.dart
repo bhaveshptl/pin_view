@@ -2,6 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/createteam/sports.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -26,7 +30,7 @@ class MyTeams extends StatefulWidget {
 
 class MyTeamsState extends State<MyTeams> {
   List<MyTeam> _myTeams;
-  int _selectedItemIndex = -1;
+  final double teamLogoHeight = 40.0;
   StreamSubscription _streamSubscription;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -70,13 +74,13 @@ class MyTeamsState extends State<MyTeams> {
     }
   }
 
-  void _onEditTeam(BuildContext context) async {
+  void _onEditTeam(BuildContext context, MyTeam team) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
-              selectedTeam: widget.myTeams[_selectedItemIndex],
+              selectedTeam: team,
               mode: TeamCreationMode.EDIT_TEAM,
             ),
       ),
@@ -87,7 +91,7 @@ class MyTeamsState extends State<MyTeams> {
     }
   }
 
-  void _onCloneTeam(BuildContext context) async {
+  void _onCloneTeam(BuildContext context, MyTeam team) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
@@ -95,7 +99,7 @@ class MyTeamsState extends State<MyTeams> {
               l1Data: widget.l1Data,
               selectedTeam: MyTeam.fromJson(
                 json.decode(
-                  json.encode(widget.myTeams[_selectedItemIndex]),
+                  json.encode(team),
                 ),
               ),
               mode: TeamCreationMode.CLONE_TEAM,
@@ -103,123 +107,12 @@ class MyTeamsState extends State<MyTeams> {
       ),
     );
     if (result != null) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
-    }
-    setState(() {
-      _selectedItemIndex = -1;
-    });
-  }
-
-  Widget _getEmptyMyTeamsWidget(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(
-          strings.get("TEAMS_NOT_AVAILABLE"),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              color: Theme.of(context).errorColor,
-              fontSize: Theme.of(context).primaryTextTheme.title.fontSize),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    OutlineButton(
-                      onPressed: () {
-                        _onCreateTeam(context);
-                      },
-                      borderSide:
-                          BorderSide(color: Theme.of(context).primaryColorDark),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Icon(Icons.add),
-                          Text(
-                            strings.get("CREATE_TEAM"),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _createMyTeamsWidget(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 72.0),
-                  child: Container(
-                    margin: const EdgeInsets.all(16.0),
-                    child: ExpansionPanelList(
-                      expansionCallback: (int index, bool isExpanded) {
-                        setState(() {
-                          if (index == _selectedItemIndex) {
-                            _selectedItemIndex = -1;
-                          } else {
-                            _selectedItemIndex = index;
-                          }
-                        });
-                      },
-                      children: getExpansionPanel(context),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  List<ExpansionPanel> getExpansionPanel(BuildContext context) {
-    int index = 0;
-    List<ExpansionPanel> items = [];
-    for (MyTeam myTeam in widget.myTeams) {
-      items.add(
-        ExpansionPanel(
-          isExpanded: index == _selectedItemIndex,
-          headerBuilder: (context, isExpanded) {
-            return FlatButton(
-              onPressed: () {
-                setState(() {
-                  int curIndex = widget.myTeams.indexOf(myTeam);
-                  if (curIndex == _selectedItemIndex) {
-                    _selectedItemIndex = -1;
-                  } else {
-                    _selectedItemIndex = curIndex;
-                  }
-                });
-              },
-              child: Row(
-                children: <Widget>[
-                  getExpansionHeader(context, isExpanded, myTeam),
-                ],
-              ),
-            );
-          },
-          body: _getExpansionBody(myTeam),
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("$result"),
         ),
       );
-      index++;
     }
-
-    return items;
   }
 
   Player getPlayer(int playerId, MyTeam myTeam) {
@@ -229,74 +122,6 @@ class MyTeamsState extends State<MyTeams> {
       }
     }
     return null;
-  }
-
-  Widget getExpansionHeader(
-      BuildContext context, bool isExpanded, MyTeam myTeam) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.only(left: 24.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(myTeam.name),
-                isExpanded
-                    ? Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: <Widget>[
-                          IconButton(
-                            padding: EdgeInsets.all(0.0),
-                            onPressed: () {
-                              _onEditTeam(context);
-                            },
-                            icon: Column(
-                              children: <Widget>[
-                                Icon(Icons.edit),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 4.0),
-                                  child: Text(
-                                    "EDIT",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .copyWith(color: Colors.black54),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0.0),
-                            onPressed: () {
-                              _onCloneTeam(context);
-                            },
-                            icon: Column(
-                              children: <Widget>[
-                                Icon(Icons.content_copy),
-                                Padding(
-                                  padding: EdgeInsets.only(top: 4.0),
-                                  child: Text(
-                                    "CLONE",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .copyWith(color: Colors.black54),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      )
-                    : Container(),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
   }
 
   _getPlayerStyle(Player player) {
@@ -441,6 +266,37 @@ class MyTeamsState extends State<MyTeams> {
     );
   }
 
+  getPlayingStyleCountWidget(List<Player> players) {
+    List<int> sortedStyle = [];
+    List<Widget> styleCount = [];
+    Map<int, List<Player>> mapTeams = {};
+    players.forEach((player) {
+      if (mapTeams[player.playingStyleId] == null) {
+        mapTeams[player.playingStyleId] = [];
+      }
+      mapTeams[player.playingStyleId].add(player);
+    });
+
+    sortedStyle = mapTeams.keys.toList();
+    sortedStyle.sort((a, b) {
+      return a - b;
+    });
+
+    sortedStyle.forEach((styleId) {
+      styleCount.add(
+        Text(
+          Sports.styles[styleId] + " : " + mapTeams[styleId].length.toString(),
+          style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                fontWeight: FontWeight.w700,
+                color: Colors.grey.shade600,
+              ),
+        ),
+      );
+    });
+
+    return styleCount;
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
@@ -449,47 +305,382 @@ class MyTeamsState extends State<MyTeams> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("MY_TEAMS"),
+          strings.get("MY_TEAMS").toUpperCase(),
         ),
+        elevation: 0.0,
       ),
-      body: Container(
-        decoration: AppConfig.of(context).showBackground
-            ? BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/background.png"),
-                    repeat: ImageRepeat.repeat),
-              )
-            : null,
-        child: Column(
-          children: <Widget>[
-            LeagueCard(
-              widget.league,
-              clickable: false,
-            ),
-            Divider(
-              height: 2.0,
-            ),
-            Expanded(
-              child: widget.myTeams.length > 0
-                  ? _createMyTeamsWidget(context)
-                  : _getEmptyMyTeamsWidget(context),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      body: Column(
         children: <Widget>[
-          FloatingActionButton(
-            onPressed: () {
-              _onCreateTeam(context);
-            },
-            child: Icon(Icons.add),
+          LeagueTitle(
+            league: widget.league,
           ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: widget.myTeams.map((MyTeam team) {
+                  Player captain;
+                  Player vCaptain;
+                  int teamAPlayerCount = 0;
+                  int teamBPlayerCount = 0;
+
+                  team.players.forEach((Player player) {
+                    if (player.id == team.captain) {
+                      captain = player;
+                    } else if (player.id == team.viceCaptain) {
+                      vCaptain = player;
+                    }
+
+                    if (player.teamId == widget.league.teamA.id) {
+                      teamAPlayerCount++;
+                    } else {
+                      teamBPlayerCount++;
+                    }
+                  });
+
+                  return Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    child: Card(
+                      elevation: 2.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6.0),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            color: Colors.grey.shade100,
+                            height: 40.0,
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  team.name,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.grey.shade800,
+                                      ),
+                                      onPressed: () {
+                                        _onEditTeam(context, team);
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.content_copy,
+                                        color: Colors.grey.shade800,
+                                      ),
+                                      onPressed: () {
+                                        _onCloneTeam(context, team);
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.share,
+                                        color: Colors.grey.shade800,
+                                      ),
+                                      onPressed: () {
+                                        // _onEditTeam(context, team);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 6.0, top: 2.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(left: 16.0),
+                                  height: 80.0,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Text(
+                                            widget.league.teamA.name + " : ",
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                          ),
+                                          Text(
+                                            teamAPlayerCount.toString(),
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .title
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.black,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Text(
+                                            widget.league.teamB.name + " : ",
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                          ),
+                                          Text(
+                                            teamBPlayerCount.toString(),
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .title
+                                                .copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.black,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Stack(
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.only(top: 6.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                CircleAvatar(
+                                                  minRadius: 24.0,
+                                                  backgroundColor:
+                                                      Colors.black12,
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: captain.jerseyUrl,
+                                                    placeholder: Container(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
+                                                      ),
+                                                      width: teamLogoHeight,
+                                                      height: teamLogoHeight,
+                                                    ),
+                                                    height: teamLogoHeight,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 4.0,
+                                                    vertical: 4.0,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.shade800,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2.0),
+                                                  ),
+                                                  child: Text(
+                                                    captain.name,
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .caption
+                                                        .copyWith(
+                                                          color: Colors.white,
+                                                          fontSize: 10.0,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.orange,
+                                            ),
+                                            padding: EdgeInsets.all(6.0),
+                                            child: Text(
+                                              "C",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .body2
+                                                  .copyWith(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 16.0),
+                                        child: Stack(
+                                          children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 6.0),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  CircleAvatar(
+                                                    minRadius: 24.0,
+                                                    backgroundColor:
+                                                        Colors.black12,
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          vCaptain.jerseyUrl,
+                                                      placeholder: Container(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          strokeWidth: 2.0,
+                                                        ),
+                                                        width: teamLogoHeight,
+                                                        height: teamLogoHeight,
+                                                      ),
+                                                      height: teamLogoHeight,
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal: 4.0,
+                                                      vertical: 4.0,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          Colors.grey.shade800,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              2.0),
+                                                    ),
+                                                    child: Text(
+                                                      vCaptain.name,
+                                                      style: Theme.of(context)
+                                                          .primaryTextTheme
+                                                          .caption
+                                                          .copyWith(
+                                                            color: Colors.white,
+                                                            fontSize: 10.0,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color:
+                                                    Colors.blueAccent.shade400,
+                                              ),
+                                              padding: EdgeInsets.all(4.0),
+                                              child: Text(
+                                                "VC",
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .body2
+                                                    .copyWith(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            color: Colors.grey.shade100,
+                            height: 40.0,
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children:
+                                  getPlayingStyleCountWidget(team.players),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                  blurRadius: 1.0,
+                  spreadRadius: 2.0,
+                )
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Container(
+                    height: 56.0,
+                    width: MediaQuery.of(context).size.width / 2,
+                    child: ColorButton(
+                      color: Colors.orange,
+                      child: Text(
+                        "Create Team".toUpperCase(),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .headline
+                            .copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                            ),
+                      ),
+                      onPressed: () {
+                        _onCreateTeam(context);
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );

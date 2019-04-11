@@ -49,12 +49,13 @@ class StateDobState extends State<StateDob> {
       )
           .then((http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 300) {
-          if (widget.onSuccess != null) {
-            widget.onSuccess(
-              strings.get("STATE_DOB_UPDATED"),
-            );
-          }
-          Navigator.of(context).pop();
+          Navigator.pop(context, {
+            "success": true,
+          });
+        } else {
+          Navigator.pop(context, {
+            "success": false,
+          });
         }
       });
     }
@@ -211,7 +212,9 @@ class StateDobState extends State<StateDob> {
         FlatButton(
           child: Text(strings.get("CANCEL").toUpperCase()),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context, {
+              "success": false,
+            });
           },
         ),
         FlatButton(

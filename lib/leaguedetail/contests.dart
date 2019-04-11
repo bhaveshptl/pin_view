@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -360,114 +362,14 @@ class ContestsState extends State<Contests> {
   onJoinContest(Contest contest) async {
     if (squadStatus()) {
       bShowJoinContest = false;
-      if (_myTeams.length > 0) {
-        final result = await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return JoinContest(
-              l1Data: _l1Data,
-              contest: contest,
-              myTeams: _myTeams,
-              onCreateTeam: _onCreateTeam,
-              onError: onJoinContestError,
-            );
-          },
-        );
-
-        if (result != null) {
-          widget.scaffoldKey.currentState
-              .showSnackBar(SnackBar(content: Text("$result")));
-        }
-      } else {
-        if (AppConfig.of(context).channelId == "10") {
-          _onCreateTeam(context, contest);
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(strings.get("ALERT").toUpperCase()),
-                content: Text(
-                  strings.get("CREATE_TEAM_WARNING"),
-                ),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      strings.get("CANCEL").toUpperCase(),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      _onCreateTeam(context, contest);
-                    },
-                    child: Text(strings.get("CREATE").toUpperCase()),
-                  )
-                ],
-              );
-            },
-          );
-        }
-      }
-    }
-  }
-
-  _showJoinContestError({String title, String message}) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  void _onCreateTeam(BuildContext context, Contest contest) async {
-    final curContest = contest;
-
-    bWaitingForTeamCreation = true;
-    if (AppConfig.of(context).channelId != "10") {
-      Navigator.of(context).pop();
-    }
-    final result = await Navigator.of(context).push(
-      FantasyPageRoute(
-        pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: _l1Data,
-            ),
-      ),
-    );
-
-    if (result != null) {
-      if (curContest != null) {
-        if (bWaitingForTeamCreation) {
-          _curContest = curContest;
-          bShowJoinContest = true;
-        } else {
-          onJoinContest(curContest);
-        }
-      }
-      widget.scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(result),
-        ),
+      ActionUtil().launchJoinContest(
+        l1Data: _l1Data,
+        contest: contest,
+        myTeams: _myTeams,
+        league: widget.league,
+        scaffoldKey: widget.scaffoldKey,
       );
     }
-    bWaitingForTeamCreation = false;
   }
 
   void _showPrizeStructure(Contest contest) async {
@@ -508,95 +410,6 @@ class ContestsState extends State<Contests> {
 
   onStateDobUpdate(String msg) {
     widget.scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(msg)));
-  }
-
-  _showAddCashConfirmation(Contest contest) {
-    final curContest = contest;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            strings.get("INSUFFICIENT_FUND").toUpperCase(),
-          ),
-          content: Text(
-            strings.get("INSUFFICIENT_FUND_MSG"),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("CANCEL").toUpperCase(),
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _launchDepositJourneyForJoinContest(curContest);
-              },
-              child: Text(
-                strings.get("DEPOSIT").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  _launchDepositJourneyForJoinContest(Contest contest) async {
-    final curContest = contest;
-    widget.showLoader(true);
-    routeLauncher.launchAddCash(context, onSuccess: (result) {
-      if (result != null) {
-        onJoinContest(curContest);
-      }
-    }, onComplete: () {
-      widget.showLoader(false);
-    });
-  }
-
-  onJoinContestError(
-      Contest contest, Map<String, dynamic> errorResponse) async {
-    JoinContestError error;
-    if (errorResponse["error"] == true) {
-      error = JoinContestError([errorResponse["resultCode"]]);
-    } else {
-      error = JoinContestError(errorResponse["reasons"]);
-    }
-
-    Navigator.of(context).pop();
-    if (error.isBlockedUser()) {
-      _showJoinContestError(
-        title: error.getTitle(),
-        message: error.getErrorMessage(),
-      );
-    } else {
-      int errorCode = error.getErrorCode();
-      switch (errorCode) {
-        case 3:
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return StateDob(
-                onSuccess: (String msg) {},
-              );
-            },
-          );
-          break;
-        case 12:
-          _showAddCashConfirmation(contest);
-          break;
-        case 6:
-          _showJoinContestError(
-            message: strings.get("ALERT"),
-            title: strings.get("NOT_VERIFIED"),
-          );
-          break;
-      }
-    }
   }
 
   @override

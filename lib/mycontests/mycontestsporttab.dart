@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -289,54 +291,13 @@ class MyContestSportTabState extends State<MyContestSportTab> {
   joinContest(Contest contest) async {
     _curContest = null;
     bShowJoinContest = false;
-    if (leagueAllMyTeams.length > 0) {
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinContest(
-            l1Data: l1Data,
-            contest: contest,
-            onCreateTeam: _onCreateTeam,
-            onError: onJoinContestError,
-            myTeams: leagueAllMyTeams,
-          );
-        },
-      );
-
-      if (result != null) {
-        widget.scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(strings.get("ALERT").toUpperCase()),
-            content: Text(
-              strings.get("CREATE_TEAM_WARNING"),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  strings.get("CANCEL").toUpperCase(),
-                ),
-              ),
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _onCreateTeam(context, contest);
-                },
-                child: Text(strings.get("CREATE").toUpperCase()),
-              )
-            ],
-          );
-        },
-      );
-    }
+    ActionUtil().launchJoinContest(
+      l1Data: l1Data,
+      contest: contest,
+      myTeams: leagueAllMyTeams,
+      scaffoldKey: widget.scaffoldKey,
+      league: _getLeague(contest.leagueId),
+    );
   }
 
   void _onCreateSheet(BuildContext context, Contest contest) async {

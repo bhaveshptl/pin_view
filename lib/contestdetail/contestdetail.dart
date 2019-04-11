@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -415,58 +417,13 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   _onJoinContest(Contest contest) async {
     if (squadStatus()) {
       bShowJoinContest = false;
-      if (_myTeams != null && _myTeams.length > 0) {
-        final result = await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return JoinContest(
-              sportsType: _sportType,
-              contest: contest,
-              myTeams: _myTeams,
-              onCreateTeam: _onCreateTeam,
-              l1Data: _l1Data,
-              onError: _onJoinContestError,
-            );
-          },
-        );
-
-        if (result != null) {
-          _scaffoldKey.currentState
-              .showSnackBar(SnackBar(content: Text("$result")));
-        }
-      } else {
-        if (AppConfig.of(context).channelId == "10") {
-          _onCreateTeam(context, contest);
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(strings.get("ALERT").toUpperCase()),
-                content: Text(
-                  strings.get("CREATE_TEAM_WARNING"),
-                ),
-                actions: <Widget>[
-                  FlatButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      strings.get("CANCEL").toUpperCase(),
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      _onCreateTeam(context, contest);
-                    },
-                    child: Text(strings.get("CREATE").toUpperCase()),
-                  )
-                ],
-              );
-            },
-          );
-        }
-      }
+      ActionUtil().launchJoinContest(
+        l1Data: _l1Data,
+        contest: contest,
+        myTeams: _myTeams,
+        league: widget.league,
+        scaffoldKey: _scaffoldKey,
+      );
     }
   }
 

@@ -42,6 +42,12 @@ void main() async {
     child: StoreProvider(
       store: store,
       child: MaterialApp(
+        builder: (context, child) {
+          return MediaQuery(
+            child: child,
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 0.8),
+          );
+        },
         home: SplashScreen(
           apiBaseUrl: apiBaseUrl,
           channelId: channelId,

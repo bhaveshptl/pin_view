@@ -7,6 +7,7 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -76,7 +77,7 @@ class AppDrawerState extends State<AppDrawer> {
   }
 
   _doLogout() {
-    sockets.reset();
+    FantasyWebSocket().stopPingPong();
     http.Client().get(
       BaseUrl().apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
@@ -757,8 +758,11 @@ class AppDrawerState extends State<AppDrawer> {
                           HttpManager.cookie = null;
                           SharedPrefHelper.internal().removeCookie();
                           Navigator.pop(context);
-                          Navigator.of(context)
-                              .pushReplacementNamed("/landingpage");
+                          Navigator.of(context).pushReplacement(
+                            FantasyPageRoute(
+                              pageBuilder: (context) => SignInPage(),
+                            ),
+                          );
                         },
                       ),
                     ],

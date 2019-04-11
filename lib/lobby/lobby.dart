@@ -8,6 +8,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/profilepages/update.dart';
@@ -449,12 +450,25 @@ class LobbyState extends State<Lobby>
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.0, right: 4.0),
-                          child: Icon(
-                            Icons.person,
-                            color: Colors.white,
-                            size: 32.0,
+                        Container(
+                          width: 44.0,
+                          child: FlatButton(
+                            padding: EdgeInsets.all(0.0),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                FantasyPageRoute(
+                                  pageBuilder: (context) => AppDrawer(),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 8.0, right: 4.0),
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 32.0,
+                              ),
+                            ),
                           ),
                         ),
                         Padding(

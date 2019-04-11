@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -59,13 +60,6 @@ class CreateTeamState extends State<CreateTeam>
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
   Map<int, List<Player>> _selectedPlayersByStyleId = {};
-
-  Map<int, String> mapSportLabel = {
-    1: "WK",
-    2: "BAT",
-    3: "BOWL",
-    4: "AR",
-  };
 
   int teamAPlayerCount = 0;
   int teamBPlayerCount = 0;
@@ -479,32 +473,11 @@ class CreateTeamState extends State<CreateTeam>
               viceCaptain: _vCaptain,
               onSave: _onSaveCaptains,
               fanTeamRules: _fanTeamRules,
-              mapSportLabel: mapSportLabel,
+              mapSportLabel: Sports.styles,
               selectedPlayers: _selectedPlayers,
             ),
       ),
     );
-    // _scaffoldKey.currentState.showBottomSheet((context) {
-    //   return Container(
-    //     decoration: new BoxDecoration(
-    //       color: Colors.white,
-    //       boxShadow: [
-    //         new BoxShadow(
-    //           color: Colors.black,
-    //           blurRadius: 20.0,
-    //         ),
-    //       ],
-    //     ),
-    //     height: 550.0,
-    //     child: ChooseCaptain(
-    //       fanTeamRules: _fanTeamRules,
-    //       selectedPlayers: _selectedPlayers,
-    //       onSave: _onSaveCaptains,
-    //       captain: _captain,
-    //       viceCaptain: _vCaptain,
-    //     ),
-    //   );
-    // });
   }
 
   ///
@@ -519,7 +492,7 @@ class CreateTeamState extends State<CreateTeam>
     for (PlayingStyle style in _playingStyles) {
       tabs.add(
         Tab(
-          text: mapSportLabel[style.id] +
+          text: Sports.styles[style.id] +
               "(" +
               (_selectedPlayersByStyleId[style.id] == null
                   ? 0.toString()
@@ -556,7 +529,7 @@ class CreateTeamState extends State<CreateTeam>
           league: widget.league,
           l1Data: widget.l1Data,
           allPlayers: allPlayers,
-          mapSportLabel: mapSportLabel,
+          mapSportLabel: Sports.styles,
           onPlayerSelect: _selectPlayer,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
         ),

@@ -1,19 +1,23 @@
+import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/createteam/createteam.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;
+  final League league;
   final int sportsType;
   final Contest contest;
   final Function onError;
@@ -23,6 +27,7 @@ class JoinContest extends StatefulWidget {
 
   JoinContest({
     this.l1Data,
+    this.league,
     this.contest,
     this.myTeams,
     this.onError,
@@ -36,15 +41,13 @@ class JoinContest extends StatefulWidget {
 }
 
 class JoinContestState extends State<JoinContest> {
+  MyTeam _teamToJoin;
   String cookie = "";
-  int _selectedTeamId = -1;
+  List<MyTeam> _myTeams;
   List<MyTeam> _myUniqueTeams = [];
-
-  double _cashBalance = 0.0;
-  double _bonusBalance = 0.0;
-  double _playableBonus = 0.0;
-
-  TapGestureRecognizer termsGesture = TapGestureRecognizer();
+  List<dynamic> contestMyTeams = [];
+  GlobalKey<ScaffoldState> scaffoldKey;
+  StreamSubscription _streamSubscription;
 
   @override
   void initState() {
@@ -54,14 +57,42 @@ class JoinContestState extends State<JoinContest> {
     } else {
       setUniqueTeams([]);
     }
-    _getUserBalance();
-    termsGesture.onTap = () {
-      _launchStaticPage("T&C");
-    };
+    _myTeams = widget.myTeams;
+    scaffoldKey = GlobalKey<ScaffoldState>();
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
+  }
+
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamAdded = MyTeam.fromJson(data["data"]);
+      bool bFound = false;
+      for (MyTeam _myTeam in _myTeams) {
+        if (_myTeam.id == teamAdded.id) {
+          bFound = true;
+        }
+      }
+      if (!bFound) {
+        _myTeams.add(teamAdded);
+      }
+      setUniqueTeams(contestMyTeams);
+    } else if (data["iType"] == RequestType.MY_TEAM_MODIFIED &&
+        data["bSuccessful"] == true) {
+      MyTeam teamUpdated = MyTeam.fromJson(data["data"]);
+      int i = 0;
+      for (MyTeam _team in _myTeams) {
+        if (_team.id == teamUpdated.id) {
+          _myTeams[i] = teamUpdated;
+        }
+        i++;
+      }
+      setUniqueTeams(contestMyTeams);
+    }
   }
 
   _joinContest(BuildContext context) async {
-    if (_selectedTeamId == null || _selectedTeamId == -1) {
+    if (_teamToJoin == null) {
       widget.onCreateTeam(
         context,
         widget.contest,
@@ -70,7 +101,7 @@ class JoinContestState extends State<JoinContest> {
       http.Request req = http.Request(
           "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_CONTEST));
       req.body = json.encode({
-        "teamId": _selectedTeamId,
+        "teamId": _teamToJoin.id,
         "context": {"channel_id": HttpManager.channelId},
         "sportsId": widget.sportsType,
         "contestId": widget.contest.id,
@@ -105,12 +136,12 @@ class JoinContestState extends State<JoinContest> {
   }
 
   _createAndJoinContest(BuildContext context) async {
-    if (_selectedTeamId == null || _selectedTeamId == -1) {
+    if (_teamToJoin == null) {
       widget.onCreateTeam(context, widget.contest,
           createContestPayload: widget.createContestPayload);
     } else {
       Map<String, dynamic> payload = widget.createContestPayload;
-      payload["fanTeamId"] = _selectedTeamId;
+      payload["fanTeamId"] = _teamToJoin;
 
       http.Request req = http.Request("POST",
           Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
@@ -123,7 +154,6 @@ class JoinContestState extends State<JoinContest> {
               Navigator.of(context).pop(res.body);
             } else if (response["error"] == true) {
               Navigator.of(context).pop(json.encode(response));
-              // widget.onError(null, response["error"]);
             }
           } else if (res.statusCode == 401) {
             Map<String, dynamic> response = json.decode(res.body);
@@ -152,7 +182,7 @@ class JoinContestState extends State<JoinContest> {
     }
     if (myUniqueTeams.length > 0) {
       setState(() {
-        _selectedTeamId = myUniqueTeams[0].id;
+        _teamToJoin = myUniqueTeams[0];
         _myUniqueTeams = myUniqueTeams;
       });
     }
@@ -167,354 +197,361 @@ class JoinContestState extends State<JoinContest> {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
           if (response[widget.contest.id.toString()] != null) {
-            List<dynamic> contestMyTeams =
-                (response[widget.contest.id.toString()] as List);
+            contestMyTeams = (response[widget.contest.id.toString()] as List);
             setUniqueTeams(contestMyTeams);
           } else {
-            setState(() {
-              setUniqueTeams([]);
-            });
+            setUniqueTeams([]);
           }
         }
       },
     );
   }
 
-  _getUserBalance() async {
-    http.Request req = http.Request(
-        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.USER_BALANCE));
-    req.body = json.encode({
-      "contestId": widget.contest == null ? "" : widget.contest.id,
-      "leagueId": widget.contest == null
-          ? widget.createContestPayload["leagueId"]
-          : widget.contest.leagueId
-    });
-    await HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          Map<String, dynamic> response = json.decode(res.body);
-          setState(() {
-            _cashBalance =
-                (response["withdrawable"] + response["depositBucket"])
-                    .toDouble();
-            _bonusBalance = (response["nonWithdrawable"]).toDouble();
-            _playableBonus = response["playablebonus"].toDouble();
-          });
-        }
-      },
-    );
-  }
-
-  List<DropdownMenuItem> _getTeamList() {
-    List<DropdownMenuItem> listTeams = [];
-    if (_myUniqueTeams != null && _myUniqueTeams.length > 0) {
-      for (MyTeam team in _myUniqueTeams) {
-        listTeams.add(
-          DropdownMenuItem(
-            child: Container(
-              child: Text(
-                team.name,
-                overflow: TextOverflow.ellipsis,
-              ),
+  void _onCreateTeam(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: widget.l1Data,
             ),
-            value: team.id,
-          ),
-        );
-      }
-    }
-    listTeams.add(
-      DropdownMenuItem(
-        child: Container(
-          width: 110.0,
-          child: Text(strings.get("CREATE_TEAM")),
-        ),
-        value: -1,
       ),
     );
-    return listTeams;
+
+    if (result != null) {
+      scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$result")));
+    }
   }
 
-  _launchStaticPage(String name) {
-    String url = "";
-    String title = "";
-    switch (name.toUpperCase()) {
-      case "T&C":
-        title = "TERMS AND CONDITIONS";
-        url = BaseUrl().staticPageUrls["TERMS"];
-        break;
-    }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WebviewScaffold(
-              url: url,
-              clearCache: true,
-              appBar: AppBar(
-                title: Text(title),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double bonusUsable = widget.contest == null
-        ? 0.0
-        : (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
-    double usableBonus = widget.contest == null
-        ? 0.0
-        : _bonusBalance > bonusUsable
-            ? (bonusUsable > _playableBonus ? _playableBonus : bonusUsable)
-            : _bonusBalance;
-
-    final formatCurrency = NumberFormat.currency(
-      locale: "hi_IN",
-      symbol: strings.rupee,
-      decimalDigits: 2,
-    );
-
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5.0),
+    return ScaffoldPage(
+      scaffoldKey: scaffoldKey,
+      appBar: AppBar(
+        title: Text("MY TEAMS"),
+        elevation: 0.0,
       ),
-      elevation: 0.0,
-      title: Row(
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Expanded(
-            child: Text(
-              strings.get("CONFIRMATION").toUpperCase(),
-              style: Theme.of(context).primaryTextTheme.title.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w800,
+          LeagueTitle(
+            league: widget.league,
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    "Choose team to join the contest".toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
-              textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: _myUniqueTeams.map((MyTeam team) {
+                  Player captain;
+                  Player vCaptain;
+
+                  team.players.forEach((Player player) {
+                    if (team.captain == player.id) {
+                      captain = player;
+                    } else if (team.viceCaptain == player.id) {
+                      vCaptain = player;
+                    }
+                  });
+
+                  return Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            child: FlatButton(
+                              onPressed: () {
+                                setState(() {
+                                  _teamToJoin = team;
+                                });
+                              },
+                              padding: EdgeInsets.all(0.0),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    height: 40.0,
+                                    color: Colors.grey.shade100,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Row(
+                                          children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 8.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: (_teamToJoin ==
+                                                                null ||
+                                                            _teamToJoin.id !=
+                                                                team.id)
+                                                        ? Colors.black
+                                                        : Colors.green,
+                                                    width: 1.0,
+                                                  ),
+                                                ),
+                                                padding: EdgeInsets.all(2.0),
+                                                child: (_teamToJoin == null ||
+                                                        _teamToJoin.id !=
+                                                            team.id)
+                                                    ? CircleAvatar(
+                                                        radius: 6.0,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                      )
+                                                    : CircleAvatar(
+                                                        radius: 6.0,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        child: CircleAvatar(
+                                                          radius: 6.0,
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                        ),
+                                                      ),
+                                              ),
+                                            ),
+                                            Text(
+                                              team.name,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        InkWell(
+                                          child: Container(
+                                            height: 40.0,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              "Preview",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .button
+                                                  .copyWith(
+                                                    color: Colors.blue,
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                  ),
+                                            ),
+                                          ),
+                                          onTap: () {},
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              right: BorderSide(
+                                                width: 1.0,
+                                                color: Colors.grey.shade200,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16.0,
+                                                vertical: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  "Captain",
+                                                  style: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .body1
+                                                      .copyWith(
+                                                        color: Colors.orange,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    captain.name,
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .body1
+                                                        .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.black,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              right: BorderSide(
+                                                width: 1.0,
+                                                color: Colors.grey.shade200,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16.0,
+                                                vertical: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  "Vice Captain",
+                                                  style: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .body1
+                                                      .copyWith(
+                                                        color: Colors.blue,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    vCaptain.name,
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .body1
+                                                        .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.black,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ),
-        ],
-      ),
-      contentPadding: EdgeInsets.all(0.0),
-      content: Container(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 24.0, left: 24.0, right: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    "Current Balance:",
-                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      (widget.contest == null &&
-                                  widget.createContestPayload["prizeType"] ==
-                                      1) ||
-                              (widget.contest != null &&
-                                  widget.contest.prizeType == 1)
-                          ? Image.asset(
-                              strings.chips,
-                              width: 16.0,
-                              height: 12.0,
-                              fit: BoxFit.contain,
-                            )
-                          : Container(),
-                      Text(
-                        formatCurrency.format(_cashBalance),
-                        textAlign: TextAlign.right,
+          Container(
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  spreadRadius: 1.0,
+                  blurRadius: 2.0,
+                  color: Colors.grey.shade300,
+                )
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    height: 48.0,
+                    padding: EdgeInsets.only(right: 8.0, left: 40.0),
+                    child: ColorButton(
+                      onPressed: () {
+                        _onCreateTeam(context);
+                      },
+                      color: Colors.orange,
+                      child: Text(
+                        "Create Team".toUpperCase(),
                         style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Divider(
-                color: Colors.black26,
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    "Joining Amount:",
-                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black,
-                        ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      (widget.contest == null &&
-                                  widget.createContestPayload["prizeType"] ==
-                                      1) ||
-                              (widget.contest != null &&
-                                  widget.contest.prizeType == 1)
-                          ? Image.asset(
-                              strings.chips,
-                              width: 16.0,
-                              height: 12.0,
-                              fit: BoxFit.contain,
-                            )
-                          : Container(),
-                      Text(
-                        widget.contest == null
-                            ? formatCurrency
-                                .format(widget.createContestPayload["entryFee"])
-                            : formatCurrency.format(widget.contest.entryFee),
-                        textAlign: TextAlign.right,
-                        style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.black,
-                                ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      "Usable Cash Bonus: " +
-                          formatCurrency.format(_playableBonus) +
-                          " OR " +
-                          widget.contest.bonusAllowed.toString() +
-                          "% of the total Entry* per match(whichever is higher)",
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black38,
-                                fontWeight: FontWeight.w800,
-                              ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
-                                  color: Colors.black38,
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w800,
                                 ),
-                        children: [
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text:
-                                    "By joining this contest, you accept Howzat's",
-                              ),
-                              TextSpan(
-                                text: " T&C ",
-                                style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  color: Colors.blue,
-                                ),
-                                recognizer: termsGesture,
-                              ),
-                              TextSpan(
-                                text:
-                                    "and confirm that you are not a resident of Assam, Odisha, Telangana, Nagaland or Sikkim.",
-                              )
-                            ],
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    strings.get("TEAM"),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.body2.fontSize,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      DropdownButton(
-                        value: _selectedTeamId,
-                        isDense: false,
-                        items: _getTeamList(),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedTeamId = value;
-                          });
-                        },
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ColorButton(
-                    onPressed: () {
-                      if (widget.contest != null) {
-                        _joinContest(context);
-                      } else if (widget.createContestPayload != null) {
-                        _createAndJoinContest(context);
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 20.0),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 48.0,
+                    padding: EdgeInsets.only(left: 8.0, right: 40.0),
+                    child: ColorButton(
+                      onPressed: _teamToJoin == null
+                          ? null
+                          : () {
+                              if (widget.contest != null) {
+                                _joinContest(context);
+                              } else if (widget.createContestPayload != null) {
+                                _createAndJoinContest(context);
+                              }
+                            },
                       child: Text(
                         "Join now".toUpperCase(),
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .title
-                            .copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800),
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
                       ),
                     ),
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
