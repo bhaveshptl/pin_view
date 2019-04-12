@@ -1,4 +1,4 @@
-package com.algorin.playfantasy.services;
+package com.howzat.howzatfantasy.services;
 
 
 
@@ -20,9 +20,8 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import android.widget.TextView;
-import com.algorin.playfantasy.MainActivity;
-import com.algorin.playfantasy.R;
+import com.howzat.howzatfantasy.MainActivity;
+import com.howzat.howzatfantasy.R;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
@@ -64,7 +63,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
 
-        Boolean isAppOnForeground = isAppOnForeground(this, "com.algorin.playfantasy");
+        Boolean isAppOnForeground = isAppOnForeground(this, "com.howzat.howzatfantasy");
         if (!isAppOnForeground) {
             sendNotification(remoteMessage);
         }
@@ -145,7 +144,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             bigPictureStyle.bigPicture(pictureUrlBitmap);
             bigPictureStyle.setBigContentTitle(body);
 
-            int smallimage=this.getResources().getIdentifier("push_logo", "drawable", "com.algorin.playfantasy");
+            int smallimage=this.getResources().getIdentifier("push_logo", "drawable", "com.howzat.howzatfantasy");
             notificationBuilder
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)

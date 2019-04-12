@@ -1,6 +1,5 @@
-package com.algorin.playfantasy.services;
+package com.howzat.howzatfantasy.services;
 
-import android.app.Application;
 import io.branch.referral.Branch;
 import io.flutter.app.FlutterApplication;
 
