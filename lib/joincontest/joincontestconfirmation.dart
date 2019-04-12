@@ -55,7 +55,7 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
   Widget build(BuildContext context) {
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
-      symbol: strings.rupee,
+      symbol: widget.prizeType == 1 ? "" : strings.rupee,
       decimalDigits: 2,
     );
 

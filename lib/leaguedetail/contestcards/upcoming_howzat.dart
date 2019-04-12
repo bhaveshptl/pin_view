@@ -9,8 +9,6 @@ class UpcomingHowzatContest extends StatelessWidget {
   final League league;
   final Contest contest;
   final Function onJoin;
-  final bool isMyContest;
-
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
@@ -20,7 +18,6 @@ class UpcomingHowzatContest extends StatelessWidget {
     this.contest,
     this.myJoinedTeams,
     this.onPrizeStructure,
-    this.isMyContest = false,
   });
 
   @override

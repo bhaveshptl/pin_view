@@ -119,7 +119,6 @@ class ContestCard extends StatelessWidget {
                       league: league,
                       onJoin: onJoin,
                       contest: contest,
-                      isMyContest: isMyContest,
                       myJoinedTeams: myJoinedTeams,
                       onPrizeStructure: onPrizeStructure,
                     )

@@ -20,7 +20,6 @@ class ActionUtil {
     League league,
     Contest contest,
     List<MyTeam> myTeams,
-    Function onCreateTeam,
     GlobalKey<ScaffoldState> scaffoldKey,
   }) async {
     final joinConfirmMsg = await showDialog(
@@ -53,7 +52,6 @@ class ActionUtil {
                         l1Data: l1Data,
                         contest: contest,
                         myTeams: myTeams,
-                        onCreateTeam: onCreateTeam,
                         scaffoldKey: scaffoldKey,
                       );
                     },

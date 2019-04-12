@@ -8,6 +8,10 @@ class LeagueTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle style = Theme.of(context).primaryTextTheme.body1.copyWith(
+          color: Theme.of(context).primaryColor,
+          fontWeight: FontWeight.w900,
+        );
     return Container(
       height: kToolbarHeight,
       padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -32,13 +36,20 @@ class LeagueTitle extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                 ),
           ),
-          EPOC(
-            timeInMiliseconds: league.matchStartTime,
-            style: Theme.of(context).primaryTextTheme.body1.copyWith(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.w900,
-                ),
-          ),
+          league.status == LeagueStatus.LIVE
+              ? Text(
+                  "LIVE",
+                  style: style,
+                )
+              : league.status == LeagueStatus.COMPLETED
+                  ? Text(
+                      "COMPLETED",
+                      style: style,
+                    )
+                  : EPOC(
+                      timeInMiliseconds: league.matchStartTime,
+                      style: style,
+                    ),
         ],
       ),
     );

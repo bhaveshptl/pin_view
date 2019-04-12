@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
+import 'package:playfantasy/mymatches/joined_contests.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class MyMatchesSportsTab extends StatefulWidget {
   final int sportsType;
   final Map<int, List<League>> myLeagues;
-  MyMatchesSportsTab({this.sportsType, this.myLeagues});
+  final Map<String, dynamic> myContestIds;
+  MyMatchesSportsTab({this.sportsType, this.myLeagues, this.myContestIds});
 
   @override
   MyMatchesSportsTabState createState() => MyMatchesSportsTabState();
@@ -167,7 +170,24 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
                         widget.myLeagues[selectedSegment].map((League league) {
                       return LeagueCard(
                         league,
-                        onClick: () {},
+                        contestCount:
+                            widget.myContestIds[league.leagueId.toString()] ==
+                                    null
+                                ? 0
+                                : widget
+                                    .myContestIds[league.leagueId.toString()]
+                                    .length,
+                        onClick: (League league) {
+                          Navigator.of(context).push(
+                            FantasyPageRoute(
+                              pageBuilder: (BuildContext context) =>
+                                  JoinedContests(
+                                    league: league,
+                                    sportsType: widget.sportsType,
+                                  ),
+                            ),
+                          );
+                        },
                       );
                     }).toList(),
                   ),

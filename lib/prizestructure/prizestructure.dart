@@ -19,11 +19,19 @@ class PrizeStructure extends StatefulWidget {
 
 class PrizeStructureState extends State<PrizeStructure> {
   String winners = "";
+  NumberFormat formatCurrency;
+
+  @override
+  void initState() {
+    formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: widget.contest.prizeType == 1 ? "" : strings.rupee,
+      decimalDigits: 0,
+    );
+    super.initState();
+  }
 
   List<Widget> _getPrizeList() {
-    final formatCurrency = NumberFormat.currency(
-        locale: "hi_IN", symbol: strings.rupee, decimalDigits: 0);
-
     List<Widget> _prizeRows = [];
     if (widget.prizeStructure.length == 0) {
       _prizeRows.add(Container());
@@ -77,9 +85,6 @@ class PrizeStructureState extends State<PrizeStructure> {
 
   @override
   Widget build(BuildContext context) {
-    final formatCurrency = NumberFormat.currency(
-        locale: "hi_IN", symbol: strings.rupee, decimalDigits: 0);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[

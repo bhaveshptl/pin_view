@@ -1,9 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -25,6 +23,7 @@ class MyMatchesState extends State<MyMatches>
   List<League> _allLeagues;
   TabController _sportsController;
   Map<int, List<League>> myLeagues;
+  Map<String, dynamic> myContestIds;
 
   void initState() {
     _sportType = widget.sportsId;
@@ -82,15 +81,17 @@ class MyMatchesState extends State<MyMatches>
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
+        myContestIds = {};
         List<League> _leagues = [];
-        List<dynamic> _mapLeagues = json.decode(res.body);
+        Map<String, dynamic> response = json.decode(res.body);
+        List<dynamic> _mapLeagues = response["myLeagues"];
+        myContestIds = response["myContestIds"];
 
         for (dynamic league in _mapLeagues) {
           _leagues.add(League.fromJson(league));
         }
-        setState(() {
-          _groupLeagues(_leagues);
-        });
+
+        _groupLeagues(_leagues);
       }
     });
   }
@@ -155,6 +156,7 @@ class MyMatchesState extends State<MyMatches>
               return MyMatchesSportsTab(
                 sportsType: sportsId,
                 myLeagues: myLeagues,
+                myContestIds: myContestIds,
               );
             }).toList(),
           ),

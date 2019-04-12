@@ -11,7 +11,9 @@ class LeagueCard extends StatelessWidget {
   final League _league;
   final bool clickable;
   final Function onClick;
-  LeagueCard(this._league, {this.onClick, this.clickable = true});
+  final int contestCount;
+  LeagueCard(this._league,
+      {this.onClick, this.clickable = true, this.contestCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -228,7 +230,8 @@ class LeagueCard extends StatelessWidget {
                                 ? Container(
                                     alignment: Alignment.center,
                                     child: Text(
-                                      "Contest Joined",
+                                      contestCount.toString() +
+                                          " Contest Joined",
                                       style: Theme.of(context)
                                           .primaryTextTheme
                                           .body1

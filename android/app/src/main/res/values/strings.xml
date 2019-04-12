@@ -2,5 +2,5 @@
 <resources>
     <string name="app_name">Howzat</string>
     <string name="facebook_app_id">127323253930</string>
-    <string name="fb_login_protocol_scheme">fb127323253930</string>
+    <string name="fb_login_protocol_scheme">fb127323253930</string>    
 </resources>
