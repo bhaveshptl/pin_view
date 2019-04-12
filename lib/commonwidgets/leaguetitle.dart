@@ -9,7 +9,10 @@ class LeagueTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextStyle style = Theme.of(context).primaryTextTheme.body1.copyWith(
-          color: Theme.of(context).primaryColor,
+          color: league.status == LeagueStatus.LIVE ||
+                  league.status == LeagueStatus.COMPLETED
+              ? Colors.green
+              : Theme.of(context).primaryColor,
           fontWeight: FontWeight.w900,
         );
     return Container(

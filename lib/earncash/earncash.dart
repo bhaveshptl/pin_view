@@ -248,9 +248,12 @@ class EarnCashState extends State<EarnCash> {
                                   onTap: () {
                                     _shareNowWhatsApp();
                                   },
-                                  child: Image.asset(
-                                    "images/watsapp.png",
-                                    height: 32.0,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      "images/watsapp.png",
+                                      height: 32.0,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -268,9 +271,12 @@ class EarnCashState extends State<EarnCash> {
                                   onTap: () {
                                     _shareNowFacebook();
                                   },
-                                  child: Image.asset(
-                                    "images/facebook.png",
-                                    height: 32.0,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      "images/facebook.png",
+                                      height: 32.0,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -288,9 +294,11 @@ class EarnCashState extends State<EarnCash> {
                                   onTap: () {
                                     _shareNowGmail();
                                   },
-                                  child: Image.asset(
-                                    "images/gmail.png",
-                                    height: 32.0,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      "images/gmail.png",
+                                    ),
                                   ),
                                 ),
                               ),

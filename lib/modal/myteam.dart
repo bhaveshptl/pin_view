@@ -15,7 +15,7 @@ class MyTeam {
   final int inningsId;
   final int contestId;
   final int viceCaptain;
-  final List<Player> players;
+  List<Player> players;
 
   MyTeam({
     this.captain,

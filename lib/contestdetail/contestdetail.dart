@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
-import 'package:playfantasy/action_utils/action_util.dart';
-import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
+import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -19,7 +18,7 @@ import 'package:playfantasy/contestdetail/viewteam.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/joincontest/joincontest.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
@@ -756,26 +755,48 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text(
-                            widget.contest.joined.toString() +
-                                " Teams".toUpperCase(),
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .body1
-                                .copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                          Expanded(
+                            child: Text(
+                              widget.contest.joined.toString() +
+                                  " Teams".toUpperCase(),
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .body1
+                                  .copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                            ),
                           ),
-                          Text(
-                            "Rank".toUpperCase(),
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .body1
-                                .copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                          widget.league.status == LeagueStatus.COMPLETED
+                              ? Container(
+                                  width: 60.0,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "POINTS",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .body1
+                                        .copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
+                                )
+                              : Container(),
+                          Container(
+                            width: 80.0,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Rank".toUpperCase(),
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .body1
+                                  .copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                            ),
                           ),
                         ],
                       ),
@@ -792,91 +813,188 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
             Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {
-                  return Container(
-                    color: Colors.white,
+                  int myTeamsCount = _mapContestTeams.length;
+                  bool bIsMyTeam = index < _mapContestTeams.length;
+                  MyTeam team = !bIsMyTeam
+                      ? _allTeams[index - myTeamsCount]
+                      : _mapContestTeams[index];
+                  return FlatButton(
+                    padding: EdgeInsets.all(0.0),
+                    onPressed: () async {
+                      MyTeam myTeam;
+                      if (bIsMyTeam) {
+                        _myTeams.forEach((curTeam) {
+                          if (team.id == curTeam.id) {
+                            myTeam = curTeam;
+                          }
+                        });
+                      } else {
+                        myTeam = await routeLauncher.getTeamPlayers(
+                            contestId: widget.contest.id, teamId: team.id);
+                      }
+                      Navigator.of(context).push(
+                        FantasyPageRoute(
+                          pageBuilder: (BuildContext context) => TeamPreview(
+                                myTeam: myTeam,
+                                league: widget.league,
+                                l1Data: widget.l1Data,
+                                isCreateTeam: !bIsMyTeam,
+                                fanTeamRules: widget.l1Data.league.fanTeamRules,
+                              ),
+                        ),
+                      );
+                    },
                     child: Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.black12,
-                            width: 1.0,
+                      color: bIsMyTeam ? Colors.orange.shade50 : Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.black12,
+                              width: 1.0,
+                            ),
                           ),
                         ),
-                      ),
-                      padding: EdgeInsets.fromLTRB(8.0, 4.0, 16.0, 4.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircleAvatar(
-                                  radius: 24.0,
-                                  child: Image.asset(
-                                    "images/person-icon.png",
-                                  ),
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        padding: EdgeInsets.fromLTRB(8.0, 4.0, 16.0, 4.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Expanded(
+                              child: Row(
                                 children: <Widget>[
-                                  Text(
-                                    _allTeams[index].name,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .copyWith(
-                                          color: Colors.black87,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                  ),
                                   Padding(
-                                    padding: EdgeInsets.only(top: 8.0),
-                                    child: Row(
-                                      children: <Widget>[
-                                        Text(
-                                          _allTeams[index].score.toString(),
-                                          style: Theme.of(context)
-                                              .primaryTextTheme
-                                              .subhead
-                                              .copyWith(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                        ),
-                                        Text(
-                                          " Points",
-                                          style: Theme.of(context)
-                                              .primaryTextTheme
-                                              .body2
-                                              .copyWith(
-                                                color: Colors.black45,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                        ),
-                                      ],
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircleAvatar(
+                                      radius: 24.0,
+                                      child: Image.asset(
+                                        "images/person-icon.png",
+                                      ),
                                     ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        team.name,
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subhead
+                                            .copyWith(
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                      ),
+                                      widget.league.status ==
+                                              LeagueStatus.COMPLETED
+                                          ? Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 8.0),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Text(
+                                                    bIsMyTeam
+                                                        ? "YOU WON "
+                                                        : "WON ",
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .subhead
+                                                        .copyWith(
+                                                          color: Colors.green,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 2.0),
+                                                    child: widget.contest
+                                                                .prizeType ==
+                                                            1
+                                                        ? Image.asset(
+                                                            strings.chips,
+                                                            width: 12.0,
+                                                            height: 12.0,
+                                                            fit: BoxFit.contain,
+                                                          )
+                                                        : Container(),
+                                                  ),
+                                                  Text(
+                                                    team.prize.toString(),
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .subhead
+                                                        .copyWith(
+                                                          color: Colors.green,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  )
+                                                ],
+                                              ),
+                                            )
+                                          : Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 8.0),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Text(
+                                                    team.score.toString(),
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .subhead
+                                                        .copyWith(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  ),
+                                                  Text(
+                                                    " Points",
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .body2
+                                                        .copyWith(
+                                                          color: Colors.black45,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                          Container(
-                            child: Text(
-                              _allTeams[index].rank == null ||
-                                      _allTeams[index].rank == 0
-                                  ? "-"
-                                  : "#" + _allTeams[index].rank.toString(),
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .title
-                                  .copyWith(
-                                    color: Colors.black,
-                                  ),
                             ),
-                          ),
-                        ],
+                            widget.league.status == LeagueStatus.COMPLETED
+                                ? Container(
+                                    width: 60.0,
+                                    child: Text(
+                                      team.score.toString(),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  )
+                                : Container(),
+                            Container(
+                              alignment: Alignment.centerRight,
+                              width: 80.0,
+                              child: Text(
+                                team.rank == null || team.rank == 0
+                                    ? "-"
+                                    : "#" + team.rank.toString(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.black,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

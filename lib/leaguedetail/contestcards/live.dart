@@ -34,73 +34,16 @@ class LiveContest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String title = "";
     MyTeam _myBestTeam = _getMyBestTeam();
-    bool bMyContest = isMyContest == null ? false : isMyContest;
 
-    if (contest.inningsId != 0 &&
-        league.teamA != null &&
-        league.teamA.sportType == 1) {
-      if (league.teamA.inningsId == contest.inningsId) {
-        title = league.teamA.name;
-      } else {
-        title = league.teamB.name;
-      }
-    } else if (contest.inningsId != 0 && league.teamA != null) {
-      if (league.teamA.inningsId == contest.inningsId) {
-        title = "First";
-      } else {
-        title = "Second";
-      }
-    }
-    final formatCurrency =
-        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: contest.prizeType == 1 ? "" : strings.rupee,
+      decimalDigits: 0,
+    );
 
     return Column(
       children: <Widget>[
-        Stack(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-                  child: Text(
-                    contest.name,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                (bMyContest && title.isNotEmpty)
-                    ? Container(
-                        padding: EdgeInsets.symmetric(horizontal: 4.0),
-                        color: Colors.redAccent,
-                        child: Text(
-                          title,
-                          style: TextStyle(color: Colors.white54),
-                        ),
-                      )
-                    : Container(),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-                  child: Text(
-                    "#" + contest.id.toString(),
-                    textAlign: TextAlign.right,
-                    style: TextStyle(color: Colors.black12),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        Divider(
-          height: 2.0,
-          color: Colors.black12,
-        ),
         Row(
           children: <Widget>[
             Expanded(

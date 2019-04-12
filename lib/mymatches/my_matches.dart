@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/mymatches/my_matches_sport_tab.dart';
@@ -39,6 +41,12 @@ class MyMatchesState extends State<MyMatches>
       2: [],
       3: [],
     };
+  }
+
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   _listenSportChange() {
@@ -93,6 +101,8 @@ class MyMatchesState extends State<MyMatches>
 
         _groupLeagues(_leagues);
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -151,6 +161,7 @@ class MyMatchesState extends State<MyMatches>
         Expanded(
           child: TabBarView(
             controller: _sportsController,
+            physics: NeverScrollableScrollPhysics(),
             children: widget.mapSportTypes.keys.map<Widget>((sportType) {
               final sportsId = widget.mapSportTypes[sportType];
               return MyMatchesSportsTab(

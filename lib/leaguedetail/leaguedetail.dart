@@ -14,11 +14,11 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/searchcontest.dart';
 import 'package:playfantasy/leaguedetail/myteams.dart';
-import 'package:playfantasy/mycontests/mycontest.dart';
 import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/leaguedetail/contests.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/mymatches/joined_contests.dart';
 import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
@@ -799,14 +799,11 @@ class LeagueDetailState extends State<LeagueDetail>
         }
         break;
       case 2:
-        result = await Navigator.of(context).push(
+        Navigator.of(context).push(
           FantasyPageRoute(
-            pageBuilder: (context) => MyContests(
-                  leagues: widget.leagues,
-                  sportsId: _sportType,
-                  leagueId: widget.league.leagueId,
-                  mapSportTypes: widget.mapSportTypes,
-                  onSportChange: widget.onSportChange,
+            pageBuilder: (BuildContext context) => JoinedContests(
+                  league: widget.league,
+                  sportsType: widget.sportType,
                 ),
           ),
         );

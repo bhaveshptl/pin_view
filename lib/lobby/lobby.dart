@@ -47,7 +47,7 @@ class Lobby extends StatefulWidget {
 class LobbyState extends State<Lobby>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   User _user;
-  int _sportType = 0;
+  int _sportType = 1;
   int _activeIndex = 0;
   List<League> _leagues;
   double userBalance = 0.0;
@@ -171,6 +171,9 @@ class LobbyState extends State<Lobby>
     await futureSportType.then((value) {
       if (value != null) {
         int _sport = int.parse(value == null || value == "0" ? "1" : value);
+        setState(() {
+          _sportType = _sport;
+        });
         Timer(Duration(seconds: 1), () {
           _onSportSelectionChaged(_sport);
         });
@@ -205,6 +208,7 @@ class LobbyState extends State<Lobby>
         setState(() {
           _activeIndex = 1;
         });
+        showLoader(true);
         break;
       case 2:
         _launchAddCash();
@@ -394,11 +398,6 @@ class LobbyState extends State<Lobby>
           mapSportTypes: _mapSportTypes,
           onSportChange: _onSportSelectionChaged,
         );
-      // return MyContests(
-      //   leagues: _leagues,
-      //   mapSportTypes: _mapSportTypes,
-      //   onSportChange: _onSportSelectionChaged,
-      // );
       default:
         return Container();
     }

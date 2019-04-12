@@ -32,7 +32,10 @@ class ContestDetailsCard extends StatelessWidget {
             league.status == LeagueStatus.COMPLETED;
 
     final formatCurrency = NumberFormat.currency(
-        locale: "hi_IN", symbol: strings.rupee, decimalDigits: 0);
+      locale: "hi_IN",
+      symbol: contest.prizeType == 1 ? "" : strings.rupee,
+      decimalDigits: 0,
+    );
 
     return Card(
       margin: EdgeInsets.all(12.0),
@@ -138,6 +141,7 @@ class ContestDetailsCard extends StatelessWidget {
                   ),
                 ),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
                       "Entry",
@@ -147,197 +151,222 @@ class ContestDetailsCard extends StatelessWidget {
                             Theme.of(context).primaryTextTheme.caption.fontSize,
                       ),
                     ),
-                    Text(
-                      formatCurrency.format(contest.entryFee),
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.title.fontSize,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Divider(
-              color: Colors.black26,
-              height: 2.0,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Container(
-                        width: 20.0,
-                        height: 20.0,
-                        child: Text(
-                          "B",
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .caption
-                              .copyWith(
-                                color: Colors.blue,
-                              ),
-                        ),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          border: Border.all(
-                            color: Colors.blueAccent,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Entry with bonus amount",
-                        style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
-                                  color: Colors.black38,
-                                ),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Container(
-                        width: 20.0,
-                        height: 20.0,
-                        child: Text(
-                          "M",
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .caption
-                              .copyWith(
-                                color: Colors.green,
-                              ),
-                        ),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          border: Border.all(
+                    Row(
+                      children: <Widget>[
+                        contest.prizeType == 1
+                            ? Image.asset(
+                                strings.chips,
+                                width: 12.0,
+                                height: 12.0,
+                                fit: BoxFit.contain,
+                              )
+                            : Container(),
+                        Text(
+                          formatCurrency.format(contest.entryFee),
+                          style: TextStyle(
                             color: Colors.green,
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .title
+                                .fontSize,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Join with multiple teams",
-                        style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
-                                  color: Colors.black38,
-                                ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 4.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Container(
-                  color: Colors.black26,
-                  child: Row(
+            league.status == LeagueStatus.COMPLETED
+                ? Container()
+                : Column(
                     children: <Widget>[
-                      Expanded(
-                        flex: contest.joined,
+                      Divider(
+                        color: Colors.black26,
+                        height: 2.0,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Container(
+                                  width: 20.0,
+                                  height: 20.0,
+                                  child: Text(
+                                    "B",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(
+                                          color: Colors.blue,
+                                        ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    border: Border.all(
+                                      color: Colors.blueAccent,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "Entry with bonus amount",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Colors.black38,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Container(
+                                  width: 20.0,
+                                  height: 20.0,
+                                  child: Text(
+                                    "M",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .caption
+                                        .copyWith(
+                                          color: Colors.green,
+                                        ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    border: Border.all(
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "Join with multiple teams",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Colors.black38,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 4.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
                           child: Container(
-                            height: 6.0,
-                            color: Colors.green,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: contest.size - contest.joined,
-                        child: Container(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 4.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        (contest.size - contest.joined).toString(),
-                        style: TextStyle(
-                          color: Colors.black38,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      Text(
-                        " seats left",
-                        style: TextStyle(color: Colors.black38),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Text(
-                        contest.size.toString(),
-                        style: TextStyle(
-                          color: Colors.black38,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      Text(
-                        " seats",
-                        style: TextStyle(color: Colors.black38),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            bIsContestFull
-                ? Container()
-                : Padding(
-                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: ColorButton(
-                            onPressed: bIsContestFull
-                                ? null
-                                : () {
-                                    onJoinContest(contest);
-                                  },
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12.0),
-                              child: Text(
-                                "Join the contest".toUpperCase(),
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .headline
-                                    .copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
+                            color: Colors.black26,
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: contest.joined,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Container(
+                                      height: 6.0,
+                                      color: Colors.green,
                                     ),
-                              ),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: contest.size - contest.joined,
+                                  child: Container(),
+                                ),
+                              ],
                             ),
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 4.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  (contest.size - contest.joined).toString(),
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  " seats left",
+                                  style: TextStyle(color: Colors.black38),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  contest.size.toString(),
+                                  style: TextStyle(
+                                    color: Colors.black38,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  " seats",
+                                  style: TextStyle(color: Colors.black38),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      bIsContestFull
+                          ? Container()
+                          : Padding(
+                              padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: ColorButton(
+                                      onPressed: bIsContestFull
+                                          ? null
+                                          : () {
+                                              onJoinContest(contest);
+                                            },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 12.0),
+                                        child: Text(
+                                          "Join the contest".toUpperCase(),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .headline
+                                              .copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                    ],
                   ),
           ],
         ),

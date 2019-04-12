@@ -6,6 +6,7 @@ import 'package:package_info/package_info.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/deposit/addcash.dart';
 import 'package:playfantasy/earncash/earncash.dart';
@@ -442,5 +443,29 @@ class RouteLauncher {
         }
       },
     );
+  }
+
+  getTeamPlayers({int contestId, int teamId}) async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl +
+            ApiUtil.GET_TEAM_INFO +
+            contestId.toString() +
+            "/teams/" +
+            teamId.toString(),
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> response = json.decode(res.body);
+        response["id"] = response["id"] == null ? teamId : response["id"];
+        return MyTeam.fromJson(response);
+      } else {
+        return null;
+      }
+    });
   }
 }

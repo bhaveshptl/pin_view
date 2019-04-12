@@ -82,6 +82,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                 color: Colors.white,
               ),
         ),
+        elevation: 0.0,
         centerTitle: true,
       ),
       body: Column(

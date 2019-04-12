@@ -49,7 +49,7 @@ class ContestCard extends StatelessWidget {
                 ? LeagueStatus.LIVE
                 : LeagueStatus.COMPLETED));
     return Tooltip(
-      message: "", //contest.id.toString() + " - " + contest.name,
+      message: contest.id.toString() + " - " + contest.name,
       child: Column(
         children: <Widget>[
           Padding(

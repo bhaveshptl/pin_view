@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -369,7 +370,24 @@ class JoinContestState extends State<JoinContest> {
                                                   ),
                                             ),
                                           ),
-                                          onTap: () {},
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              FantasyPageRoute(
+                                                pageBuilder:
+                                                    (BuildContext context) =>
+                                                        TeamPreview(
+                                                          myTeam: team,
+                                                          league: widget.league,
+                                                          l1Data: widget.l1Data,
+                                                          isCreateTeam: false,
+                                                          fanTeamRules: widget
+                                                              .l1Data
+                                                              .league
+                                                              .fanTeamRules,
+                                                        ),
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),

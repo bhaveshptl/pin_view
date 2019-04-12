@@ -2,22 +2,22 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/action_utils/action_util.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/contestdetail/contestdetail.dart';
-import 'package:playfantasy/leaguedetail/contestcard.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/prizestructure/prizestructure.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/leaguedetail/contestcard.dart';
 import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/contestdetail/contestdetail.dart';
+import 'package:playfantasy/prizestructure/prizestructure.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class JoinedContests extends StatefulWidget {
   final League league;
@@ -158,7 +158,8 @@ class JoinedContestsState extends State<JoinedContests>
 
   _getMyContestMyTeams(MyAllContest _mapMyContests) async {
     List<int> _contestIds = [];
-    List<Contest> _contests = _mapMyContests.normal;
+    List<Contest> _contests =
+        _mapMyContests == null ? [] : _mapMyContests.normal;
     for (Contest contest in _contests) {
       _contestIds.add(contest.id);
     }

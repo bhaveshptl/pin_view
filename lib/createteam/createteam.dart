@@ -1113,8 +1113,11 @@ class CreateTeamState extends State<CreateTeam>
                             FantasyPageRoute(
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
+                                    isCreateTeam: true,
                                     fanTeamRules: _fanTeamRules,
-                                    selectedPlayers: _selectedPlayers,
+                                    myTeam: MyTeam(
+                                      players: _selectedPlayers,
+                                    ),
                                   ),
                             ),
                           );
