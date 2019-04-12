@@ -116,34 +116,49 @@ class LeagueCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Container(
-                            width: 32.0,
-                            height: 32.0,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black45,
-                                width: 1.0,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  "vs".toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context)
+                          _league.status == LeagueStatus.COMPLETED
+                              ? Container(
+                                  height: 32.0,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    "Completed",
+                                    style: Theme.of(context)
                                         .primaryTextTheme
-                                        .caption
-                                        .fontSize,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.black87,
+                                        .subhead
+                                        .copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: Theme.of(context).primaryColor,
+                                        ),
+                                  ),
+                                )
+                              : Container(
+                                  width: 32.0,
+                                  height: 32.0,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black45,
+                                      width: 1.0,
+                                    ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        "vs".toUpperCase(),
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: Theme.of(context)
+                                              .primaryTextTheme
+                                              .caption
+                                              .fontSize,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
                           Column(
                             children: <Widget>[
                               Row(
@@ -208,9 +223,24 @@ class LeagueCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Expanded(
-                            child: EPOC(
-                              timeInMiliseconds: _league.matchStartTime,
-                            ),
+                            child: _league.status == LeagueStatus.COMPLETED ||
+                                    _league.status == LeagueStatus.LIVE
+                                ? Container(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "Contest Joined",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body1
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  )
+                                : EPOC(
+                                    timeInMiliseconds: _league.matchStartTime,
+                                  ),
                           )
                         ],
                       )

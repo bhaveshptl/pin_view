@@ -11,6 +11,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/mymatches/my_matches.dart';
 import 'package:playfantasy/profilepages/update.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -67,7 +68,7 @@ class LobbyState extends State<Lobby>
   initState() {
     super.initState();
     _controller = TabController(vsync: this, length: 3);
-    getBanners();
+    _getBanners();
     _getSportsType();
     _controller.addListener(() {
       if (!_controller.indexIsChanging) {
@@ -137,7 +138,6 @@ class LobbyState extends State<Lobby>
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> user = json.decode(res.body)["user"];
-        print(res.body);
         SharedPrefHelper.internal().saveToSharedPref(
             ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
         return User.fromJson(user);
@@ -147,7 +147,7 @@ class LobbyState extends State<Lobby>
     });
   }
 
-  getBanners() async {
+  _getBanners() async {
     http.Request req = http.Request(
         "GET",
         Uri.parse(
@@ -389,11 +389,16 @@ class LobbyState extends State<Lobby>
         );
         break;
       case 1:
-        return MyContests(
-          leagues: _leagues,
+        return MyMatches(
+          sportsId: _sportType,
           mapSportTypes: _mapSportTypes,
           onSportChange: _onSportSelectionChaged,
         );
+      // return MyContests(
+      //   leagues: _leagues,
+      //   mapSportTypes: _mapSportTypes,
+      //   onSportChange: _onSportSelectionChaged,
+      // );
       default:
         return Container();
     }

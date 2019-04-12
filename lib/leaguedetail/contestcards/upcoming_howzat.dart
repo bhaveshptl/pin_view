@@ -164,7 +164,7 @@ class UpcomingHowzatContest extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          flex: contest.size,
+                          flex: contest.size - contest.joined,
                           child: Container(),
                         ),
                       ],

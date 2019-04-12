@@ -37,7 +37,7 @@ class ApiUtil {
   static const SHARED_PREFERENCE_SPORT_SELECTION = "fantasy_sport_selection";
   static const SHARED_PREFERENCE_FIREBASE_TOKEN = "deviceId";
   static const SHARED_PREFERENCE_REFCODE_BRANCH = "refcode_branch";
-  static const SHARED_PREFERENCE_GOOGLE_ADDID ="google_addid";
+  static const SHARED_PREFERENCE_GOOGLE_ADDID = "google_addid";
   static const SHARED_PREFERENCE_INSTALLREFERRING_BRANCH = "installReferring";
   static const WS_SHARED_PREFERENCE_KEY = "ws_fantasy_cookie";
   static const LANGUAGE_TABLE = "fantasy_language_table";
@@ -116,6 +116,7 @@ class ApiUtil {
   static const GET_MY_CONTEST_MY_SHEETS =
       "/api/v2/lobby/quiz/mycontest-all-answersheet";
   static const GET_MY_ALL_CONTESTS = "/api/v2/lobby/mycontests/";
+  static const GET_MY_ALL_MATCHES = "/api/v2/lobby/mymatches/";
   static const GET_LEAGUE_FLIPS = "/api/v2/lobby/quiz/get-flips/";
   static const GET_FLIP_BALANCE = "/api/v2/lobby/quiz/get-flips/usable/";
   static const GET_CONTEST_SHEETS = "/api/lobby/contest/";
