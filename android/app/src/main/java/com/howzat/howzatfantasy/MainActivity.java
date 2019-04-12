@@ -1,4 +1,4 @@
-package com.algorin.playfantasy;
+package com.howzat.howzatfantasy;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.algorin.playfantasy.services.DeviceInfo;
-import com.algorin.playfantasy.services.MyHelperClass;
+import com.howzat.howzatfantasy.services.DeviceInfo;
+import com.howzat.howzatfantasy.services.MyHelperClass;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,11 +29,9 @@ import com.razorpay.PaymentResultWithDataListener;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.Intent;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.util.Log;
+
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -44,8 +42,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+
 import java.io.IOException;
 
 

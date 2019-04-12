@@ -1,4 +1,4 @@
-package com.algorin.playfantasy.services;
+package com.howzat.howzatfantasy.services;
 
 import android.net.Uri;
 

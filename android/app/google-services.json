@@ -1,39 +1,45 @@
 {
   "project_info": {
-    "project_number": "671728109308",
-    "firebase_url": "https://playfantasy-e3d76.firebaseio.com",
-    "project_id": "playfantasy-e3d76",
-    "storage_bucket": "playfantasy-e3d76.appspot.com"
+    "project_number": "378084934266",
+    "firebase_url": "https://howzat-3ed95.firebaseio.com",
+    "project_id": "howzat-3ed95",
+    "storage_bucket": "howzat-3ed95.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:671728109308:android:daa4c98d9c9d46fb",
+        "mobilesdk_app_id": "1:378084934266:android:c8f639bf45c5ac7c",
         "android_client_info": {
-          "package_name": "com.algorin.playfantasy"
+          "package_name": "com.howzat.howzatfantasy"
         }
       },
       "oauth_client": [
         {
-          "client_id": "671728109308-09q2h8tngp5pgg9hirr0oct8ddbq4ss9.apps.googleusercontent.com",
+          "client_id": "378084934266-0q4inb3cjc09tgurgp1cmra9m5d8d85u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.howzat.howzatfantasy",
+            "certificate_hash": "ad2c01e3e31104c61b1df1bd32b3c2ad3dee0203"
+          }
+        },
+        {
+          "client_id": "378084934266-ogj1tdp2cdmvn68h844uab5o392hv1mo.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCTov1zTsel1dkkqtj4XX0Jl_gdh66SUvU"
+          "current_key": "AIzaSyA6xXGMrCLZM6JMOxO0kawlNBkpbp2qIrU"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "378084934266-ogj1tdp2cdmvn68h844uab5o392hv1mo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
