@@ -319,7 +319,7 @@ class SignupState extends State<Signup> {
   _doFacebookLogin(BuildContext context) async {
     showLoader(true);
     var facebookLogin = new FacebookLogin();
-    facebookLogin.loginBehavior = FacebookLoginBehavior.nativeWithFallback;
+    facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
     var result = await facebookLogin
         .logInWithReadPermissions(['email', 'public_profile']);
 
