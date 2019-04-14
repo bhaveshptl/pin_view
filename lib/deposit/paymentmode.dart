@@ -673,7 +673,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("CHOOSE_PAYMENT_MODE"),
+          strings.get("CHOOSE_PAYMENT_MODE").toUpperCase(),
         ),
       ),
       body: Container(

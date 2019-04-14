@@ -26,7 +26,9 @@ class MyAccountState extends State<MyAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("My account"),
+        title: Text(
+          "My account".toUpperCase(),
+        ),
       ),
       body: Column(
         children: <Widget>[

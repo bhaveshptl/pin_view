@@ -166,8 +166,6 @@ class SignupState extends State<Signup> {
     return value;
   }
 
-  
-
   Future<String> getAndroidDeviceInfo() async {
     String value;
     try {
@@ -192,7 +190,7 @@ class SignupState extends State<Signup> {
   }
 
   _doSignUp() async {
-     showLoader(true);
+    showLoader(true);
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
@@ -339,7 +337,7 @@ class SignupState extends State<Signup> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
-     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
@@ -485,52 +483,80 @@ class SignupState extends State<Signup> {
                               Row(
                                 children: <Widget>[
                                   Expanded(
-                                    child: SimpleTextBox(
-                                      onSaved: (val) => _authName = val,
-                                      labelText: strings.get("EMAIL_OR_MOBILE"),
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return strings
-                                              .get("EMAIL_OR_MOBILE_ERROR");
-                                        }
-                                      },
-                                      keyboardType: TextInputType.emailAddress,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        height: 32.0,
+                                        child: SimpleTextBox(
+                                          onSaved: (val) => _authName = val,
+                                          labelText:
+                                              strings.get("EMAIL_OR_MOBILE"),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("EMAIL_OR_MOBILE_ERROR");
+                                            }
+                                          },
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                        ),
+                                      ),
                                     ),
                                   )
                                 ],
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 16.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: SimpleTextBox(
-                                        onSaved: (val) => _password = val,
-                                        labelText: strings.get("PASSWORD"),
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return strings
-                                                .get("PASSWORD_ERROR");
-                                          }
-                                        },
-                                        obscureText: _obscureText,
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        height: 32.0,
+                                        child: SimpleTextBox(
+                                          onSaved: (val) => _password = val,
+                                          labelText: strings.get("PASSWORD"),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscureText = !_obscureText;
+                                              });
+                                            },
+                                            padding: EdgeInsets.all(0.0),
+                                            icon: Icon(
+                                              _obscureText
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                            ),
+                                          ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("PASSWORD_ERROR");
+                                            }
+                                          },
+                                          obscureText: _obscureText,
+                                        ),
                                       ),
-                                    )
-                                  ],
-                                ),
+                                    ),
+                                  )
+                                ],
                               ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: SimpleTextBox(
-                                        controller: _referralCodeController,
-                                        labelText: strings.get("REFERRAL_CODE"),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        height: 32.0,
+                                        child: SimpleTextBox(
+                                          controller: _referralCodeController,
+                                          labelText:
+                                              strings.get("REFERRAL_CODE"),
+                                        ),
                                       ),
-                                    )
-                                  ],
-                                ),
+                                    ),
+                                  )
+                                ],
                               ),
                               Row(
                                 children: <Widget>[

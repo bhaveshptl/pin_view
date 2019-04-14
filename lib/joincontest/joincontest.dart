@@ -2,15 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/createteam/teampreview.dart';
+import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/createteam/createteam.dart';
+import 'package:playfantasy/createteam/teampreview.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
@@ -205,7 +207,15 @@ class JoinContestState extends State<JoinContest> {
           }
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
+  }
+
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   void _onCreateTeam(BuildContext context) async {
@@ -234,7 +244,7 @@ class JoinContestState extends State<JoinContest> {
     return ScaffoldPage(
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
-        title: Text("MY TEAMS"),
+        title: Text("My Teams".toUpperCase()),
         elevation: 0.0,
       ),
       body: Column(
@@ -379,7 +389,7 @@ class JoinContestState extends State<JoinContest> {
                                                           myTeam: team,
                                                           league: widget.league,
                                                           l1Data: widget.l1Data,
-                                                          isCreateTeam: false,
+                                                          allowEditTeam: true,
                                                           fanTeamRules: widget
                                                               .l1Data
                                                               .league

@@ -239,6 +239,7 @@ class PlayingStyleTab extends StatelessWidget {
                             child: CachedNetworkImage(
                               imageUrl: _player.jerseyUrl,
                               placeholder: Container(
+                                padding: EdgeInsets.all(8.0),
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.0,
                                 ),

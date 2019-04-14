@@ -517,7 +517,9 @@ class MyProfileState extends State<MyProfile> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("MY PROFILE"),
+        title: Text(
+          "MY PROFILE".toUpperCase(),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(

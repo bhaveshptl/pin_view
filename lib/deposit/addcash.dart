@@ -1162,7 +1162,7 @@ class AddCashState extends State<AddCash> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("ADD_CASH"),
+          strings.get("ADD_CASH").toUpperCase(),
         ),
       ),
       body: Container(

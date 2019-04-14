@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 
@@ -179,7 +180,9 @@ class ContactUsState extends State<ContactUs> {
               url: url,
               clearCache: true,
               appBar: AppBar(
-                title: Text(title),
+                title: Text(
+                  title.toUpperCase(),
+                ),
               ),
             ),
         fullscreenDialog: true,
@@ -192,7 +195,9 @@ class ContactUsState extends State<ContactUs> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Contact Us"),
+        title: Text(
+          "Contact Us".toUpperCase(),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -232,6 +237,11 @@ class ContactUsState extends State<ContactUs> {
                             decoration: InputDecoration(
                               labelText: "Mobile Number",
                             ),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(
+                                10,
+                              )
+                            ],
                             validator: (value) {
                               if (value.isEmpty) {
                                 return "Please enter mobile number.";

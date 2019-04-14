@@ -151,7 +151,8 @@ class StateDobState extends State<StateDob> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Padding(
+          Container(
+            width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

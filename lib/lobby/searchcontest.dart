@@ -77,7 +77,9 @@ class SearchContestState extends State<SearchContest> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(strings.get("SEARCH_CONTEST")),
+        title: Text(
+          strings.get("SEARCH_CONTEST").toUpperCase(),
+        ),
       ),
       body: Form(
         key: _formKey,

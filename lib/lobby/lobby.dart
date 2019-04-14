@@ -8,16 +8,15 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/lobby/appdrawer.dart';
-import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/user.dart';
-import 'package:playfantasy/mymatches/my_matches.dart';
-import 'package:playfantasy/profilepages/update.dart';
+import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/lobby/lobbywidget.dart';
-import 'package:playfantasy/mycontests/mycontest.dart';
+import 'package:playfantasy/profilepages/update.dart';
+import 'package:playfantasy/mymatches/my_matches.dart';
 import 'package:playfantasy/lobby/bottomnavigation.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -273,7 +272,9 @@ class LobbyState extends State<Lobby>
               url: "https://www.playfantasy.com/assets/help.html?cache=" +
                   DateTime.now().millisecondsSinceEpoch.toString(),
               appBar: AppBar(
-                title: Text("HELP"),
+                title: Text(
+                  "HELP".toUpperCase(),
+                ),
               ),
             ),
         fullscreenDialog: true,

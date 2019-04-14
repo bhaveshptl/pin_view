@@ -878,8 +878,23 @@ class LeagueDetailState extends State<LeagueDetail>
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(title),
-        actions: <Widget>[],
+        title: Text(
+          title.toUpperCase(),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              Navigator.of(context).push(
+                FantasyPageRoute(
+                  pageBuilder: (context) => SearchContest(
+                        leagues: widget.leagues,
+                      ),
+                ),
+              );
+            },
+          ),
+        ],
         elevation: 0.0,
       ),
       body: Column(

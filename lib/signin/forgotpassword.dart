@@ -147,7 +147,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(strings.get("FORGOT_PASS_TITLE")),
+        title: Text(
+          strings.get("FORGOT_PASS_TITLE").toUpperCase(),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

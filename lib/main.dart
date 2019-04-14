@@ -21,7 +21,7 @@ disableDeviceRotation() {
 ///
 void main() async {
   String channelId = "10";
-  const apiBaseUrl = "https://www.playfantasy.com";
+  const apiBaseUrl = "https://dryrun.howzat.com";
   String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
 
   disableDeviceRotation();

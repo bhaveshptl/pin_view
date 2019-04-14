@@ -136,7 +136,9 @@ class AppDrawerState extends State<AppDrawer> {
               url: url,
               clearCache: true,
               appBar: AppBar(
-                title: Text(title),
+                title: Text(
+                  title.toUpperCase(),
+                ),
               ),
             ),
         fullscreenDialog: true,
@@ -311,7 +313,9 @@ class AppDrawerState extends State<AppDrawer> {
         Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-            title: Text("Profile"),
+            title: Text(
+              "Profile".toUpperCase(),
+            ),
             actions: <Widget>[
               !bIsUserVerified
                   ? Container(

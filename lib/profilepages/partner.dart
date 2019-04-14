@@ -62,7 +62,9 @@ class PartnerState extends State<Partner> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Partner request"),
+        title: Text(
+          "Partner request".toUpperCase(),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(

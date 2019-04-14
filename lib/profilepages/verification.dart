@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -386,7 +388,7 @@ class VerificationState extends State<Verification> {
       key: scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("ACCOUNT_VERIFICATION"),
+          strings.get("ACCOUNT_VERIFICATION").toUpperCase(),
         ),
       ),
       body: SingleChildScrollView(
@@ -582,26 +584,22 @@ class VerificationState extends State<Verification> {
                                 ),
                                 Form(
                                   key: formKey,
-                                  child: _bIsMobileVerified
+                                  child: !_bIsMobileVerified
                                       ? Column(
                                           children: <Widget>[
                                             ListTile(
-                                              leading: TextFormField(
+                                              leading: SimpleTextBox(
                                                 controller: _mobileController,
                                                 keyboardType:
                                                     TextInputType.phone,
                                                 enabled: !_bDisableOTP,
-                                                decoration: InputDecoration(
-                                                  labelText:
-                                                      "Enter mobile number",
-                                                  hintText: "9999999999",
-                                                  prefix: Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 4.0),
-                                                    child: Text("+91"),
-                                                  ),
-                                                ),
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(
+                                                    10,
+                                                  )
+                                                ],
+                                                labelText:
+                                                    "Enter mobile number",
                                               ),
                                             ),
                                             _bIsOTPSent

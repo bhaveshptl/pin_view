@@ -502,7 +502,7 @@ class CreateContestState extends State<CreateContest> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("CREATE_CONTEST"),
+          strings.get("CREATE_CONTEST").toUpperCase(),
         ),
       ),
       body: Column(

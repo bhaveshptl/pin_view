@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SimpleTextBox extends StatelessWidget {
+  final bool enabled;
   final String labelText;
   final bool obscureText;
   final Widget prefixIcon;
@@ -12,8 +14,10 @@ class SimpleTextBox extends StatelessWidget {
   final FormFieldSetter<String> onSaved;
   final TextEditingController controller;
   final FormFieldValidator<String> validator;
+  final List<TextInputFormatter> inputFormatters;
 
   SimpleTextBox({
+    this.enabled,
     this.onSaved,
     this.labelText,
     this.validator,
@@ -22,6 +26,7 @@ class SimpleTextBox extends StatelessWidget {
     this.controller,
     this.labelStyle,
     this.keyboardType,
+    this.inputFormatters,
     this.obscureText = false,
     this.alwaysShowPlaceholder = true,
   });
@@ -47,11 +52,13 @@ class SimpleTextBox extends StatelessWidget {
     );
 
     return TextFormField(
+      enabled: enabled,
       onSaved: onSaved,
       validator: validator,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: labelText,
         suffixIcon: suffixIcon,

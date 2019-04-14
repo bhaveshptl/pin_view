@@ -66,7 +66,9 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Recent withdraws"),
+        title: Text(
+          "Recent withdraws".toUpperCase(),
+        ),
       ),
       body: ListView(
         children: recents.map((recentWithdraw) {

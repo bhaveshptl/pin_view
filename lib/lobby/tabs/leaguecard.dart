@@ -89,7 +89,7 @@ class LeagueCard extends StatelessWidget {
                                             : "",
                                         fit: BoxFit.fitHeight,
                                         placeholder: Container(
-                                          padding: EdgeInsets.all(4.0),
+                                          padding: EdgeInsets.all(12.0),
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.0,
                                           ),

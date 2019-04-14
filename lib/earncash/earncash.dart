@@ -141,11 +141,19 @@ class EarnCashState extends State<EarnCash> {
 
   @override
   Widget build(BuildContext context) {
+    BoxDecoration iconDecoration = BoxDecoration(
+      shape: BoxShape.circle,
+      border: Border.all(
+        width: 1.0,
+        color: Colors.black26,
+      ),
+    );
+
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          "REFER & EARN",
+          "Refer & Earn".toUpperCase(),
         ),
       ),
       body: Column(
@@ -241,9 +249,7 @@ class EarnCashState extends State<EarnCash> {
                               Container(
                                 width: 56.0,
                                 height: 56.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
+                                decoration: iconDecoration,
                                 child: InkWell(
                                   onTap: () {
                                     _shareNowWhatsApp();
@@ -260,13 +266,7 @@ class EarnCashState extends State<EarnCash> {
                               Container(
                                 width: 56.0,
                                 height: 56.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    width: 1.0,
-                                    color: Colors.black26,
-                                  ),
-                                ),
+                                decoration: iconDecoration,
                                 child: InkWell(
                                   onTap: () {
                                     _shareNowFacebook();
@@ -283,13 +283,7 @@ class EarnCashState extends State<EarnCash> {
                               Container(
                                 width: 56.0,
                                 height: 56.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    width: 1.0,
-                                    color: Colors.black26,
-                                  ),
-                                ),
+                                decoration: iconDecoration,
                                 child: InkWell(
                                   onTap: () {
                                     _shareNowGmail();
@@ -305,13 +299,7 @@ class EarnCashState extends State<EarnCash> {
                               Container(
                                 width: 56.0,
                                 height: 56.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    width: 1.0,
-                                    color: Colors.black26,
-                                  ),
-                                ),
+                                decoration: iconDecoration,
                                 child: InkWell(
                                   onTap: () {
                                     _copyCode();

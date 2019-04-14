@@ -59,13 +59,10 @@ class SignInPageState extends State<SignInPage> {
   void initState() {
     super.initState();
 
-   
-
     getLocalStorageValues();
-    getAndroidDeviceInfo().then((String value) {
-     
-    });
+    getAndroidDeviceInfo().then((String value) {});
   }
+
   getLocalStorageValues() {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
@@ -203,7 +200,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
-   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
@@ -233,7 +230,8 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
       _payload["context"]["network_type"] =
           androidDeviceInfoMap["network_type"];
-      _payload["context"]["googleEmailList"] =json.encode(androidDeviceInfoMap["googleEmailList"]);
+      _payload["context"]["googleEmailList"] =
+          json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
     print(
         "<<<<<<<<<<<<<<<<<<<Sign in  Context non social>>>>>>>>>>>>>>>>>>>>>>>");
@@ -304,7 +302,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _sendTokenToAuthenticate(String token, int authFor) async {
-     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
@@ -341,7 +339,8 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
       _payload["context"]["network_type"] =
           androidDeviceInfoMap["network_type"];
-     _payload["context"]["googleEmailList"] =json.encode(androidDeviceInfoMap["googleEmailList"]);
+      _payload["context"]["googleEmailList"] =
+          json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
 
     print("<<<<<<<<<<<<<<<<<<<Signin  Context social>>>>>>>>>>>>>>>>>>>>>>>");
@@ -453,51 +452,62 @@ class SignInPageState extends State<SignInPage> {
                               Row(
                                 children: <Widget>[
                                   Expanded(
-                                    child: SimpleTextBox(
-                                      onSaved: (val) => _authName = val,
-                                      labelText: "Username or Email",
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return strings.get("USERNAME_ERROR");
-                                        }
-                                      },
-                                      keyboardType: TextInputType.emailAddress,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        height: 32.0,
+                                        child: SimpleTextBox(
+                                          onSaved: (val) => _authName = val,
+                                          labelText: "Username or Email",
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("USERNAME_ERROR");
+                                            }
+                                          },
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                        ),
+                                      ),
                                     ),
                                   )
                                 ],
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 16.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: SimpleTextBox(
-                                        onSaved: (val) => _password = val,
-                                        labelText: "Password",
-                                        suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _obscureText = !_obscureText;
-                                            });
-                                          },
-                                          padding: EdgeInsets.all(0.0),
-                                          icon: Icon(
-                                            _obscureText
-                                                ? Icons.visibility
-                                                : Icons.visibility_off,
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 8.0),
+                                      child: Container(
+                                        height: 32.0,
+                                        child: SimpleTextBox(
+                                          onSaved: (val) => _password = val,
+                                          labelText: "Password",
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscureText = !_obscureText;
+                                              });
+                                            },
+                                            padding: EdgeInsets.all(0.0),
+                                            icon: Icon(
+                                              _obscureText
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                            ),
                                           ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("PASSWORD_ERROR");
+                                            }
+                                          },
+                                          obscureText: _obscureText,
                                         ),
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return strings
-                                                .get("PASSWORD_ERROR");
-                                          }
-                                        },
-                                        obscureText: _obscureText,
                                       ),
-                                    )
-                                  ],
-                                ),
+                                    ),
+                                  )
+                                ],
                               ),
                             ],
                           ),

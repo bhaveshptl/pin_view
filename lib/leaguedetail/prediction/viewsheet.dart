@@ -179,7 +179,9 @@ class ViewSheetState extends State<ViewSheet> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(sheet.name),
+        title: Text(
+          sheet.name.toUpperCase(),
+        ),
         actions: <Widget>[
           widget.league.status == LeagueStatus.UPCOMING
               ? IconButton(

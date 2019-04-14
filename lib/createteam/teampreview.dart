@@ -11,7 +11,7 @@ class TeamPreview extends StatelessWidget {
   final L1 l1Data;
   final League league;
   final MyTeam myTeam;
-  final bool isCreateTeam;
+  final bool allowEditTeam;
   final FanTeamRule fanTeamRules;
 
   TeamPreview({
@@ -19,7 +19,7 @@ class TeamPreview extends StatelessWidget {
     this.league,
     this.myTeam,
     this.fanTeamRules,
-    this.isCreateTeam = false,
+    this.allowEditTeam = false,
   });
 
   void _onEditTeam(BuildContext context) async {
@@ -49,24 +49,70 @@ class TeamPreview extends StatelessWidget {
         players.add(
           Column(
             children: <Widget>[
-              Container(
-                width: bIsSmallDevice ? 40.0 : 56.0,
-                height: bIsSmallDevice ? 40.0 : 56.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 1.0,
-                      spreadRadius: 1.0,
-                      color: Colors.black38,
-                      offset: Offset(1, 2),
+              Stack(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Container(
+                      width: bIsSmallDevice ? 40.0 : 56.0,
+                      height: bIsSmallDevice ? 40.0 : 56.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 1.0,
+                            spreadRadius: 1.0,
+                            color: Colors.black38,
+                            offset: Offset(1, 2),
+                          ),
+                        ],
+                        color: Colors.grey.shade300,
+                      ),
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            player.jerseyUrl != null ? player.jerseyUrl : "",
+                      ),
                     ),
-                  ],
-                  color: Colors.grey.shade300,
-                ),
-                child: CachedNetworkImage(
-                  imageUrl: player.jerseyUrl != null ? player.jerseyUrl : "",
-                ),
+                  ),
+                  myTeam.captain == player.id
+                      ? Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.orange,
+                          ),
+                          padding: EdgeInsets.all(6.0),
+                          child: Text(
+                            "C",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body2
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        )
+                      : Container(),
+                  myTeam.viceCaptain == player.id
+                      ? Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blueAccent.shade400,
+                          ),
+                          padding: EdgeInsets.all(4.0),
+                          child: Text(
+                            "VC",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body2
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                          ),
+                        )
+                      : Container(),
+                ],
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
@@ -125,7 +171,7 @@ class TeamPreview extends StatelessWidget {
             title:
                 Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
             actions: <Widget>[
-              !isCreateTeam && league.status == LeagueStatus.UPCOMING
+              allowEditTeam && league.status == LeagueStatus.UPCOMING
                   ? IconButton(
                       icon: Icon(Icons.edit),
                       onPressed: () {
@@ -134,10 +180,6 @@ class TeamPreview extends StatelessWidget {
                     )
                   : Container(),
               IconButton(
-                icon: Icon(Icons.share),
-                onPressed: () {},
-              ),
-              IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
                   Navigator.pop(context);
@@ -145,41 +187,85 @@ class TeamPreview extends StatelessWidget {
               )
             ],
           ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: Column(
-                  children: <Widget>[
-                    Row(
+          body: Stack(
+            alignment: Alignment.bottomLeft,
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    child: Column(
                       children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            playingStyle.label.toUpperCase(),
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .body1
-                                .copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                            textAlign: TextAlign.center,
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                playingStyle.label.toUpperCase(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .body1
+                                    .copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: getPlayersForStyle(playingStyle, context),
                           ),
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: getPlayersForStyle(playingStyle, context),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
+              ),
+              league.status == LeagueStatus.COMPLETED
+                  ? Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            height: 56.0,
+                            color: Colors.black45,
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Score",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
+                                Text(
+                                  myTeam.score.toString(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .headline
+                                      .copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  : Container(),
+            ],
           ),
         ),
       ],

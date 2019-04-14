@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/joincontest/joincontest.dart';
@@ -7,6 +8,7 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/profilepages/statedob.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
@@ -22,10 +24,15 @@ class ActionUtil {
     List<MyTeam> myTeams,
     GlobalKey<ScaffoldState> scaffoldKey,
   }) async {
+    showLoader(scaffoldKey.currentContext, true);
+    final balance = await routeLauncher.getUserBalance(
+        leagueId: league.leagueId, contestId: contest.id);
+    showLoader(scaffoldKey.currentContext, false);
     final joinConfirmMsg = await showDialog(
       context: scaffoldKey.currentContext,
       builder: (BuildContext context) {
         return JoinContestConfirmation(
+          userBalance: balance,
           entryFees: contest.entryFee,
           prizeType: contest.prizeType,
           bonusAllowed: contest.bonusAllowed,
@@ -33,6 +40,7 @@ class ActionUtil {
       },
     );
     if (joinConfirmMsg != null && joinConfirmMsg["confirm"]) {
+      showLoader(scaffoldKey.currentContext, true);
       final result = await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => JoinContest(
@@ -66,6 +74,12 @@ class ActionUtil {
             .showSnackBar(SnackBar(content: Text("$result")));
       }
     }
+  }
+
+  showLoader(context, bool bShow) {
+    AppConfig.of(context).store.dispatch(
+          bShow ? LoaderShowAction() : LoaderHideAction(),
+        );
   }
 
   onJoinContestError(

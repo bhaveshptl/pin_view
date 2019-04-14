@@ -189,84 +189,92 @@ class ContestDetailsCard extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Container(
-                                  width: 20.0,
-                                  height: 20.0,
-                                  child: Text(
-                                    "B",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .copyWith(
-                                          color: Colors.blue,
+                          contest.bonusAllowed == 0
+                              ? Container()
+                              : Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Container(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        child: Text(
+                                          "B",
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .caption
+                                              .copyWith(
+                                                color: Colors.blue,
+                                              ),
                                         ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                    border: Border.all(
-                                      color: Colors.blueAccent,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  "Entry with bonus amount",
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .copyWith(
-                                        color: Colors.black38,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Container(
-                                  width: 20.0,
-                                  height: 20.0,
-                                  child: Text(
-                                    "M",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .copyWith(
-                                          color: Colors.green,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
+                                          border: Border.all(
+                                            color: Colors.blueAccent,
+                                          ),
                                         ),
-                                  ),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                    border: Border.all(
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  "Join with multiple teams",
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .copyWith(
-                                        color: Colors.black38,
                                       ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        "Entry with bonus amount",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .caption
+                                            .copyWith(
+                                              color: Colors.black38,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
+                          contest.teamsAllowed == 1
+                              ? Container()
+                              : Row(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Container(
+                                        width: 20.0,
+                                        height: 20.0,
+                                        child: Text(
+                                          "M",
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .caption
+                                              .copyWith(
+                                                color: Colors.green,
+                                              ),
+                                        ),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
+                                          border: Border.all(
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        "Join with multiple teams",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .caption
+                                            .copyWith(
+                                              color: Colors.black38,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ],
                       ),
                       Padding(

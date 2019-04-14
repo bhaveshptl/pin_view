@@ -212,10 +212,10 @@ class Player {
   final int id;
   final String name;
   final int sportsId;
-  final String sportName;
-  final int playingStyleId;
-  final String playingStyleDesc;
+  int playingStyleId;
   final int countryId;
+  final String sportName;
+  String playingStyleDesc;
   final String countryName;
   final dynamic seriesScore;
   final double score;

@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/withdraw.dart';
@@ -25,7 +27,8 @@ class Withdraw extends StatefulWidget {
   WithdrawState createState() => WithdrawState();
 }
 
-class WithdrawState extends State<Withdraw> {
+class WithdrawState extends State<Withdraw>
+    with SingleTickerProviderStateMixin {
   File _panImage;
   File _addressImage;
   List<dynamic> _addressList = [];
@@ -65,6 +68,8 @@ class WithdrawState extends State<Withdraw> {
   TextEditingController accountLastNameController = TextEditingController();
   TextEditingController accountFirstNameController = TextEditingController();
 
+  TabController _tabController;
+
   @override
   void initState() {
     super.initState();
@@ -73,6 +78,10 @@ class WithdrawState extends State<Withdraw> {
 
     _setVerificationStatus(_withdrawData);
     _withdrawModes = widget.data["withdrawModes"];
+    _tabController = TabController(
+      length: _withdrawModes.keys.length,
+      vsync: this,
+    );
     initFormInputs();
   }
 
@@ -216,21 +225,20 @@ class WithdrawState extends State<Withdraw> {
                 ? Column(
                     children: <Widget>[
                       ListTile(
-                        leading: TextFormField(
+                        leading: SimpleTextBox(
                           controller: mobileController,
                           keyboardType: TextInputType.phone,
-                          decoration: InputDecoration(
-                              labelText: "Enter mobile number",
-                              hintText: "9999999999",
-                              prefix: Padding(
-                                padding: const EdgeInsets.only(right: 4.0),
-                                child: Text("+91"),
-                              )),
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(
+                              10,
+                            )
+                          ],
+                          labelText: "Enter mobile number",
                         ),
                       ),
                       _bIsOTPSent
                           ? ListTile(
-                              leading: TextFormField(
+                              leading: SimpleTextBox(
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Please enter OTP.';
@@ -238,9 +246,7 @@ class WithdrawState extends State<Withdraw> {
                                 },
                                 controller: otpController,
                                 keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: "Enter OTP",
-                                ),
+                                labelText: "Enter OTP",
                               ),
                             )
                           : Container(),
@@ -907,27 +913,10 @@ class WithdrawState extends State<Withdraw> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                  child: TextFormField(
+                                  child: SimpleTextBox(
                                     controller: paytmAmountController,
-                                    decoration: InputDecoration(
-                                      labelText: "Amount",
-                                      prefix: Text(
-                                        strings.rupee,
-                                        style: TextStyle(color: Colors.black87),
-                                      ),
-                                      hintText: _withdrawData.paytmMinWithdraw
-                                          .toString(),
-                                      contentPadding: EdgeInsets.all(8.0),
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Colors.black38,
-                                        ),
-                                      ),
-                                    ),
+                                    labelText: "Amount",
                                     keyboardType: TextInputType.number,
-                                    style: TextStyle(
-                                      color: Colors.black87,
-                                    ),
                                     validator: (value) {
                                       if (value.isEmpty) {
                                         return "Please enter amount to withdraw";
@@ -965,25 +954,13 @@ class WithdrawState extends State<Withdraw> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(right: 4.0),
-                                      child: TextFormField(
+                                      child: SimpleTextBox(
                                         controller: firstNameController,
                                         enabled:
                                             _withdrawData.loginName == null ||
                                                 _withdrawData.loginName == "",
-                                        decoration: InputDecoration(
-                                          labelText: "First name",
-                                          contentPadding: EdgeInsets.all(8.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black38,
-                                            ),
-                                          ),
-                                          errorMaxLines: 2,
-                                        ),
+                                        labelText: "First name",
                                         keyboardType: TextInputType.text,
-                                        style: TextStyle(
-                                          color: Colors.black45,
-                                        ),
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return "Account name is required for paytm withdraw.";
@@ -995,25 +972,13 @@ class WithdrawState extends State<Withdraw> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(left: 4.0),
-                                      child: TextFormField(
+                                      child: SimpleTextBox(
                                         controller: lastNameController,
                                         enabled:
                                             _withdrawData.loginName == null ||
                                                 _withdrawData.loginName == "",
-                                        decoration: InputDecoration(
-                                          labelText: "Last name",
-                                          contentPadding: EdgeInsets.all(8.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black38,
-                                            ),
-                                          ),
-                                          errorMaxLines: 2,
-                                        ),
+                                        labelText: "Last name",
                                         keyboardType: TextInputType.text,
-                                        style: TextStyle(
-                                          color: Colors.black45,
-                                        ),
                                       ),
                                     ),
                                   ),
@@ -1198,28 +1163,10 @@ class WithdrawState extends State<Withdraw> {
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
-                                      child: TextFormField(
+                                      child: SimpleTextBox(
                                         controller: amountController,
-                                        decoration: InputDecoration(
-                                          labelText: "Amount",
-                                          prefix: Text(
-                                            strings.rupee,
-                                            style: TextStyle(
-                                                color: Colors.black87),
-                                          ),
-                                          hintText: _withdrawData.minWithdraw
-                                              .toString(),
-                                          contentPadding: EdgeInsets.all(8.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black38,
-                                            ),
-                                          ),
-                                        ),
+                                        labelText: "Amount",
                                         keyboardType: TextInputType.number,
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                        ),
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return "Please enter amount to withdraw";
@@ -1260,26 +1207,14 @@ class WithdrawState extends State<Withdraw> {
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsets.only(right: 4.0),
-                                        child: TextFormField(
+                                        child: SimpleTextBox(
                                           controller:
                                               accountFirstNameController,
                                           enabled: _withdrawData.firstName ==
                                                   null ||
                                               _withdrawData.firstName.isEmpty,
-                                          decoration: InputDecoration(
-                                            labelText: "First name",
-                                            contentPadding: EdgeInsets.all(8.0),
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Colors.black38,
-                                              ),
-                                            ),
-                                            errorMaxLines: 2,
-                                          ),
+                                          labelText: "First name",
                                           keyboardType: TextInputType.text,
-                                          style: TextStyle(
-                                            color: Colors.black45,
-                                          ),
                                           validator: (value) {
                                             if (value.isEmpty) {
                                               return "Account name is required for bank withdraw.";
@@ -1291,25 +1226,13 @@ class WithdrawState extends State<Withdraw> {
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsets.only(left: 4.0),
-                                        child: TextFormField(
+                                        child: SimpleTextBox(
                                           controller: accountLastNameController,
                                           enabled: _withdrawData.firstName ==
                                                   null ||
                                               _withdrawData.firstName.isEmpty,
-                                          decoration: InputDecoration(
-                                            labelText: "Last name",
-                                            contentPadding: EdgeInsets.all(8.0),
-                                            border: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                color: Colors.black38,
-                                              ),
-                                            ),
-                                            errorMaxLines: 2,
-                                          ),
+                                          labelText: "Last name",
                                           keyboardType: TextInputType.text,
-                                          style: TextStyle(
-                                            color: Colors.black45,
-                                          ),
                                         ),
                                       ),
                                     ),
@@ -1321,23 +1244,12 @@ class WithdrawState extends State<Withdraw> {
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
-                                      child: TextFormField(
+                                      child: SimpleTextBox(
                                         controller: accountNumberController,
                                         enabled:
                                             _withdrawData.accountNumber == null,
-                                        decoration: InputDecoration(
-                                          labelText: "Account number",
-                                          contentPadding: EdgeInsets.all(8.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black38,
-                                            ),
-                                          ),
-                                        ),
+                                        labelText: "Account number",
                                         keyboardType: TextInputType.number,
-                                        style: TextStyle(
-                                          color: Colors.black45,
-                                        ),
                                       ),
                                     ),
                                   ],
@@ -1348,22 +1260,11 @@ class WithdrawState extends State<Withdraw> {
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
-                                      child: TextFormField(
+                                      child: SimpleTextBox(
                                         controller: acIFSCCodeController,
                                         enabled: _withdrawData.ifscCode == null,
-                                        decoration: InputDecoration(
-                                          labelText: "IFSC code",
-                                          contentPadding: EdgeInsets.all(8.0),
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Colors.black38,
-                                            ),
-                                          ),
-                                        ),
+                                        labelText: "IFSC code",
                                         keyboardType: TextInputType.text,
-                                        style: TextStyle(
-                                          color: Colors.black45,
-                                        ),
                                         validator: (value) {
                                           if (RegExp(r'^[A-Za-z]{4}0[A-Z0-9a-z]{6}$')
                                                   .allMatches(value)
@@ -1461,7 +1362,9 @@ class WithdrawState extends State<Withdraw> {
       key: _scaffoldKey,
       appBar: AppBar(
         elevation: 0.0,
-        title: Text("Withdraw"),
+        title: Text(
+          "Withdraw".toUpperCase(),
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -1473,37 +1376,29 @@ class WithdrawState extends State<Withdraw> {
             },
           )
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          indicatorWeight: 4.0,
+          tabs: _withdrawModes.keys.map((k) {
+            return Tab(
+              child: Text(k.toUpperCase()),
+            );
+          }).toList(),
+        ),
       ),
-      body: _withdrawModes != null && _withdrawModes.keys.length > 1
-          ? DefaultTabController(
-              length: _withdrawModes.keys.length,
-              child: Column(
-                children: <Widget>[
-                  Material(
-                    color: Theme.of(context).primaryColor,
-                    child: TabBar(
-                      indicatorColor: Colors.white,
-                      indicatorWeight: 4.0,
-                      tabs: _withdrawModes.keys.map((k) {
-                        return Tab(
-                          child: Text(k.toUpperCase()),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  Expanded(
-                    child: TabBarView(
-                      children: _withdrawModes.keys.map((k) {
-                        return getTabByWithdrawMode(context, k);
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : (_withdrawModes != null
-              ? getTabByWithdrawMode(context, _withdrawModes.keys.elementAt(0))
-              : Container()),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: _withdrawModes.keys.map((k) {
+                return getTabByWithdrawMode(context, k);
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

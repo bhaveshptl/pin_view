@@ -11,7 +11,9 @@ class JoinContestConfirmation extends StatefulWidget {
   final int prizeType;
   final int entryFees;
   final int bonusAllowed;
-  JoinContestConfirmation({this.prizeType, this.entryFees, this.bonusAllowed});
+  final Map<String, dynamic> userBalance;
+  JoinContestConfirmation(
+      {this.prizeType, this.entryFees, this.bonusAllowed, this.userBalance});
 
   @override
   JoinContestConfirmationState createState() => JoinContestConfirmationState();
@@ -43,7 +45,9 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
               url: url,
               clearCache: true,
               appBar: AppBar(
-                title: Text(title),
+                title: Text(
+                  title.toUpperCase(),
+                ),
               ),
             ),
         fullscreenDialog: true,
@@ -109,7 +113,9 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                             )
                           : Container(),
                       Text(
-                        formatCurrency.format(0),
+                        formatCurrency.format(widget.userBalance == null
+                            ? 0
+                            : widget.userBalance["cashBalance"]),
                         textAlign: TextAlign.right,
                         style:
                             Theme.of(context).primaryTextTheme.body2.copyWith(

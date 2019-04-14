@@ -42,330 +42,162 @@ class LiveContest extends StatelessWidget {
       decimalDigits: 0,
     );
 
+    TextStyle bodyStyle = TextStyle(
+      color: Theme.of(context).primaryColorDark,
+      fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
+      fontWeight: FontWeight.w700,
+    );
+
     return Column(
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: Column(
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Prize Pool",
+                          style: TextStyle(color: Colors.black38),
+                        ),
+                        Row(
                           children: <Widget>[
                             contest.prizeType == 1
-                                ? Image.asset(
-                                    strings.chips,
-                                    width: 12.0,
-                                    height: 12.0,
-                                    fit: BoxFit.contain,
+                                ? Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.0),
+                                    child: Image.asset(
+                                      strings.chips,
+                                      width: 10.0,
+                                      height: 10.0,
+                                      fit: BoxFit.contain,
+                                    ),
                                   )
-                                : Text(
-                                    strings.rupee,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color:
-                                            Theme.of(context).primaryColorDark,
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .headline
-                                            .fontSize),
-                                  ),
+                                : Container(),
                             Text(
                               formatCurrency.format(
                                   contest.prizeDetails[0]["totalPrizeAmount"]),
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColorDark,
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .headline
-                                      .fontSize),
+                              style: bodyStyle,
                             ),
                           ],
                         ),
-                      ),
-                      Container(
-                        height: 20.0,
-                        width: 1.0,
-                        color: Colors.black12,
-                      ),
-                      Expanded(
-                        child: Tooltip(
-                          message: strings.get("NO_OF_WINNERS"),
-                          child: FlatButton(
-                            padding: EdgeInsets.all(0.0),
-                            onPressed: () {
-                              if (onPrizeStructure != null) {
-                                onPrizeStructure(contest);
-                              }
-                            },
-                            child: Column(
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 16.0),
-                                      child: Text(
-                                        strings.get("WINNERS").toUpperCase(),
-                                        style: TextStyle(
-                                          color: Colors.black45,
-                                          fontSize: Theme.of(context)
-                                              .primaryTextTheme
-                                              .caption
-                                              .fontSize,
-                                        ),
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.chevron_right,
-                                      size: 16.0,
-                                      color: Colors.black26,
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(contest.prizeDetails[0]["noOfPrizes"]
-                                        .toString())
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 20.0,
-                        width: 1.0,
-                        color: Colors.black12,
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  strings.get("ENTRY_FEE"),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black45,
-                                    fontSize: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .fontSize,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                contest.prizeType == 1
-                                    ? Image.asset(
-                                        strings.chips,
-                                        width: 12.0,
-                                        height: 12.0,
-                                        fit: BoxFit.contain,
-                                      )
-                                    : Text(
-                                        strings.rupee,
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .primaryColorDark,
-                                            fontSize: Theme.of(context)
-                                                .primaryTextTheme
-                                                .title
-                                                .fontSize),
-                                      ),
-                                Text(
-                                  contest.entryFee.toString(),
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColorDark,
-                                      fontSize: Theme.of(context)
-                                          .primaryTextTheme
-                                          .title
-                                          .fontSize),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Divider(
-                    height: 2.0,
-                    color: Colors.black12,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                    child: Row(
+                  Expanded(
+                    child: Column(
                       children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    strings.get("JOINED"),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black45,
-                                      fontSize: Theme.of(context)
-                                          .primaryTextTheme
-                                          .caption
-                                          .fontSize,
+                        Text(
+                          "Winners",
+                          style: TextStyle(color: Colors.black38),
+                        ),
+                        Text(
+                          contest.prizeDetails[0]["noOfPrizes"].toString(),
+                          style: bodyStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          "Entry",
+                          style: TextStyle(color: Colors.black38),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            contest.prizeType == 1
+                                ? Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.0),
+                                    child: Image.asset(
+                                      strings.chips,
+                                      width: 10.0,
+                                      height: 10.0,
+                                      fit: BoxFit.contain,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    contest.joined.toString(),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 20.0,
-                          width: 1.0,
-                          color: Colors.black12,
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    strings.get("BEST_TEAM"),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black45,
-                                      fontSize: Theme.of(context)
-                                          .primaryTextTheme
-                                          .caption
-                                          .fontSize,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    _myBestTeam.name == null
-                                        ? "-"
-                                        : _myBestTeam.name,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 20.0,
-                          width: 1.0,
-                          color: Colors.black12,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    strings.get("RANK"),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black45,
-                                      fontSize: Theme.of(context)
-                                          .primaryTextTheme
-                                          .caption
-                                          .fontSize,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    _myBestTeam.rank == null
-                                        ? "-"
-                                        : _myBestTeam.rank.toString(),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          height: 20.0,
-                          width: 1.0,
-                          color: Colors.black12,
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    strings.get("SCORE"),
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black45,
-                                      fontSize: Theme.of(context)
-                                          .primaryTextTheme
-                                          .caption
-                                          .fontSize,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    _myBestTeam.score == null
-                                        ? "-"
-                                        : _myBestTeam.score.toString(),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                  )
+                                : Container(),
+                            Text(
+                              formatCurrency.format(contest.entryFee),
+                              style: bodyStyle,
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        )
+              Divider(
+                color: Colors.grey.shade300,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Team",
+                          style: TextStyle(color: Colors.black38),
+                        ),
+                        Text(
+                          _myBestTeam == null ? "-" : _myBestTeam.name,
+                          textAlign: TextAlign.center,
+                          style: bodyStyle,
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          "Points",
+                          style: TextStyle(color: Colors.black38),
+                        ),
+                        Text(
+                          _myBestTeam == null
+                              ? "-"
+                              : _myBestTeam.score.toString(),
+                          style: bodyStyle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          "Rank",
+                          style: TextStyle(color: Colors.black38),
+                        ),
+                        Text(
+                          _myBestTeam == null
+                              ? "-"
+                              : _myBestTeam.rank.toString(),
+                          style: bodyStyle,
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

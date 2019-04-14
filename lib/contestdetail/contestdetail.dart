@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
-import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -14,6 +13,7 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/profilepages/statedob.dart';
 import 'package:playfantasy/createteam/createteam.dart';
+import 'package:playfantasy/createteam/teampreview.dart';
 import 'package:playfantasy/contestdetail/viewteam.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
@@ -74,6 +74,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   StreamSubscription _streamSubscription;
 
   Duration pollTime;
+  List<int> myTeamsId = [];
 
   @override
   initState() {
@@ -87,6 +88,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     }
     _mapContestTeams =
         widget.mapContestTeams == null ? [] : widget.mapContestTeams;
+    _mapContestTeams.forEach((MyTeam team) {
+      myTeamsId.add(team.id);
+    });
 
     initAllTeams();
     _getInitData();
@@ -182,10 +186,13 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           _mapContestMyTeams[int.parse(key)] = _myTeams;
         });
 
+        _mapContestTeams = _mapContestMyTeams[widget.contest.id] == null
+            ? []
+            : _mapContestMyTeams[widget.contest.id];
         setState(() {
-          _mapContestTeams = _mapContestMyTeams[widget.contest.id] == null
-              ? []
-              : _mapContestMyTeams[widget.contest.id];
+          _mapContestTeams.forEach((MyTeam team) {
+            myTeamsId.add(team.id);
+          });
         });
       }
     });
@@ -708,7 +715,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("CONTEST_DETAILS"),
+          strings.get("CONTEST_DETAILS").toUpperCase(),
         ),
         elevation: 0.0,
       ),
@@ -818,27 +825,37 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                   MyTeam team = !bIsMyTeam
                       ? _allTeams[index - myTeamsCount]
                       : _mapContestTeams[index];
+                  if (!bIsMyTeam && myTeamsId.indexOf(team.id) != -1) {
+                    return Container();
+                  }
                   return FlatButton(
                     padding: EdgeInsets.all(0.0),
                     onPressed: () async {
                       MyTeam myTeam;
+                      myTeam = await routeLauncher.getTeamPlayers(
+                          contestId: widget.contest.id, teamId: team.id);
                       if (bIsMyTeam) {
                         _myTeams.forEach((curTeam) {
                           if (team.id == curTeam.id) {
-                            myTeam = curTeam;
+                            myTeam.players.forEach((Player player) {
+                              curTeam.players.forEach((Player curPlayer) {
+                                curPlayer.playingStyleId =
+                                    player.playingStyleId;
+                                curPlayer.playingStyleDesc =
+                                    player.playingStyleDesc;
+                              });
+                            });
                           }
                         });
-                      } else {
-                        myTeam = await routeLauncher.getTeamPlayers(
-                            contestId: widget.contest.id, teamId: team.id);
                       }
+
                       Navigator.of(context).push(
                         FantasyPageRoute(
                           pageBuilder: (BuildContext context) => TeamPreview(
                                 myTeam: myTeam,
                                 league: widget.league,
                                 l1Data: widget.l1Data,
-                                isCreateTeam: !bIsMyTeam,
+                                allowEditTeam: bIsMyTeam,
                                 fanTeamRules: widget.l1Data.league.fanTeamRules,
                               ),
                         ),
@@ -999,7 +1016,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                     ),
                   );
                 },
-                itemCount: _allTeams.length,
+                itemCount: _allTeams.length + _mapContestTeams.length,
               ),
             ),
           ],

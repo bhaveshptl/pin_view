@@ -843,7 +843,7 @@ class CreateTeamState extends State<CreateTeam>
                                                 : "",
                                             fit: BoxFit.fitHeight,
                                             placeholder: Container(
-                                              padding: EdgeInsets.all(4.0),
+                                              padding: EdgeInsets.all(12.0),
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2.0,
                                               ),
@@ -946,7 +946,7 @@ class CreateTeamState extends State<CreateTeam>
                                                 : "",
                                             fit: BoxFit.fitHeight,
                                             placeholder: Container(
-                                              padding: EdgeInsets.all(4.0),
+                                              padding: EdgeInsets.all(12.0),
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2.0,
                                               ),
@@ -1113,7 +1113,7 @@ class CreateTeamState extends State<CreateTeam>
                             FantasyPageRoute(
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
-                                    isCreateTeam: true,
+                                    allowEditTeam: false,
                                     fanTeamRules: _fanTeamRules,
                                     myTeam: MyTeam(
                                       players: _selectedPlayers,

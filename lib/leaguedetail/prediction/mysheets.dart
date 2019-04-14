@@ -339,7 +339,9 @@ class MySheetsState extends State<MySheets> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Sheets"),
+        title: Text(
+          "My Sheets".toUpperCase(),
+        ),
       ),
       body: Container(
         decoration: AppConfig.of(context).showBackground

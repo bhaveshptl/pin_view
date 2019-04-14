@@ -703,7 +703,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
           key: _scaffoldKey,
           appBar: AppBar(
             title: Text(
-              strings.get("CONTEST_DETAILS"),
+              strings.get("CONTEST_DETAILS").toUpperCase(),
             ),
           ),
           body: Container(
