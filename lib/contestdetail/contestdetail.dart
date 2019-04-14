@@ -151,7 +151,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         () async {
           await _getContestMyTeams();
           final teams = await _getContestTeams(0, curPage * rowsPerPage);
-          if(teams!= null && teams.length !=){
+          if (teams != null && teams.length != 0) {
             setState(() {
               _allTeams = teams;
             });
