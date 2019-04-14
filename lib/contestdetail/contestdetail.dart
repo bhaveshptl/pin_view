@@ -146,6 +146,12 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         pollTime,
         () async {
           await _getContestMyTeams();
+          final teams = await _getContestTeams(0, curPage * rowsPerPage);
+          if(teams!= null && teams.length !=){
+            setState(() {
+              _allTeams = teams;
+            });
+          }
           _startPolling();
         },
       );
