@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/commonwidgets/epoc.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class ChooseCaptain extends StatefulWidget {
+  final L1 l1Data;
   final League league;
   final Player captain;
   final Function onSave;
@@ -18,6 +22,7 @@ class ChooseCaptain extends StatefulWidget {
   final Map<int, String> mapSportLabel;
 
   ChooseCaptain({
+    this.l1Data,
     this.league,
     this.onSave,
     this.captain,
@@ -426,7 +431,25 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                 fontWeight: FontWeight.w900,
                               ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            FantasyPageRoute(
+                              pageBuilder: (BuildContext context) =>
+                                  TeamPreview(
+                                    league: widget.league,
+                                    l1Data: widget.l1Data,
+                                    allowEditTeam: false,
+                                    fanTeamRules:
+                                        widget.l1Data.league.fanTeamRules,
+                                    myTeam: MyTeam(
+                                      captain: _captain.id,
+                                      viceCaptain: _vCaptain.id,
+                                      players: widget.selectedPlayers,
+                                    ),
+                                  ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class InitPay extends StatefulWidget {
@@ -30,7 +31,8 @@ class InitPayState extends State<InitPay> {
     flutterWebviewPlugin.onStateChanged.listen(
       (WebViewStateChanged state) {
         Uri uri = Uri.dataFromString(state.url);
-        if (uri.path.indexOf(BaseUrl().apiUrl + ApiUtil.PAYMENT_SUCCESS) != -1 &&
+        if (uri.path.indexOf(BaseUrl().apiUrl + ApiUtil.PAYMENT_SUCCESS) !=
+                -1 &&
             uri.hasQuery) {
           if (depositResponse == null) {
             depositResponse = uri.queryParameters;
@@ -41,6 +43,7 @@ class InitPayState extends State<InitPay> {
       },
     );
 
+    cookie = HttpManager.cookie;
     if (cookie == null || cookie == "") {
       Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
       await futureCookie.then((value) {

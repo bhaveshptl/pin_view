@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -270,6 +271,22 @@ class JoinedContestsState extends State<JoinedContests>
     );
   }
 
+  _onPredictionClick(Contest contest, League league) {
+    Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (context) => PredictionContestDetail(
+              contest: contest,
+              league: league,
+              predictionData: _predictionData,
+              mySheets: _mySheets,
+              mapContestSheets: _mapContestSheets != null
+                  ? _mapContestSheets[contest.id]
+                  : null,
+            ),
+      ),
+    );
+  }
+
   getTabTitle() {
     List<Widget> tabs = [];
     if (_myContests == null) {
@@ -348,13 +365,13 @@ class JoinedContestsState extends State<JoinedContests>
         Container(
           padding: const EdgeInsets.only(top: 8.0),
           child: ListView.builder(
-            itemCount: _myContests.normal.length,
+            itemCount: _myContests.prediction.length,
             padding: EdgeInsets.only(bottom: 16.0),
             itemBuilder: (context, index) {
-              Contest contest = _myContests.normal[index];
+              Contest contest = _myContests.prediction[index];
               bool bShowBrandInfo = index > 0
                   ? !(contest.brand["info"] ==
-                      _myContests.normal[index].brand["info"])
+                      _myContests.prediction[index].brand["info"])
                   : true;
 
               return Padding(
@@ -367,7 +384,7 @@ class JoinedContestsState extends State<JoinedContests>
                   predictionData: _predictionData,
                   onJoin: (Contest curContest) {},
                   contest: contest,
-                  onClick: _onContestClick,
+                  onClick: _onPredictionClick,
                   bShowBrandInfo: bShowBrandInfo,
                   onPrizeStructure: _showPrizeStructure,
                   myJoinedSheets: _mapContestSheets != null

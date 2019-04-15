@@ -153,7 +153,9 @@ class LiveContest extends StatelessWidget {
                           style: TextStyle(color: Colors.black38),
                         ),
                         Text(
-                          _myBestTeam == null ? "-" : _myBestTeam.name,
+                          (_myBestTeam == null || _myBestTeam.name == null)
+                              ? "-"
+                              : _myBestTeam.name,
                           textAlign: TextAlign.center,
                           style: bodyStyle,
                         )
@@ -168,7 +170,7 @@ class LiveContest extends StatelessWidget {
                           style: TextStyle(color: Colors.black38),
                         ),
                         Text(
-                          _myBestTeam == null
+                          (_myBestTeam == null || _myBestTeam.name == null)
                               ? "-"
                               : _myBestTeam.score.toString(),
                           style: bodyStyle,

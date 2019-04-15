@@ -465,10 +465,14 @@ class CreateTeamState extends State<CreateTeam>
   /// and vice captain selection.
   ///
   void _showChooseCaptain() {
+    _selectedPlayers.sort((a, b) {
+      return a.playingStyleId - b.playingStyleId;
+    });
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ChooseCaptain(
               captain: _captain,
+              l1Data: widget.l1Data,
               league: widget.league,
               viceCaptain: _vCaptain,
               onSave: _onSaveCaptains,
@@ -1113,9 +1117,13 @@ class CreateTeamState extends State<CreateTeam>
                             FantasyPageRoute(
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
+                                    league: widget.league,
+                                    l1Data: widget.l1Data,
                                     allowEditTeam: false,
                                     fanTeamRules: _fanTeamRules,
                                     myTeam: MyTeam(
+                                      // captain: _captain.id,
+                                      // viceCaptain: _vCaptain.id,
                                       players: _selectedPlayers,
                                     ),
                                   ),
