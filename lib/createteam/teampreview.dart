@@ -157,7 +157,7 @@ class TeamPreview extends StatelessWidget {
             Expanded(
               child: Image.asset(
                 "images/ground-image.png",
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
               ),
             ),
           ],

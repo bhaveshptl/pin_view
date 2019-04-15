@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
@@ -178,6 +179,7 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
                                     .myContestIds[league.leagueId.toString()]
                                     .length,
                         onClick: (League league) {
+                          ActionUtil().showLoader(context, true);
                           Navigator.of(context).push(
                             FantasyPageRoute(
                               pageBuilder: (BuildContext context) =>

@@ -260,9 +260,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   }
 
   showLoader(bool bShow) {
-    AppConfig.of(context)
-        .store
-        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
+    AppConfig.of(context).store.dispatch(
+          bShow ? LoaderShowAction() : LoaderHideAction(),
+        );
   }
 
   _updateContestTeams(Map<String, dynamic> _data) {
@@ -836,37 +836,46 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                   }
                   return FlatButton(
                     padding: EdgeInsets.all(0.0),
-                    onPressed: () async {
-                      MyTeam myTeam;
-                      myTeam = await routeLauncher.getTeamPlayers(
-                          contestId: widget.contest.id, teamId: team.id);
-                      if (bIsMyTeam) {
-                        _myTeams.forEach((curTeam) {
-                          if (team.id == curTeam.id) {
-                            myTeam.players.forEach((Player player) {
-                              curTeam.players.forEach((Player curPlayer) {
-                                curPlayer.playingStyleId =
-                                    player.playingStyleId;
-                                curPlayer.playingStyleDesc =
-                                    player.playingStyleDesc;
+                    onPressed: ((widget.league.status ==
+                                    LeagueStatus.UPCOMING &&
+                                bIsMyTeam) ||
+                            (widget.league.status == LeagueStatus.LIVE ||
+                                widget.league.status == LeagueStatus.COMPLETED))
+                        ? () async {
+                            MyTeam myTeam;
+                            showLoader(true);
+                            myTeam = await routeLauncher.getTeamPlayers(
+                                contestId: widget.contest.id, teamId: team.id);
+                            if (bIsMyTeam) {
+                              _myTeams.forEach((curTeam) {
+                                if (team.id == curTeam.id) {
+                                  myTeam.players.forEach((Player player) {
+                                    curTeam.players.forEach((Player curPlayer) {
+                                      curPlayer.playingStyleId =
+                                          player.playingStyleId;
+                                      curPlayer.playingStyleDesc =
+                                          player.playingStyleDesc;
+                                    });
+                                  });
+                                }
                               });
-                            });
-                          }
-                        });
-                      }
-
-                      Navigator.of(context).push(
-                        FantasyPageRoute(
-                          pageBuilder: (BuildContext context) => TeamPreview(
-                                myTeam: myTeam,
-                                league: widget.league,
-                                l1Data: widget.l1Data,
-                                allowEditTeam: bIsMyTeam,
-                                fanTeamRules: widget.l1Data.league.fanTeamRules,
+                            }
+                            showLoader(false);
+                            Navigator.of(context).push(
+                              FantasyPageRoute(
+                                pageBuilder: (BuildContext context) =>
+                                    TeamPreview(
+                                      myTeam: myTeam,
+                                      league: widget.league,
+                                      l1Data: widget.l1Data,
+                                      allowEditTeam: bIsMyTeam,
+                                      fanTeamRules:
+                                          widget.l1Data.league.fanTeamRules,
+                                    ),
                               ),
-                        ),
-                      );
-                    },
+                            );
+                          }
+                        : null,
                     child: Container(
                       color: bIsMyTeam ? Colors.orange.shade50 : Colors.white,
                       child: Container(
