@@ -382,7 +382,15 @@ class JoinedContestsState extends State<JoinedContests>
                   ),
                   league: widget.league,
                   predictionData: _predictionData,
-                  onJoin: (Contest curContest) {},
+                  onJoin: (Contest curContest) {
+                    ActionUtil().launchJoinPrediction(
+                      contest: contest,
+                      mySheets: _mySheets,
+                      league: widget.league,
+                      scaffoldKey: scaffoldKey,
+                      predictionData: _predictionData,
+                    );
+                  },
                   contest: contest,
                   onClick: _onPredictionClick,
                   bShowBrandInfo: bShowBrandInfo,

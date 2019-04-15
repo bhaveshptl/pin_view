@@ -209,19 +209,19 @@ class Team {
 }
 
 class Player {
+  int teamId;
   final int id;
+  int sportsId;
+  double score;
+  double credit;
+  int countryId;
+  String jerseyUrl;
   final String name;
-  final int sportsId;
   int playingStyleId;
-  final int countryId;
+  dynamic seriesScore;
   final String sportName;
   String playingStyleDesc;
   final String countryName;
-  final dynamic seriesScore;
-  final double score;
-  final double credit;
-  String jerseyUrl;
-  int teamId;
   Player({
     this.id,
     this.name,

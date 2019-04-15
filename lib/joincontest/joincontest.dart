@@ -45,7 +45,6 @@ class JoinContest extends StatefulWidget {
 
 class JoinContestState extends State<JoinContest> {
   MyTeam _teamToJoin;
-  String cookie = "";
   List<MyTeam> _myTeams;
   List<MyTeam> _myUniqueTeams = [];
   List<dynamic> contestMyTeams = [];

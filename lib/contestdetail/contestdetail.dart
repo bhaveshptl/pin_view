@@ -851,10 +851,17 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                 if (team.id == curTeam.id) {
                                   myTeam.players.forEach((Player player) {
                                     curTeam.players.forEach((Player curPlayer) {
-                                      curPlayer.playingStyleId =
-                                          player.playingStyleId;
-                                      curPlayer.playingStyleDesc =
-                                          player.playingStyleDesc;
+                                      if (player.id == curPlayer.id) {
+                                        player.playingStyleId =
+                                            curPlayer.playingStyleId;
+                                        // player.teamId = curPlayer.teamId;
+                                        // player.playingStyleDesc =
+                                        //     curPlayer.playingStyleDesc;
+                                        // player.credit = curPlayer.credit;
+                                        // player.sportsId = curPlayer.sportsId;
+                                        // player.countryId = curPlayer.countryId;
+                                        // player.seriesScore = curPlayer.seriesScore;
+                                      }
                                     });
                                   });
                                 }

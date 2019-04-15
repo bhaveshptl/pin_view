@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -20,6 +20,7 @@ import 'package:playfantasy/prizestructure/prizestructure.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/joinpredictioncontest.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestcard.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
 
 class PredictionView extends StatefulWidget {
@@ -91,70 +92,13 @@ class PredictionViewState extends State<PredictionView> {
       return null;
     }
     bShowJoinContest = false;
-    if (widget.mySheets.length > 0) {
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinPredictionContest(
-            contest: contest,
-            mySheets: widget.mySheets,
-            onCreateSheet: _onCreateSheet,
-            onError: onJoinContestError,
-            prediction: widget.prediction,
-          );
-        },
-      );
-
-      if (result != null) {
-        final response = json.decode(result);
-        final int contestId = response["contestId"];
-        if (!response["error"]) {
-          MySheet sheet = getSheetById(response["answerSheetId"]);
-          if (sheet != null) {
-            if (widget.mapContestSheets[contestId] == null) {
-              widget.mapContestSheets[contestId] = [];
-            }
-            setState(() {
-              widget.mapContestSheets[contestId].add(sheet);
-            });
-          }
-        }
-        widget.scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text(response["message"])));
-      }
-    } else {
-      if (AppConfig.of(context).channelId == "10") {
-        _onCreateSheet(context, contest);
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(strings.get("ALERT").toUpperCase()),
-              content: Text(
-                "No sheet created for this match. Please create one to join contest.",
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    strings.get("CANCEL").toUpperCase(),
-                  ),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    _onCreateSheet(context, contest);
-                  },
-                  child: Text(strings.get("CREATE").toUpperCase()),
-                )
-              ],
-            );
-          },
-        );
-      }
-    }
+    ActionUtil().launchJoinPrediction(
+      contest: contest,
+      league: widget.league,
+      mySheets: widget.mySheets,
+      scaffoldKey: widget.scaffoldKey,
+      predictionData: widget.prediction,
+    );
   }
 
   onJoinContestError(

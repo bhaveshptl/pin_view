@@ -157,16 +157,19 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
     List<League> _liveLeagues = [];
     List<League> _completedLeagues = [];
     for (League league in leagues) {
-      switch (league.status) {
-        case LeagueStatus.UPCOMING:
-          _upcomingLeagues.add(league);
-          break;
-        case LeagueStatus.LIVE:
+      if (league.status == LeagueStatus.UPCOMING) {
+        if (DateTime.fromMillisecondsSinceEpoch(league.matchStartTime)
+                .difference(DateTime.now())
+                .inMilliseconds <=
+            0) {
           _liveLeagues.add(league);
-          break;
-        case LeagueStatus.COMPLETED:
-          _completedLeagues.add(league);
-          break;
+        } else {
+          _upcomingLeagues.add(league);
+        }
+      } else if (league.status == LeagueStatus.LIVE) {
+        _liveLeagues.add(league);
+      } else if (league.status == LeagueStatus.COMPLETED) {
+        _completedLeagues.add(league);
       }
     }
     _liveLeagues.sort((a, b) {
@@ -239,13 +242,15 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
               children: <Widget>[
                 Expanded(
                   child: StatusTab(
-                    allLeagues: _allLeagues,
-                    sportType: widget.sportType,
-                    statusLeagues: upcomingLeagues,
-                    onSportChange: widget.onSportChange,
-                    leagueStatus: LeagueStatus.UPCOMING,
-                    mapSportTypes: widget.mapSportTypes,
-                  ),
+                      allLeagues: _allLeagues,
+                      sportType: widget.sportType,
+                      statusLeagues: upcomingLeagues,
+                      onSportChange: widget.onSportChange,
+                      leagueStatus: LeagueStatus.UPCOMING,
+                      mapSportTypes: widget.mapSportTypes,
+                      onLeagueStatusChanged: () {
+                        _seperateLeaguesByRunningStatus(_allLeagues);
+                      }),
                 ),
               ],
             ),

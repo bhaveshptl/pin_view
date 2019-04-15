@@ -2,20 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
-import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-import 'package:playfantasy/createteam/sports.dart';
-import 'package:playfantasy/createteam/teampreview.dart';
 
 import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/createteam/createteam.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/createteam/teampreview.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class MyTeams extends StatefulWidget {
@@ -123,148 +121,6 @@ class MyTeamsState extends State<MyTeams> {
       }
     }
     return null;
-  }
-
-  _getPlayerStyle(Player player) {
-    PlayingStyle _style;
-    widget.l1Data.league.fanTeamRules.styles.forEach((PlayingStyle style) {
-      if (player.playingStyleId == style.id ||
-          player.playingStyleDesc.toLowerCase().replaceAll(" ", "") ==
-              style.label.toLowerCase().replaceAll(" ", "")) {
-        _style = style;
-      }
-    });
-    return _style;
-  }
-
-  Widget _getExpansionBody(MyTeam myTeam) {
-    List<ListTile> items = [];
-    Player captain = getPlayer(myTeam.captain, myTeam);
-    Player vCaptain = getPlayer(myTeam.viceCaptain, myTeam);
-
-    for (Player player in myTeam.players) {
-      final style = _getPlayerStyle(player);
-      items.add(
-        ListTile(
-          leading: Container(
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: player.jerseyUrl == null
-                      ? Container()
-                      : CircleAvatar(
-                          backgroundColor: Colors.black12,
-                          child: CachedNetworkImage(
-                            imageUrl: player.jerseyUrl,
-                            placeholder: Container(
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                ),
-                              ),
-                              width: TEAM_LOGO_HEIGHT,
-                              height: TEAM_LOGO_HEIGHT,
-                            ),
-                            height: TEAM_LOGO_HEIGHT,
-                          ),
-                        ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(player.name),
-                      captain == player
-                          ? Text(widget.l1Data.league.fanTeamRules.captainMult
-                                  .toString() +
-                              "X")
-                          : (vCaptain == player
-                              ? Text(widget.l1Data.league.fanTeamRules.vcMult
-                                      .toString() +
-                                  "X")
-                              : Container()),
-                      style == null
-                          ? Container()
-                          : Container(
-                              height: 18.0,
-                              width: 18.0,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                      ('images/' +
-                                              style.label +
-                                              " " +
-                                              player.sportsId.toString() +
-                                              "-black"
-                                              ".png")
-                                          .toLowerCase()
-                                          .replaceAll(" ", "-"),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    player.score.toString(),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      children: <Widget>[
-        Divider(height: 1.0),
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Column(
-            children: <Widget>[
-              ListTile(
-                leading: Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
-                      child: Container(),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        strings.get("PLAYERS").toUpperCase(),
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        strings.get("SCORE").toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                children: items,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   getPlayingStyleCountWidget(List<Player> players) {
@@ -407,15 +263,6 @@ class MyTeamsState extends State<MyTeams> {
                                           _onCloneTeam(context, team);
                                         },
                                       ),
-                                      // IconButton(
-                                      //   icon: Icon(
-                                      //     Icons.share,
-                                      //     color: Colors.grey.shade800,
-                                      //   ),
-                                      //   onPressed: () {
-                                      //     // _onEditTeam(context, team);
-                                      //   },
-                                      // ),
                                     ],
                                   ),
                                 ],

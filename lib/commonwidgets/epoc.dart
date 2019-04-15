@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class EPOC extends StatefulWidget {
   final TextStyle style;
   final int timeInMiliseconds;
-  EPOC({this.timeInMiliseconds, this.style});
+  final Function onTimeComplete;
+  EPOC({this.timeInMiliseconds, this.style, this.onTimeComplete});
 
   @override
   EPOCState createState() => EPOCState();
@@ -45,6 +46,9 @@ class EPOCState extends State<EPOC> {
       if (remainingTime.inMilliseconds > 0) {
         startTimerToCalculateEPOC();
       } else {
+        if (widget.onTimeComplete != null) {
+          widget.onTimeComplete();
+        }
         setState(() {
           bIsTimerClosed = true;
         });

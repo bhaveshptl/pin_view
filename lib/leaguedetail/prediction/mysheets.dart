@@ -3,14 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
-import 'package:playfantasy/leaguedetail/prediction/createsheet/predictionsummarywidget.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/predictionsummarywidget.dart';
 
 class MySheets extends StatefulWidget {
   final League league;
@@ -336,37 +338,34 @@ class MySheetsState extends State<MySheets> {
   }
 
   @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ScaffoldPage(
       appBar: AppBar(
         title: Text(
           "My Sheets".toUpperCase(),
         ),
+        elevation: 0.0,
       ),
-      body: Container(
-        decoration: AppConfig.of(context).showBackground
-            ? BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/background.png"),
-                    repeat: ImageRepeat.repeat),
-              )
-            : null,
-        child: Column(
-          children: <Widget>[
-            LeagueCard(
-              widget.league,
-              clickable: false,
-            ),
-            Divider(
-              height: 2.0,
-            ),
-            Expanded(
-              child: widget.mySheets.length > 0
-                  ? _createMySheetsWidget(context)
-                  : _getEmptyMyTeamsWidget(context),
-            )
-          ],
-        ),
+      body: Column(
+        children: <Widget>[
+          LeagueTitle(
+            league: widget.league,
+          ),
+          Divider(
+            height: 2.0,
+          ),
+          Expanded(
+            child: widget.mySheets.length > 0
+                ? _createMySheetsWidget(context)
+                : _getEmptyMyTeamsWidget(context),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -375,11 +374,5 @@ class MySheetsState extends State<MySheets> {
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _streamSubscription.cancel();
-    super.dispose();
   }
 }

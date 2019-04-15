@@ -5,9 +5,9 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/prediction.dart';
-import 'package:playfantasy/leaguedetail/prediction/contestcards/live.dart';
-import 'package:playfantasy/leaguedetail/prediction/contestcards/result.dart';
-import 'package:playfantasy/leaguedetail/prediction/contestcards/upcoming_howzat.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/live_prediction.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/result_prediction.dart';
+import 'package:playfantasy/leaguedetail/prediction/contestcards/upcoming_prediction.dart';
 
 class PredictionContestCard extends StatelessWidget {
   final int status;
@@ -120,7 +120,7 @@ class PredictionContestCard extends StatelessWidget {
               },
               padding: EdgeInsets.all(0.0),
               child: leagueStatus == LeagueStatus.UPCOMING
-                  ? UpcomingHowzatPredictionContest(
+                  ? UpcomingPrediction(
                       league: league,
                       onJoin: onJoin,
                       contest: contest,
@@ -128,13 +128,13 @@ class PredictionContestCard extends StatelessWidget {
                       onPrizeStructure: onPrizeStructure,
                     )
                   : leagueStatus == LeagueStatus.LIVE
-                      ? LivePredictionContest(
+                      ? LivePrediction(
                           league: league,
                           contest: contest,
                           myJoinedSheets: myJoinedSheets,
                           onPrizeStructure: onPrizeStructure,
                         )
-                      : ResultPredictionContest(
+                      : ResultPrediction(
                           league: league,
                           contest: contest,
                           myJoinedSheets: myJoinedSheets,

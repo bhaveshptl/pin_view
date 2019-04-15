@@ -26,7 +26,7 @@ class PrizeStructureState extends State<PrizeStructure> {
     formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: widget.contest.prizeType == 1 ? "" : strings.rupee,
-      decimalDigits: 0,
+      decimalDigits: 2,
     );
     super.initState();
   }

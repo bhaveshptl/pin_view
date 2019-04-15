@@ -58,7 +58,6 @@ class LeagueDetailState extends State<LeagueDetail>
   String title = "Contest".toUpperCase();
 
   List<MySheet> _mySheets;
-  bool bShowInnings = false;
   Prediction predictionData;
   int joinedContestCount = 0;
   List<int> predictionContestIds;
@@ -82,7 +81,6 @@ class LeagueDetailState extends State<LeagueDetail>
     _createL1WSObject();
 
     _getMyContests();
-    bShowInnings = widget.league.prediction == 1;
     tabController = TabController(length: 2, vsync: this);
     tabController.addListener(() {
       setState(() {
@@ -126,7 +124,8 @@ class LeagueDetailState extends State<LeagueDetail>
           }).toList();
         }
       });
-    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+    } else if (l1Data != null &&
+        data["iType"] == RequestType.L1_DATA_REFRESHED &&
         data["bSuccessful"] == true) {
       _applyL1DataUpdate(data["diffData"]["ld"]);
     } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
@@ -873,8 +872,10 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   Widget build(BuildContext context) {
-    bShowInnings =
-        AppConfig.of(context).channelId == "9" ? false : bShowInnings;
+    bool notAllowJoinedContests =
+        (activeTabIndex == 0 && joinedContestCount == 0) ||
+            (activeTabIndex == 1 && joinedPredictionContestCount == 0);
+
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
@@ -902,67 +903,40 @@ class LeagueDetailState extends State<LeagueDetail>
           LeagueTitle(
             league: widget.league,
           ),
-          bShowInnings
-              ? Container(
-                  color: Colors.white,
-                  child: TabBar(
-                    controller: tabController,
-                    labelColor: Theme.of(context).primaryColor,
-                    unselectedLabelColor: Colors.black,
-                    labelStyle:
-                        Theme.of(context).primaryTextTheme.body2.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                    indicator: UnderlineTabIndicator(
-                      borderSide: BorderSide(
-                        width: 4.0,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    tabs: <Widget>[
-                      Tab(
-                        child: Text(
-                          "Contest".toUpperCase(),
-                        ),
-                      ),
-                      Tab(
-                        child: Text(
-                          "Prediction".toUpperCase(),
-                        ),
-                      )
-                    ],
+          Container(
+            color: Colors.white,
+            child: TabBar(
+              controller: tabController,
+              labelColor: Theme.of(context).primaryColor,
+              unselectedLabelColor: Colors.black,
+              labelStyle: Theme.of(context).primaryTextTheme.body2.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+              indicator: UnderlineTabIndicator(
+                borderSide: BorderSide(
+                  width: 4.0,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              tabs: <Widget>[
+                Tab(
+                  child: Text(
+                    "Contest".toUpperCase(),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "Prediction".toUpperCase(),
                   ),
                 )
-              : Container(),
+              ],
+            ),
+          ),
           Expanded(
-            child: bShowInnings
-                ? TabBarView(
-                    controller: tabController,
-                    children: <Widget>[
-                      l1Data == null
-                          ? Container()
-                          : Contests(
-                              l1Data: l1Data,
-                              myTeams: _myTeams,
-                              league: widget.league,
-                              showLoader: showLoader,
-                              scaffoldKey: _scaffoldKey,
-                              mapContestTeams: _mapContestTeams,
-                            ),
-                      predictionData == null
-                          ? Container()
-                          : PredictionView(
-                              mySheets: _mySheets,
-                              league: widget.league,
-                              showLoader: showLoader,
-                              scaffoldKey: _scaffoldKey,
-                              prediction: predictionData,
-                              predictionContestIds: predictionContestIds,
-                              mapContestSheets: _mapContestSheets,
-                            ),
-                    ],
-                  )
-                : l1Data == null
+            child: TabBarView(
+              controller: tabController,
+              children: <Widget>[
+                l1Data == null
                     ? Container()
                     : Contests(
                         l1Data: l1Data,
@@ -972,6 +946,19 @@ class LeagueDetailState extends State<LeagueDetail>
                         scaffoldKey: _scaffoldKey,
                         mapContestTeams: _mapContestTeams,
                       ),
+                predictionData == null
+                    ? Container()
+                    : PredictionView(
+                        mySheets: _mySheets,
+                        league: widget.league,
+                        showLoader: showLoader,
+                        scaffoldKey: _scaffoldKey,
+                        prediction: predictionData,
+                        predictionContestIds: predictionContestIds,
+                        mapContestSheets: _mapContestSheets,
+                      ),
+              ],
+            ),
           ),
           Container(
             height: 72.0,
@@ -1080,7 +1067,9 @@ class LeagueDetailState extends State<LeagueDetail>
                                             height: 24.0,
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              color: Colors.orange,
+                                              color: notAllowJoinedContests
+                                                  ? Colors.grey
+                                                  : Colors.orange,
                                             ),
                                             alignment: Alignment.center,
                                             child: Text(
@@ -1103,15 +1092,21 @@ class LeagueDetailState extends State<LeagueDetail>
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: <Widget>[
-                                            Text("Joined Contest"),
+                                            Text(
+                                              activeTabIndex == 0
+                                                  ? "Joined Contest"
+                                                  : "Joined Prediction",
+                                            ),
                                           ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                  onPressed: () {
-                                    _onBottomButtonClick(2);
-                                  },
+                                  onPressed: notAllowJoinedContests
+                                      ? null
+                                      : () {
+                                          _onBottomButtonClick(2);
+                                        },
                                 ),
                               ),
                             ),

@@ -9,9 +9,15 @@ import 'package:playfantasy/utils/stringtable.dart';
 
 class MyMatchesSportsTab extends StatefulWidget {
   final int sportsType;
+  final Function onLeagueStatusChange;
   final Map<int, List<League>> myLeagues;
   final Map<String, dynamic> myContestIds;
-  MyMatchesSportsTab({this.sportsType, this.myLeagues, this.myContestIds});
+  MyMatchesSportsTab({
+    this.sportsType,
+    this.myLeagues,
+    this.myContestIds,
+    this.onLeagueStatusChange,
+  });
 
   @override
   MyMatchesSportsTabState createState() => MyMatchesSportsTabState();
@@ -178,6 +184,7 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
                                 : widget
                                     .myContestIds[league.leagueId.toString()]
                                     .length,
+                        onTimeComplete: widget.onLeagueStatusChange,
                         onClick: (League league) {
                           ActionUtil().showLoader(context, true);
                           Navigator.of(context).push(

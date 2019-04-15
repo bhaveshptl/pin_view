@@ -4,9 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
-import 'package:playfantasy/contestdetail/contestdetailscard.dart';
-import 'package:playfantasy/leaguedetail/prediction/predictiondetailscard.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -17,18 +14,15 @@ import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/loader.dart';
-import 'package:playfantasy/profilepages/statedob.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
-import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/contestdetail/contestdetail.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/commonwidgets/gradientbutton.dart';
 import 'package:playfantasy/prizestructure/prizestructure.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/viewsheet.dart';
-import 'package:playfantasy/leaguedetail/prediction/joinpredictioncontest.dart';
+import 'package:playfantasy/leaguedetail/prediction/predictiondetailscard.dart';
 import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
 
 class PredictionContestDetail extends StatefulWidget {
@@ -200,7 +194,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
       }
 
       if (bShowJoinContest) {
-        joinPredictionContest(widget.contest);
+        onJoinPrediction(widget.contest);
       } else if (bWaitingForSheetCreation) {
         bWaitingForSheetCreation = false;
       }
@@ -283,114 +277,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     });
   }
 
-  onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
-    JoinContestError error;
-    if (errorResponse["error"] == true) {
-      error = JoinContestError([errorResponse["resultCode"]]);
-    } else {
-      error = JoinContestError(errorResponse["reasons"]);
-    }
-
-    Navigator.of(context).pop();
-    if (error.isBlockedUser()) {
-      _showJoinContestError(
-        title: error.getTitle(),
-        message: error.getErrorMessage(),
-      );
-    } else {
-      int errorCode = error.getErrorCode();
-      switch (errorCode) {
-        case 3:
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return StateDob();
-            },
-          );
-          break;
-        case 12:
-          _showAddCashConfirmation(contest);
-          break;
-        case 6:
-          _showJoinContestError(
-            message: strings.get("ALERT"),
-            title: strings.get("NOT_VERIFIED"),
-          );
-          break;
-      }
-    }
-  }
-
-  _showJoinContestError({String title, String message}) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  _showAddCashConfirmation(Contest contest) {
-    final curContest = contest;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            strings.get("INSUFFICIENT_FUND").toUpperCase(),
-          ),
-          content: Text(
-            strings.get("INSUFFICIENT_FUND_MSG"),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("CANCEL").toUpperCase(),
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _launchDepositJourneyForJoinContest(curContest);
-              },
-              child: Text(
-                strings.get("DEPOSIT").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  _launchDepositJourneyForJoinContest(Contest contest) async {
-    showLoader(true);
-    routeLauncher.launchAddCash(context, onSuccess: (result) {
-      if (result != null) {
-        joinPredictionContest(contest);
-      }
-    }, onComplete: () {
-      showLoader(false);
-    });
-  }
-
-  joinPredictionContest(Contest contest) async {
+  onJoinPrediction(Contest contest) async {
     if (predictionData == null) {
       return null;
     }
@@ -406,69 +293,13 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
       return null;
     }
     bShowJoinContest = false;
-    if (mySheets.length > 0) {
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinPredictionContest(
-            contest: contest,
-            mySheets: mySheets,
-            prediction: predictionData,
-            onError: onJoinContestError,
-            onCreateSheet: _onCreateSheet,
-          );
-        },
-      );
-
-      if (result != null) {
-        final response = json.decode(result);
-        if (!response["error"]) {
-          MySheet sheet = getSheetById(response["answerSheetId"]);
-          if (sheet != null) {
-            if (_mapContestSheets == null) {
-              _mapContestSheets = [];
-            }
-            setState(() {
-              _mapContestSheets.add(sheet);
-            });
-          }
-        }
-        _scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text(response["message"])));
-      }
-    } else {
-      if (AppConfig.of(context).channelId == "10") {
-        _onCreateSheet(context, contest);
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(strings.get("ALERT").toUpperCase()),
-              content: Text(
-                "No sheet created for this match. Please create one to join contest.",
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    strings.get("CANCEL").toUpperCase(),
-                  ),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    _onCreateSheet(context, contest);
-                  },
-                  child: Text(strings.get("CREATE").toUpperCase()),
-                )
-              ],
-            );
-          },
-        );
-      }
-    }
+    ActionUtil().launchJoinPrediction(
+      contest: contest,
+      league: widget.league,
+      mySheets: widget.mySheets,
+      scaffoldKey: _scaffoldKey,
+      predictionData: predictionData,
+    );
   }
 
   getSheetById(int id) {
@@ -509,7 +340,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
         if (bWaitingForSheetCreation) {
           bShowJoinContest = true;
         } else {
-          joinPredictionContest(curContest);
+          onJoinPrediction(curContest);
         }
       }
     }
@@ -734,7 +565,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
                             contest: widget.contest,
                             predictionSheets: _mapContestSheets,
                             onJoinContest: (Contest contest) {
-                              joinPredictionContest(contest);
+                              onJoinPrediction(contest);
                             },
                             onPrizeStructure: () {
                               _showPrizeStructure();

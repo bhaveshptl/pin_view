@@ -4,9 +4,12 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/joincontest/joincontest.dart';
 import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
+import 'package:playfantasy/leaguedetail/prediction/joinpredictioncontest.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/profilepages/statedob.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
@@ -131,6 +134,65 @@ class ActionUtil {
             title: strings.get("NOT_VERIFIED"),
           );
           break;
+      }
+    }
+  }
+
+  launchJoinPrediction({
+    League league,
+    Contest contest,
+    List<MySheet> mySheets,
+    Prediction predictionData,
+    GlobalKey<ScaffoldState> scaffoldKey,
+  }) async {
+    showLoader(scaffoldKey.currentContext, true);
+    final balance = await routeLauncher.getUserQuizBalance(
+        leagueId: league.leagueId, contestId: contest.id);
+    showLoader(scaffoldKey.currentContext, false);
+    final joinConfirmMsg = await showDialog(
+      context: scaffoldKey.currentContext,
+      builder: (BuildContext context) {
+        return JoinContestConfirmation(
+          userBalance: balance,
+          entryFees: contest.entryFee,
+          prizeType: contest.prizeType,
+          bonusAllowed: contest.bonusAllowed,
+        );
+      },
+    );
+    if (joinConfirmMsg != null && joinConfirmMsg["confirm"]) {
+      showLoader(scaffoldKey.currentContext, true);
+      final result = await Navigator.of(scaffoldKey.currentContext).push(
+        FantasyPageRoute(
+          pageBuilder: (context) => JoinPredictionContest(
+                league: league,
+                contest: contest,
+                mySheets: mySheets,
+                prediction: predictionData,
+                onError:
+                    ((Contest contest, Map<String, dynamic> errorResponse) {
+                  final result = onJoinContestError(
+                    scaffoldKey.currentContext,
+                    contest,
+                    errorResponse,
+                    onJoin: () {
+                      launchJoinPrediction(
+                        league: league,
+                        contest: contest,
+                        mySheets: mySheets,
+                        scaffoldKey: scaffoldKey,
+                        predictionData: predictionData,
+                      );
+                    },
+                  );
+                }),
+              ),
+        ),
+      );
+
+      if (result != null) {
+        scaffoldKey.currentState
+            .showSnackBar(SnackBar(content: Text("$result")));
       }
     }
   }

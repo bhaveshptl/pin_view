@@ -491,4 +491,26 @@ class RouteLauncher {
       },
     );
   }
+
+  getUserQuizBalance({@required int leagueId, @required int contestId}) {
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.QUIZ_USER_BALANCE));
+    req.body = json.encode({"leagueId": leagueId, "contestId": contestId});
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+
+          return {
+            "cashBalance":
+                (response["withdrawable"] + response["depositBucket"])
+                    .toDouble(),
+            "bonusBalance": (response["nonWithdrawable"]).toDouble(),
+            "playableBonus": response["playablebonus"].toDouble(),
+          };
+        }
+        return null;
+      },
+    );
+  }
 }

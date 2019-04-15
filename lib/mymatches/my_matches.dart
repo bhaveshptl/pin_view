@@ -119,6 +119,12 @@ class MyMatchesState extends State<MyMatches>
   _groupLeagues(List<League> leagues) {
     _initializeMyLeagues();
     leagues.forEach((League league) {
+      if (DateTime.fromMillisecondsSinceEpoch(league.matchStartTime)
+              .difference(DateTime.now())
+              .inMilliseconds <=
+          0) {
+        league.status = LeagueStatus.LIVE;
+      }
       myLeagues[league.status].add(league);
     });
 
@@ -168,6 +174,13 @@ class MyMatchesState extends State<MyMatches>
                 sportsType: sportsId,
                 myLeagues: myLeagues,
                 myContestIds: myContestIds,
+                onLeagueStatusChange: () {
+                  List<League> _leagues = [];
+                  myLeagues.keys.forEach((int key) {
+                    _leagues.addAll(myLeagues[key]);
+                  });
+                  _groupLeagues(_leagues);
+                },
               );
             }).toList(),
           ),

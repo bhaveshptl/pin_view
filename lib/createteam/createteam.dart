@@ -78,11 +78,6 @@ class CreateTeamState extends State<CreateTeam>
             widget.l1Data.league.fanTeamRules.playersTotal)
         .toStringAsFixed(2);
 
-    if (widget.mode == TeamCreationMode.CLONE_TEAM ||
-        widget.mode == TeamCreationMode.EDIT_TEAM) {
-      _editOrCloneTeam();
-    }
-
     List<Player> teamAPlayers =
         widget.l1Data.league.rounds[0].matches[0].teamA.players;
     List<Player> teamBPlayers =
@@ -91,6 +86,21 @@ class CreateTeamState extends State<CreateTeam>
     allPlayers = [];
     allPlayers.addAll(teamAPlayers);
     allPlayers.addAll(teamBPlayers);
+
+    List<Player> _selectedTeamPlayers = [];
+    allPlayers.forEach((Player player) {
+      _selectedPlayers.forEach((Player selectedPlayer) {
+        if (selectedPlayer.id == player.id) {
+          _selectedTeamPlayers.add(player);
+        }
+      });
+    });
+    _selectedPlayers = _selectedTeamPlayers;
+
+    if (widget.mode == TeamCreationMode.CLONE_TEAM ||
+        widget.mode == TeamCreationMode.EDIT_TEAM) {
+      _editOrCloneTeam();
+    }
 
     onSort("CREDITS");
 
@@ -243,6 +253,11 @@ class CreateTeamState extends State<CreateTeam>
         }
       } else {
         _selectedPlayers.removeAt(_selectedPlayerIndex);
+        if (_captain != null && player.id == _captain.id) {
+          _captain = null;
+        } else if (_vCaptain != null && player.id == _vCaptain.id) {
+          _vCaptain = null;
+        }
         if (player.teamId == widget.league.teamA.id) {
           teamAPlayerCount--;
         } else {

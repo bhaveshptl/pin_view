@@ -1,5 +1,5 @@
 class League {
-  final int status;
+  int status;
   final Team teamA;
   final Team teamB;
   final int matchId;
@@ -8,7 +8,7 @@ class League {
   final int prediction;
   final int matchEndTime;
   final String matchName;
-  final int matchStartTime;
+  int matchStartTime;
 
   League({
     this.teamA,

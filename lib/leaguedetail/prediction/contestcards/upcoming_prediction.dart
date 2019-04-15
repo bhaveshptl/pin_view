@@ -6,7 +6,7 @@ import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
-class UpcomingHowzatPredictionContest extends StatelessWidget {
+class UpcomingPrediction extends StatelessWidget {
   final League league;
   final Contest contest;
   final Function onJoin;
@@ -14,7 +14,7 @@ class UpcomingHowzatPredictionContest extends StatelessWidget {
   final Function onPrizeStructure;
   final List<MySheet> myJoinedSheets;
 
-  UpcomingHowzatPredictionContest({
+  UpcomingPrediction({
     this.league,
     this.onJoin,
     this.contest,

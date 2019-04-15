@@ -15,6 +15,7 @@ class StatusTab extends StatelessWidget {
   final List<League> allLeagues;
   final List<League> statusLeagues;
   final Map<String, int> mapSportTypes;
+  final Function onLeagueStatusChanged;
 
   StatusTab({
     this.sportType,
@@ -23,6 +24,7 @@ class StatusTab extends StatelessWidget {
     this.statusLeagues,
     this.onSportChange,
     this.mapSportTypes,
+    this.onLeagueStatusChanged,
   });
 
   showLoader(bool bShow, BuildContext context) {
@@ -62,6 +64,7 @@ class StatusTab extends StatelessWidget {
         itemBuilder: (context, index) {
           return LeagueCard(
             statusLeagues[index],
+            onTimeComplete: onLeagueStatusChanged,
             onClick: (league) {
               onLeagueSelect(context, league);
             },

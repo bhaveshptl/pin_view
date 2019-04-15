@@ -12,8 +12,14 @@ class LeagueCard extends StatelessWidget {
   final bool clickable;
   final Function onClick;
   final int contestCount;
-  LeagueCard(this._league,
-      {this.onClick, this.clickable = true, this.contestCount = 0});
+  final Function onTimeComplete;
+  LeagueCard(
+    this._league, {
+    this.onClick,
+    this.clickable = true,
+    this.contestCount = 0,
+    this.onTimeComplete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -242,6 +248,7 @@ class LeagueCard extends StatelessWidget {
                                     ),
                                   )
                                 : EPOC(
+                                    onTimeComplete: onTimeComplete,
                                     timeInMiliseconds: _league.matchStartTime,
                                   ),
                           )

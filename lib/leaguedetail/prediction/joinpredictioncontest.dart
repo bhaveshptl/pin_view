@@ -1,16 +1,24 @@
+import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/modal/l1.dart';
-import 'package:playfantasy/modal/mysheet.dart';
-import 'package:playfantasy/modal/prediction.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
 
+import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/modal/prediction.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/stringtable.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 class JoinPredictionContest extends StatefulWidget {
+  final League league;
   final Contest contest;
   final Function onError;
   final Prediction prediction;
@@ -18,6 +26,7 @@ class JoinPredictionContest extends StatefulWidget {
   final List<MySheet> mySheets;
 
   JoinPredictionContest({
+    this.league,
     this.contest,
     this.onError,
     this.mySheets,
@@ -30,92 +39,107 @@ class JoinPredictionContest extends StatefulWidget {
 }
 
 class JoinPredictionContestState extends State<JoinPredictionContest> {
-  int _selectedSheetId = -1;
+  MySheet _sheetToJoin;
+  List<MySheet> _mySheets;
   List<MySheet> _myUniqueSheets = [];
-
-  double _cashBalance = 0.0;
-  double _bonusBalance = 0.0;
-  double _playableBonus = 0.0;
+  List<MySheet> contestMySheets = [];
+  GlobalKey<ScaffoldState> scaffoldKey;
+  StreamSubscription _streamSubscription;
 
   @override
   void initState() {
     super.initState();
-    _getUserBalance();
+    _mySheets = widget.mySheets;
+    scaffoldKey = GlobalKey<ScaffoldState>();
     getMyContestMySheets([widget.contest.id]);
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
-  _joinContest(BuildContext context) async {
-    if (_selectedSheetId == null || _selectedSheetId == -1) {
-      widget.onCreateSheet(
-        context,
-        widget.contest,
-      );
-    } else {
-      http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_PREDICTION_CONTEST));
-      req.body = json.encode({
-        "answerSheetId": _selectedSheetId,
-        "contestId": widget.contest.id,
-        "channel_id": HttpManager.channelId,
-        "leagueId": widget.contest.leagueId,
-        "entryFee": widget.contest.entryFee,
-        "prizeType": widget.contest.prizeType,
-        "inningsId": widget.contest.inningsId,
-        "serviceFee": widget.contest.serviceFee,
-        "visibilityId": widget.contest.visibilityId,
-        "bonusAllowed": widget.contest.bonusAllowed,
-        "contestCode": widget.contest.contestJoinCode,
-      });
-      await HttpManager(http.Client()).sendRequest(req).then(
-        (http.Response res) {
-          if (res.statusCode >= 200 && res.statusCode <= 299) {
-            Map<String, dynamic> response = json.decode(res.body);
-            if (response["error"] != null) {
-              Navigator.of(context).pop(json.encode({
-                "message": response["message"],
-                "contestId": widget.contest.id,
-                "answerSheetId": _selectedSheetId,
-                "error": response["error"],
-              }));
-            }
-          } else if (res.statusCode == 401) {
-            Map<String, dynamic> response = json.decode(res.body);
-            if (response["error"]["reasons"].length > 0) {
-              widget.onError(widget.contest, response["error"]);
-            }
-          }
-        },
-      );
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+        data["bSuccessful"] == true) {
+      MySheet sheetAdded = MySheet.fromJson(data["data"]);
+      int i = 0;
+      bool bFound = false;
+      for (MySheet _mySheet in _mySheets) {
+        if (_mySheet.id == sheetAdded.id) {
+          _mySheets[i] = sheetAdded;
+          bFound = true;
+        }
+        i++;
+      }
+      if (!bFound) {
+        _mySheets.add(sheetAdded);
+      }
+      setUniqueSheets(contestMySheets);
     }
   }
 
-  _getUserBalance() async {
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.QUIZ_USER_BALANCE));
+  _joinPrediction(BuildContext context) async {
+    http.Request req = http.Request(
+      "POST",
+      Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_PREDICTION_CONTEST),
+    );
     req.body = json.encode({
+      "contestId": widget.contest.id,
+      "answerSheetId": _sheetToJoin.id,
+      "channel_id": HttpManager.channelId,
       "leagueId": widget.contest.leagueId,
-      "contestId": widget.contest == null ? "" : widget.contest.id
+      "entryFee": widget.contest.entryFee,
+      "prizeType": widget.contest.prizeType,
+      "inningsId": widget.contest.inningsId,
+      "serviceFee": widget.contest.serviceFee,
+      "visibilityId": widget.contest.visibilityId,
+      "bonusAllowed": widget.contest.bonusAllowed,
+      "contestCode": widget.contest.contestJoinCode,
     });
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
-          setState(() {
-            _cashBalance =
-                (response["withdrawable"] + response["depositBucket"])
-                    .toDouble();
-            _bonusBalance = (response["nonWithdrawable"]).toDouble();
-            _playableBonus = response["playablebonus"].toDouble();
-          });
+          if (response["error"] != null) {
+            Navigator.of(context).pop(json.encode({
+              "message": response["message"],
+              "contestId": widget.contest.id,
+              "answerSheetId": _sheetToJoin.id,
+              "error": response["error"],
+            }));
+          }
+        } else if (res.statusCode == 401) {
+          Map<String, dynamic> response = json.decode(res.body);
+          if (response["error"]["reasons"].length > 0) {
+            widget.onError(widget.contest, response["error"]);
+          }
         }
       },
     );
   }
 
+  void _onCreateSheet(BuildContext context) async {
+    final result = await Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (context) => CreateSheet(
+              league: widget.league,
+              predictionData: widget.prediction,
+              mode: SheetCreationMode.CREATE_SHEET,
+            ),
+      ),
+    );
+
+    if (result != null) {
+      scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(result),
+        ),
+      );
+    }
+  }
+
   getMyContestMySheets(List<int> contests) {
     if (contests != null && contests.length > 0) {
-      http.Request req = http.Request(
-          "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
+      http.Request req = http.Request("POST",
+          Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_SHEETS));
       req.body = json.encode(contests);
       return HttpManager(http.Client())
           .sendRequest(req)
@@ -143,6 +167,8 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
               ? []
               : _mapContestMySheets[widget.contest.id]);
         }
+      }).whenComplete(() {
+        ActionUtil().showLoader(context, false);
       });
     }
   }
@@ -168,261 +194,228 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
     }
     if (myUniqueSheets.length > 0) {
       setState(() {
-        _selectedSheetId = myUniqueSheets[0].id;
+        _sheetToJoin = myUniqueSheets[0];
         _myUniqueSheets = myUniqueSheets;
       });
     }
   }
 
-  List<DropdownMenuItem> _getSheetList() {
-    List<DropdownMenuItem> lstSheets = [];
-    if (_myUniqueSheets != null && _myUniqueSheets.length > 0) {
-      for (MySheet answerSheet in _myUniqueSheets) {
-        lstSheets.add(
-          DropdownMenuItem(
-            child: Container(
-              child: Text(
-                answerSheet.name == ""
-                    ? answerSheet.id.toString()
-                    : answerSheet.name,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            value: answerSheet.id,
-          ),
-        );
-      }
-    }
-    lstSheets.add(
-      DropdownMenuItem(
-        child: Container(
-          width: 110.0,
-          child: Text("Create sheet"),
-        ),
-        value: -1,
-      ),
-    );
-    return lstSheets;
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double bonusUsable = widget.contest == null
-        ? 0.0
-        : (widget.contest.entryFee * widget.contest.bonusAllowed) / 100;
-    double usableBonus = widget.contest == null
-        ? 0.0
-        : _bonusBalance > bonusUsable
-            ? (bonusUsable > _playableBonus ? _playableBonus : bonusUsable)
-            : _bonusBalance;
-
-    return AlertDialog(
-      title: Text(strings.get("CONFIRMATION").toUpperCase()),
-      content: Column(
+    return ScaffoldPage(
+      scaffoldKey: scaffoldKey,
+      appBar: AppBar(
+        title: Text("My Teams".toUpperCase()),
+        elevation: 0.0,
+      ),
+      body: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          strings.get("CASH").toUpperCase() + " ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .body2
-                                .fontSize,
-                          ),
+          LeagueTitle(
+            league: widget.league,
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    "Choose answer sheet to join the prediction".toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
                         ),
-                        Text(
-                          strings.rupee + _cashBalance.toStringAsFixed(2),
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-                Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          strings.get("BONUS").toUpperCase() + " ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .body2
-                                .fontSize,
+              ),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: _myUniqueSheets.map((MySheet sheet) {
+                  return Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            child: FlatButton(
+                              onPressed: () {
+                                setState(() {
+                                  _sheetToJoin = sheet;
+                                });
+                              },
+                              padding: EdgeInsets.all(0.0),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    height: 40.0,
+                                    color: Colors.grey.shade100,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Row(
+                                          children: <Widget>[
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 8.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: (_sheetToJoin ==
+                                                                null ||
+                                                            _sheetToJoin.id !=
+                                                                sheet.id)
+                                                        ? Colors.black
+                                                        : Colors.green,
+                                                    width: 1.0,
+                                                  ),
+                                                ),
+                                                padding: EdgeInsets.all(2.0),
+                                                child: (_sheetToJoin == null ||
+                                                        _sheetToJoin.id !=
+                                                            sheet.id)
+                                                    ? CircleAvatar(
+                                                        radius: 6.0,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                      )
+                                                    : CircleAvatar(
+                                                        radius: 6.0,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        child: CircleAvatar(
+                                                          radius: 6.0,
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                        ),
+                                                      ),
+                                              ),
+                                            ),
+                                            Text(
+                                              sheet.name,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        InkWell(
+                                          child: Container(
+                                            height: 40.0,
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              "Preview",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .button
+                                                  .copyWith(
+                                                    color: Colors.blue,
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                  ),
+                                            ),
+                                          ),
+                                          onTap: () {},
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                        Text(
-                          strings.rupee + _bonusBalance.toStringAsFixed(2),
-                          style: TextStyle(
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .fontSize,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          Container(
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  spreadRadius: 1.0,
+                  blurRadius: 2.0,
+                  color: Colors.grey.shade300,
                 )
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  strings.get("ENTRY_FEE"),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    (widget.contest != null && widget.contest.prizeType == 1)
-                        ? Image.asset(
-                            strings.chips,
-                            width: 16.0,
-                            height: 12.0,
-                            fit: BoxFit.contain,
-                          )
-                        : Text(strings.rupee),
-                    Text(
-                      widget.contest.entryFee.toStringAsFixed(2),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.body2.fontSize,
+                Expanded(
+                  child: Container(
+                    height: 48.0,
+                    padding: EdgeInsets.only(right: 8.0, left: 40.0),
+                    child: ColorButton(
+                      onPressed: () {
+                        _onCreateSheet(context);
+                      },
+                      color: Colors.orange,
+                      child: Text(
+                        "Create Sheet".toUpperCase(),
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  strings.get("BONUS_USABLE"),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
                   ),
                 ),
-                Text(
-                  strings.rupee + usableBonus.toStringAsFixed(2),
-                  style: TextStyle(
-                    fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            color: Colors.black12,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                strings.get("CASH_TO_PAY"),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  (widget.contest != null && widget.contest.prizeType == 1)
-                      ? Image.asset(
-                          strings.chips,
-                          width: 16.0,
-                          height: 12.0,
-                          fit: BoxFit.contain,
-                        )
-                      : Text(strings.rupee),
-                  Text(
-                    (widget.contest.entryFee - usableBonus).toStringAsFixed(2),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize:
-                          Theme.of(context).primaryTextTheme.body2.fontSize,
+                Expanded(
+                  child: Container(
+                    height: 48.0,
+                    padding: EdgeInsets.only(left: 8.0, right: 40.0),
+                    child: ColorButton(
+                      onPressed: _sheetToJoin == null
+                          ? null
+                          : () {
+                              if (widget.contest != null) {
+                                _joinPrediction(context);
+                              }
+                            },
+                      child: Text(
+                        "Join now".toUpperCase(),
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                      ),
                     ),
-                    textAlign: TextAlign.right,
                   ),
-                ],
-              ),
-            ],
-          ),
-          Divider(
-            color: Colors.black12,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                "Sheets",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: Theme.of(context).primaryTextTheme.body2.fontSize,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  DropdownButton(
-                    value: _selectedSheetId,
-                    isDense: false,
-                    items: _getSheetList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSheetId = value;
-                      });
-                    },
-                  )
-                ],
-              ),
-            ],
-          ),
+                )
+              ],
+            ),
+          )
         ],
       ),
-      actions: <Widget>[
-        FlatButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text(strings.get("CANCEL").toUpperCase()),
-        ),
-        FlatButton(
-          onPressed: () {
-            _joinContest(context);
-          },
-          child: Text(strings.get("JOIN").toUpperCase()),
-        ),
-      ],
     );
   }
 }
