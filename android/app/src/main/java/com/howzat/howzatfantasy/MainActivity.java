@@ -108,12 +108,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             myHeperClass = new MyHelperClass();
             JSONObject installParams = Branch.getInstance().getFirstReferringParams();
             String installReferring_link = (String) installParams.get("~referring_link");
-            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link, "pfRefCode");
+            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link, "refCode");
 
 
             JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
             String installReferring_link2 = (String) sessionParams.get("~referring_link");
-            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "pfRefCode");
+            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "refCode");
 
         } catch (Exception e) {
 
@@ -203,12 +203,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             myHeperClass = new MyHelperClass();
             JSONObject installParams = Branch.getInstance().getFirstReferringParams();
             String installReferring_link = (String) installParams.get("~referring_link");
-            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link, "pfRefCode");
+            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link, "refCode");
 
 
             JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
             String installReferring_link2 = (String) sessionParams.get("~referring_link");
-            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "pfRefCode");
+            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "refCode");
 
         } catch (Exception e) {
 
