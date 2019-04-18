@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -19,8 +20,9 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 class AddCash extends StatefulWidget {
   final String source;
   final Deposit depositData;
+  final double prefilledAmount;
 
-  AddCash({this.depositData, this.source});
+  AddCash({this.depositData, this.source, this.prefilledAmount});
 
   @override
   State<StatefulWidget> createState() => AddCashState();
@@ -58,12 +60,16 @@ class AddCashState extends State<AddCash> {
 
     setDepositInfo();
 
-    // AnalyticsManager().setJourney("deposit");
-    // AnalyticsManager().addEvent(Event(
-    //   name: "addcash",
-    //   source: widget.source,
-    //   v1: widget.depositData.chooseAmountData.isFirstDeposit ? 1 : 0,
-    // ));
+    if (widget.prefilledAmount != null && widget.depositData != null) {
+      final double amount = widget.prefilledAmount <
+              widget.depositData.chooseAmountData.minAmount.toDouble()
+          ? widget.depositData.chooseAmountData.minAmount.toDouble()
+          : widget.prefilledAmount;
+      widget.depositData.chooseAmountData.minAmount.toDouble();
+      amountController.text = amount.ceil().toString();
+      customAmountController.text = amount.ceil().toString();
+    }
+
     customAmountController.addListener(() {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
@@ -1158,8 +1164,8 @@ class AddCashState extends State<AddCash> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           strings.get("ADD_CASH").toUpperCase(),

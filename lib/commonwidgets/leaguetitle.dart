@@ -8,12 +8,12 @@ class LeagueTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle style = Theme.of(context).primaryTextTheme.body1.copyWith(
+    TextStyle style = Theme.of(context).primaryTextTheme.title.copyWith(
           color: league.status == LeagueStatus.LIVE ||
                   league.status == LeagueStatus.COMPLETED
               ? Colors.green
               : Theme.of(context).primaryColor,
-          fontWeight: FontWeight.w900,
+          fontWeight: FontWeight.w700,
         );
     return Container(
       height: kToolbarHeight,
@@ -34,9 +34,9 @@ class LeagueTitle extends StatelessWidget {
             league.teamA.name.toUpperCase() +
                 " VS " +
                 league.teamB.name.toUpperCase(),
-            style: Theme.of(context).primaryTextTheme.body2.copyWith(
+            style: Theme.of(context).primaryTextTheme.title.copyWith(
                   color: Colors.black,
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                 ),
           ),
           league.status == LeagueStatus.LIVE

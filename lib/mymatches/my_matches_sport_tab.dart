@@ -42,10 +42,17 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
           child: Container(
             height: 40.0,
             width: width * 0.8,
+            padding: EdgeInsets.all(2.0),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24.0),
-            ),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24.0),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 5.0,
+                    spreadRadius: 1.0,
+                    color: Colors.black.withAlpha(15),
+                  ),
+                ]),
             child: Row(
               children: <Widget>[
                 Expanded(
@@ -56,20 +63,23 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
                       });
                     },
                     child: Container(
-                      height: 40.0,
+                      padding: EdgeInsets.all(2.0),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: selectedSegment == 1
-                            ? Theme.of(context).primaryColor
+                            ? Color.fromRGBO(150, 27, 24, 1)
                             : null,
                         borderRadius: BorderRadius.circular(24.0),
                       ),
                       child: Text(
                         "Upcoming",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: selectedSegment == 1 ? Colors.white : null,
-                        ),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: selectedSegment == 1
+                                      ? Colors.white
+                                      : Theme.of(context).primaryColor,
+                                ),
                       ),
                     ),
                   ),
@@ -82,20 +92,22 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
                       });
                     },
                     child: Container(
-                      height: 40.0,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: selectedSegment == 2
-                            ? Theme.of(context).primaryColor
+                            ? Color.fromRGBO(150, 27, 24, 1)
                             : null,
                         borderRadius: BorderRadius.circular(24.0),
                       ),
                       child: Text(
                         "Live",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: selectedSegment == 2 ? Colors.white : null,
-                        ),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: selectedSegment == 2
+                                      ? Colors.white
+                                      : Theme.of(context).primaryColor,
+                                ),
                       ),
                     ),
                   ),
@@ -108,20 +120,22 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
                       });
                     },
                     child: Container(
-                      height: 40.0,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: selectedSegment == 3
-                            ? Theme.of(context).primaryColor
+                            ? Color.fromRGBO(150, 27, 24, 1)
                             : null,
                         borderRadius: BorderRadius.circular(24.0),
                       ),
                       child: Text(
                         "Completed",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: selectedSegment == 3 ? Colors.white : null,
-                        ),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: selectedSegment == 3
+                                      ? Colors.white
+                                      : Theme.of(context).primaryColor,
+                                ),
                       ),
                     ),
                   ),
@@ -130,26 +144,29 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab> {
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  selectedSegment == 1
-                      ? "Upcoming Matches"
-                      : selectedSegment == 2
-                          ? "Live Matches"
-                          : "Completed Matches",
-                  style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w800,
+        widget.myLeagues[selectedSegment].length > 0
+            ? Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        selectedSegment == 1
+                            ? "Upcoming Matches"
+                            : selectedSegment == 2
+                                ? "Live Matches"
+                                : "Completed Matches",
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700,
+                                ),
                       ),
+                    )
+                  ],
                 ),
               )
-            ],
-          ),
-        ),
+            : Container(),
         widget.myLeagues[selectedSegment].length == 0
             ? Padding(
                 padding: EdgeInsets.only(top: 32.0, left: 16.0, right: 16.0),

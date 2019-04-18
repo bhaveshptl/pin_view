@@ -6,6 +6,7 @@ import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -310,8 +311,8 @@ class AppDrawerState extends State<AppDrawer> {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Scaffold(
-          key: _scaffoldKey,
+        ScaffoldPage(
+          scaffoldKey: _scaffoldKey,
           appBar: AppBar(
             title: Text(
               "Profile".toUpperCase(),

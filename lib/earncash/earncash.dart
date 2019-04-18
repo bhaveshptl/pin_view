@@ -61,19 +61,12 @@ class EarnCashState extends State<EarnCash> {
 
   _shareNow() {
     inviteMsg =
-        "I'm having super fun playing Fantasy sports daily. Join me at " +
-            AppConfig.of(context).appName +
-            " and win cash prizes in every match. Take this bonus of " +
+        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
             strings.rupee +
             refBAmount.toString() +
-            " and join me at " +
-            AppConfig.of(context).appName +
-            ". " +
-            "Click " +
+            " in your account - Click " +
             inviteUrl +
-            " to download " +
-            AppConfig.of(context).appName +
-            " app and use my code " +
+            " to download the Howzat app and use my code " +
             refCode +
             " to register.";
     FlutterShareMe().shareToSystem(msg: inviteMsg);
@@ -81,19 +74,12 @@ class EarnCashState extends State<EarnCash> {
 
   _shareNowWhatsApp() {
     inviteMsg =
-        "I'm having super fun playing Fantasy sports daily. Join me at " +
-            AppConfig.of(context).appName +
-            " and win cash prizes in every match. Take this bonus of " +
+        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
             strings.rupee +
             refBAmount.toString() +
-            " and join me at " +
-            AppConfig.of(context).appName +
-            ". " +
-            "Click " +
+            " in your account - Click " +
             inviteUrl +
-            " to download " +
-            AppConfig.of(context).appName +
-            " app and use my code " +
+            " to download the Howzat app and use my code " +
             refCode +
             " to register.";
     FlutterShareMe().shareToWhatsApp(msg: inviteMsg);
@@ -101,19 +87,12 @@ class EarnCashState extends State<EarnCash> {
 
   _shareNowFacebook() {
     inviteMsg =
-        "I'm having super fun playing Fantasy sports daily. Join me at " +
-            AppConfig.of(context).appName +
-            " and win cash prizes in every match. Take this bonus of " +
+        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
             strings.rupee +
             refBAmount.toString() +
-            " and join me at " +
-            AppConfig.of(context).appName +
-            ". " +
-            "Click " +
+            " in your account - Click " +
             inviteUrl +
-            " to download " +
-            AppConfig.of(context).appName +
-            " app and use my code " +
+            " to download the Howzat app and use my code " +
             refCode +
             " to register.";
     FlutterShareMe().shareToFacebook(msg: inviteMsg);
@@ -121,19 +100,12 @@ class EarnCashState extends State<EarnCash> {
 
   _shareNowGmail() {
     inviteMsg =
-        "I'm having super fun playing Fantasy sports daily. Join me at " +
-            AppConfig.of(context).appName +
-            " and win cash prizes in every match. Take this bonus of " +
+        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
             strings.rupee +
             refBAmount.toString() +
-            " and join me at " +
-            AppConfig.of(context).appName +
-            ". " +
-            "Click " +
+            " in your account - Click " +
             inviteUrl +
-            " to download " +
-            AppConfig.of(context).appName +
-            " app and use my code " +
+            " to download the Howzat app and use my code " +
             refCode +
             " to register.";
     FlutterShareMe().shareToSystem(msg: inviteMsg);
@@ -169,7 +141,7 @@ class EarnCashState extends State<EarnCash> {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).primaryTextTheme.headline.copyWith(
                           color: Colors.black,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                         ),
                   ),
                 ),
@@ -186,9 +158,8 @@ class EarnCashState extends State<EarnCash> {
                         strings.rupee +
                         refAAmount.toString()),
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
                           color: Colors.black,
-                          fontWeight: FontWeight.w800,
                         ),
                   ),
                 ),
@@ -204,7 +175,7 @@ class EarnCashState extends State<EarnCash> {
                     child: Column(
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.only(top: 16.0, bottom: 8.0),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -213,10 +184,10 @@ class EarnCashState extends State<EarnCash> {
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .caption
+                                      .body1
                                       .copyWith(
                                         color: Colors.black,
-                                        fontWeight: FontWeight.w800,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                 ),
                               ),
@@ -232,7 +203,7 @@ class EarnCashState extends State<EarnCash> {
                                     .primaryTextTheme
                                     .title
                                     .copyWith(
-                                      color: Colors.green,
+                                      color: Color.fromRGBO(70, 165, 12, 1),
                                       fontWeight: FontWeight.w800,
                                     ),
                                 textAlign: TextAlign.center,
@@ -316,7 +287,7 @@ class EarnCashState extends State<EarnCash> {
                         ),
                         Padding(
                           padding: EdgeInsets.only(
-                              left: 32.0, right: 32.0, bottom: 16.0, top: 16.0),
+                              left: 32.0, right: 32.0, bottom: 24.0, top: 16.0),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -375,11 +346,11 @@ class EarnCashState extends State<EarnCash> {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 4.0),
                         child: Text(
-                          "Terms and Conditions",
+                          "Share and Earn Rs 10 in three easy steps!",
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
                                     color: Colors.black,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w700,
                                   ),
                         ),
                       ),
@@ -387,27 +358,18 @@ class EarnCashState extends State<EarnCash> {
                         padding: EdgeInsets.symmetric(vertical: 4.0),
                         child: Row(
                           children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Container(
-                                width: 8.0,
-                                height: 8.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
                             Expanded(
-                              child: Text(
-                                "You need to verify your mobile Number.",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .body2
-                                    .copyWith(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "Step 1 -  Verify your mobile number.",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body2
+                                      .copyWith(
+                                        color: Colors.black87,
+                                      ),
+                                ),
                               ),
                             ),
                           ],
@@ -417,27 +379,18 @@ class EarnCashState extends State<EarnCash> {
                         padding: EdgeInsets.symmetric(vertical: 4.0),
                         child: Row(
                           children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Container(
-                                width: 8.0,
-                                height: 8.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
                             Expanded(
-                              child: Text(
-                                "Share your invite code with your friends.",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .body2
-                                    .copyWith(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "Step 2 - Share the invite code above with your friends.",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body2
+                                      .copyWith(
+                                        color: Colors.black87,
+                                      ),
+                                ),
                               ),
                             ),
                           ],
@@ -447,32 +400,42 @@ class EarnCashState extends State<EarnCash> {
                         padding: EdgeInsets.symmetric(vertical: 4.0),
                         child: Row(
                           children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Container(
-                                width: 8.0,
-                                height: 8.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
                             Expanded(
-                              child: Text(
-                                "Your friends should also verify their mobile number.",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .body2
-                                    .copyWith(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  "Step 3 - Your friend joins and verifies their mobile number.",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body2
+                                      .copyWith(
+                                        color: Colors.black87,
+                                      ),
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                "That's it!  You get ₹$refAAmount and your friend gets ₹$refBAmount when both of you have verified your mobile numbers.",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .body2
+                                    .copyWith(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
                 ),

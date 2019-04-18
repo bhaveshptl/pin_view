@@ -24,7 +24,7 @@ class LeagueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8.0, 2.0, 8.0, 2.0),
+      padding: EdgeInsets.fromLTRB(16.0, 2.0, 16.0, 2.0),
       child: Tooltip(
         message: _league != null && _league.matchId != null
             ? _league.matchId.toString() + " - " + _league.matchName
@@ -32,6 +32,7 @@ class LeagueCard extends StatelessWidget {
         child: Card(
           elevation: 3.0,
           clipBehavior: Clip.antiAliasWithSaveLayer,
+          margin: EdgeInsets.symmetric(vertical: 4.0),
           child: Stack(
             children: <Widget>[
               FlatButton(
@@ -113,10 +114,10 @@ class LeagueCard extends StatelessWidget {
                                       _league.teamA.name,
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .body2
+                                          .title
                                           .copyWith(
                                             color: Colors.black,
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                     ),
                                   ),
@@ -144,7 +145,7 @@ class LeagueCard extends StatelessWidget {
                                   height: 32.0,
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: Colors.black45,
+                                      color: Colors.grey.shade400,
                                       width: 1.0,
                                     ),
                                     shape: BoxShape.circle,
@@ -177,10 +178,10 @@ class LeagueCard extends StatelessWidget {
                                       _league.teamB.name,
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .body2
+                                          .title
                                           .copyWith(
                                             color: Colors.black,
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                     ),
                                   ),
@@ -243,7 +244,6 @@ class LeagueCard extends StatelessWidget {
                                           .body1
                                           .copyWith(
                                             color: Colors.black,
-                                            fontWeight: FontWeight.w600,
                                           ),
                                     ),
                                   )

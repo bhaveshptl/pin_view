@@ -883,16 +883,23 @@ class LeagueDetailState extends State<LeagueDetail>
           title.toUpperCase(),
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              Navigator.of(context).push(
-                FantasyPageRoute(
-                  pageBuilder: (context) => SearchContest(
-                        leagues: widget.leagues,
+          FlatButton(
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
+                Text(
+                  " Contest code".toUpperCase(),
+                  style: Theme.of(context).primaryTextTheme.button.copyWith(
+                        color: Colors.white,
                       ),
                 ),
-              );
+              ],
+            ),
+            onPressed: () {
+              _onSearchContest();
             },
           ),
         ],
@@ -909,8 +916,8 @@ class LeagueDetailState extends State<LeagueDetail>
               controller: tabController,
               labelColor: Theme.of(context).primaryColor,
               unselectedLabelColor: Colors.black,
-              labelStyle: Theme.of(context).primaryTextTheme.body2.copyWith(
-                    fontWeight: FontWeight.w800,
+              labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
               indicator: UnderlineTabIndicator(
                 borderSide: BorderSide(
@@ -1094,8 +1101,8 @@ class LeagueDetailState extends State<LeagueDetail>
                                           children: <Widget>[
                                             Text(
                                               activeTabIndex == 0
-                                                  ? "Joined Contest"
-                                                  : "Joined Prediction",
+                                                  ? "Joined Contests"
+                                                  : "Joined Predictions",
                                             ),
                                           ],
                                         ),
@@ -1110,6 +1117,61 @@ class LeagueDetailState extends State<LeagueDetail>
                                 ),
                               ),
                             ),
+                            activeTabIndex == 0
+                                ? Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Container(
+                                      width: 1.0,
+                                      height: 72.0,
+                                      color: Colors.black12,
+                                    ),
+                                  )
+                                : Container(),
+                            activeTabIndex == 0
+                                ? Expanded(
+                                    child: Container(
+                                      height: 72.0,
+                                      child: FlatButton(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Container(
+                                              width: 24.0,
+                                              height: 24.0,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.orange,
+                                              ),
+                                              alignment: Alignment.center,
+                                              child: Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(top: 4.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Text(
+                                                    "Create Contest",
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        onPressed: () {
+                                          _onBottomButtonClick(0);
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
                           ],
                         ),
                       )
@@ -1125,7 +1187,7 @@ class LeagueDetailState extends State<LeagueDetail>
                                 .toUpperCase(),
                             style: Theme.of(context)
                                 .primaryTextTheme
-                                .subhead
+                                .title
                                 .copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w900,

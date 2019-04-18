@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -74,12 +77,13 @@ class SearchContestState extends State<SearchContest> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           strings.get("SEARCH_CONTEST").toUpperCase(),
         ),
+        elevation: 0.0,
       ),
       body: Form(
         key: _formKey,
@@ -93,20 +97,15 @@ class SearchContestState extends State<SearchContest> {
                     children: <Widget>[
                       Expanded(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                                hintText: 'Contest code to search.'),
+                          padding: EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 8.0),
+                          child: SimpleTextBox(
+                            hintText: 'Contest code to search.',
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Contest code is required to search contest.';
                               }
                             },
                             controller: _contestCodeController,
-                            onEditingComplete: () {
-                              _onSearchContest();
-                            },
                           ),
                         ),
                       ),
@@ -117,31 +116,39 @@ class SearchContestState extends State<SearchContest> {
                     children: <Widget>[
                       Expanded(
                         child: Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 8.0),
+                          padding: EdgeInsets.fromLTRB(8.0, 24.0, 8.0, 8.0),
                           child: Tooltip(
                             message: strings.get("SEARCH_CONTEST_WITH_CODE"),
-                            child: RaisedButton(
-                              color: Theme.of(context).primaryColorDark,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.search,
-                                    color: Colors.white70,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                      strings.get("SEARCH").toUpperCase(),
-                                      style: TextStyle(color: Colors.white70),
+                            child: Container(
+                              height: 48.0,
+                              child: ColorButton(
+                                elevation: 0.0,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.search,
+                                      color: Colors.white,
                                     ),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        strings.get("SEARCH").toUpperCase(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () {
+                                  _onSearchContest();
+                                },
                               ),
-                              onPressed: () {
-                                _onSearchContest();
-                              },
                             ),
                           ),
                         ),

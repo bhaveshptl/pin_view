@@ -2,7 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -111,18 +115,7 @@ class CreateContestState extends State<CreateContest> {
   }
 
   _onWsMsg(data) {
-    if (data["iType"] == RequestType.GET_ALL_L1 &&
-        data["bSuccessful"] == true) {
-      setState(() {
-        _l1Data = L1.fromJson(data["data"]["l1"]);
-        _myTeams = (data["data"]["myteams"] as List)
-            .map((i) => MyTeam.fromJson(i))
-            .toList();
-      });
-    } else if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
-        data["bSuccessful"] == true) {
-      _applyL1DataUpdate(data["diffData"]["ld"]);
-    } else if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
+    if (data["iType"] == RequestType.MY_TEAMS_ADDED &&
         data["bSuccessful"] == true) {
       MyTeam teamAdded = MyTeam.fromJson(data["data"]);
       setState(() {
@@ -143,38 +136,6 @@ class CreateContestState extends State<CreateContest> {
     }
   }
 
-  _applyL1DataUpdate(Map<String, dynamic> _data) {
-    if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
-      List<Contest> _addedContests =
-          (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
-      setState(() {
-        for (Contest _contest in _addedContests) {
-          bool bFound = false;
-          for (Contest _curContest in _l1Data.contests) {
-            if (_curContest.id == _contest.id) {
-              bFound = true;
-            }
-          }
-          if (!bFound && _l1Data.league.id == _contest.leagueId) {
-            _l1Data.contests.add(_contest);
-          }
-        }
-      });
-    }
-    if (_data["lstModified"] != null && _data["lstModified"].length > 0) {
-      List<dynamic> _modifiedContests = _data["lstModified"];
-      for (Map<String, dynamic> _changedContest in _modifiedContests) {
-        for (Contest _contest in _l1Data.contests) {
-          if (_contest.id == _changedContest["id"]) {
-            setState(() {
-              _contest.joined = _changedContest["joined"];
-            });
-          }
-        }
-      }
-    }
-  }
-
   _onCreateContest() async {
     if (_formKey.currentState.validate()) {
       Map<String, dynamic> payload = {
@@ -192,41 +153,49 @@ class CreateContestState extends State<CreateContest> {
         "totalPrizeAmount": getTotalPrizeAmount(prizeStructure),
       };
 
-      final result = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return JoinContest(
-            l1Data: _l1Data,
-            myTeams: _myTeams,
-            onError: onJoinContestError,
-            onCreateTeam: _onCreateTeam,
-            createContestPayload: payload,
-          );
-        },
+      ActionUtil().launchJoinContest(
+        l1Data: widget.l1data,
+        league: widget.league,
+        myTeams: widget.myTeams,
+        scaffoldKey: _scaffoldKey,
+        createContestPayload: payload,
       );
 
-      if (result != null) {
-        Map<String, dynamic> response = json.decode(result);
-        if (response["error"]) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(response["message"]),
-            ),
-          );
-        } else {
-          Contest contest = Contest.fromJson(response["contest"]);
-          Navigator.of(context).pushReplacement(
-            FantasyPageRoute(
-              pageBuilder: (context) => ContestDetail(
-                    contest: contest,
-                    l1Data: _l1Data,
-                    myTeams: _myTeams,
-                    league: widget.league,
-                  ),
-            ),
-          );
-        }
-      }
+      // final result = await showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return JoinContest(
+      //       l1Data: _l1Data,
+      //       myTeams: _myTeams,
+      //       onError: onJoinContestError,
+      //       onCreateTeam: _onCreateTeam,
+      //       createContestPayload: payload,
+      //     );
+      //   },
+      // );
+
+      // if (result != null) {
+      //   Map<String, dynamic> response = json.decode(result);
+      //   if (response["error"]) {
+      //     _scaffoldKey.currentState.showSnackBar(
+      //       SnackBar(
+      //         content: Text(response["message"]),
+      //       ),
+      //     );
+      //   } else {
+      //     Contest contest = Contest.fromJson(response["contest"]);
+      //     Navigator.of(context).pushReplacement(
+      //       FantasyPageRoute(
+      //         pageBuilder: (context) => ContestDetail(
+      //               contest: contest,
+      //               l1Data: _l1Data,
+      //               myTeams: _myTeams,
+      //               league: widget.league,
+      //             ),
+      //       ),
+      //     );
+      //   }
+      // }
     }
   }
 
@@ -504,6 +473,7 @@ class CreateContestState extends State<CreateContest> {
         title: Text(
           strings.get("CREATE_CONTEST").toUpperCase(),
         ),
+        elevation: 0.0,
       ),
       body: Column(
         children: <Widget>[
@@ -512,17 +482,12 @@ class CreateContestState extends State<CreateContest> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
-                  child: LeagueCard(
-                    widget.league,
-                    clickable: false,
+                  child: LeagueTitle(
+                    league: widget.league,
                   ),
                 ),
               ),
             ],
-          ),
-          Divider(
-            height: 2.0,
-            color: Colors.black12,
           ),
           Expanded(
             child: Form(
@@ -530,18 +495,9 @@ class CreateContestState extends State<CreateContest> {
               child: ListView(
                 children: <Widget>[
                   ListTile(
-                    leading: TextFormField(
-                      decoration: InputDecoration(
-                        labelText: strings.get("CONTEST_NAME"),
-                        contentPadding: EdgeInsets.all(8.0),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black38,
-                          ),
-                        ),
-                      ),
+                    leading: SimpleTextBox(
+                      labelText: strings.get("CONTEST_NAME"),
                       controller: _nameController,
-                      textInputAction: TextInputAction.next,
                     ),
                   ),
                   ListTile(
@@ -567,23 +523,12 @@ class CreateContestState extends State<CreateContest> {
                       ],
                     ),
                   ),
-                  ListTile(
-                    leading: TextFormField(
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: SimpleTextBox(
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: strings.get("ENTRY_FEE"),
-                        hintText: '1 - 10,000',
-                        prefix: Padding(
-                          padding: const EdgeInsets.only(left: 2.0, right: 4.0),
-                          child: Text(strings.rupee),
-                        ),
-                        contentPadding: EdgeInsets.all(8.0),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black38,
-                          ),
-                        ),
-                      ),
+                      labelText: strings.get("ENTRY_FEE"),
+                      hintText: '1 - 10,000',
                       controller: _entryFeeController,
                       validator: (value) {
                         if (isNumeric(value)) {
@@ -597,24 +542,16 @@ class CreateContestState extends State<CreateContest> {
                           return strings.get("ENTRY_FEE_NUMBER_ERROR");
                         }
                       },
-                      textInputAction: TextInputAction.next,
                     ),
                   ),
-                  ListTile(
-                    leading: Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: TextFormField(
+                  Padding(
+                    padding: EdgeInsets.only(top: 16.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: SimpleTextBox(
                         keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: strings.get("PARTICIPANTS"),
-                          hintText: '2-100',
-                          contentPadding: EdgeInsets.all(8.0),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black38,
-                            ),
-                          ),
-                        ),
+                        labelText: strings.get("PARTICIPANTS"),
+                        hintText: '2-100',
                         controller: _participantsController,
                         validator: (value) {
                           if (isNumeric(value)) {
@@ -628,7 +565,6 @@ class CreateContestState extends State<CreateContest> {
                             return strings.get("PARTICIPANTS_NUMBER_ERROR");
                           }
                         },
-                        textInputAction: TextInputAction.next,
                       ),
                     ),
                   ),
@@ -784,28 +720,30 @@ class CreateContestState extends State<CreateContest> {
                       message: strings.get("CREATE_CONTEST_TOOLTIP"),
                       child: Padding(
                         padding: const EdgeInsets.only(top: 32.0),
-                        child: RaisedButton(
-                          color: Theme.of(context).primaryColorDark,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(
-                                Icons.add,
-                                color: Colors.white70,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  strings.get("CREATE").toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white70),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 48.0,
+                                child: ColorButton(
+                                  child: Text(
+                                    strings.get("CREATE").toUpperCase(),
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                  ),
+                                  onPressed: () {
+                                    _onCreateContest();
+                                  },
                                 ),
                               ),
-                            ],
-                          ),
-                          onPressed: () {
-                            _onCreateContest();
-                          },
+                            ),
+                          ],
                         ),
                       ),
                     ),

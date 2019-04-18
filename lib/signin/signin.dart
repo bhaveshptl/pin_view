@@ -393,21 +393,32 @@ class SignInPageState extends State<SignInPage> {
       appBar: AppBar(
         title: Padding(
           padding: EdgeInsets.all(8.0),
-          child: Image.asset("images/logo_with_name.png"),
+          child: Row(
+            children: <Widget>[
+              Image.asset("images/logo_white.png"),
+              Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: Image.asset(
+                  "images/logo_name_white.png",
+                  height: 20.0,
+                ),
+              ),
+            ],
+          ),
         ),
         actions: <Widget>[
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(10.0),
             child: ColorButton(
               onPressed: () {
                 _launchSignup(context);
               },
               child: Text(
                 "Register".toUpperCase(),
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                      color: Color.fromRGBO(25, 14, 4, 1),
+                      fontWeight: FontWeight.w700,
+                    ),
               ),
               color: Color.fromRGBO(243, 180, 81, 1),
             ),
@@ -426,12 +437,10 @@ class SignInPageState extends State<SignInPage> {
                     child: Text(
                       "Welcome! Login & Start Playing.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w900,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.subhead.fontSize,
-                      ),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ),
                 ],
@@ -454,20 +463,17 @@ class SignInPageState extends State<SignInPage> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
-                                      child: Container(
-                                        height: 32.0,
-                                        child: SimpleTextBox(
-                                          onSaved: (val) => _authName = val,
-                                          labelText: "Username or Email",
-                                          validator: (value) {
-                                            if (value.isEmpty) {
-                                              return strings
-                                                  .get("USERNAME_ERROR");
-                                            }
-                                          },
-                                          keyboardType:
-                                              TextInputType.emailAddress,
-                                        ),
+                                      child: SimpleTextBox(
+                                        onSaved: (val) => _authName = val,
+                                        labelText: "Username or Email",
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return strings
+                                                .get("USERNAME_ERROR");
+                                          }
+                                        },
+                                        keyboardType:
+                                            TextInputType.emailAddress,
                                       ),
                                     ),
                                   )
@@ -476,35 +482,28 @@ class SignInPageState extends State<SignInPage> {
                               Row(
                                 children: <Widget>[
                                   Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(bottom: 8.0),
-                                      child: Container(
-                                        height: 32.0,
-                                        child: SimpleTextBox(
-                                          onSaved: (val) => _password = val,
-                                          labelText: "Password",
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                _obscureText = !_obscureText;
-                                              });
-                                            },
-                                            padding: EdgeInsets.all(0.0),
-                                            icon: Icon(
-                                              _obscureText
-                                                  ? Icons.visibility
-                                                  : Icons.visibility_off,
-                                            ),
-                                          ),
-                                          validator: (value) {
-                                            if (value.isEmpty) {
-                                              return strings
-                                                  .get("PASSWORD_ERROR");
-                                            }
-                                          },
-                                          obscureText: _obscureText,
+                                    child: SimpleTextBox(
+                                      onSaved: (val) => _password = val,
+                                      labelText: "Password",
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _obscureText = !_obscureText;
+                                          });
+                                        },
+                                        padding: EdgeInsets.all(0.0),
+                                        icon: Icon(
+                                          _obscureText
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
                                         ),
                                       ),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return strings.get("PASSWORD_ERROR");
+                                        }
+                                      },
+                                      obscureText: _obscureText,
                                     ),
                                   )
                                 ],
@@ -535,34 +534,40 @@ class SignInPageState extends State<SignInPage> {
                       )
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: ColorButton(
-                          onPressed: () {
-                            if (formKey.currentState.validate()) {
-                              formKey.currentState.save();
-                              _doSignIn(_authName, _password);
-                            }
-                          },
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
                           child: Container(
-                            child: Text(
-                              "Login",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .button
-                                  .copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                            height: 48.0,
+                            child: ColorButton(
+                              onPressed: () {
+                                if (formKey.currentState.validate()) {
+                                  formKey.currentState.save();
+                                  _doSignIn(_authName, _password);
+                                }
+                              },
+                              child: Container(
+                                child: Text(
+                                  "Login",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    padding: EdgeInsets.only(top: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -575,7 +580,7 @@ class SignInPageState extends State<SignInPage> {
                             children: <Widget>[
                               Expanded(
                                 child: Divider(
-                                  color: Colors.black54,
+                                  color: Colors.grey.shade400,
                                 ),
                               ),
                               CircleAvatar(
@@ -594,7 +599,7 @@ class SignInPageState extends State<SignInPage> {
                               ),
                               Expanded(
                                 child: Divider(
-                                  color: Colors.black54,
+                                  color: Colors.grey.shade400,
                                 ),
                               )
                             ],
@@ -612,42 +617,15 @@ class SignInPageState extends State<SignInPage> {
                     child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: ColorButton(
+                          child: FlatButton(
                             onPressed: () {
                               _doGoogleLogin(context);
                             },
-                            color: Colors.white,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    gplus_squared,
-                                    color: Colors.black,
-                                    size: 32.0,
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16.0),
-                                    child: Container(
-                                      height: 32.0,
-                                      width: 1.0,
-                                      color: Colors.black26,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "Continue with Google",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            padding: EdgeInsets.all(0.0),
+                            color: Colors.transparent,
+                            child: Image.asset(
+                              "images/googleBtn.png",
+                              fit: BoxFit.cover,
                             ),
                           ),
                         ),
@@ -659,39 +637,15 @@ class SignInPageState extends State<SignInPage> {
                     child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: ColorButton(
+                          child: FlatButton(
+                            padding: EdgeInsets.all(0.0),
                             onPressed: () {
                               _doFacebookLogin(context);
                             },
-                            color: Color.fromRGBO(59, 89, 153, 1),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    facebook_squared,
-                                    color: Colors.white,
-                                    size: 32.0,
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16.0),
-                                    child: Container(
-                                      height: 32.0,
-                                      width: 1.0,
-                                      color: Colors.black26,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "Continue with Facebook",
-                                      style: TextStyle(color: Colors.white),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            color: Colors.transparent,
+                            child: Image.asset(
+                              "images/fbButton.png",
+                              fit: BoxFit.cover,
                             ),
                           ),
                         )
@@ -703,7 +657,10 @@ class SignInPageState extends State<SignInPage> {
                     children: <Widget>[
                       Text(
                         "Not a Member yet?",
-                        style: TextStyle(color: Colors.black38),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.grey.shade600,
+                                ),
                       ),
                       InkWell(
                         onTap: () {
@@ -713,11 +670,14 @@ class SignInPageState extends State<SignInPage> {
                           padding: EdgeInsets.all(4.0),
                           child: Text(
                             "Register now",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
                           ),
                         ),
                       )

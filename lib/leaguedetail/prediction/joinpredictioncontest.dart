@@ -2,20 +2,23 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/action_utils/action_util.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/leaguedetail/prediction/viewsheet.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
-import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
 
 class JoinPredictionContest extends StatefulWidget {
   final League league;
@@ -200,6 +203,12 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
     }
   }
 
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
@@ -283,7 +292,8 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
                                                             _sheetToJoin.id !=
                                                                 sheet.id)
                                                         ? Colors.black
-                                                        : Colors.green,
+                                                        : Color.fromRGBO(
+                                                            70, 165, 12, 1),
                                                     width: 1.0,
                                                   ),
                                                 ),
@@ -303,7 +313,8 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
                                                         child: CircleAvatar(
                                                           radius: 6.0,
                                                           backgroundColor:
-                                                              Colors.green,
+                                                              Color.fromRGBO(70,
+                                                                  165, 12, 1),
                                                         ),
                                                       ),
                                               ),
@@ -336,7 +347,22 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
                                                   ),
                                             ),
                                           ),
-                                          onTap: () {},
+                                          onTap: () {
+                                            showLoader(true);
+                                            Navigator.of(context).push(
+                                              FantasyPageRoute(
+                                                pageBuilder: (context) =>
+                                                    ViewSheet(
+                                                      sheet: sheet,
+                                                      league: widget.league,
+                                                      contest: widget.contest,
+                                                      predictionData:
+                                                          widget.prediction,
+                                                    ),
+                                                fullscreenDialog: true,
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),

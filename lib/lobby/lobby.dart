@@ -48,6 +48,7 @@ class LobbyState extends State<Lobby>
   User _user;
   int _sportType = 1;
   int _activeIndex = 0;
+  int _curPageIndex = 0;
   List<League> _leagues;
   double userBalance = 0.0;
   TabController _controller;
@@ -293,8 +294,8 @@ class LobbyState extends State<Lobby>
                 controller: _controller,
                 labelColor: Theme.of(context).primaryColor,
                 unselectedLabelColor: Colors.black,
-                labelStyle: Theme.of(context).primaryTextTheme.body2.copyWith(
-                      fontWeight: FontWeight.w800,
+                labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
                 indicator: UnderlineTabIndicator(
                   borderSide: BorderSide(
@@ -309,64 +310,98 @@ class LobbyState extends State<Lobby>
                 }).toList(),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: _carousel.length > 0
-                  ? CarouselSlider(
-                      enlargeCenterPage: false,
-                      aspectRatio: 16 / 3,
-                      autoPlayInterval: Duration(seconds: 10),
-                      items: _carousel.map<Widget>((dynamic banner) {
-                        return FlatButton(
-                          padding: EdgeInsets.all(0.0),
-                          onPressed: () {
-                            if (banner["CTA"] != "" && banner["CTA"] != "NA") {
-                              showLoader(true);
-                            }
-                            routeLauncher.launchBannerRoute(
-                                banner: banner,
-                                context: context,
-                                scaffoldKey: scaffoldKey,
-                                onComplete: () {
-                                  showLoader(false);
-                                });
+            Column(
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: _carousel.length > 0
+                      ? CarouselSlider(
+                          enlargeCenterPage: true,
+                          aspectRatio: 16 / 3.5,
+                          viewportFraction: 1.0,
+                          onPageChanged: (int index) {
+                            setState(() {
+                              _curPageIndex = index;
+                            });
                           },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 4.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4.0),
+                          enableInfiniteScroll: true,
+                          autoPlayInterval: Duration(seconds: 10),
+                          items: _carousel.map<Widget>((dynamic banner) {
+                            return FlatButton(
+                              padding: EdgeInsets.all(0.0),
+                              onPressed: () {
+                                if (banner["CTA"] != "" &&
+                                    banner["CTA"] != "NA") {
+                                  showLoader(true);
+                                }
+                                routeLauncher.launchBannerRoute(
+                                    banner: banner,
+                                    context: context,
+                                    scaffoldKey: scaffoldKey,
+                                    onComplete: () {
+                                      showLoader(false);
+                                    });
+                              },
                               child: Image.network(
                                 banner["banner"],
-                                fit: BoxFit.cover,
-                                width: 1000.0,
+                                fit: BoxFit.fitWidth,
+                                width: MediaQuery.of(context).size.width,
                               ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      autoPlay: _carousel.length <= 2 ? false : true,
-                      reverse: false,
-                    )
-                  : Container(),
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.0,
-                    ),
-                    child: Text(
-                      "Upcoming Matches",
-                      style:
-                          Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w800,
+                            );
+                          }).toList(),
+                          autoPlay: _carousel.length <= 2 ? false : true,
+                          reverse: false,
+                        )
+                      : Container(),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _carousel
+                        .asMap()
+                        .map((index, f) => MapEntry(
+                            index,
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Container(
+                                width: 8.0,
+                                height: 8.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: index == _curPageIndex
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.black45,
+                                ),
                               ),
-                    ),
+                            )))
+                        .values
+                        .toList(),
                   ),
                 ),
               ],
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                      ),
+                      child: Text(
+                        "Upcoming Matches",
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: TabBarView(
@@ -439,82 +474,45 @@ class LobbyState extends State<Lobby>
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(5.0),
                   child: Image.asset(
-                    "images/logo.png",
+                    "images/logo_white.png",
                     width: 48.0,
                   ),
                 ),
               ),
-              Container(
-                // width: MediaQuery.of(context).size.width / 2,
-                height: 48.0,
-                decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
+              ColorButton(
                 child: Row(
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          width: 44.0,
-                          child: FlatButton(
-                            padding: EdgeInsets.all(0.0),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                FantasyPageRoute(
-                                  pageBuilder: (context) => AppDrawer(),
-                                ),
-                              );
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.only(left: 8.0, right: 4.0),
-                              child: Icon(
-                                Icons.person,
+                    Text(
+                      "ADD CASH",
+                      style:
+                          Theme.of(context).primaryTextTheme.subhead.copyWith(
                                 color: Colors.white,
-                                size: 32.0,
+                                fontWeight: FontWeight.w700,
                               ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: Text(
-                            formatCurrency.format(
-                              userBalance,
-                            ),
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .subhead
-                                .copyWith(
-                                  color: Colors.white,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: 8.0,
-                        right: 8.0,
-                        top: 4.0,
-                        bottom: 4.0,
-                      ),
-                      child: ColorButton(
-                        child: Text(
-                          "ADD CASH",
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .button
-                              .copyWith(
-                                color: Colors.white,
-                              ),
-                        ),
-                        onPressed: () {
-                          _launchAddCash();
-                        },
-                      ),
                     ),
                   ],
+                ),
+                onPressed: () {
+                  _launchAddCash();
+                },
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    FantasyPageRoute(
+                      pageBuilder: (context) => AppDrawer(),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0),
+                  child: Container(
+                    color: Color.fromRGBO(242, 242, 242, 1),
+                    child: Image.asset(
+                      "images/person-icon.png",
+                      height: 40.0,
+                    ),
+                  ),
                 ),
               ),
             ],

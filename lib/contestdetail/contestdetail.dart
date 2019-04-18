@@ -604,10 +604,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
     String contestCode = widget.contest.contestJoinCode;
     String contestShareUrl = BaseUrl().contestShareUrl;
-    String inviteMsg = AppConfig.of(context).channelId == "10"
-        ? "Join my HOWZAT $contestVisibility League I've created a Contest for us to play. Use the contest code *$contestCode* in Howzat to join! \n $contestShareUrl"
-        : AppConfig.of(context).appName.toUpperCase() +
-            " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
+    String inviteMsg =
+        "Join my HOWZAT $contestVisibility Contest! Use the contest code $contestCode in Howzat to join! \n $contestShareUrl";
 
     FlutterShareMe().shareToSystem(msg: inviteMsg);
   }
@@ -723,6 +721,31 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         title: Text(
           strings.get("CONTEST_DETAILS").toUpperCase(),
         ),
+        actions: <Widget>[
+          FlatButton(
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.share,
+                  color: Colors.white,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 4.0),
+                  child: Text(
+                    "Share".toUpperCase(),
+                    style: Theme.of(context)
+                        .primaryTextTheme
+                        .button
+                        .copyWith(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () {
+              _shareContestDialog(context);
+            },
+          )
+        ],
         elevation: 0.0,
       ),
       body: NestedScrollView(
@@ -854,13 +877,6 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                       if (player.id == curPlayer.id) {
                                         player.playingStyleId =
                                             curPlayer.playingStyleId;
-                                        // player.teamId = curPlayer.teamId;
-                                        // player.playingStyleDesc =
-                                        //     curPlayer.playingStyleDesc;
-                                        // player.credit = curPlayer.credit;
-                                        // player.sportsId = curPlayer.sportsId;
-                                        // player.countryId = curPlayer.countryId;
-                                        // player.seriesScore = curPlayer.seriesScore;
                                       }
                                     });
                                   });
@@ -889,7 +905,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: Colors.black12,
+                              color: Colors.grey.shade100,
                               width: 1.0,
                             ),
                           ),
@@ -939,7 +955,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                                         .primaryTextTheme
                                                         .subhead
                                                         .copyWith(
-                                                          color: Colors.green,
+                                                          color: Color.fromRGBO(
+                                                              70, 165, 12, 1),
                                                           fontWeight:
                                                               FontWeight.w600,
                                                         ),
@@ -965,7 +982,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                                         .primaryTextTheme
                                                         .subhead
                                                         .copyWith(
-                                                          color: Colors.green,
+                                                          color: Color.fromRGBO(
+                                                              70, 165, 12, 1),
                                                           fontWeight:
                                                               FontWeight.w600,
                                                         ),

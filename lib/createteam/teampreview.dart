@@ -117,13 +117,17 @@ class TeamPreview extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: league.teamA.id == player.teamId
+                      ? Colors.white
+                      : Colors.grey.shade900,
                   borderRadius: BorderRadius.circular(2.0),
                 ),
                 child: Text(
                   player.name,
                   style: Theme.of(context).primaryTextTheme.caption.copyWith(
-                        color: Colors.black,
+                        color: league.teamA.id == player.teamId
+                            ? Colors.black
+                            : Colors.white,
                         fontSize: 10.0,
                         fontWeight: FontWeight.w800,
                       ),
@@ -133,8 +137,10 @@ class TeamPreview extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.only(top: 4.0),
                   child: Text(
-                    player.score.toString() + " Pts",
-                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                    league.status == LeagueStatus.UPCOMING
+                        ? player.credit.toString() + " Cr"
+                        : player.score.toString() + " Pts",
+                    style: Theme.of(context).primaryTextTheme.button.copyWith(
                           color: Colors.white,
                         ),
                   ),
@@ -146,6 +152,19 @@ class TeamPreview extends StatelessWidget {
       }
     });
     return players;
+  }
+
+  getPlayingStyleLabel(String label) {
+    switch (label) {
+      case "Batsman":
+        return "batsmen".toUpperCase();
+      case "Bowler":
+        return "Bowlers".toUpperCase();
+      case "All Rounder":
+        return "All Rounders".toUpperCase();
+      default:
+        return label.toUpperCase();
+    }
   }
 
   @override
@@ -187,75 +206,101 @@ class TeamPreview extends StatelessWidget {
               )
             ],
           ),
-          body: Stack(
-            alignment: Alignment.bottomLeft,
+          body: Column(
             children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
+              Container(
+                padding: EdgeInsets.only(bottom: 16.0, top: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset(
+                      "images/logo_white.png",
+                      color: Colors.white30,
+                      height: 56.0,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Image.asset(
+                        "images/logo_name_white.png",
+                        color: Colors.white30,
+                        height: 30.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:
+                        fanTeamRules.styles.map((PlayingStyle playingStyle) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Column(
                           children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                playingStyle.label.toUpperCase(),
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .body1
-                                    .copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                textAlign: TextAlign.center,
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    getPlayingStyleLabel(playingStyle.label),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .subhead
+                                        .copyWith(
+                                          color: Colors.white54,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children:
+                                    getPlayersForStyle(playingStyle, context),
                               ),
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: getPlayersForStyle(playingStyle, context),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
               league.status == LeagueStatus.COMPLETED
                   ? Row(
                       children: <Widget>[
                         Expanded(
                           child: Container(
-                            height: 56.0,
-                            color: Colors.black45,
+                            height: 64.0,
+                            color: Colors.grey.shade700,
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  "Score",
+                                  myTeam.score.toString(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .display1
+                                      .copyWith(
+                                        color: Colors.white,
+                                      ),
+                                ),
+                                Text(
+                                  "Total Points".toUpperCase(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .title
                                       .copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                ),
-                                Text(
-                                  myTeam.score.toString(),
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .headline
-                                      .copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
+                                        color: Colors.grey.shade400,
                                       ),
                                 ),
                               ],

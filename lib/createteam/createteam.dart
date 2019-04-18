@@ -531,7 +531,8 @@ class CreateTeamState extends State<CreateTeam>
         labelColor: Theme.of(context).primaryColor,
         indicatorColor: Theme.of(context).primaryColor,
         labelStyle: Theme.of(context).primaryTextTheme.subhead.copyWith(
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
+              fontSize: 18.0,
             ),
       ),
     );
@@ -786,10 +787,10 @@ class CreateTeamState extends State<CreateTeam>
                                 " players from a team",
                             style: Theme.of(context)
                                 .primaryTextTheme
-                                .body2
+                                .subhead
                                 .copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                 ),
                           ),
                         ],
@@ -1037,7 +1038,7 @@ class CreateTeamState extends State<CreateTeam>
                                   ),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(2.0),
-                                    color: Colors.green,
+                                    color: Color.fromRGBO(70, 165, 12, 1),
                                   ),
                                   width: ((MediaQuery.of(context).size.width -
                                               32.0) /
@@ -1119,13 +1120,11 @@ class CreateTeamState extends State<CreateTeam>
                         color: Colors.orange,
                         child: Text(
                           "Team Preview",
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .subhead
-                              .copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                              ),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                         ),
                         onPressed: () {
                           Navigator.of(context).push(
@@ -1137,8 +1136,6 @@ class CreateTeamState extends State<CreateTeam>
                                     allowEditTeam: false,
                                     fanTeamRules: _fanTeamRules,
                                     myTeam: MyTeam(
-                                      // captain: _captain.id,
-                                      // viceCaptain: _vCaptain.id,
                                       players: _selectedPlayers,
                                     ),
                                   ),
@@ -1157,13 +1154,11 @@ class CreateTeamState extends State<CreateTeam>
                       child: ColorButton(
                         child: Text(
                           "Continue",
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .subhead
-                              .copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                              ),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                         ),
                         onPressed: _selectedPlayers.length !=
                                 _fanTeamRules.playersTotal

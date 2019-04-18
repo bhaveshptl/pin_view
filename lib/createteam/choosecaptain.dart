@@ -228,22 +228,33 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                           ),
                           child: Row(
                             children: <Widget>[
-                              Expanded(
-                                flex: 3,
-                                child: CircleAvatar(
-                                  minRadius: 24.0,
-                                  backgroundColor: Colors.black12,
-                                  child: CachedNetworkImage(
-                                    imageUrl: _player.jerseyUrl,
-                                    placeholder: Container(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.0,
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: <Widget>[
+                                    CircleAvatar(
+                                      minRadius: 24.0,
+                                      backgroundColor: Colors.black12,
+                                      child: CachedNetworkImage(
+                                        imageUrl: _player.jerseyUrl,
+                                        placeholder: Container(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                          ),
+                                          width: teamLogoHeight,
+                                          height: teamLogoHeight,
+                                        ),
+                                        height: teamLogoHeight,
                                       ),
-                                      width: teamLogoHeight,
-                                      height: teamLogoHeight,
                                     ),
-                                    height: teamLogoHeight,
-                                  ),
+                                    Image.asset(
+                                      "images/style-" +
+                                          _player.playingStyleId.toString() +
+                                          ".png",
+                                      height: 16.0,
+                                    ),
+                                  ],
                                 ),
                               ),
                               Expanded(

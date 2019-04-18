@@ -7,16 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/withdraw.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/profilepages/verification.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/withdraw/withdrawhistory.dart';
+import 'package:playfantasy/withdraw/withdrawsuccess.dart';
 
 class Withdraw extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -83,6 +87,29 @@ class WithdrawState extends State<Withdraw>
       vsync: this,
     );
     initFormInputs();
+  }
+
+  updateWithdrawData() {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.AUTH_WITHDRAW,
+      ),
+    );
+    HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+      Map<String, dynamic> response = json.decode(res.body);
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        _withdrawData = Withhdraw.fromJson(response["data"]);
+      } else {
+        JoinContestError error = JoinContestError(response["error"]);
+        int errorCode = error.getErrorCode();
+        if (errorCode == 6 || errorCode == -1) {
+          setState(() {
+            _withdrawData = Withhdraw.fromJson(response["data"]);
+          });
+        }
+      }
+    });
   }
 
   _setAddressList() async {
@@ -805,18 +832,15 @@ class WithdrawState extends State<Withdraw>
       "name": firstNameController.text
     });
     await HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
+      (http.Response res) async {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text("Your withdraw request submitted successfully."),
-            ),
+          updateWithdrawData();
+          await showDialog(
+            context: context,
+            builder: (context) => WithdrawSuccess(
+                  withdrawResponse: json.decode(res.body),
+                ),
           );
-          final result = openWithdrawHistory(context);
-          if (result != null && result == true) {
-            _withdrawData.ifscCode = acIFSCCodeController.text;
-            _withdrawData.accountNumber = accountNumberController.text;
-          }
         } else {
           Map<String, dynamic> response = json.decode(res.body);
           if (response["error"] != null) {
@@ -907,7 +931,7 @@ class WithdrawState extends State<Withdraw>
                     child: Card(
                       elevation: 3.0,
                       child: Container(
-                        padding: EdgeInsets.fromLTRB(8.0, 16.0, 8.0, 8.0),
+                        padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
                         child: Column(
                           children: <Widget>[
                             Row(
@@ -1028,22 +1052,35 @@ class WithdrawState extends State<Withdraw>
                               child: Row(
                                 children: <Widget>[
                                   Expanded(
-                                    child: RaisedButton(
-                                      onPressed: () {
-                                        if (_paytmFormKey.currentState
-                                            .validate()) {
-                                          makeWithdrawRequest(
-                                            context,
-                                            withdrawType: 4,
-                                            amount: double.parse(
-                                              paytmAmountController.text,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: Text("REQUEST WITHDRAW"),
-                                      textColor: Colors.white70,
-                                      color: Theme.of(context).primaryColorDark,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        height: 48.0,
+                                        child: ColorButton(
+                                          onPressed: () async {
+                                            if (_paytmFormKey.currentState
+                                                .validate()) {
+                                              makeWithdrawRequest(
+                                                context,
+                                                withdrawType: 4,
+                                                amount: double.parse(
+                                                  paytmAmountController.text,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: Text(
+                                            "REQUEST WITHDRAWAL",
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   )
                                 ],
@@ -1284,7 +1321,7 @@ class WithdrawState extends State<Withdraw>
                                   children: <Widget>[
                                     Expanded(
                                       child: Text(
-                                        "*Account name is auto-populated as per your KYC if it is not matching with the Name of your Bank Account, please send a mail to support@algorintechlabs.com",
+                                        "*Account name is auto-populated as per your KYC if it is not matching with the Name of your Bank Account, please send a mail to support@howzat.com",
                                         textAlign: TextAlign.justify,
                                         style: TextStyle(
                                           color: Colors.black54,
@@ -1302,33 +1339,44 @@ class WithdrawState extends State<Withdraw>
                                 children: <Widget>[
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsets.only(bottom: 8.0),
-                                      child: RaisedButton(
-                                        onPressed: () {
-                                          if (_withdrawData.withdrawCost !=
-                                                  null &&
-                                              _withdrawData.withdrawCost > 0 &&
-                                              _withdrawData
-                                                      .numberOfFreeWithdraw <
-                                                  _withdrawData.totalWithdraw) {
-                                            confirmWithdrawRequest(context);
-                                          } else {
-                                            if (_formKey.currentState
-                                                .validate()) {
-                                              makeWithdrawRequest(
-                                                context,
-                                                withdrawType: 1,
-                                                amount: double.parse(
-                                                  amountController.text,
-                                                ),
-                                              );
+                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      child: Container(
+                                        height: 48.0,
+                                        child: ColorButton(
+                                          onPressed: () {
+                                            if (_withdrawData.withdrawCost !=
+                                                    null &&
+                                                _withdrawData.withdrawCost >
+                                                    0 &&
+                                                _withdrawData
+                                                        .numberOfFreeWithdraw <
+                                                    _withdrawData
+                                                        .totalWithdraw) {
+                                              confirmWithdrawRequest(context);
+                                            } else {
+                                              if (_formKey.currentState
+                                                  .validate()) {
+                                                makeWithdrawRequest(
+                                                  context,
+                                                  withdrawType: 1,
+                                                  amount: double.parse(
+                                                    amountController.text,
+                                                  ),
+                                                );
+                                              }
                                             }
-                                          }
-                                        },
-                                        child: Text("REQUEST WITHDRAW"),
-                                        textColor: Colors.white70,
-                                        color:
-                                            Theme.of(context).primaryColorDark,
+                                          },
+                                          child: Text(
+                                            "REQUEST WITHDRAWAL",
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1358,12 +1406,12 @@ class WithdrawState extends State<Withdraw>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         elevation: 0.0,
         title: Text(
-          "Withdraw".toUpperCase(),
+          "withdrawal".toUpperCase(),
         ),
         actions: <Widget>[
           IconButton(
@@ -1371,8 +1419,9 @@ class WithdrawState extends State<Withdraw>
               Icons.compare_arrows,
               size: Theme.of(context).primaryTextTheme.display1.fontSize,
             ),
-            onPressed: () {
-              openWithdrawHistory(context);
+            onPressed: () async {
+              await openWithdrawHistory(context);
+              updateWithdrawData();
             },
           )
         ],
@@ -1380,6 +1429,9 @@ class WithdrawState extends State<Withdraw>
           controller: _tabController,
           indicatorColor: Colors.white,
           indicatorWeight: 4.0,
+          labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
           tabs: _withdrawModes.keys.map((k) {
             return Tab(
               child: Text(k.toUpperCase()),

@@ -220,7 +220,7 @@ class ResultContest extends StatelessWidget {
                   Text(
                     "You Won ",
                     style: Theme.of(context).primaryTextTheme.body1.copyWith(
-                          color: Colors.green,
+                          color: Color.fromRGBO(70, 165, 12, 1),
                           fontWeight: FontWeight.w900,
                         ),
                   ),
@@ -238,7 +238,7 @@ class ResultContest extends StatelessWidget {
                   Text(
                     formatCurrency.format(_totalWinnings),
                     style: Theme.of(context).primaryTextTheme.body1.copyWith(
-                          color: Colors.green,
+                          color: Color.fromRGBO(70, 165, 12, 1),
                           fontWeight: FontWeight.w900,
                         ),
                   )

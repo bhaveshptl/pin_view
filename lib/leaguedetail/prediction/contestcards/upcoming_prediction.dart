@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -45,11 +46,15 @@ class UpcomingPrediction extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     "Prize Pool",
-                    style: TextStyle(color: Colors.black38),
+                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
                   ),
                   Text(
                     "Entry Fee",
-                    style: TextStyle(color: Colors.black38),
+                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
                   ),
                 ],
               ),
@@ -74,25 +79,23 @@ class UpcomingPrediction extends StatelessWidget {
                             contest.prizeDetails[0]["totalPrizeAmount"]),
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Theme.of(context).primaryColorDark,
-                          fontSize:
-                              Theme.of(context).primaryTextTheme.title.fontSize,
-                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          fontSize: Theme.of(context)
+                              .primaryTextTheme
+                              .headline
+                              .fontSize,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
                   ),
-                  RaisedButton(
+                  ColorButton(
                     onPressed: (bIsContestFull || onJoin == null)
                         ? null
                         : () {
                             onJoin(contest);
                           },
                     elevation: 0.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    color: Colors.green,
                     padding: EdgeInsets.all(0.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -129,9 +132,9 @@ class UpcomingPrediction extends StatelessWidget {
                                   formatCurrency.format(contest.entryFee),
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .button
+                                      .subhead
                                       .copyWith(
-                                        color: Colors.white70,
+                                        color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
@@ -158,12 +161,12 @@ class UpcomingPrediction extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8.0),
                             child: Container(
                               height: 6.0,
-                              color: Colors.green,
+                              color: Color.fromRGBO(70, 165, 12, 1),
                             ),
                           ),
                         ),
                         Expanded(
-                          flex: contest.size,
+                          flex: contest.size - contest.joined,
                           child: Container(),
                         ),
                       ],
@@ -172,7 +175,7 @@ class UpcomingPrediction extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: 4.0),
+                padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -187,7 +190,12 @@ class UpcomingPrediction extends StatelessWidget {
                         ),
                         Text(
                           " seats left",
-                          style: TextStyle(color: Colors.black38),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.grey.shade500,
+                              ),
                         ),
                       ],
                     ),
@@ -202,7 +210,12 @@ class UpcomingPrediction extends StatelessWidget {
                         ),
                         Text(
                           " seats",
-                          style: TextStyle(color: Colors.black38),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.grey.shade500,
+                              ),
                         ),
                       ],
                     ),
@@ -234,19 +247,19 @@ class UpcomingPrediction extends StatelessWidget {
                       Text(
                         contest.prizeDetails[0]["noOfPrizes"].toString() + " ",
                         style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   color: Colors.orange,
                                   fontWeight: FontWeight.w900,
                                 ),
                       ),
                       Text(
                         contest.prizeDetails[0]["noOfPrizes"].toString() == "1"
-                            ? "WINNER"
-                            : strings.get("WINNERS").toUpperCase(),
+                            ? "Winner"
+                            : strings.get("WINNERS"),
                         style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   color: Colors.orange,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                 ),
                       ),
                       Icon(
@@ -271,7 +284,7 @@ class UpcomingPrediction extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(
-                              color: Colors.black38,
+                              color: Colors.grey.shade300,
                             ),
                             borderRadius: BorderRadius.circular(4.0),
                           ),
@@ -303,7 +316,7 @@ class UpcomingPrediction extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border.all(
-                                color: Colors.black38,
+                                color: Colors.grey.shade300,
                               ),
                               borderRadius: BorderRadius.circular(4.0),
                             ),
@@ -314,7 +327,7 @@ class UpcomingPrediction extends StatelessWidget {
                               child: Text(
                                 "B",
                                 style: TextStyle(
-                                  color: Colors.green,
+                                  color: Color.fromRGBO(70, 165, 12, 1),
                                   fontSize: Theme.of(context)
                                       .primaryTextTheme
                                       .caption

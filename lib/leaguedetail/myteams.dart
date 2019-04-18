@@ -143,8 +143,7 @@ class MyTeamsState extends State<MyTeams> {
       styleCount.add(
         Text(
           Sports.styles[styleId] + " : " + mapTeams[styleId].length.toString(),
-          style: Theme.of(context).primaryTextTheme.body1.copyWith(
-                fontWeight: FontWeight.w700,
+          style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                 color: Colors.grey.shade600,
               ),
         ),
@@ -240,7 +239,7 @@ class MyTeamsState extends State<MyTeams> {
                                         .subhead
                                         .copyWith(
                                           color: Colors.black,
-                                          fontWeight: FontWeight.w800,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                   ),
                                   Row(
@@ -289,7 +288,6 @@ class MyTeamsState extends State<MyTeams> {
                                                   .primaryTextTheme
                                                   .subhead
                                                   .copyWith(
-                                                    fontWeight: FontWeight.w800,
                                                     color: Colors.grey.shade600,
                                                   ),
                                             ),
@@ -313,7 +311,6 @@ class MyTeamsState extends State<MyTeams> {
                                                   .primaryTextTheme
                                                   .subhead
                                                   .copyWith(
-                                                    fontWeight: FontWeight.w800,
                                                     color: Colors.grey.shade600,
                                                   ),
                                             ),

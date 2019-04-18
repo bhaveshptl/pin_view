@@ -143,7 +143,7 @@ class JoinContestState extends State<JoinContest> {
           createContestPayload: widget.createContestPayload);
     } else {
       Map<String, dynamic> payload = widget.createContestPayload;
-      payload["fanTeamId"] = _teamToJoin;
+      payload["fanTeamId"] = _teamToJoin.id;
 
       http.Request req = http.Request("POST",
           Uri.parse(BaseUrl().apiUrl + ApiUtil.CREATE_AND_JOIN_CONTEST));
@@ -258,11 +258,11 @@ class JoinContestState extends State<JoinContest> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 8.0),
                   child: Text(
-                    "Choose team to join the contest".toUpperCase(),
+                    "Choose a team to join the contest".toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                    style: Theme.of(context).primaryTextTheme.title.copyWith(
                           color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w500,
                         ),
                   ),
                 ),
@@ -291,8 +291,14 @@ class JoinContestState extends State<JoinContest> {
                           padding: EdgeInsets.all(8.0),
                           child: Card(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
+                                borderRadius: BorderRadius.circular(4.0),
+                                side: BorderSide(
+                                  color: (_teamToJoin != null &&
+                                          _teamToJoin.id == team.id)
+                                      ? Colors.green
+                                      : Colors.transparent,
+                                  width: 1.0,
+                                )),
                             clipBehavior: Clip.hardEdge,
                             child: FlatButton(
                               onPressed: () {
@@ -326,7 +332,8 @@ class JoinContestState extends State<JoinContest> {
                                                             _teamToJoin.id !=
                                                                 team.id)
                                                         ? Colors.black
-                                                        : Colors.green,
+                                                        : Color.fromRGBO(
+                                                            70, 165, 12, 1),
                                                     width: 1.0,
                                                   ),
                                                 ),
@@ -346,7 +353,8 @@ class JoinContestState extends State<JoinContest> {
                                                         child: CircleAvatar(
                                                           radius: 6.0,
                                                           backgroundColor:
-                                                              Colors.green,
+                                                              Color.fromRGBO(70,
+                                                                  165, 12, 1),
                                                         ),
                                                       ),
                                               ),
@@ -358,7 +366,7 @@ class JoinContestState extends State<JoinContest> {
                                                   .subhead
                                                   .copyWith(
                                                     color: Colors.black,
-                                                    fontWeight: FontWeight.w800,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                             ),
                                           ],
@@ -428,8 +436,6 @@ class JoinContestState extends State<JoinContest> {
                                                       .body1
                                                       .copyWith(
                                                         color: Colors.orange,
-                                                        fontWeight:
-                                                            FontWeight.w600,
                                                       ),
                                                 ),
                                                 Padding(
@@ -441,8 +447,6 @@ class JoinContestState extends State<JoinContest> {
                                                         .primaryTextTheme
                                                         .body1
                                                         .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600,
                                                           color: Colors.black,
                                                         ),
                                                   ),
@@ -477,8 +481,6 @@ class JoinContestState extends State<JoinContest> {
                                                       .body1
                                                       .copyWith(
                                                         color: Colors.blue,
-                                                        fontWeight:
-                                                            FontWeight.w600,
                                                       ),
                                                 ),
                                                 Padding(
@@ -490,8 +492,6 @@ class JoinContestState extends State<JoinContest> {
                                                         .primaryTextTheme
                                                         .body1
                                                         .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.w600,
                                                           color: Colors.black,
                                                         ),
                                                   ),

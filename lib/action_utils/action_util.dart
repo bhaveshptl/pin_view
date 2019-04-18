@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/contestdetail/contestdetail.dart';
 import 'package:playfantasy/joincontest/joincontest.dart';
 import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
 import 'package:playfantasy/leaguedetail/prediction/joinpredictioncontest.dart';
@@ -26,24 +29,31 @@ class ActionUtil {
     Contest contest,
     List<MyTeam> myTeams,
     GlobalKey<ScaffoldState> scaffoldKey,
+    Map<String, dynamic> createContestPayload,
   }) async {
     showLoader(scaffoldKey.currentContext, true);
     final balance = await routeLauncher.getUserBalance(
-        leagueId: league.leagueId, contestId: contest.id);
+      leagueId: league.leagueId,
+      contestId: contest == null ? null : contest.id,
+    );
     showLoader(scaffoldKey.currentContext, false);
     final joinConfirmMsg = await showDialog(
       context: scaffoldKey.currentContext,
       builder: (BuildContext context) {
         return JoinContestConfirmation(
           userBalance: balance,
-          entryFees: contest.entryFee,
-          prizeType: contest.prizeType,
-          bonusAllowed: contest.bonusAllowed,
+          entryFees: contest == null
+              ? createContestPayload["entryFee"]
+              : contest.entryFee,
+          prizeType: contest == null
+              ? createContestPayload["prizeType"]
+              : contest.prizeType,
+          bonusAllowed: contest == null ? 0 : contest.bonusAllowed,
         );
       },
     );
     if (joinConfirmMsg != null && joinConfirmMsg["confirm"]) {
-      showLoader(scaffoldKey.currentContext, true);
+      showLoader(scaffoldKey.currentContext, contest == null ? false : true);
       final result = await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => JoinContest(
@@ -51,6 +61,7 @@ class ActionUtil {
                 l1Data: l1Data,
                 contest: contest,
                 myTeams: myTeams,
+                createContestPayload: createContestPayload,
                 onError:
                     ((Contest contest, Map<String, dynamic> errorResponse) {
                   final result = onJoinContestError(
@@ -66,13 +77,42 @@ class ActionUtil {
                         scaffoldKey: scaffoldKey,
                       );
                     },
+                    userBalance: balance,
                   );
                 }),
               ),
         ),
       );
 
-      if (result != null) {
+      if (createContestPayload != null) {
+        final response = json.decode(result);
+        if (!response["error"]) {
+          final createdContest = Contest.fromJson(response["contest"]);
+          Navigator.of(scaffoldKey.currentContext).pushReplacement(
+            FantasyPageRoute(
+              pageBuilder: (context) => ContestDetail(
+                    contest: createdContest,
+                    league: league,
+                  ),
+            ),
+          );
+        } else {
+          final result = onJoinContestError(
+            scaffoldKey.currentContext,
+            contest,
+            response,
+            onJoin: () {
+              launchJoinContest(
+                league: league,
+                l1Data: l1Data,
+                contest: contest,
+                myTeams: myTeams,
+                scaffoldKey: scaffoldKey,
+              );
+            },
+          );
+        }
+      } else if (result != null) {
         scaffoldKey.currentState
             .showSnackBar(SnackBar(content: Text("$result")));
       }
@@ -87,13 +127,23 @@ class ActionUtil {
 
   onJoinContestError(
       BuildContext context, Contest contest, Map<String, dynamic> errorResponse,
-      {Function onJoin}) async {
+      {Function onJoin, Map<String, dynamic> userBalance}) async {
     JoinContestError error;
     if (errorResponse["error"] == true) {
       error = JoinContestError([errorResponse["resultCode"]]);
     } else {
       error = JoinContestError(errorResponse["reasons"]);
     }
+
+    double bonusUsable =
+        contest.entryFee == null || contest.bonusAllowed == null
+            ? 0.0
+            : (contest.entryFee * contest.bonusAllowed) / 100;
+    double usableBonus = userBalance["bonusBalance"] > bonusUsable
+        ? (bonusUsable > userBalance["playableBonus"]
+            ? userBalance["playableBonus"]
+            : bonusUsable)
+        : userBalance["bonusBalance"];
 
     Navigator.of(context).pop();
     if (error.isBlockedUser()) {
@@ -120,11 +170,17 @@ class ActionUtil {
         case 12:
           final result = await _showAddCashConfirmation(context, contest);
           if (result["launchJoinConfirmation"]) {
-            routeLauncher.launchAddCash(context, onSuccess: (result) {
-              if (result != null) {
-                onJoin();
-              }
-            });
+            routeLauncher.launchAddCash(
+              context,
+              prefilledAmount: contest.entryFee - usableBonus > 25
+                  ? contest.entryFee - usableBonus
+                  : 25,
+              onSuccess: (result) {
+                if (result != null) {
+                  onJoin();
+                }
+              },
+            );
           }
           break;
         case 6:
@@ -191,8 +247,8 @@ class ActionUtil {
       );
 
       if (result != null) {
-        scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
+        final msg = json.decode(result)["message"];
+        scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$msg")));
       }
     }
   }

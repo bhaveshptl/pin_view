@@ -62,12 +62,14 @@ class StatusTab extends StatelessWidget {
         shrinkWrap: true,
         itemCount: statusLeagues.length,
         itemBuilder: (context, index) {
-          return LeagueCard(
-            statusLeagues[index],
-            onTimeComplete: onLeagueStatusChanged,
-            onClick: (league) {
-              onLeagueSelect(context, league);
-            },
+          return Container(
+            child: LeagueCard(
+              statusLeagues[index],
+              onTimeComplete: onLeagueStatusChanged,
+              onClick: (league) {
+                onLeagueSelect(context, league);
+              },
+            ),
           );
         },
       );

@@ -4,11 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -49,7 +51,6 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     with RouteAware {
   int _sportType = 1;
   int _curPageOffset = 0;
-  bool bShowLoader = false;
   final int rowsPerPage = 25;
   List<MySheet> mySheets = [];
 
@@ -123,16 +124,17 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     } else {
       sheetToView = null;
       waitForPredictionDataToViewSheet = false;
+      showLoader(true);
       Navigator.of(context).push(
         FantasyPageRoute(
-            pageBuilder: (context) => ViewSheet(
-                  sheet: sheet,
-                  league: widget.league,
-                  contest: widget.contest,
-                  mySheet: widget.mySheets,
-                  predictionData: predictionData,
-                ),
-            fullscreenDialog: true),
+          pageBuilder: (context) => ViewSheet(
+                sheet: sheet,
+                league: widget.league,
+                contest: widget.contest,
+                predictionData: predictionData,
+              ),
+          fullscreenDialog: true,
+        ),
       );
     }
   }
@@ -347,9 +349,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   }
 
   showLoader(bool bShow) {
-    setState(() {
-      bShowLoader = bShow;
-    });
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   void _showPrizeStructure() async {
@@ -520,21 +522,14 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    bool bIsContestFull = widget.contest.size <= widget.contest.joined ||
-        (_mapContestSheets != null &&
-            widget.contest.teamsAllowed <= _mapContestSheets.length) ||
-        widget.league.status == LeagueStatus.LIVE ||
-        widget.league.status == LeagueStatus.COMPLETED;
-    final formatCurrency =
-        NumberFormat.currency(locale: "hi_IN", symbol: "", decimalDigits: 0);
 
     _sheetDataSource.setWidth(width);
     _sheetDataSource.setContext(context);
 
     return Stack(
       children: <Widget>[
-        Scaffold(
-          key: _scaffoldKey,
+        ScaffoldPage(
+          scaffoldKey: _scaffoldKey,
           appBar: AppBar(
             title: Text(
               strings.get("CONTEST_DETAILS").toUpperCase(),
@@ -638,7 +633,6 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
             ),
           ),
         ),
-        bShowLoader ? Loader() : Container(),
       ],
     );
   }

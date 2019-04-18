@@ -323,7 +323,7 @@ class PredictionViewState extends State<PredictionView> {
                     : true;
 
                 return Padding(
-                  padding: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+                  padding: EdgeInsets.only(top: 4.0, right: 16.0, left: 16.0),
                   child: PredictionContestCard(
                     radius: BorderRadius.circular(
                       5.0,

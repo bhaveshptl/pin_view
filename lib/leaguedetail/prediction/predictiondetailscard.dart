@@ -164,7 +164,7 @@ class PredictionDetailsCard extends StatelessWidget {
                         Text(
                           formatCurrency.format(contest.entryFee),
                           style: TextStyle(
-                            color: Colors.green,
+                            color: Color.fromRGBO(70, 165, 12, 1),
                             fontSize: Theme.of(context)
                                 .primaryTextTheme
                                 .title
@@ -248,7 +248,8 @@ class PredictionDetailsCard extends StatelessWidget {
                                               .primaryTextTheme
                                               .caption
                                               .copyWith(
-                                                color: Colors.green,
+                                                color: Color.fromRGBO(
+                                                    70, 165, 12, 1),
                                               ),
                                         ),
                                         alignment: Alignment.center,
@@ -256,7 +257,8 @@ class PredictionDetailsCard extends StatelessWidget {
                                           borderRadius:
                                               BorderRadius.circular(5.0),
                                           border: Border.all(
-                                            color: Colors.green,
+                                            color:
+                                                Color.fromRGBO(70, 165, 12, 1),
                                           ),
                                         ),
                                       ),
@@ -291,7 +293,7 @@ class PredictionDetailsCard extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8.0),
                                     child: Container(
                                       height: 6.0,
-                                      color: Colors.green,
+                                      color: Color.fromRGBO(70, 165, 12, 1),
                                     ),
                                   ),
                                 ),

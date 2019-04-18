@@ -16,7 +16,7 @@ class PlayingStyleTab extends StatelessWidget {
   final List<Player> selectedPlayers;
   final Map<int, String> mapSportLabel;
 
-  final double teamLogoHeight = 32.0;
+  final double teamLogoHeight = 36.0;
 
   PlayingStyleTab({
     this.style,
@@ -48,7 +48,7 @@ class PlayingStyleTab extends StatelessWidget {
     onPlayerSelect(style, _player);
   }
 
-  Widget _playerListView() {
+  Widget _playerListView(BuildContext context) {
     List<Player> tabPlayers = [];
 
     for (Player player in allPlayers) {
@@ -67,7 +67,7 @@ class PlayingStyleTab extends StatelessWidget {
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.black.withAlpha(30),
+                        color: Colors.grey.shade100,
                         width: 1.0,
                       ),
                     ),
@@ -77,10 +77,12 @@ class PlayingStyleTab extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      Expanded(
-                        flex: 3,
-                        child: Container(
-                          height: 28.0,
+                      Container(
+                        height: 0.0,
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: CircleAvatar(
+                          minRadius: 24.0,
+                          backgroundColor: Colors.transparent,
                         ),
                       ),
                       Expanded(
@@ -98,19 +100,12 @@ class PlayingStyleTab extends StatelessWidget {
                               children: <Widget>[
                                 Text(
                                   "Players".toUpperCase(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 8.0),
-                                  child: sortedBy == "NAME"
-                                      ? Icon(
-                                          Icons.sort,
-                                          size: 16.0,
-                                        )
-                                      : Container(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.grey.shade600,
+                                      ),
                                 ),
                               ],
                             ),
@@ -136,18 +131,14 @@ class PlayingStyleTab extends StatelessWidget {
                                   child: Text(
                                     "Points".toUpperCase(),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.black54,
-                                    ),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .subhead
+                                        .copyWith(
+                                          color: Colors.grey.shade600,
+                                        ),
                                   ),
                                 ),
-                                sortedBy == "SCORE"
-                                    ? Icon(
-                                        Icons.sort,
-                                        size: 16.0,
-                                      )
-                                    : Container(),
                               ],
                             ),
                           ),
@@ -170,18 +161,15 @@ class PlayingStyleTab extends StatelessWidget {
                                   child: Text(
                                     "Credits".toUpperCase(),
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.black54,
-                                    ),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .subhead
+                                        .copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey.shade600,
+                                        ),
                                   ),
                                 ),
-                                sortedBy == "CREDITS"
-                                    ? Icon(
-                                        Icons.sort,
-                                        size: 16.0,
-                                      )
-                                    : Container(),
                               ],
                             ),
                           ),
@@ -215,7 +203,7 @@ class PlayingStyleTab extends StatelessWidget {
                     color: Colors.white,
                     border: Border(
                       bottom: BorderSide(
-                        color: Colors.black.withAlpha(30),
+                        color: Colors.grey.shade100,
                         width: 1.0,
                       ),
                     ),
@@ -231,23 +219,34 @@ class PlayingStyleTab extends StatelessWidget {
                         EdgeInsets.only(bottom: 12.0, top: 12.0, right: 8.0),
                     child: Row(
                       children: <Widget>[
-                        Expanded(
-                          flex: 3,
-                          child: CircleAvatar(
-                            minRadius: 20.0,
-                            backgroundColor: Colors.black12,
-                            child: CachedNetworkImage(
-                              imageUrl: _player.jerseyUrl,
-                              placeholder: Container(
-                                padding: EdgeInsets.all(8.0),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Stack(
+                            alignment: Alignment.bottomRight,
+                            children: <Widget>[
+                              CircleAvatar(
+                                minRadius: 24.0,
+                                backgroundColor: Colors.black12,
+                                child: CachedNetworkImage(
+                                  imageUrl: _player.jerseyUrl,
+                                  placeholder: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                    ),
+                                    width: teamLogoHeight,
+                                    height: teamLogoHeight,
+                                  ),
+                                  height: teamLogoHeight,
                                 ),
-                                width: teamLogoHeight,
-                                height: teamLogoHeight,
                               ),
-                              height: teamLogoHeight,
-                            ),
+                              Image.asset(
+                                "images/style-" +
+                                    _player.playingStyleId.toString() +
+                                    ".png",
+                                height: 16.0,
+                              ),
+                            ],
                           ),
                         ),
                         Expanded(
@@ -257,9 +256,13 @@ class PlayingStyleTab extends StatelessWidget {
                             children: <Widget>[
                               Text(
                                 _player.name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                ),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .subhead
+                                    .copyWith(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                               ),
                               Padding(
                                 padding: EdgeInsets.only(top: 4.0),
@@ -269,16 +272,22 @@ class PlayingStyleTab extends StatelessWidget {
                                       _player.teamId == league.teamA.id
                                           ? league.teamA.name
                                           : league.teamB.name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .subhead
+                                          .copyWith(
+                                            color: Colors.black,
+                                          ),
                                     ),
                                     Text(
                                       " - " +
                                           mapSportLabel[_player.playingStyleId],
-                                      style: TextStyle(
-                                        color: Colors.black54,
-                                      ),
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .subhead
+                                          .copyWith(
+                                            color: Colors.grey.shade500,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -291,6 +300,12 @@ class PlayingStyleTab extends StatelessWidget {
                           child: Text(
                             _player.seriesScore.toString(),
                             textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
+                                  color: Colors.black,
+                                ),
                           ),
                         ),
                         Expanded(
@@ -298,16 +313,23 @@ class PlayingStyleTab extends StatelessWidget {
                           child: Text(
                             _player.credit.toString(),
                             textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
+                                  color: Colors.black,
+                                ),
                           ),
                         ),
                         Container(
-                          width: 40.0,
-                          height: 32.0,
-                          alignment: Alignment.centerRight,
+                          width: 48.0,
+                          height: 40.0,
+                          padding: EdgeInsets.only(left: 8.0),
+                          alignment: Alignment.center,
                           decoration: BoxDecoration(
                             border: Border(
                               left: BorderSide(
-                                color: Colors.black.withAlpha(20),
+                                color: Colors.grey.shade200,
                               ),
                             ),
                           ),
@@ -335,7 +357,7 @@ class PlayingStyleTab extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          color: Colors.black12,
+          color: Colors.grey.shade300,
           height: kToolbarHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -354,14 +376,14 @@ class PlayingStyleTab extends StatelessWidget {
                     style.label.toUpperCase(),
                 style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                       color: Colors.black,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                     ),
               ),
             ],
           ),
         ),
         Expanded(
-          child: _playerListView(),
+          child: _playerListView(context),
         )
       ],
     );

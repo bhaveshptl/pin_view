@@ -57,7 +57,7 @@ class JoinContestError {
   }
 
   int getErrorCode() {
-    if (_errorCodes.indexOf(12) != -1) {
+    if (_errorCodes.indexOf(12) != -1 || _errorCodes.indexOf(-7) != -1) {
       return 12;
     } else if (_errorCodes.indexOf(3) != -1) {
       return 3;

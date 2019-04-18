@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/leaguedetail/prediction/createsheet/predictionsummarywidget.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -121,7 +122,7 @@ class PredictionSummaryState extends State<PredictionSummary> {
         quiz.questions.length < widget.predictionData.rules["0"]["qcount"]
             ? quiz.questions.length
             : widget.predictionData.rules["0"]["qcount"];
-    return Scaffold(
+    return ScaffoldPage(
       appBar: AppBar(
         title: Text(
           widget.league.teamA.name.toString() +

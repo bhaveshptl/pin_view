@@ -22,7 +22,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           "Home",
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
           ),
           maxLines: 2,
         ),
@@ -40,7 +40,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           "My Matches",
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
           ),
           maxLines: 2,
         ),
@@ -59,7 +59,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           "Add Cash",
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
           ),
           maxLines: 2,
         ),
@@ -78,7 +78,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           "Refer & Earn",
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600,
           ),
           maxLines: 2,
         ),
@@ -95,8 +95,7 @@ class LobbyBottomNavigation extends StatelessWidget {
         textTheme: Theme.of(context).primaryTextTheme.copyWith(
               caption: TextStyle(
                 color: Colors.black54,
-                fontSize: 12.0,
-                fontWeight: FontWeight.w900,
+                fontSize: 16.0,
               ),
             ),
       ),

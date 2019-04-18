@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -21,13 +24,11 @@ class ViewSheet extends StatefulWidget {
   final MySheet sheet;
   final League league;
   final Contest contest;
-  final List<MySheet> mySheet;
   final Prediction predictionData;
 
   ViewSheet({
     this.sheet,
     this.league,
-    this.mySheet,
     this.contest,
     this.predictionData,
   });
@@ -37,7 +38,6 @@ class ViewSheet extends StatefulWidget {
 }
 
 class ViewSheetState extends State<ViewSheet> {
-  Prediction predictionData;
   MySheet sheet = MySheet.fromJson({});
   StreamSubscription _streamSubscription;
   Map<String, dynamic> l1UpdatePackate = {};
@@ -49,34 +49,10 @@ class ViewSheetState extends State<ViewSheet> {
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     getSheet();
-    if (widget.predictionData == null) {
-      _createL1WSObject();
-    } else {
-      predictionData = widget.predictionData;
-    }
-  }
-
-  _createL1WSObject() async {
-    l1UpdatePackate["bResAvail"] = true;
-    l1UpdatePackate["withPrediction"] = true;
-    l1UpdatePackate["id"] = widget.league.leagueId;
-    l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
-    l1UpdatePackate["sportsId"] = widget.league.teamA.sportType;
-    _getL1Data();
   }
 
   _onWsMsg(data) {
-    if (data["bReady"] == 1) {
-      // _showLoader(true);
-      _getL1Data();
-    } else if (data["iType"] == RequestType.GET_ALL_L1 &&
-        data["bSuccessful"] == true) {
-      setState(() {
-        if (data["data"]["prediction"] != null) {
-          predictionData = Prediction.fromJson(data["data"]["prediction"]);
-        }
-      });
-    } else if (data["iType"] == RequestType.MY_SHEET_ADDED &&
+    if (data["iType"] == RequestType.MY_SHEET_ADDED &&
         data["bSuccessful"] == true) {
       MySheet sheetAdded = MySheet.fromJson(data["data"]);
       if (sheetAdded.id == sheet.id) {
@@ -101,6 +77,7 @@ class ViewSheetState extends State<ViewSheet> {
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
+        showLoader(false);
         setState(() {
           sheet = MySheet.fromJson(response);
         });
@@ -108,9 +85,10 @@ class ViewSheetState extends State<ViewSheet> {
     });
   }
 
-  _getL1Data() {
-    // _showLoader(true);
-    FantasyWebSocket().sendMessage(l1UpdatePackate);
+  showLoader(bool bShow) {
+    AppConfig.of(context).store.dispatch(
+          bShow ? LoaderShowAction() : LoaderHideAction(),
+        );
   }
 
   void _onEditSheet(BuildContext context) async {
@@ -152,8 +130,9 @@ class ViewSheetState extends State<ViewSheet> {
   Widget build(BuildContext context) {
     Map<int, int> mapAnswers = {};
     int maxQuestionRules = 0;
-    Quiz quiz =
-        predictionData == null ? null : predictionData.quizSet.quiz["0"];
+    Quiz quiz = widget.predictionData == null
+        ? null
+        : widget.predictionData.quizSet.quiz["0"];
     if (quiz != null && sheet.answers != null) {
       List<int>.generate(sheet.answers.length, (index) {
         if (sheet.answers[index] != -1) {
@@ -161,9 +140,9 @@ class ViewSheetState extends State<ViewSheet> {
         }
       });
       maxQuestionRules =
-          quiz.questions.length < predictionData.rules["0"]["qcount"]
+          quiz.questions.length < widget.predictionData.rules["0"]["qcount"]
               ? quiz.questions.length
-              : predictionData.rules["0"]["qcount"];
+              : widget.predictionData.rules["0"]["qcount"];
     }
     Map<int, int> flips = {};
     if (sheet.boosterThree != null) {
@@ -176,8 +155,8 @@ class ViewSheetState extends State<ViewSheet> {
       });
     }
 
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           sheet.name.toUpperCase(),

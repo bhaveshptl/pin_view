@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/profile.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -514,8 +515,8 @@ class MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           "MY PROFILE".toUpperCase(),

@@ -52,12 +52,13 @@ class ContestCard extends StatelessWidget {
       message: contest.id.toString() + " - " + contest.name,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              children: <Widget>[
-                contest.brand != null && bShowBrandInfo
-                    ? Column(
+          contest.brand != null && bShowBrandInfo
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Column(
                         children: <Widget>[
                           CachedNetworkImage(
                             imageUrl: contest.brand["brandLogoUrl"],
@@ -72,11 +73,9 @@ class ContestCard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
-                    : Container(),
-                Expanded(
-                  child: contest.brand != null && bShowBrandInfo
-                      ? Column(
+                      ),
+                      Expanded(
+                        child: Column(
                           children: <Widget>[
                             Row(
                               children: <Widget>[
@@ -96,47 +95,50 @@ class ContestCard extends StatelessWidget {
                               ],
                             ),
                           ],
-                        )
-                      : Container(),
-                ),
-              ],
-            ),
-          ),
-          Card(
-            elevation: 3.0,
-            shape: radius != null
-                ? RoundedRectangleBorder(borderRadius: radius)
-                : null,
-            margin: margin == null ? EdgeInsets.all(0.0) : margin,
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            child: FlatButton(
-              onPressed: () {
-                onClick(contest, league);
-              },
-              padding: EdgeInsets.all(0.0),
-              child: leagueStatus == LeagueStatus.UPCOMING
-                  ? UpcomingHowzatContest(
-                      league: league,
-                      onJoin: onJoin,
-                      contest: contest,
-                      myJoinedTeams: myJoinedTeams,
-                      onPrizeStructure: onPrizeStructure,
-                    )
-                  : leagueStatus == LeagueStatus.LIVE
-                      ? LiveContest(
-                          league: league,
-                          contest: contest,
-                          isMyContest: isMyContest,
-                          myJoinedTeams: myJoinedTeams,
-                          onPrizeStructure: onPrizeStructure,
-                        )
-                      : ResultContest(
-                          league: league,
-                          contest: contest,
-                          isMyContest: isMyContest,
-                          myJoinedTeams: myJoinedTeams,
-                          onPrizeStructure: onPrizeStructure,
                         ),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Card(
+              elevation: 3.0,
+              shape: radius != null
+                  ? RoundedRectangleBorder(borderRadius: radius)
+                  : null,
+              margin: margin == null ? EdgeInsets.all(0.0) : margin,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: FlatButton(
+                onPressed: () {
+                  onClick(contest, league);
+                },
+                padding: EdgeInsets.all(0.0),
+                child: leagueStatus == LeagueStatus.UPCOMING
+                    ? UpcomingHowzatContest(
+                        league: league,
+                        onJoin: onJoin,
+                        contest: contest,
+                        myJoinedTeams: myJoinedTeams,
+                        onPrizeStructure: onPrizeStructure,
+                      )
+                    : leagueStatus == LeagueStatus.LIVE
+                        ? LiveContest(
+                            league: league,
+                            contest: contest,
+                            isMyContest: isMyContest,
+                            myJoinedTeams: myJoinedTeams,
+                            onPrizeStructure: onPrizeStructure,
+                          )
+                        : ResultContest(
+                            league: league,
+                            contest: contest,
+                            isMyContest: isMyContest,
+                            myJoinedTeams: myJoinedTeams,
+                            onPrizeStructure: onPrizeStructure,
+                          ),
+              ),
             ),
           ),
         ],

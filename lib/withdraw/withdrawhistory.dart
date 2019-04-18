@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -64,10 +65,10 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ScaffoldPage(
       appBar: AppBar(
         title: Text(
-          "Recent withdraws".toUpperCase(),
+          "Recent withdrawals".toUpperCase(),
         ),
       ),
       body: ListView(

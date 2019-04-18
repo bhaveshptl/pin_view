@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 class SimpleTextBox extends StatelessWidget {
   final bool enabled;
+  final String hintText;
   final String labelText;
   final bool obscureText;
   final Widget prefixIcon;
@@ -19,6 +20,7 @@ class SimpleTextBox extends StatelessWidget {
   SimpleTextBox({
     this.enabled,
     this.onSaved,
+    this.hintText,
     this.labelText,
     this.validator,
     this.prefixIcon,
@@ -35,7 +37,13 @@ class SimpleTextBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final InputBorder enabledBorder = OutlineInputBorder(
       borderSide: BorderSide(
-        color: Colors.black54,
+        color: Colors.grey.shade400,
+      ),
+    );
+
+    final InputBorder disabledBorder = OutlineInputBorder(
+      borderSide: BorderSide(
+        color: Colors.grey.shade300,
       ),
     );
 
@@ -60,18 +68,19 @@ class SimpleTextBox extends StatelessWidget {
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
+        filled: true,
+        hintText: hintText,
         labelText: labelText,
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,
         labelStyle: labelStyle,
-        filled: true,
         fillColor: Colors.white70,
         errorBorder: errorBorder,
         focusedBorder: focusedBorder,
         enabledBorder: enabledBorder,
+        disabledBorder: disabledBorder,
         hasFloatingPlaceholder: alwaysShowPlaceholder,
         focusedErrorBorder: errorBorder,
-        contentPadding: EdgeInsets.all(12.0),
       ),
     );
   }

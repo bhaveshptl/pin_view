@@ -49,19 +49,21 @@ class ContestDetailsCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          "Prize pool",
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: Theme.of(context)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 4.0),
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            "Prize pool",
+                            style: Theme.of(context)
                                 .primaryTextTheme
-                                .caption
-                                .fontSize,
+                                .body1
+                                .copyWith(
+                                  color: Colors.grey.shade500,
+                                ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Row(
                       children: <Widget>[
@@ -82,9 +84,9 @@ class ContestDetailsCard extends StatelessWidget {
                             color: Colors.black,
                             fontSize: Theme.of(context)
                                 .primaryTextTheme
-                                .title
+                                .headline
                                 .fontSize,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -102,20 +104,22 @@ class ContestDetailsCard extends StatelessWidget {
                         EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: Column(
                       children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              "Winners",
-                              style: TextStyle(
-                                color: Colors.black54,
-                                fontSize: Theme.of(context)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 4.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                "Winners",
+                                style: Theme.of(context)
                                     .primaryTextTheme
-                                    .caption
-                                    .fontSize,
+                                    .body1
+                                    .copyWith(
+                                      color: Colors.grey.shade500,
+                                    ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -131,7 +135,7 @@ class ContestDetailsCard extends StatelessWidget {
                                     .primaryTextTheme
                                     .title
                                     .fontSize,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ],
@@ -143,12 +147,14 @@ class ContestDetailsCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    Text(
-                      "Entry",
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.caption.fontSize,
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 4.0),
+                      child: Text(
+                        "Entry",
+                        style:
+                            Theme.of(context).primaryTextTheme.body1.copyWith(
+                                  color: Colors.grey.shade500,
+                                ),
                       ),
                     ),
                     Row(
@@ -164,12 +170,12 @@ class ContestDetailsCard extends StatelessWidget {
                         Text(
                           formatCurrency.format(contest.entryFee),
                           style: TextStyle(
-                            color: Colors.green,
+                            color: Color.fromRGBO(70, 165, 12, 1),
                             fontSize: Theme.of(context)
                                 .primaryTextTheme
                                 .title
                                 .fontSize,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -183,7 +189,7 @@ class ContestDetailsCard extends StatelessWidget {
                 : Column(
                     children: <Widget>[
                       Divider(
-                        color: Colors.black26,
+                        color: Colors.grey.shade400,
                         height: 2.0,
                       ),
                       Row(
@@ -234,46 +240,50 @@ class ContestDetailsCard extends StatelessWidget {
                                 ),
                           contest.teamsAllowed == 1
                               ? Container()
-                              : Row(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Container(
-                                        width: 20.0,
-                                        height: 20.0,
+                              : Expanded(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Container(
+                                          width: 20.0,
+                                          height: 20.0,
+                                          child: Text(
+                                            "M",
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .caption
+                                                .copyWith(
+                                                  color: Color.fromRGBO(
+                                                      70, 165, 12, 1),
+                                                ),
+                                          ),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(5.0),
+                                            border: Border.all(
+                                              color: Color.fromRGBO(
+                                                  70, 165, 12, 1),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
                                         child: Text(
-                                          "M",
+                                          "Join with multiple teams",
                                           style: Theme.of(context)
                                               .primaryTextTheme
                                               .caption
                                               .copyWith(
-                                                color: Colors.green,
+                                                color: Colors.black38,
                                               ),
                                         ),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                          border: Border.all(
-                                            color: Colors.green,
-                                          ),
-                                        ),
                                       ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 8.0),
-                                      child: Text(
-                                        "Join with multiple teams",
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .caption
-                                            .copyWith(
-                                              color: Colors.black38,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                         ],
                       ),
@@ -291,7 +301,7 @@ class ContestDetailsCard extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(8.0),
                                     child: Container(
                                       height: 6.0,
-                                      color: Colors.green,
+                                      color: Color.fromRGBO(70, 165, 12, 1),
                                     ),
                                   ),
                                 ),
@@ -305,22 +315,23 @@ class ContestDetailsCard extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 4.0),
+                        padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Row(
                               children: <Widget>[
                                 Text(
-                                  (contest.size - contest.joined).toString(),
-                                  style: TextStyle(
-                                    color: Colors.black38,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                                Text(
-                                  " seats left",
-                                  style: TextStyle(color: Colors.black38),
+                                  "Only " +
+                                      (contest.size - contest.joined)
+                                          .toString() +
+                                      " seats left",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.grey.shade500,
+                                      ),
                                 ),
                               ],
                             ),
@@ -335,7 +346,12 @@ class ContestDetailsCard extends StatelessWidget {
                                 ),
                                 Text(
                                   " seats",
-                                  style: TextStyle(color: Colors.black38),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.grey.shade500,
+                                      ),
                                 ),
                               ],
                             ),

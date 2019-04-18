@@ -53,6 +53,7 @@ class MyMatchesState extends State<MyMatches>
     _sportsController =
         TabController(vsync: this, length: widget.mapSportTypes.keys.length);
     _sportsController.addListener(() {
+      showLoader(true);
       if (!_sportsController.indexIsChanging) {
         print(_sportsController.index + 1);
         _sportType = _sportsController.index + 1;
@@ -78,6 +79,10 @@ class MyMatchesState extends State<MyMatches>
   }
 
   _getMyMatches({bool bShowLoader = true}) async {
+    if (bShowLoader) {
+      showLoader(true);
+    }
+    var sporttype = _sportType;
     http.Request req = http.Request(
       "GET",
       Uri.parse(BaseUrl().apiUrl +
@@ -89,6 +94,10 @@ class MyMatchesState extends State<MyMatches>
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
+        print(_sportType);
+        print(sporttype);
+        print(_sportsController.indexIsChanging);
+        showLoader(false);
         myContestIds = {};
         List<League> _leagues = [];
         Map<String, dynamic> response = json.decode(res.body);
@@ -120,9 +129,10 @@ class MyMatchesState extends State<MyMatches>
     _initializeMyLeagues();
     leagues.forEach((League league) {
       if (DateTime.fromMillisecondsSinceEpoch(league.matchStartTime)
-              .difference(DateTime.now())
-              .inMilliseconds <=
-          0) {
+                  .difference(DateTime.now())
+                  .inMilliseconds <=
+              0 &&
+          league.status != LeagueStatus.COMPLETED) {
         league.status = LeagueStatus.LIVE;
       }
       myLeagues[league.status].add(league);
@@ -148,8 +158,8 @@ class MyMatchesState extends State<MyMatches>
             controller: _sportsController,
             labelColor: Theme.of(context).primaryColor,
             unselectedLabelColor: Colors.black,
-            labelStyle: Theme.of(context).primaryTextTheme.body2.copyWith(
-                  fontWeight: FontWeight.w800,
+            labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
             indicator: UnderlineTabIndicator(
               borderSide: BorderSide(

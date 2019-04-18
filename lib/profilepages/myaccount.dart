@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/modal/account.dart';
 
 import 'package:playfantasy/utils/stringtable.dart';
@@ -24,7 +25,7 @@ class MyAccountState extends State<MyAccount> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return ScaffoldPage(
       appBar: AppBar(
         title: Text(
           "My account".toUpperCase(),

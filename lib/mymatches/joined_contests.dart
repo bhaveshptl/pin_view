@@ -2,25 +2,28 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
+import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
-import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/leaguedetail/myteams.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/leaguedetail/contestcard.dart';
 import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/createcontest/createcontest.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/contestdetail/contestdetail.dart';
 import 'package:playfantasy/prizestructure/prizestructure.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestcard.dart';
+import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
 
 class JoinedContests extends StatefulWidget {
   final League league;
@@ -46,6 +49,7 @@ class JoinedContestsState extends State<JoinedContests>
   Map<int, List<MyTeam>> _mapContestTeams = {};
 
   TabController _tabController;
+  int activeTabIndex = 0;
 
   @override
   void initState() {
@@ -55,8 +59,47 @@ class JoinedContestsState extends State<JoinedContests>
     scaffoldKey = GlobalKey<ScaffoldState>();
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
-    _tabController = TabController(length: 1, vsync: this);
+    initTabController();
     super.initState();
+  }
+
+  initTabController() {
+    _tabController = TabController(
+        length: _myContests != null &&
+                _myContests.normal.length > 0 &&
+                _myContests.prediction.length > 0
+            ? 2
+            : 1,
+        vsync: this);
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setActiveTabIndex();
+      }
+    });
+  }
+
+  setActiveTabIndex() {
+    if (_myContests != null &&
+        _myContests.prediction != null &&
+        _myContests.prediction.length > 0 &&
+        _myContests.normal != null &&
+        _myContests.normal.length > 0) {
+      setState(() {
+        activeTabIndex = _tabController.index;
+      });
+    } else if (_myContests != null &&
+        _myContests.prediction != null &&
+        _myContests.prediction.length > 0) {
+      setState(() {
+        activeTabIndex = 1;
+      });
+    } else if (_myContests != null &&
+        _myContests.normal != null &&
+        _myContests.normal.length > 0) {
+      setState(() {
+        activeTabIndex = 0;
+      });
+    }
   }
 
   _onWsMsg(data) {
@@ -160,15 +203,13 @@ class JoinedContestsState extends State<JoinedContests>
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
+        _myContests = NewMyContest.fromJson(response)
+            .leagues[widget.league.leagueId.toString()];
+        initTabController();
+        setActiveTabIndex();
+
         setState(() {
-          _myContests = NewMyContest.fromJson(response)
-              .leagues[widget.league.leagueId.toString()];
-          _tabController = TabController(
-              length: _myContests.normal.length > 0 &&
-                      _myContests.prediction.length > 0
-                  ? 2
-                  : 1,
-              vsync: this);
+          _myContests = _myContests;
         });
 
         _getMyContestMyTeams(_myContests);
@@ -330,7 +371,7 @@ class JoinedContestsState extends State<JoinedContests>
                   : true;
 
               return Padding(
-                padding: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+                padding: EdgeInsets.only(top: 4.0, right: 16.0, left: 16.0),
                 child: ContestCard(
                   radius: BorderRadius.circular(
                     5.0,
@@ -375,7 +416,7 @@ class JoinedContestsState extends State<JoinedContests>
                   : true;
 
               return Padding(
-                padding: EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+                padding: EdgeInsets.only(top: 4.0, right: 16.0, left: 16.0),
                 child: PredictionContestCard(
                   radius: BorderRadius.circular(
                     5.0,
@@ -407,6 +448,54 @@ class JoinedContestsState extends State<JoinedContests>
     }
 
     return tabsBody;
+  }
+
+  onBottomNavigationClicked(int itemIndex) async {
+    var result;
+    switch (itemIndex) {
+      case 0:
+        result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateContest(
+                  l1data: _l1Data,
+                  myTeams: _myTeams,
+                  league: widget.league,
+                ),
+          ),
+        );
+        break;
+      case 1:
+        result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => MyTeams(
+                  l1Data: _l1Data,
+                  myTeams: _myTeams,
+                  league: widget.league,
+                ),
+          ),
+        );
+        break;
+      case 2:
+        result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => MySheets(
+                  predictionData: _predictionData,
+                  mySheets: _mySheets,
+                  league: widget.league,
+                ),
+          ),
+        );
+    }
+    if (result != null) {
+      scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(result),
+          duration: Duration(
+            seconds: 3,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -461,6 +550,205 @@ class JoinedContestsState extends State<JoinedContests>
               children: getTabBody(),
             ),
           ),
+          activeTabIndex == 0
+              ? Container(
+                  height: 72.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10.0,
+                        spreadRadius: 3.0,
+                        color: Colors.black12,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 72.0,
+                                child: FlatButton(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        width: 24.0,
+                                        height: 24.0,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.orange,
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              "Create Contest",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    onBottomNavigationClicked(0);
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Container(
+                                width: 1.0,
+                                height: 72.0,
+                                color: Colors.black12,
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                height: 72.0,
+                                child: FlatButton(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 24.0,
+                                            height: 24.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.orange,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              _myTeams == null
+                                                  ? "0"
+                                                  : _myTeams.length.toString(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              "My Teams",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    onBottomNavigationClicked(1);
+                                  },
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Container(
+                  height: 72.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10.0,
+                        spreadRadius: 3.0,
+                        color: Colors.black12,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 72.0,
+                                child: FlatButton(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 24.0,
+                                            height: 24.0,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.orange,
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              _mySheets == null
+                                                  ? "0"
+                                                  : _mySheets.length.toString(),
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              "My Sheets",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onPressed: () {
+                                    onBottomNavigationClicked(2);
+                                  },
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
         ],
       ),
     );

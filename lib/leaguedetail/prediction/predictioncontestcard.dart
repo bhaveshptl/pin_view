@@ -57,12 +57,13 @@ class PredictionContestCard extends StatelessWidget {
       message: contest.id.toString() + " - " + contest.name,
       child: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              children: <Widget>[
-                contest.brand != null && bShowBrandInfo
-                    ? Column(
+          contest.brand != null && bShowBrandInfo
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Column(
                         children: <Widget>[
                           CachedNetworkImage(
                             imageUrl: contest.brand["brandLogoUrl"],
@@ -77,11 +78,9 @@ class PredictionContestCard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
-                    : Container(),
-                Expanded(
-                  child: contest.brand != null && bShowBrandInfo
-                      ? Column(
+                      ),
+                      Expanded(
+                        child: Column(
                           children: <Widget>[
                             Row(
                               children: <Widget>[
@@ -101,45 +100,48 @@ class PredictionContestCard extends StatelessWidget {
                               ],
                             ),
                           ],
-                        )
-                      : Container(),
-                ),
-              ],
-            ),
-          ),
-          Card(
-            elevation: 3.0,
-            shape: radius != null
-                ? RoundedRectangleBorder(borderRadius: radius)
-                : null,
-            margin: margin == null ? EdgeInsets.all(0.0) : margin,
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            child: FlatButton(
-              onPressed: () {
-                onClick(contest, league);
-              },
-              padding: EdgeInsets.all(0.0),
-              child: leagueStatus == LeagueStatus.UPCOMING
-                  ? UpcomingPrediction(
-                      league: league,
-                      onJoin: onJoin,
-                      contest: contest,
-                      myJoinedSheets: myJoinedSheets,
-                      onPrizeStructure: onPrizeStructure,
-                    )
-                  : leagueStatus == LeagueStatus.LIVE
-                      ? LivePrediction(
-                          league: league,
-                          contest: contest,
-                          myJoinedSheets: myJoinedSheets,
-                          onPrizeStructure: onPrizeStructure,
-                        )
-                      : ResultPrediction(
-                          league: league,
-                          contest: contest,
-                          myJoinedSheets: myJoinedSheets,
-                          onPrizeStructure: onPrizeStructure,
                         ),
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Card(
+              elevation: 3.0,
+              shape: radius != null
+                  ? RoundedRectangleBorder(borderRadius: radius)
+                  : null,
+              margin: margin == null ? EdgeInsets.all(0.0) : margin,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: FlatButton(
+                onPressed: () {
+                  onClick(contest, league);
+                },
+                padding: EdgeInsets.all(0.0),
+                child: leagueStatus == LeagueStatus.UPCOMING
+                    ? UpcomingPrediction(
+                        league: league,
+                        onJoin: onJoin,
+                        contest: contest,
+                        myJoinedSheets: myJoinedSheets,
+                        onPrizeStructure: onPrizeStructure,
+                      )
+                    : leagueStatus == LeagueStatus.LIVE
+                        ? LivePrediction(
+                            league: league,
+                            contest: contest,
+                            myJoinedSheets: myJoinedSheets,
+                            onPrizeStructure: onPrizeStructure,
+                          )
+                        : ResultPrediction(
+                            league: league,
+                            contest: contest,
+                            myJoinedSheets: myJoinedSheets,
+                            onPrizeStructure: onPrizeStructure,
+                          ),
+              ),
             ),
           ),
         ],

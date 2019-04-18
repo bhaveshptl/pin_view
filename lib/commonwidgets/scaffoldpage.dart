@@ -9,6 +9,7 @@ class ScaffoldPage extends StatelessWidget {
   final Widget body;
   final Widget title;
   final Widget action;
+  final Widget bottomSheet;
   final GlobalKey scaffoldKey;
   final Color backgroundColor;
   final Widget bottomNavigationBar;
@@ -20,6 +21,7 @@ class ScaffoldPage extends StatelessWidget {
     this.title,
     this.action,
     this.appBar,
+    this.bottomSheet,
     this.scaffoldKey,
     this.backgroundColor,
     this.bottomNavigationBar,
@@ -47,6 +49,7 @@ class ScaffoldPage extends StatelessWidget {
                     )
               : appBar,
           body: body,
+          bottomSheet: bottomSheet,
           backgroundColor: Colors.transparent,
           bottomNavigationBar: bottomNavigationBar,
         ),

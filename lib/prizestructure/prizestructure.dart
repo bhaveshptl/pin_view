@@ -39,17 +39,24 @@ class PrizeStructureState extends State<PrizeStructure> {
       for (dynamic _prize in widget.prizeStructure) {
         _prizeRows.add(
           Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey.shade200,
+                ),
+              ),
+            ),
             child: Padding(
               padding: const EdgeInsets.only(
-                  left: 16.0, right: 16.0, top: 4.0, bottom: 4.0),
+                  left: 16.0, right: 16.0, top: 12.0, bottom: 12.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Text(
                     "RANK: " + _prize["rank"],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          color: Colors.grey.shade800,
+                        ),
                   ),
                   Row(
                     children: <Widget>[
@@ -65,10 +72,10 @@ class PrizeStructureState extends State<PrizeStructure> {
                         formatCurrency.format(
                           double.parse(_prize["amount"].toString()),
                         ),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black38,
-                        ),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.grey.shade600,
+                                ),
                       )
                     ],
                   )
@@ -85,136 +92,165 @@ class PrizeStructureState extends State<PrizeStructure> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          color: Theme.of(context).primaryColor,
-          height: 40.0,
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Prize breakup".toUpperCase(),
-                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.close,
-                      color: Colors.white54,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Container(
-          constraints: BoxConstraints(
-            maxHeight:
-                (MediaQuery.of(context).size.height - kToolbarHeight) * 0.80,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: (MediaQuery.of(context).size.height - kToolbarHeight) * 0.80,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            color: Theme.of(context).primaryColor,
+            height: 48.0,
+            child: Stack(
+              alignment: Alignment.center,
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 0.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        "Prize Pool".toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
-                                  color: Colors.black38,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                      ),
-                      Text(
-                        "Winners".toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
-                                  color: Colors.black38,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          widget.contest.prizeType == 1
-                              ? Image.asset(
-                                  strings.chips,
-                                  width: 16.0,
-                                  height: 12.0,
-                                  fit: BoxFit.contain,
-                                )
-                              : Container(),
-                          Text(
-                            formatCurrency.format(widget.contest.prizeDetails[0]
-                                ["totalPrizeAmount"]),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .body2
-                                .copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Prize breakup".toUpperCase(),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
-                        ],
-                      ),
-                      Text(
-                        widget.contest.prizeDetails[0]["noOfPrizes"].toString(),
-                        style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: 16.0, bottom: 32.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Column(
-                          children: _getPrizeList(),
-                        ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white54,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
-      ],
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          "Prize Pool".toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subtitle
+                              .copyWith(
+                                color: Colors.grey.shade500,
+                              ),
+                        ),
+                        Text(
+                          "Winners".toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subtitle
+                              .copyWith(
+                                color: Colors.grey.shade500,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            widget.contest.prizeType == 1
+                                ? Image.asset(
+                                    strings.chips,
+                                    width: 16.0,
+                                    height: 12.0,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Container(),
+                            Text(
+                              formatCurrency.format(widget
+                                  .contest.prizeDetails[0]["totalPrizeAmount"]),
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .title
+                                  .copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          widget.contest.prizeDetails[0]["noOfPrizes"]
+                              .toString(),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 32.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Column(
+                            children: _getPrizeList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        bottom: 8.0, left: 8.0, right: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            strings.get("PRIZE_STRUCTURE_TEXT_1") +
+                                " " +
+                                strings.get("PRIZE_STRUCTURE_TEXT_2") +
+                                " " +
+                                strings.get("PRIZE_STRUCTURE_TEXT_3"),
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .fontSize,
+                              color: Colors.black54,
+                            ),
+                            textAlign: TextAlign.justify,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -57,6 +57,15 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
 
   @override
   Widget build(BuildContext context) {
+    double bonusUsable = widget.entryFees == null || widget.bonusAllowed == null
+        ? 0.0
+        : (widget.entryFees * widget.bonusAllowed) / 100;
+    double usableBonus = widget.userBalance["bonusBalance"] > bonusUsable
+        ? (bonusUsable > widget.userBalance["playableBonus"]
+            ? widget.userBalance["playableBonus"]
+            : bonusUsable)
+        : widget.userBalance["bonusBalance"];
+
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: widget.prizeType == 1 ? "" : strings.rupee,
@@ -73,9 +82,9 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
           Expanded(
             child: Text(
               strings.get("CONFIRMATION").toUpperCase(),
-              style: Theme.of(context).primaryTextTheme.title.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w800,
+              style: Theme.of(context).primaryTextTheme.headline.copyWith(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -96,8 +105,8 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                 children: <Widget>[
                   Text(
                     "Current Balance:",
-                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                          fontWeight: FontWeight.w900,
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          fontWeight: FontWeight.w700,
                           color: Theme.of(context).primaryColor,
                         ),
                   ),
@@ -118,7 +127,46 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                             : widget.userBalance["cashBalance"]),
                         textAlign: TextAlign.right,
                         style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0, left: 24.0, right: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Bonus Balance:",
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      (widget.prizeType == 1)
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Container(),
+                      Text(
+                        formatCurrency.format(widget.userBalance == null
+                            ? 0
+                            : widget.userBalance["bonusBalance"]),
+                        textAlign: TextAlign.right,
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Theme.of(context).primaryColor,
                                 ),
@@ -141,8 +189,8 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                 children: <Widget>[
                   Text(
                     "Joining Amount:",
-                    style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                          fontWeight: FontWeight.w900,
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          fontWeight: FontWeight.w700,
                           color: Colors.black,
                         ),
                   ),
@@ -161,7 +209,87 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                         formatCurrency.format(widget.entryFees),
                         textAlign: TextAlign.right,
                         style:
-                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 0.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Usable Bonus:",
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      (widget.prizeType == 1)
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Container(),
+                      Text(
+                        formatCurrency.format(usableBonus),
+                        textAlign: TextAlign.right,
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Divider(
+                color: Colors.black26,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 0.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "Entry to be Paid:",
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      (widget.prizeType == 1)
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Container(),
+                      Text(
+                        formatCurrency.format(widget.entryFees - usableBonus),
+                        textAlign: TextAlign.right,
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   fontWeight: FontWeight.w800,
                                   color: Colors.black,
                                 ),
@@ -178,33 +306,10 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                   Expanded(
                     child: RichText(
                       text: TextSpan(
-                        text: "Usable Cash Bonus: " +
-                            formatCurrency.format(0) +
-                            " OR " +
-                            widget.bonusAllowed.toString() +
-                            "% of the total Entry* per match(whichever is higher)",
                         style:
                             Theme.of(context).primaryTextTheme.caption.copyWith(
                                   color: Colors.black38,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 0.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
-                                  color: Colors.black38,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: 10.0,
                                 ),
                         children: [
                           TextSpan(

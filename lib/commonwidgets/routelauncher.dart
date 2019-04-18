@@ -28,14 +28,20 @@ class RouteLauncher {
   RouteLauncher._internal();
   factory RouteLauncher() => RouteLauncher._internal();
 
-  launchAddCash(BuildContext context,
-      {Function onSuccess, Function onFailed, Function onComplete}) async {
+  launchAddCash(
+    BuildContext context, {
+    Function onSuccess,
+    Function onFailed,
+    Function onComplete,
+    double prefilledAmount,
+  }) async {
     Deposit depositData = await getDepositInfo(context);
     if (depositData != null) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => AddCash(
                 depositData: depositData,
+                prefilledAmount: prefilledAmount,
               ),
         ),
       );

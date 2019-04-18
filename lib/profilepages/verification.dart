@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -384,8 +385,8 @@ class VerificationState extends State<Verification> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
+    return ScaffoldPage(
+      scaffoldKey: scaffoldKey,
       appBar: AppBar(
         title: Text(
           strings.get("ACCOUNT_VERIFICATION").toUpperCase(),
