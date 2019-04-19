@@ -9,11 +9,11 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/deposit/paymentmode.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
 import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
@@ -31,7 +31,6 @@ class AddCash extends StatefulWidget {
 class AddCashState extends State<AddCash> {
   int amount;
   String cookie = "";
-  bool bShowLoader = false;
   bool bShowPromoInput = false;
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
@@ -124,10 +123,14 @@ class AddCashState extends State<AddCash> {
     }
   }
 
+  showLoader(bool bShow) {
+    AppConfig.of(context).store.dispatch(
+          bShow ? LoaderShowAction() : LoaderHideAction(),
+        );
+  }
+
   processSuccessResponse(Map<String, dynamic> payload) {
-    setState(() {
-      bShowLoader = false;
-    });
+    showLoader(false);
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
     req.body = json.encode(payload);
@@ -916,9 +919,8 @@ class AddCashState extends State<AddCash> {
   }
 
   proceedToPaymentMode(int amount) async {
-    setState(() {
-      bShowLoader = true;
-    });
+    showLoader(true);
+
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.PAYMENT_MODE));
     req.body = json.encode({
@@ -929,9 +931,7 @@ class AddCashState extends State<AddCash> {
     });
     return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
-        setState(() {
-          bShowLoader = false;
-        });
+        showLoader(false);
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           return res.body;
         }
@@ -1046,9 +1046,7 @@ class AddCashState extends State<AddCash> {
       index++;
     });
 
-    setState(() {
-      bShowLoader = true;
-    });
+    showLoader(true);
 
     if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
@@ -1091,9 +1089,7 @@ class AddCashState extends State<AddCash> {
       ),
     );
 
-    setState(() {
-      bShowLoader = false;
-    });
+    showLoader(false);
 
     if (result != null) {
       Map<String, dynamic> response = json.decode(result);
@@ -1180,54 +1176,47 @@ class AddCashState extends State<AddCash> {
                 ),
               )
             : null,
-        child: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    color: Colors.black26,
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          "Account balance",
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .subhead
-                                .fontSize,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 4.0),
-                          child: Text(
-                            strings.rupee +
-                                (widget.depositData == null
-                                    ? "0.0"
-                                    : (widget.depositData.chooseAmountData.balance
-                                                .deposited +
-                                            widget.depositData.chooseAmountData
-                                                .balance.nonWithdrawable +
-                                            widget.depositData.chooseAmountData
-                                                .balance.withdrawable)
-                                        .toStringAsFixed(2)),
-                          ),
-                        )
-                      ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(
+                color: Colors.black26,
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Account balance",
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize:
+                            Theme.of(context).primaryTextTheme.subhead.fontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Column(
-                    children: createChooseAmountUI(),
-                  )
-                ],
+                    Padding(
+                      padding: EdgeInsets.only(left: 4.0),
+                      child: Text(
+                        strings.rupee +
+                            (widget.depositData == null
+                                ? "0.0"
+                                : (widget.depositData.chooseAmountData.balance
+                                            .deposited +
+                                        widget.depositData.chooseAmountData
+                                            .balance.nonWithdrawable +
+                                        widget.depositData.chooseAmountData
+                                            .balance.withdrawable)
+                                    .toStringAsFixed(2)),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            bShowLoader ? Loader() : Container()
-          ],
+              Column(
+                children: createChooseAmountUI(),
+              )
+            ],
+          ),
         ),
       ),
     );
