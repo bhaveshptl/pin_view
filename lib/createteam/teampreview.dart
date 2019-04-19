@@ -41,7 +41,8 @@ class TeamPreview extends StatelessWidget {
 
   getPlayersForStyle(PlayingStyle playingStyle, BuildContext context) {
     List<Widget> players = [];
-    bool bIsSmallDevice = MediaQuery.of(context).size.width < 320.0;
+    bool bIsSmallDevice = MediaQuery.of(context).size.height < 640;
+    bool bIsMediumDevice = MediaQuery.of(context).size.height < 840;
     myTeam.players.forEach((Player player) {
       if (player.playingStyleId == playingStyle.id ||
           player.playingStyleDesc.replaceAll(" ", "").toLowerCase() ==
@@ -54,8 +55,12 @@ class TeamPreview extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.all(4.0),
                     child: Container(
-                      width: bIsSmallDevice ? 40.0 : 56.0,
-                      height: bIsSmallDevice ? 40.0 : 56.0,
+                      width: bIsSmallDevice
+                          ? 32.0
+                          : (bIsMediumDevice ? 40.0 : 48.0),
+                      height: bIsSmallDevice
+                          ? 32.0
+                          : (bIsMediumDevice ? 40.0 : 48.0),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -169,6 +174,8 @@ class TeamPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool bIsSmallDevice = MediaQuery.of(context).size.height < 720;
+    bool bIsMediumDevice = MediaQuery.of(context).size.height < 1080;
     return Stack(
       children: <Widget>[
         Column(
@@ -209,21 +216,24 @@ class TeamPreview extends StatelessWidget {
           body: Column(
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(bottom: 16.0, top: 8.0),
+                padding: EdgeInsets.only(
+                    bottom:
+                        bIsSmallDevice ? 8.0 : (bIsMediumDevice ? 12.0 : 16.0),
+                    top: bIsSmallDevice ? 4.0 : (bIsMediumDevice ? 6.0 : 8.0)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Image.asset(
                       "images/logo_white.png",
                       color: Colors.white30,
-                      height: 56.0,
+                      height: bIsSmallDevice ? 32.0 : 56.0,
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 8.0),
                       child: Image.asset(
                         "images/logo_name_white.png",
                         color: Colors.white30,
-                        height: 30.0,
+                        height: bIsSmallDevice ? 18.0 : 30.0,
                       ),
                     ),
                   ],

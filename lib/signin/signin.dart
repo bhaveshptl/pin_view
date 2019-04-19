@@ -38,7 +38,6 @@ class SignInPageState extends State<SignInPage> {
   List<dynamic> _languages;
   String _installReferring_link = "";
   String _pfRefCode;
-  bool bShowLoader = false;
   bool bUpdateAppConfirmationShown = false;
   Map<String, dynamic> androidDeviceInfoMap;
 

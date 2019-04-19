@@ -7,6 +7,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/deposit/addcash.dart';
 import 'package:playfantasy/earncash/earncash.dart';
@@ -28,6 +29,12 @@ class RouteLauncher {
   RouteLauncher._internal();
   factory RouteLauncher() => RouteLauncher._internal();
 
+  showLoader(context, bool bShow) {
+    AppConfig.of(context).store.dispatch(
+          bShow ? LoaderShowAction() : LoaderHideAction(),
+        );
+  }
+
   launchAddCash(
     BuildContext context, {
     Function onSuccess,
@@ -36,6 +43,7 @@ class RouteLauncher {
     double prefilledAmount,
   }) async {
     Deposit depositData = await getDepositInfo(context);
+    showLoader(context, false);
     if (depositData != null) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(

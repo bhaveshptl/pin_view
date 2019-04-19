@@ -32,7 +32,6 @@ class SignupState extends State<Signup> {
   String _pfRefCode;
   String googleAddId = "";
   bool _obscureText = true;
-  bool bShowLoader = false;
   String _installAndroid_link;
 
   bool _bShowReferralInput = false;

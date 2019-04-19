@@ -5,6 +5,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/leaguedetail/prediction/createsheet/predictionsummarywidget.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -35,7 +36,6 @@ class PredictionSummary extends StatefulWidget {
 }
 
 class PredictionSummaryState extends State<PredictionSummary> {
-  bool bShowLoader = false;
   final String language = "1";
 
   onEdit(BuildContext context) {
@@ -47,9 +47,9 @@ class PredictionSummaryState extends State<PredictionSummary> {
   }
 
   showLoader(bool bShow) {
-    setState(() {
-      bShowLoader = bShow;
-    });
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   getQuestionIndex(int id) {

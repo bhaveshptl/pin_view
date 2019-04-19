@@ -550,204 +550,219 @@ class JoinedContestsState extends State<JoinedContests>
               children: getTabBody(),
             ),
           ),
-          activeTabIndex == 0
-              ? Container(
-                  height: 72.0,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        spreadRadius: 3.0,
-                        color: Colors.black12,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                height: 72.0,
-                                child: FlatButton(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Container(
-                                        width: 24.0,
-                                        height: 24.0,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.orange,
-                                        ),
-                                        alignment: Alignment.center,
-                                        child: Icon(
-                                          Icons.add,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 4.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text(
-                                              "Create Contest",
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  onPressed: () {
-                                    onBottomNavigationClicked(0);
-                                  },
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Container(
-                                width: 1.0,
-                                height: 72.0,
+          widget.league.status != LeagueStatus.UPCOMING
+              ? Container()
+              : Container(
+                  child: activeTabIndex == 0
+                      ? Container(
+                          height: 72.0,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 10.0,
+                                spreadRadius: 3.0,
                                 color: Colors.black12,
                               ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                height: 72.0,
-                                child: FlatButton(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Container(
-                                            width: 24.0,
-                                            height: 24.0,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.orange,
-                                            ),
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              _myTeams == null
-                                                  ? "0"
-                                                  : _myTeams.length.toString(),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w900,
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Container(
+                                        height: 72.0,
+                                        child: FlatButton(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Container(
+                                                width: 24.0,
+                                                height: 24.0,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.orange,
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: Icon(
+                                                  Icons.add,
+                                                  color: Colors.white,
+                                                ),
                                               ),
-                                            ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 4.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      "Create Contest",
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 4.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text(
-                                              "My Teams",
-                                            ),
-                                          ],
+                                          onPressed: () {
+                                            onBottomNavigationClicked(0);
+                                          },
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  onPressed: () {
-                                    onBottomNavigationClicked(1);
-                                  },
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              : Container(
-                  height: 72.0,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        spreadRadius: 3.0,
-                        color: Colors.black12,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                height: 72.0,
-                                child: FlatButton(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Container(
-                                            width: 24.0,
-                                            height: 24.0,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.orange,
-                                            ),
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              _mySheets == null
-                                                  ? "0"
-                                                  : _mySheets.length.toString(),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w900,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Container(
+                                        width: 1.0,
+                                        height: 72.0,
+                                        color: Colors.black12,
                                       ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 4.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text(
-                                              "My Sheets",
-                                            ),
-                                          ],
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        height: 72.0,
+                                        child: FlatButton(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Container(
+                                                    width: 24.0,
+                                                    height: 24.0,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.orange,
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                      _myTeams == null
+                                                          ? "0"
+                                                          : _myTeams.length
+                                                              .toString(),
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 4.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      "My Teams",
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          onPressed: () {
+                                            onBottomNavigationClicked(1);
+                                          },
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  onPressed: () {
-                                    onBottomNavigationClicked(2);
-                                  },
+                                    )
+                                  ],
                                 ),
+                              )
+                            ],
+                          ),
+                        )
+                      : Container(
+                          height: 72.0,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 10.0,
+                                spreadRadius: 3.0,
+                                color: Colors.black12,
                               ),
-                            )
-                          ],
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Container(
+                                        height: 72.0,
+                                        child: FlatButton(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Container(
+                                                    width: 24.0,
+                                                    height: 24.0,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.orange,
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                      _mySheets == null
+                                                          ? "0"
+                                                          : _mySheets.length
+                                                              .toString(),
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 4.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      "My Sheets",
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          onPressed: () {
+                                            onBottomNavigationClicked(2);
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      )
-                    ],
-                  ),
                 )
         ],
       ),

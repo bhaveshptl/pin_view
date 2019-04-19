@@ -1,18 +1,18 @@
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
 import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-import 'package:playfantasy/leaguedetail/prediction/createsheet/predictionsummary.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/commonwidgets/loader.dart';
+import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/leaguedetail/prediction/createsheet/predictionsummary.dart';
 
 class SheetCreationMode {
   static const int CREATE_SHEET = 1;
@@ -59,8 +59,6 @@ class CreateSheetState extends State<CreateSheet>
   Map<int, int> answers = {};
   TabController tabController;
 
-  bool bShowLoader = false;
-
   int flipBalance = 0;
   int totalFlipBalance = 0;
   Map<int, int> usedFlips = {};
@@ -99,9 +97,9 @@ class CreateSheetState extends State<CreateSheet>
   }
 
   showLoader(bool bShow) {
-    setState(() {
-      bShowLoader = bShow;
-    });
+    AppConfig.of(context).store.dispatch(
+          bShow ? LoaderShowAction() : LoaderHideAction(),
+        );
   }
 
   getFlipBalance() {
@@ -493,294 +491,284 @@ class CreateSheetState extends State<CreateSheet>
         curIndex = flipBooster[index];
       }
     }
-    return Stack(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    children: <Widget>[
-                      Card(
-                        elevation: 3.0,
-                        margin: EdgeInsets.all(16.0),
-                        child: Column(
-                          children: <Widget>[
-                            Padding(
-                              padding:
-                                  EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-                              child: Row(
+        Expanded(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                children: <Widget>[
+                  Card(
+                    elevation: 3.0,
+                    margin: EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  question.text[language],
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .copyWith(
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(16.0, 16.0, 8.0, 16.0),
+                          child: Column(
+                            children: getTriviaList(question),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      children: List<Widget>.generate(question.options.length,
+                          (optionsIndex) {
+                        dynamic option = question.options[optionsIndex];
+                        bool bIsSelected = answers[curIndex] == optionsIndex;
+                        return Card(
+                          elevation: 3.0,
+                          clipBehavior: Clip.hardEdge,
+                          child: Container(
+                            color: bIsSelected
+                                ? Theme.of(context).primaryColor
+                                : Colors.transparent,
+                            child: FlatButton(
+                              onPressed: () {
+                                setAnswer(
+                                  index: curIndex,
+                                  oldIndex: index,
+                                  optionsIndex: optionsIndex,
+                                );
+                              },
+                              padding: EdgeInsets.all(0.0),
+                              child: Column(
                                 children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                      question.text[language],
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .title
-                                          .copyWith(
-                                            color:
-                                                Theme.of(context).primaryColor,
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text(
+                                          option["negative"].toString(),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .copyWith(
+                                                color: bIsSelected
+                                                    ? Colors.redAccent
+                                                    : Colors.red.shade800,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            option["label"][language]
+                                                .toString(),
+                                            textAlign: TextAlign.center,
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  color: bIsSelected
+                                                      ? Colors.white70
+                                                      : Colors.black87,
+                                                  fontWeight: bIsSelected
+                                                      ? FontWeight.bold
+                                                      : FontWeight.normal,
+                                                ),
                                           ),
+                                        ),
+                                        Text(
+                                          "+" + option["positive"].toString(),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .copyWith(
+                                                color: bIsSelected
+                                                    ? Colors.greenAccent
+                                                    : Colors.green.shade800,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding:
-                                  EdgeInsets.fromLTRB(16.0, 16.0, 8.0, 16.0),
-                              child: Column(
-                                children: getTriviaList(question),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Column(
-                          children: List<Widget>.generate(
-                              question.options.length, (optionsIndex) {
-                            dynamic option = question.options[optionsIndex];
-                            bool bIsSelected =
-                                answers[curIndex] == optionsIndex;
-                            return Card(
-                              elevation: 3.0,
-                              clipBehavior: Clip.hardEdge,
-                              child: Container(
-                                color: bIsSelected
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.transparent,
-                                child: FlatButton(
-                                  onPressed: () {
-                                    setAnswer(
-                                      index: curIndex,
-                                      oldIndex: index,
-                                      optionsIndex: optionsIndex,
-                                    );
-                                  },
-                                  padding: EdgeInsets.all(0.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Text(
-                                              option["negative"].toString(),
-                                              style: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .title
-                                                  .copyWith(
-                                                    color: bIsSelected
-                                                        ? Colors.redAccent
-                                                        : Colors.red.shade800,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                option["label"][language]
-                                                    .toString(),
-                                                textAlign: TextAlign.center,
-                                                style: Theme.of(context)
-                                                    .primaryTextTheme
-                                                    .subhead
-                                                    .copyWith(
-                                                      color: bIsSelected
-                                                          ? Colors.white70
-                                                          : Colors.black87,
-                                                      fontWeight: bIsSelected
-                                                          ? FontWeight.bold
-                                                          : FontWeight.normal,
-                                                    ),
-                                              ),
-                                            ),
-                                            Text(
-                                              "+" +
-                                                  option["positive"].toString(),
-                                              style: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .title
-                                                  .copyWith(
-                                                    color: bIsSelected
-                                                        ? Colors.greenAccent
-                                                        : Colors.green.shade800,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                ],
               ),
             ),
-            Container(
-                height: 56.0,
-                child: Container(
-                  color: Colors.blue.withAlpha(50),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        width: 48.0,
-                        child: Stack(
-                          children: <Widget>[
-                            IconButton(
-                              // padding: EdgeInsets.all(8.0),
-                              onPressed: () {
-                                apply2XBooster(curIndex);
-                              },
-                              icon: SvgPicture.asset(
-                                curIndex == xBooster
-                                    ? "images/2x_selected.svg"
-                                    : "images/2x.svg",
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 2.0,
-                                        spreadRadius: 2.0,
-                                        color: Colors.black38,
-                                      )
-                                    ],
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 8.0,
-                                    backgroundColor: Colors.red,
-                                    child: Text(
-                                      xBoosterLeft.toString(),
-                                      style: TextStyle(
-                                        fontSize: 8.0,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 48.0,
-                        child: Stack(
-                          children: <Widget>[
-                            IconButton(
-                              onPressed: () {
-                                applyBPlusBooster(curIndex);
-                              },
-                              icon: SvgPicture.asset(
-                                curIndex == bPlusBooster
-                                    ? "images/bpos_selected.svg"
-                                    : "images/bpos.svg",
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 2.0,
-                                        spreadRadius: 2.0,
-                                        color: Colors.black38,
-                                      )
-                                    ],
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 8.0,
-                                    backgroundColor: Colors.red,
-                                    child: Text(
-                                      bPlusBoosterLeft.toString(),
-                                      style: TextStyle(
-                                        fontSize: 8.0,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 48.0,
-                        child: Stack(
-                          children: <Widget>[
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  flipQuestion(curIndex, question);
-                                });
-                              },
-                              icon: SvgPicture.asset(
-                                bIsQuestionFlipped
-                                    ? "images/flip_selected.svg"
-                                    : "images/flip.svg",
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  decoration: BoxDecoration(
-                                    boxShadow: [
-                                      BoxShadow(
-                                        blurRadius: 2.0,
-                                        spreadRadius: 2.0,
-                                        color: Colors.black38,
-                                      )
-                                    ],
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 8.0,
-                                    backgroundColor: Colors.red,
-                                    child: Text(
-                                      flipBalance.toString(),
-                                      style: TextStyle(
-                                        fontSize: 8.0,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ))
-          ],
+          ),
         ),
-        bShowLoader ? Loader() : Container(),
+        Container(
+            height: 56.0,
+            child: Container(
+              color: Colors.blue.withAlpha(50),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: 48.0,
+                    child: Stack(
+                      children: <Widget>[
+                        IconButton(
+                          // padding: EdgeInsets.all(8.0),
+                          onPressed: () {
+                            apply2XBooster(curIndex);
+                          },
+                          icon: SvgPicture.asset(
+                            curIndex == xBooster
+                                ? "images/2x_selected.svg"
+                                : "images/2x.svg",
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2.0,
+                                    spreadRadius: 2.0,
+                                    color: Colors.black38,
+                                  )
+                                ],
+                                shape: BoxShape.circle,
+                              ),
+                              child: CircleAvatar(
+                                radius: 8.0,
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  xBoosterLeft.toString(),
+                                  style: TextStyle(
+                                    fontSize: 8.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 48.0,
+                    child: Stack(
+                      children: <Widget>[
+                        IconButton(
+                          onPressed: () {
+                            applyBPlusBooster(curIndex);
+                          },
+                          icon: SvgPicture.asset(
+                            curIndex == bPlusBooster
+                                ? "images/bpos_selected.svg"
+                                : "images/bpos.svg",
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2.0,
+                                    spreadRadius: 2.0,
+                                    color: Colors.black38,
+                                  )
+                                ],
+                                shape: BoxShape.circle,
+                              ),
+                              child: CircleAvatar(
+                                radius: 8.0,
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  bPlusBoosterLeft.toString(),
+                                  style: TextStyle(
+                                    fontSize: 8.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 48.0,
+                    child: Stack(
+                      children: <Widget>[
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              flipQuestion(curIndex, question);
+                            });
+                          },
+                          icon: SvgPicture.asset(
+                            bIsQuestionFlipped
+                                ? "images/flip_selected.svg"
+                                : "images/flip.svg",
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2.0,
+                                    spreadRadius: 2.0,
+                                    color: Colors.black38,
+                                  )
+                                ],
+                                shape: BoxShape.circle,
+                              ),
+                              child: CircleAvatar(
+                                radius: 8.0,
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  flipBalance.toString(),
+                                  style: TextStyle(
+                                    fontSize: 8.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ))
       ],
     );
   }
