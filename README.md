@@ -11,3 +11,19 @@ https://docs.flutter.io/flutter/services/MethodChannel/invokeMethod.html
 https://stackoverflow.com/questions/50187680/flutter-how-to-call-methods-in-dart-portion-of-the-app-from-the-native-platfor
 
 https://stackoverflow.com/questions/49847513/is-there-a-way-to-get-the-future-from-setmethodcallhandler
+
+
+
+####################################################
+##################  iOS          ###################
+#################################################### 
+#To run app
+flutter run
+#To add ios platform:swift
+flutter create -i swift . 
+#Cocopods
+pod init
+pod update
+pod install
+#Keyboard Shortcuts
+to open ios keyboard in simulator=⇧(Option) + ⌘(Command) +K
