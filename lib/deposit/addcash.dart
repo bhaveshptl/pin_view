@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/textbox.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
@@ -35,12 +38,17 @@ class AddCashState extends State<AddCash> {
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
   bool bRepeatTransaction = true;
+  TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  int selectedTileindex = 0;
 
   TextEditingController promoController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController customAmountController = TextEditingController();
+
+  FocusNode _customAmountFocusNode = FocusNode();
 
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
@@ -56,6 +64,9 @@ class AddCashState extends State<AddCash> {
         widget.depositData.chooseAmountData.lastPaymentArray.length == 0) {
       bRepeatTransaction = false;
     }
+    termsGesture.onTap = () {
+      _launchStaticPage("T&C");
+    };
 
     setDepositInfo();
 
@@ -68,6 +79,18 @@ class AddCashState extends State<AddCash> {
       amountController.text = amount.ceil().toString();
       customAmountController.text = amount.ceil().toString();
     }
+
+    _customAmountFocusNode.addListener(() {
+      if (_customAmountFocusNode.hasFocus) {
+        if (selectedTileindex !=
+            widget.depositData.chooseAmountData.amountTiles.length) {
+          setState(() {
+            selectedTileindex =
+                widget.depositData.chooseAmountData.amountTiles.length;
+          });
+        }
+      }
+    });
 
     customAmountController.addListener(() {
       int customAmount = int.parse(customAmountController.text == ""
@@ -101,6 +124,31 @@ class AddCashState extends State<AddCash> {
     flutterWebviewPlugin.launch(
       BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
       hidden: true,
+    );
+  }
+
+  _launchStaticPage(String name) {
+    String url = "";
+    String title = "";
+    switch (name.toUpperCase()) {
+      case "T&C":
+        title = "TERMS AND CONDITIONS";
+        url = BaseUrl().staticPageUrls["TERMS"];
+        break;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              clearCache: true,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+        fullscreenDialog: true,
+      ),
     );
   }
 
@@ -180,69 +228,195 @@ class AddCashState extends State<AddCash> {
   createChooseAmountUI() {
     if (widget.depositData != null &&
         widget.depositData.chooseAmountData.isFirstDeposit) {
-      return getAmountTiles();
+      return Column(
+        children: <Widget>[
+          Card(
+            elevation: 0.0,
+            margin: EdgeInsets.all(16.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(1.0),
+              side: BorderSide(
+                color: Colors.grey.shade300,
+                width: 1.0,
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: Column(
+                children: getAmountTiles(),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    height: 56.0,
+                    child: ColorButton(
+                      child: Text(
+                        "Add Cash".toUpperCase(),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .headline
+                            .copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      onPressed: () {
+                        int amount = widget.depositData.chooseAmountData
+                                    .amountTiles.length <=
+                                selectedTileindex
+                            ? int.parse(
+                                customAmountController.text,
+                                onError: (e) => 0,
+                              )
+                            : widget.depositData.chooseAmountData
+                                .amountTiles[selectedTileindex];
+                        onProceed(amount: amount);
+                      },
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      );
     } else if (widget.depositData != null) {
-      return getRepeatDepositUI();
+      return Column(
+        children: getRepeatDepositUI(),
+      );
     } else {
-      return [Container()];
+      return Container();
     }
   }
 
   getAmountTiles() {
     List<Widget> tiles = [];
-    widget.depositData.chooseAmountData.amountTiles.forEach((amount) {
-      tiles.add(
-        Card(
-          elevation: 1.0,
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          child: Container(
-            height: 64.0,
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Expanded(
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                  strings.rupee + amount.toString(),
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .primaryTextTheme
-                                        .display1
-                                        .fontSize,
-                                  ),
+    int i = 0;
+    widget.depositData.chooseAmountData.amountTiles.forEach(
+      (amount) {
+        int curTileIndex = i;
+        tiles.add(
+          Stack(
+            alignment: Alignment.centerLeft,
+            children: <Widget>[
+              Card(
+                elevation: 0.0,
+                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(1.0),
+                  side: BorderSide(
+                    color: Colors.grey.shade300,
+                    width: 1.0,
+                  ),
+                ),
+                child: FlatButton(
+                  onPressed: () {
+                    setState(() {
+                      selectedTileindex = curTileIndex;
+                    });
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  },
+                  padding: EdgeInsets.only(
+                      left: 16.0, right: 16.0, top: 16.0, bottom: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 2,
+                        child: Container(),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Text(
+                          strings.rupee + amount.toString(),
+                          style: TextStyle(
+                            fontSize: Theme.of(context)
+                                .primaryTextTheme
+                                .display1
+                                .fontSize,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Container(
+                              width: 20.0,
+                              height: 20.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: i == selectedTileindex
+                                      ? Colors.green
+                                      : Colors.grey.shade400,
+                                  width: 2.0,
                                 ),
-                                Row(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          right: 8.0, left: 8.0),
-                                      child: Icon(
-                                        gift_1,
-                                        color: (amount >=
-                                                    widget
-                                                        .depositData
-                                                        .chooseAmountData
-                                                        .bonusArray[0]["min"] &&
-                                                amount <=
-                                                    widget
-                                                        .depositData
-                                                        .chooseAmountData
-                                                        .bonusArray[0]["max"])
-                                            ? Colors.teal
-                                            : Colors.red,
-                                        size: 18.0,
+                              ),
+                              padding: EdgeInsets.all(2.0),
+                              child: i == selectedTileindex
+                                  ? Container(
+                                      width: 16.0,
+                                      height: 16.0,
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        shape: BoxShape.circle,
                                       ),
-                                    ),
-                                    Text(
-                                      (amount >=
+                                    )
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              IgnorePointer(
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        height: 50.0,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: ExactAssetImage("images/Ribbon.png"),
+                          ),
+                        ),
+                        margin: EdgeInsets.only(left: 10.0, right: 32.0),
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Image.asset(
+                              "images/Bonus-gift.png",
+                              height: 20.0,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                (amount >=
+                                            widget.depositData.chooseAmountData
+                                                .bonusArray[0]["min"] &&
+                                        amount <=
+                                            widget.depositData.chooseAmountData
+                                                .bonusArray[0]["max"]
+                                    ? (strings.rupee +
+                                        getFirstDepositBonusAmount(amount) +
+                                        " Bonus")
+                                    : "No Bonus"),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .subhead
+                                    .copyWith(
+                                      color: (amount >=
                                                   widget
                                                       .depositData
                                                       .chooseAmountData
@@ -251,144 +425,71 @@ class AddCashState extends State<AddCash> {
                                                   widget
                                                       .depositData
                                                       .chooseAmountData
-                                                      .bonusArray[0]["max"]
-                                          ? ("+ " +
-                                              strings.rupee +
-                                              getFirstDepositBonusAmount(
-                                                  amount))
-                                          : "No Bonus"),
-                                      style: TextStyle(
-                                        color: (amount >=
-                                                    widget
-                                                        .depositData
-                                                        .chooseAmountData
-                                                        .bonusArray[0]["min"] &&
-                                                amount <=
-                                                    widget
-                                                        .depositData
-                                                        .chooseAmountData
-                                                        .bonusArray[0]["max"])
-                                            ? Colors.teal
-                                            : Colors.red,
-                                      ),
-                                    )
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                          OutlineButton(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).primaryColorDark,
-                            ),
-                            textColor: Theme.of(context).primaryColorDark,
-                            child: Text("Add now"),
-                            onPressed: () {
-                              onProceed(amount: amount);
-                            },
-                          )
-                        ],
+                                                      .bonusArray[0]["max"])
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
+                    Expanded(
+                      flex: 2,
+                      child: Container(),
+                    )
                   ],
                 ),
-              ],
-            ),
-          ),
-        ),
-      );
-    });
-
-    tiles.add(
-      Card(
-        elevation: 1.0,
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        child: Container(
-          height: 60.0,
-          child: Stack(
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                width: 100.0,
-                                child: TextFormField(
-                                  controller: customAmountController,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.all(8.0),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.black38,
-                                      ),
-                                    ),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  style: TextStyle(
-                                    fontSize: Theme.of(context)
-                                        .primaryTextTheme
-                                        .title
-                                        .fontSize,
-                                    color: Colors.black45,
-                                  ),
-                                ),
-                              ),
-                              customAmountController.text != ""
-                                  ? Row(
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              right: 8.0, left: 8.0),
-                                          child: Icon(
-                                            gift_1,
-                                            color: customAmountBonus > 0
-                                                ? Colors.teal
-                                                : Colors.red,
-                                            size: 18.0,
-                                          ),
-                                        ),
-                                        Text(
-                                          (customAmountBonus > 0
-                                              ? ("+ " +
-                                                  strings.rupee +
-                                                  customAmountBonus.toString())
-                                              : "No Bonus"),
-                                          style: TextStyle(
-                                            color: customAmountBonus > 0
-                                                ? Colors.teal
-                                                : Colors.red,
-                                          ),
-                                        )
-                                      ],
-                                    )
-                                  : Container(),
-                            ],
-                          ),
-                        ),
-                        OutlineButton(
-                          borderSide: BorderSide(
-                            color: Theme.of(context).primaryColorDark,
-                          ),
-                          textColor: Theme.of(context).primaryColorDark,
-                          child: Text("Add now"),
-                          onPressed: () {
-                            onCustomAddAmount();
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
+        );
+        i++;
+      },
+    );
+
+    tiles.add(
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: SimpleTextBox(
+          style: TextStyle(
+            fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
+            color: Colors.grey.shade900,
+          ),
+          focusedBorderColor: Colors.green,
+          suffixIcon: customAmountController.text != "" && customAmountBonus > 0
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Icon(
+                        gift_1,
+                        size: 20.0,
+                        color: Colors.green,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Text(
+                        strings.rupee +
+                            customAmountBonus.toStringAsFixed(0) +
+                            " Bonus",
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.green,
+                                ),
+                      ),
+                    )
+                  ],
+                )
+              : null,
+          focusNode: _customAmountFocusNode,
+          controller: customAmountController,
+          keyboardType: TextInputType.number,
+          contentPadding: EdgeInsets.all(12.0),
         ),
       ),
     );
@@ -491,13 +592,13 @@ class AddCashState extends State<AddCash> {
     } else if (bonusAmount > maxAmount) {
       bonusAmount = maxAmount.toDouble();
     }
-    return bonusAmount.toString();
+    return bonusAmount.toStringAsFixed(0);
   }
 
   getRepeatDepositUI() {
     List<Widget> rows = [
       Padding(
-        padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 8.0),
+        padding: EdgeInsets.all(16.0),
         child: ClipRRect(
           clipBehavior: Clip.hardEdge,
           borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -519,6 +620,7 @@ class AddCashState extends State<AddCash> {
           Expanded(
             child: Card(
               elevation: 3.0,
+              margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Row(
@@ -757,6 +859,7 @@ class AddCashState extends State<AddCash> {
                                     children: <Widget>[
                                       Checkbox(
                                         value: bRepeatTransaction,
+                                        activeColor: Colors.green,
                                         onChanged: widget
                                                 .depositData.bAllowRepeatDeposit
                                             ? (bool checked) {
@@ -797,74 +900,44 @@ class AddCashState extends State<AddCash> {
         ],
       ),
       Padding(
-        padding: EdgeInsets.fromLTRB(4.0, 16.0, 4.0, 4.0),
+        padding: EdgeInsets.all(16.0),
         child: Row(
           children: <Widget>[
             Expanded(
-              child: RaisedButton(
-                onPressed: () {
-                  if (bRepeatTransaction) {
-                    onRepeatTransaction();
-                  } else {
-                    onProceed();
-                  }
-                },
-                textColor: Colors.white70,
-                color: Theme.of(context).primaryColorDark,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text("DEPOSIT "),
-                    amountController.text != ""
-                        ? Padding(
-                            padding: EdgeInsets.only(left: 4.0),
-                            child: Text(
-                              strings.rupee + amount.toString(),
-                              style: TextStyle(color: Colors.white),
+              child: Container(
+                height: 48.0,
+                child: ColorButton(
+                  onPressed: () {
+                    if (bRepeatTransaction) {
+                      onRepeatTransaction();
+                    } else {
+                      onProceed();
+                    }
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "DEPOSIT " +
+                            (amountController.text != ""
+                                ? strings.rupee + amount.toString()
+                                : ""),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .headline
+                            .copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
-                          )
-                        : Container(),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
           ],
         ),
       ),
-      Padding(
-        padding: EdgeInsets.only(top: 16.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: <Widget>[
-              Container(
-                child: Image.asset("images/pci.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/paytm.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/visa.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/master.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/amex.png"),
-                height: 48.0,
-              ),
-              Container(
-                child: Image.asset("images/cashfree.png"),
-                height: 48.0,
-              ),
-            ],
-          ),
-        ),
-      )
     ];
 
     return rows;
@@ -1164,7 +1237,7 @@ class AddCashState extends State<AddCash> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("ADD_CASH").toUpperCase(),
+          "Payment".toUpperCase(),
         ),
       ),
       body: Container(
@@ -1176,47 +1249,122 @@ class AddCashState extends State<AddCash> {
                 ),
               )
             : null,
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Container(
-                color: Colors.black26,
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Account balance",
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontSize:
-                            Theme.of(context).primaryTextTheme.subhead.fontSize,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 4.0),
-                      child: Text(
-                        strings.rupee +
-                            (widget.depositData == null
-                                ? "0.0"
-                                : (widget.depositData.chooseAmountData.balance
-                                            .deposited +
-                                        widget.depositData.chooseAmountData
-                                            .balance.nonWithdrawable +
-                                        widget.depositData.chooseAmountData
-                                            .balance.withdrawable)
-                                    .toStringAsFixed(2)),
-                      ),
-                    )
-                  ],
-                ),
+        child: Column(
+          children: <Widget>[
+            // Container(
+            //   color: Colors.black26,
+            //   padding: EdgeInsets.symmetric(vertical: 8.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: <Widget>[
+            //       Text(
+            //         "Account balance",
+            //         style: TextStyle(
+            //           color: Colors.black87,
+            //           fontSize:
+            //               Theme.of(context).primaryTextTheme.subhead.fontSize,
+            //           fontWeight: FontWeight.bold,
+            //         ),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.only(left: 4.0),
+            //         child: Text(
+            //           strings.rupee +
+            //               (widget.depositData == null
+            //                   ? "0.0"
+            //                   : (widget.depositData.chooseAmountData.balance
+            //                               .deposited +
+            //                           widget.depositData.chooseAmountData
+            //                               .balance.nonWithdrawable +
+            //                           widget.depositData.chooseAmountData
+            //                               .balance.withdrawable)
+            //                       .toStringAsFixed(2)),
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: createChooseAmountUI(),
               ),
-              Column(
-                children: createChooseAmountUI(),
-              )
-            ],
-          ),
+            ),
+            Container(
+              height: 72.0,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 3.0,
+                    spreadRadius: 1.0,
+                    color: Colors.black12,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset(
+                          "images/payment-footer-strip.png",
+                          height: 28.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "We do not accept deposits from the states of Assam, Odisha and Telangana",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                color: Colors.grey.shade500,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .caption
+                                .copyWith(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 10.0,
+                                ),
+                            children: [
+                              TextSpan(
+                                text: "Bonus credit is subject to ",
+                              ),
+                              TextSpan(
+                                recognizer: termsGesture,
+                                text: "Terms and Conditions*",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -200,15 +200,19 @@ class LobbyState extends State<Lobby>
   _onNavigationSelectionChange(BuildContext context, int index) async {
     switch (index) {
       case 0:
-        setState(() {
-          _activeIndex = 0;
-        });
+        if (_activeIndex != 0) {
+          setState(() {
+            _activeIndex = 0;
+          });
+        }
         break;
       case 1:
-        setState(() {
-          _activeIndex = 1;
-        });
-        showLoader(true);
+        if (_activeIndex != 1) {
+          setState(() {
+            _activeIndex = 1;
+          });
+          showLoader(true);
+        }
         break;
       case 2:
         _launchAddCash();

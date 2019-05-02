@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
+import 'package:intl/intl.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -715,6 +716,12 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 
   @override
   Widget build(BuildContext context) {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: widget.contest.prizeType == 1 ? "" : strings.rupee,
+      decimalDigits: 0,
+    );
+
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
@@ -890,10 +897,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                     TeamPreview(
                                       myTeam: myTeam,
                                       league: widget.league,
-                                      l1Data: widget.l1Data,
+                                      l1Data: _l1Data,
                                       allowEditTeam: bIsMyTeam,
-                                      fanTeamRules:
-                                          widget.l1Data.league.fanTeamRules,
+                                      fanTeamRules: _l1Data.league.fanTeamRules,
                                     ),
                               ),
                             );
@@ -977,7 +983,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                                         : Container(),
                                                   ),
                                                   Text(
-                                                    team.prize.toString(),
+                                                    formatCurrency
+                                                        .format(team.prize),
                                                     style: Theme.of(context)
                                                         .primaryTextTheme
                                                         .subhead

@@ -1,8 +1,13 @@
+import 'dart:convert';
+
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 
-import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -25,6 +30,8 @@ class EarnCashState extends State<EarnCash> {
   String refCode = "";
   String inviteUrl = "";
   String inviteMsg = "";
+
+  List<dynamic> _carousel = [];
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   static const _kFontFam = 'MyFlutterApp';
@@ -37,6 +44,7 @@ class EarnCashState extends State<EarnCash> {
   void initState() {
     super.initState();
     setReferralDetails();
+    _getBanners();
   }
 
   setReferralDetails() async {
@@ -44,6 +52,24 @@ class EarnCashState extends State<EarnCash> {
     refAAmount = widget.data["amountUserA"];
     refBAmount = widget.data["amountUserB"];
     inviteUrl = (widget.data["refLink"] as String).replaceAll("%3d", "=");
+  }
+
+  _getBanners() async {
+    http.Request req = http.Request(
+        "GET",
+        Uri.parse(
+          BaseUrl().apiUrl + ApiUtil.GET_BANNERS + "/5",
+        ));
+    await HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        final banners = json.decode(res.body)["banners"];
+        setState(() {
+          _carousel = (banners as List).map((dynamic value) {
+            return value;
+          }).toList();
+        });
+      }
+    });
   }
 
   _copyCode() {
@@ -130,7 +156,27 @@ class EarnCashState extends State<EarnCash> {
       ),
       body: Column(
         children: <Widget>[
-          Image.asset("images/referal.png"),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            child: _carousel.length > 0
+                ? CarouselSlider(
+                    enlargeCenterPage: true,
+                    aspectRatio: 16 / 3.5,
+                    viewportFraction: 1.0,
+                    enableInfiniteScroll: true,
+                    autoPlayInterval: Duration(seconds: 10),
+                    items: _carousel.map<Widget>((dynamic banner) {
+                      return Image.network(
+                        banner["banner"],
+                        fit: BoxFit.fitWidth,
+                        width: MediaQuery.of(context).size.width,
+                      );
+                    }).toList(),
+                    autoPlay: _carousel.length <= 2 ? false : true,
+                    reverse: false,
+                  )
+                : Container(),
+          ),
           Padding(
             padding: EdgeInsets.only(top: 16.0),
             child: Row(
@@ -346,7 +392,7 @@ class EarnCashState extends State<EarnCash> {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 4.0),
                         child: Text(
-                          "Share and Earn Rs 10 in three easy steps!",
+                          "Share and Earn ₹$refAAmount in three easy steps!",
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
                                     color: Colors.black,

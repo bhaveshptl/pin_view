@@ -35,6 +35,7 @@ class AuthResult {
           .saveCookieToStorage(response.headers["set-cookie"]);
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY, response.body);
+      SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
       await setWSCookie();
       Navigator.of(scaffoldKey.currentContext).pushReplacement(
         FantasyPageRoute(

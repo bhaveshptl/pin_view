@@ -138,6 +138,17 @@ class MyMatchesState extends State<MyMatches>
       myLeagues[league.status].add(league);
     });
 
+    if (myLeagues[2] != null) {
+      myLeagues[2].sort((a, b) {
+        return b.matchStartTime - a.matchStartTime;
+      });
+    }
+    if (myLeagues[3] != null) {
+      myLeagues[3].sort((a, b) {
+        return b.matchStartTime - a.matchStartTime;
+      });
+    }
+
     setState(() {
       myLeagues = myLeagues;
     });

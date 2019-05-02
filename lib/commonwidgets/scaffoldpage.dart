@@ -52,6 +52,7 @@ class ScaffoldPage extends StatelessWidget {
           bottomSheet: bottomSheet,
           backgroundColor: Colors.transparent,
           bottomNavigationBar: bottomNavigationBar,
+          floatingActionButton: floatingActionButton,
         ),
         StoreConnector<LoaderModel, LoaderModel>(
           converter: (store) => store.state,

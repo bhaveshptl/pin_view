@@ -57,6 +57,7 @@ class LeagueDetailState extends State<LeagueDetail>
   List<MyTeam> _myTeams;
   String title = "Contest".toUpperCase();
 
+  bool bIsPredictionAvailable = false;
   List<MySheet> _mySheets;
   Prediction predictionData;
   int joinedContestCount = 0;
@@ -75,13 +76,15 @@ class LeagueDetailState extends State<LeagueDetail>
   @override
   initState() {
     super.initState();
+    bIsPredictionAvailable = widget.league.prediction == 1;
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _sportType = widget.sportType;
     _createL1WSObject();
 
     _getMyContests();
-    tabController = TabController(length: 2, vsync: this);
+    tabController =
+        TabController(length: bIsPredictionAvailable ? 2 : 1, vsync: this);
     tabController.addListener(() {
       setState(() {
         activeTabIndex = tabController.index;
@@ -910,63 +913,84 @@ class LeagueDetailState extends State<LeagueDetail>
           LeagueTitle(
             league: widget.league,
           ),
-          Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: tabController,
-              labelColor: Theme.of(context).primaryColor,
-              unselectedLabelColor: Colors.black,
-              labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-              indicator: UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  width: 4.0,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ),
-              tabs: <Widget>[
-                Tab(
-                  child: Text(
-                    "Contest".toUpperCase(),
-                  ),
-                ),
-                Tab(
-                  child: Text(
-                    "Prediction".toUpperCase(),
+          bIsPredictionAvailable
+              ? Container(
+                  color: Colors.white,
+                  child: TabBar(
+                    controller: tabController,
+                    labelColor: Theme.of(context).primaryColor,
+                    unselectedLabelColor: Colors.black,
+                    labelStyle:
+                        Theme.of(context).primaryTextTheme.title.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                    indicator: UnderlineTabIndicator(
+                      borderSide: BorderSide(
+                        width: 4.0,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    tabs: <Widget>[
+                      Tab(
+                        child: Text(
+                          "Contest".toUpperCase(),
+                        ),
+                      ),
+                      Tab(
+                        child: Text(
+                          "Prediction".toUpperCase(),
+                        ),
+                      )
+                    ],
                   ),
                 )
-              ],
-            ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: tabController,
-              children: <Widget>[
-                l1Data == null
-                    ? Container()
-                    : Contests(
-                        l1Data: l1Data,
-                        myTeams: _myTeams,
-                        league: widget.league,
-                        showLoader: showLoader,
-                        scaffoldKey: _scaffoldKey,
-                        mapContestTeams: _mapContestTeams,
-                      ),
-                predictionData == null
-                    ? Container()
-                    : PredictionView(
-                        mySheets: _mySheets,
-                        league: widget.league,
-                        showLoader: showLoader,
-                        scaffoldKey: _scaffoldKey,
-                        prediction: predictionData,
-                        predictionContestIds: predictionContestIds,
-                        mapContestSheets: _mapContestSheets,
-                      ),
-              ],
-            ),
-          ),
+              : Container(),
+          bIsPredictionAvailable
+              ? Expanded(
+                  child: TabBarView(
+                    controller: tabController,
+                    children: <Widget>[
+                      l1Data == null
+                          ? Container()
+                          : Contests(
+                              l1Data: l1Data,
+                              myTeams: _myTeams,
+                              league: widget.league,
+                              showLoader: showLoader,
+                              scaffoldKey: _scaffoldKey,
+                              mapContestTeams: _mapContestTeams,
+                            ),
+                      predictionData == null
+                          ? Container()
+                          : PredictionView(
+                              mySheets: _mySheets,
+                              league: widget.league,
+                              showLoader: showLoader,
+                              scaffoldKey: _scaffoldKey,
+                              prediction: predictionData,
+                              predictionContestIds: predictionContestIds,
+                              mapContestSheets: _mapContestSheets,
+                            ),
+                    ],
+                  ),
+                )
+              : Expanded(
+                  child: TabBarView(
+                    controller: tabController,
+                    children: <Widget>[
+                      l1Data == null
+                          ? Container()
+                          : Contests(
+                              l1Data: l1Data,
+                              myTeams: _myTeams,
+                              league: widget.league,
+                              showLoader: showLoader,
+                              scaffoldKey: _scaffoldKey,
+                              mapContestTeams: _mapContestTeams,
+                            ),
+                    ],
+                  ),
+                ),
           Container(
             height: 72.0,
             decoration: BoxDecoration(

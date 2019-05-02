@@ -458,7 +458,8 @@ class SignupState extends State<Signup> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.asset("images/referal.png"),
+            Image.network(
+                "https://dyrnmb8cbz1ud.cloudfront.net/images/banners_10/banner_howzat_referral_raf_50.png"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(

@@ -287,76 +287,139 @@ class ContestDetailsCard extends StatelessWidget {
                                 ),
                         ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Container(
-                            color: Colors.black26,
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  flex: contest.joined,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Container(
-                                      height: 6.0,
-                                      color: Color.fromRGBO(70, 165, 12, 1),
+                      Container(
+                        child: league.status == LeagueStatus.UPCOMING
+                            ? Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Container(
+                                        color: Colors.black26,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              flex: contest.joined,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: Container(
+                                                  height: 6.0,
+                                                  color: Color.fromRGBO(
+                                                      70, 165, 12, 1),
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex:
+                                                  contest.size - contest.joined,
+                                              child: Container(),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  flex: contest.size - contest.joined,
-                                  child: Container(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Text(
-                                  "Only " +
-                                      (contest.size - contest.joined)
-                                          .toString() +
-                                      " seats left",
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .copyWith(
-                                        color: Colors.grey.shade500,
-                                      ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                Text(
-                                  contest.size.toString(),
-                                  style: TextStyle(
-                                    color: Colors.black38,
-                                    fontWeight: FontWeight.w900,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.only(top: 4.0, bottom: 4.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Row(
+                                          children: <Widget>[
+                                            Text(
+                                              "Only " +
+                                                  (contest.size -
+                                                          contest.joined)
+                                                      .toString() +
+                                                  " seats left",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.grey.shade500,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: <Widget>[
+                                            Text(
+                                              contest.size.toString(),
+                                              style: TextStyle(
+                                                color: Colors.black38,
+                                                fontWeight: FontWeight.w900,
+                                              ),
+                                            ),
+                                            Text(
+                                              " seats",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.grey.shade500,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  " seats",
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .copyWith(
-                                        color: Colors.grey.shade500,
+                                ],
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Container(
+                                        color: Colors.black26,
+                                        child: Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              flex: contest.joined,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                child: Container(
+                                                  height: 6.0,
+                                                  color: Color.fromRGBO(
+                                                      70, 165, 12, 1),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(
+                                            (contest.size - contest.joined)
+                                                    .toString() +
+                                                " seats",
+                                            textAlign: TextAlign.center,
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  color: Colors.grey.shade500,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                       ),
                       bIsContestFull
                           ? Container()

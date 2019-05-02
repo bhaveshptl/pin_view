@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -365,26 +366,36 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                           ),
                         ],
                       ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: RaisedButton(
-                              onPressed: () {
-                                if (validateUserInfo()) {
-                                  onPaySecurely(
-                                    lastPaymentMethod,
-                                    type["type"],
-                                  );
-                                }
-                              },
-                              child: Text(
-                                strings.get("PAY_SECURELY").toUpperCase(),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 48.0,
+                                child: ColorButton(
+                                  onPressed: () {
+                                    if (validateUserInfo()) {
+                                      onPaySecurely(
+                                        lastPaymentMethod,
+                                        type["type"],
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    strings.get("PAY_SECURELY").toUpperCase(),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .copyWith(
+                                          color: Colors.white,
+                                        ),
+                                  ),
+                                ),
                               ),
-                              textColor: Colors.white70,
-                              color: Theme.of(context).primaryColorDark,
-                            ),
-                          )
-                        ],
+                            )
+                          ],
+                        ),
                       )
                     ],
                   ),
@@ -471,24 +482,35 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                       ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RaisedButton(
-                          onPressed: () {
-                            if (validateUserInfo()) {
-                              onPaySecurely(selectedPaymentMethod[type["type"]],
-                                  type["type"]);
-                            }
-                          },
-                          child: Text(
-                            strings.get("PAY_SECURELY").toUpperCase(),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            height: 48.0,
+                            child: ColorButton(
+                              onPressed: () {
+                                if (validateUserInfo()) {
+                                  onPaySecurely(
+                                      selectedPaymentMethod[type["type"]],
+                                      type["type"]);
+                                }
+                              },
+                              child: Text(
+                                strings.get("PAY_SECURELY").toUpperCase(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.white,
+                                    ),
+                              ),
+                            ),
                           ),
-                          textColor: Colors.white70,
-                          color: Theme.of(context).primaryColorDark,
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -673,7 +695,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          strings.get("CHOOSE_PAYMENT_MODE").toUpperCase(),
+          "Payment".toUpperCase(),
         ),
       ),
       body: widget.paymentMode != null

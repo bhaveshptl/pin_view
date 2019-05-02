@@ -218,15 +218,15 @@ class TeamPreview extends StatelessWidget {
               Container(
                 padding: EdgeInsets.only(
                     bottom:
-                        bIsSmallDevice ? 8.0 : (bIsMediumDevice ? 12.0 : 16.0),
-                    top: bIsSmallDevice ? 4.0 : (bIsMediumDevice ? 6.0 : 8.0)),
+                        bIsSmallDevice ? 4.0 : (bIsMediumDevice ? 8.0 : 12.0),
+                    top: bIsSmallDevice ? 0.0 : (bIsMediumDevice ? 6.0 : 8.0)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Image.asset(
                       "images/logo_white.png",
                       color: Colors.white30,
-                      height: bIsSmallDevice ? 32.0 : 56.0,
+                      height: bIsSmallDevice ? 24.0 : 56.0,
                     ),
                     Padding(
                       padding: EdgeInsets.only(left: 8.0),
@@ -241,7 +241,9 @@ class TeamPreview extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 16.0),
+                  padding: EdgeInsets.only(
+                    bottom: league.status == LeagueStatus.UPCOMING ? 32.0 : 0.0,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:
@@ -288,7 +290,9 @@ class TeamPreview extends StatelessWidget {
                       children: <Widget>[
                         Expanded(
                           child: Container(
-                            height: 64.0,
+                            height: bIsMediumDevice
+                                ? 56.0
+                                : bIsSmallDevice ? 48.0 : 64.0,
                             color: Colors.grey.shade700,
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
                             child: Column(
@@ -299,7 +303,7 @@ class TeamPreview extends StatelessWidget {
                                   myTeam.score.toString(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .display1
+                                      .headline
                                       .copyWith(
                                         color: Colors.white,
                                       ),

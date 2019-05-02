@@ -91,6 +91,7 @@ class ActionUtil {
           Navigator.of(scaffoldKey.currentContext).pushReplacement(
             FantasyPageRoute(
               pageBuilder: (context) => ContestDetail(
+                    l1Data: l1Data,
                     contest: createdContest,
                     league: league,
                   ),

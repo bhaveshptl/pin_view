@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class SimpleTextBox extends StatelessWidget {
+class UnderlineTextBox extends StatelessWidget {
   final bool enabled;
   final TextStyle style;
   final String hintText;
@@ -22,7 +22,7 @@ class SimpleTextBox extends StatelessWidget {
   final FormFieldValidator<String> validator;
   final List<TextInputFormatter> inputFormatters;
 
-  SimpleTextBox({
+  UnderlineTextBox({
     this.style,
     this.enabled,
     this.onSaved,
@@ -45,19 +45,19 @@ class SimpleTextBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final InputBorder enabledBorder = OutlineInputBorder(
+    final InputBorder enabledBorder = UnderlineInputBorder(
       borderSide: BorderSide(
         color: borderColor != null ? borderColor : Colors.grey.shade400,
       ),
     );
 
-    final InputBorder disabledBorder = OutlineInputBorder(
+    final InputBorder disabledBorder = UnderlineInputBorder(
       borderSide: BorderSide(
         color: Colors.grey.shade300,
       ),
     );
 
-    final InputBorder focusedBorder = OutlineInputBorder(
+    final InputBorder focusedBorder = UnderlineInputBorder(
       borderSide: BorderSide(
         color: focusedBorderColor != null
             ? focusedBorderColor
@@ -65,7 +65,7 @@ class SimpleTextBox extends StatelessWidget {
       ),
     );
 
-    final InputBorder errorBorder = OutlineInputBorder(
+    final InputBorder errorBorder = UnderlineInputBorder(
       borderSide: BorderSide(
         color: Theme.of(context).errorColor,
       ),

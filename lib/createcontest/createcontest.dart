@@ -2,13 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:playfantasy/action_utils/action_util.dart';
-import 'package:playfantasy/appconfig.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
-import 'package:playfantasy/commonwidgets/textbox.dart';
+import 'package:playfantasy/commonwidgets/underline_textbox.dart';
 
 import 'package:playfantasy/modal/l1.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -17,13 +14,13 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/modal/prizestructure.dart';
 import 'package:playfantasy/profilepages/statedob.dart';
 import 'package:playfantasy/createteam/createteam.dart';
-import 'package:playfantasy/lobby/tabs/leaguecard.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
-import 'package:playfantasy/joincontest/joincontest.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leaguetitle.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
-import 'package:playfantasy/contestdetail/contestdetail.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createcontest/createprizestructure.dart';
@@ -492,266 +489,432 @@ class CreateContestState extends State<CreateContest> {
           Expanded(
             child: Form(
               key: _formKey,
-              child: ListView(
-                children: <Widget>[
-                  ListTile(
-                    leading: SimpleTextBox(
-                      labelText: strings.get("CONTEST_NAME"),
-                      controller: _nameController,
-                    ),
-                  ),
-                  ListTile(
-                    leading: Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: Text(
-                            strings.get("TYPE"),
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 4,
-                          child: ContestTypeRadio(
-                            defaultValue: _prizeType,
-                            allowedContestType: allowedContestType,
-                            onValueChanged: (int value) {
-                              _prizeType = value;
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
-                    child: SimpleTextBox(
-                      keyboardType: TextInputType.number,
-                      labelText: strings.get("ENTRY_FEE"),
-                      hintText: '1 - 10,000',
-                      controller: _entryFeeController,
-                      validator: (value) {
-                        if (isNumeric(value)) {
-                          final int entryFee = int.parse(value);
-                          if (value.isEmpty ||
-                              entryFee <= 0 ||
-                              entryFee > 10000) {
-                            return strings.get("ENTRY_FEE_LIMIT");
-                          }
-                        } else {
-                          return strings.get("ENTRY_FEE_NUMBER_ERROR");
-                        }
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16.0),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: SimpleTextBox(
-                        keyboardType: TextInputType.number,
-                        labelText: strings.get("PARTICIPANTS"),
-                        hintText: '2-100',
-                        controller: _participantsController,
-                        validator: (value) {
-                          if (isNumeric(value)) {
-                            final int noOfParticipants = int.parse(value);
-                            if (value.isEmpty ||
-                                noOfParticipants <= 1 ||
-                                noOfParticipants > 100) {
-                              return strings.get("PARTICIPANTS_LIMIT");
-                            }
-                          } else {
-                            return strings.get("PARTICIPANTS_NUMBER_ERROR");
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          strings.get("MULTY_ENTRY"),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Switch(
-                          onChanged: _bAllowMultiEntryChange
-                              ? (bool value) {
-                                  setState(() {
-                                    _bIsMultyEntry = value;
-                                  });
-                                }
-                              : null,
-                          value: _bIsMultyEntry,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                    child: ListTile(
-                      leading: Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black26),
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    color: Theme.of(context).primaryColor,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            strings.get("TOTAL_PRIZE"),
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .subhead
-                                                  .fontSize,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(strings.rupee +
-                                              " " +
-                                              _totalPrize.toStringAsFixed(2)),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 1.0, color: Colors.black26),
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    color: Theme.of(context).primaryColor,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            strings.get("NUMBER_OF_PRIZE"),
-                                            style: TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .subhead
-                                                  .fontSize,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Stack(
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              _numberOfPrize.toString(),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: <Widget>[
-                                          Container(
-                                            height: 28.0,
-                                            child: IconButton(
-                                              padding: EdgeInsets.all(0.0),
-                                              icon: Icon(Icons.edit),
-                                              iconSize: 16.0,
-                                              onPressed: () {
-                                                _onEditPrize();
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    leading: Tooltip(
-                      message: strings.get("CREATE_CONTEST_TOOLTIP"),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 32.0),
-                        child: Row(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    Card(
+                      margin:
+                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      child: Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
                           children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                height: 48.0,
-                                child: ColorButton(
-                                  child: Text(
-                                    strings.get("CREATE").toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .title
-                                        .copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                  ),
-                                  onPressed: () {
-                                    _onCreateContest();
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: UnderlineTextBox(
+                                labelText: strings.get("CONTEST_NAME"),
+                                controller: _nameController,
+                              ),
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Text(
+                                  strings.get("TYPE"),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                ContestTypeRadio(
+                                  defaultValue: _prizeType,
+                                  allowedContestType: [1, 2],
+                                  onValueChanged: (int value) {
+                                    _prizeType = value;
                                   },
                                 ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: UnderlineTextBox(
+                                keyboardType: TextInputType.number,
+                                labelText: "Entry Fee (1 - 10,000)",
+                                controller: _entryFeeController,
+                                validator: (value) {
+                                  if (isNumeric(value)) {
+                                    final int entryFee = int.parse(value);
+                                    if (value.isEmpty ||
+                                        entryFee <= 0 ||
+                                        entryFee > 10000) {
+                                      return strings.get("ENTRY_FEE_LIMIT");
+                                    }
+                                  } else {
+                                    return strings
+                                        .get("ENTRY_FEE_NUMBER_ERROR");
+                                  }
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: UnderlineTextBox(
+                                keyboardType: TextInputType.number,
+                                labelText: "Number of Entries (2-100)",
+                                controller: _participantsController,
+                                validator: (value) {
+                                  if (isNumeric(value)) {
+                                    final int noOfParticipants =
+                                        int.parse(value);
+                                    if (value.isEmpty ||
+                                        noOfParticipants <= 1 ||
+                                        noOfParticipants > 100) {
+                                      return strings.get("PARTICIPANTS_LIMIT");
+                                    }
+                                  } else {
+                                    return strings
+                                        .get("PARTICIPANTS_NUMBER_ERROR");
+                                  }
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Text(
+                                    strings.get("MULTY_ENTRY"),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Switch(
+                                    onChanged: _bAllowMultiEntryChange
+                                        ? (bool value) {
+                                            setState(() {
+                                              _bIsMultyEntry = value;
+                                            });
+                                          }
+                                        : null,
+                                    value: _bIsMultyEntry,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  )
-                ],
+                    Container(
+                      padding: EdgeInsets.all(16.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(5.0),
+                        clipBehavior: Clip.hardEdge,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 5.0,
+                                spreadRadius: 5.0,
+                                color: Colors.grey.shade600,
+                              )
+                            ],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      height: 48.0,
+                                      alignment: Alignment.center,
+                                      color: Theme.of(context).primaryColor,
+                                      child: Text(
+                                        strings.get("TOTAL_PRIZE"),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 48.0,
+                                      alignment: Alignment.center,
+                                      color: Colors.white,
+                                      child: Text(
+                                        strings.rupee +
+                                            " " +
+                                            _totalPrize.toStringAsFixed(2),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.black,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 1.0,
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      width: 1.0,
+                                      height: 48.0,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    Container(
+                                      width: 1.0,
+                                      height: 48.0,
+                                      color: Colors.grey.shade200,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      height: 48.0,
+                                      alignment: Alignment.center,
+                                      color: Theme.of(context).primaryColor,
+                                      child: Text(
+                                        strings.get("NUMBER_OF_PRIZE"),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 48.0,
+                                      alignment: Alignment.center,
+                                      color: Colors.white,
+                                      child: Text(
+                                        _numberOfPrize.toString(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.black,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // ListView(
+                    //   children: <Widget>[
+                    //     Padding(
+                    //       padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                    //       child: ListTile(
+                    //         leading: Row(
+                    //           children: <Widget>[
+                    //             Expanded(
+                    //               flex: 1,
+                    //               child: Container(
+                    //                 decoration: BoxDecoration(
+                    //                   border: Border.all(
+                    //                       width: 1.0, color: Colors.black26),
+                    //                 ),
+                    //                 child: Column(
+                    //                   children: <Widget>[
+                    //                     Container(
+                    //                       color: Theme.of(context).primaryColor,
+                    //                       child: Row(
+                    //                         mainAxisAlignment:
+                    //                             MainAxisAlignment.center,
+                    //                         children: <Widget>[
+                    //                           Padding(
+                    //                             padding:
+                    //                                 const EdgeInsets.all(8.0),
+                    //                             child: Text(
+                    //                               strings.get("TOTAL_PRIZE"),
+                    //                               style: TextStyle(
+                    //                                 color: Colors.white70,
+                    //                                 fontSize: Theme.of(context)
+                    //                                     .primaryTextTheme
+                    //                                     .subhead
+                    //                                     .fontSize,
+                    //                               ),
+                    //                             ),
+                    //                           ),
+                    //                         ],
+                    //                       ),
+                    //                     ),
+                    //                     Row(
+                    //                       mainAxisAlignment:
+                    //                           MainAxisAlignment.center,
+                    //                       children: <Widget>[
+                    //                         Align(
+                    //                           alignment: Alignment.center,
+                    //                           child: Padding(
+                    //                             padding:
+                    //                                 const EdgeInsets.all(8.0),
+                    //                             child: Text(strings.rupee +
+                    //                                 " " +
+                    //                                 _totalPrize
+                    //                                     .toStringAsFixed(2)),
+                    //                           ),
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             Expanded(
+                    //               flex: 1,
+                    //               child: Container(
+                    //                 decoration: BoxDecoration(
+                    //                   border: Border.all(
+                    //                       width: 1.0, color: Colors.black26),
+                    //                 ),
+                    //                 child: Column(
+                    //                   children: <Widget>[
+                    //                     Container(
+                    //                       color: Theme.of(context).primaryColor,
+                    //                       child: Row(
+                    //                         mainAxisAlignment:
+                    //                             MainAxisAlignment.center,
+                    //                         children: <Widget>[
+                    //                           Padding(
+                    //                             padding:
+                    //                                 const EdgeInsets.all(8.0),
+                    //                             child: Text(
+                    //                               strings.get("NUMBER_OF_PRIZE"),
+                    //                               style: TextStyle(
+                    //                                 color: Colors.white70,
+                    //                                 fontSize: Theme.of(context)
+                    //                                     .primaryTextTheme
+                    //                                     .subhead
+                    //                                     .fontSize,
+                    //                               ),
+                    //                             ),
+                    //                           ),
+                    //                         ],
+                    //                       ),
+                    //                     ),
+                    //                     Stack(
+                    //                       children: <Widget>[
+                    //                         Row(
+                    //                           mainAxisAlignment:
+                    //                               MainAxisAlignment.center,
+                    //                           children: <Widget>[
+                    //                             Padding(
+                    //                               padding:
+                    //                                   const EdgeInsets.all(8.0),
+                    //                               child: Text(
+                    //                                 _numberOfPrize.toString(),
+                    //                               ),
+                    //                             ),
+                    //                           ],
+                    //                         ),
+                    //                         Row(
+                    //                           mainAxisAlignment:
+                    //                               MainAxisAlignment.end,
+                    //                           children: <Widget>[
+                    //                             Container(
+                    //                               height: 28.0,
+                    //                               child: IconButton(
+                    //                                 padding: EdgeInsets.all(0.0),
+                    //                                 icon: Icon(Icons.edit),
+                    //                                 iconSize: 16.0,
+                    //                                 onPressed: () {
+                    //                                   _onEditPrize();
+                    //                                 },
+                    //                               ),
+                    //                             ),
+                    //                           ],
+                    //                         ),
+                    //                       ],
+                    //                     ),
+                    //                   ],
+                    //                 ),
+                    //               ),
+                    //             )
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     ListTile(
+                    //       leading: Tooltip(
+                    //         message: strings.get("CREATE_CONTEST_TOOLTIP"),
+                    //         child: Padding(
+                    //           padding: const EdgeInsets.only(top: 32.0),
+                    //           child: Row(
+                    //             children: <Widget>[
+                    //               Expanded(
+                    //                 child: Container(
+                    //                   height: 48.0,
+                    //                   child: ColorButton(
+                    //                     child: Text(
+                    //                       strings.get("CREATE").toUpperCase(),
+                    //                       textAlign: TextAlign.center,
+                    //                       style: Theme.of(context)
+                    //                           .primaryTextTheme
+                    //                           .title
+                    //                           .copyWith(
+                    //                             color: Colors.white,
+                    //                             fontWeight: FontWeight.w800,
+                    //                           ),
+                    //                     ),
+                    //                     onPressed: () {
+                    //                       _onCreateContest();
+                    //                     },
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                  ],
+                ),
               ),
             ),
           ),
+          Container(
+            height: 72.0,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  spreadRadius: 1.0,
+                  blurRadius: 2.0,
+                  color: Colors.grey.shade300,
+                )
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  height: 48.0,
+                  child: ColorButton(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        "Create Contest".toUpperCase(),
+                        textAlign: TextAlign.center,
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                      ),
+                    ),
+                    onPressed: () {
+                      _onCreateContest();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
@@ -790,37 +953,35 @@ class ContestTypeRadioState extends State<ContestTypeRadio> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Expanded(
-          child: Row(
-            children: <Widget>[
-              Radio(
-                value: 2,
-                groupValue: _radioValue,
-                onChanged: (int value) {
-                  if (widget.allowedContestType.indexOf(2) != -1) {
-                    _handleRadioValueChange(value);
-                  }
-                },
-              ),
-              Text(strings.get("CASH")),
-            ],
-          ),
+        Row(
+          children: <Widget>[
+            Radio(
+              value: 2,
+              groupValue: _radioValue,
+              activeColor: Colors.green,
+              onChanged: widget.allowedContestType.indexOf(2) != -1
+                  ? (int value) {
+                      _handleRadioValueChange(value);
+                    }
+                  : null,
+            ),
+            Text(strings.get("CASH")),
+          ],
         ),
-        Expanded(
-          child: Row(
-            children: <Widget>[
-              Radio(
-                value: 1,
-                groupValue: _radioValue,
-                onChanged: (int value) {
-                  if (widget.allowedContestType.indexOf(1) != -1) {
-                    _handleRadioValueChange(value);
-                  }
-                },
-              ),
-              Text(strings.get("PRACTICE")),
-            ],
-          ),
+        Row(
+          children: <Widget>[
+            Radio(
+              value: 1,
+              groupValue: _radioValue,
+              activeColor: Colors.green,
+              onChanged: widget.allowedContestType.indexOf(1) != -1
+                  ? (int value) {
+                      _handleRadioValueChange(value);
+                    }
+                  : null,
+            ),
+            Text(strings.get("PRACTICE")),
+          ],
         )
       ],
     );

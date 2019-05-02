@@ -7,6 +7,7 @@ import 'package:package_info/package_info.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/profilepages/update.dart';
+import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/authcheck.dart';
@@ -43,7 +44,7 @@ class SplashScreenState extends State<SplashScreen>
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   String _installReferring_link = "";
-  String _pfRefCode = "";    
+  String _pfRefCode = "";
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class SplashScreenState extends State<SplashScreen>
     super.initState();
 
     _getFirebaseToken();
-     _initBranchStuff();
+    _initBranchStuff();
     _getGoogleAddId();
     _getBranchRefCode();
     _subscribeToFirebaseTopic(widget.fcmSubscribeId);
@@ -85,6 +86,7 @@ class SplashScreenState extends State<SplashScreen>
       }
 
       setLoadingPercentage(99.0);
+      SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(),
@@ -92,9 +94,11 @@ class SplashScreenState extends State<SplashScreen>
       );
     } else {
       setLoadingPercentage(99.0);
+      final result =
+          await SharedPrefHelper().getFromSharedPref(ApiUtil.REGISTERED_USER);
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
-          pageBuilder: (context) => SignInPage(),
+          pageBuilder: (context) => result == null ? Signup() : SignInPage(),
         ),
       );
     }
@@ -140,8 +144,7 @@ class SplashScreenState extends State<SplashScreen>
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getGoogleAddId');
-    } catch (e) {
-    }
+    } catch (e) {}
     return value;
   }
 
@@ -149,8 +152,7 @@ class SplashScreenState extends State<SplashScreen>
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-    } catch (e) {
-    }
+    } catch (e) {}
     return value;
   }
 
@@ -158,8 +160,7 @@ class SplashScreenState extends State<SplashScreen>
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-    } catch (e) {
-    }
+    } catch (e) {}
     return value;
   }
 

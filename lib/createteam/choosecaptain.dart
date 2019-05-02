@@ -453,8 +453,11 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                     fanTeamRules:
                                         widget.l1Data.league.fanTeamRules,
                                     myTeam: MyTeam(
-                                      captain: _captain.id,
-                                      viceCaptain: _vCaptain.id,
+                                      captain:
+                                          _captain == null ? null : _captain.id,
+                                      viceCaptain: _vCaptain == null
+                                          ? null
+                                          : _vCaptain.id,
                                       players: widget.selectedPlayers,
                                     ),
                                   ),
