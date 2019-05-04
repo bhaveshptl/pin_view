@@ -19,11 +19,19 @@ https://stackoverflow.com/questions/49847513/is-there-a-way-to-get-the-future-fr
 #################################################### 
 #To run app
 flutter run
+..................................
+to run on particular device 
+flutter run -d ZX1PC2JHXH
+.................................
 #To add ios platform:swift
 flutter create -i swift . 
 #Cocopods
 pod init
 pod update
 pod install
+#To open simulator
+open -a Simulator
+
 #Keyboard Shortcuts
 to open ios keyboard in simulator=⇧(Option) + ⌘(Command) +K
+                                 =⌘(Command) +K
