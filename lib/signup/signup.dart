@@ -59,19 +59,30 @@ class SignupState extends State<Signup> {
   }
 
   getLocalStorageValues() {
-    _getInstallReferringLink().then((String link) {
-      _installReferring_link = link;
-      print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
-      print(_installReferring_link);
-    });
-
-    _getBranchRefCode().then((String refcode) {
-      _pfRefCode = refcode;
+    Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
+    getbranchRefCode.then((value) {
+      if (value.length > 0) {
+       _pfRefCode = value;
       setState(() {
         _referralCodeController.text = _pfRefCode;
       });
        print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
        print(_pfRefCode);
+      } else {
+        _pfRefCode = "";
+      }
+    });
+    Future<dynamic> getbranchReferringLink = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
+    getbranchReferringLink.then((value) {
+      if (value.length > 0) {
+       _installReferring_link = value;
+      print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
+      print(_installReferring_link);
+      } else {
+        _installReferring_link = "";
+      }
     });
 
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
@@ -125,16 +136,7 @@ class SignupState extends State<Signup> {
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
-  Future<String> _getBranchRefCode() async {
-    String value = "";
-    try {
-      value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-      print(value);
-    } catch (e) {
-      print(e);
-    }
-    return value;
-  }
+  
 
   Future<String> getAndroidDeviceInfo() async {
     String value;
@@ -145,16 +147,7 @@ class SignupState extends State<Signup> {
     return value;
   }
 
-  Future<String> _getInstallReferringLink() async {
-    String value = "";
-    try {
-      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-      print(value);
-    } catch (e) {
-      print(e);
-    }
-    return value;
-  }
+ 
 
   _showReferralInput() {
     setState(() {

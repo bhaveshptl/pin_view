@@ -54,7 +54,6 @@ class SplashScreenState extends State<SplashScreen>
     _getFirebaseToken();
     _initBranchStuff();
     _getGoogleAddId();
-    _getBranchRefCode();
     _subscribeToFirebaseTopic(widget.fcmSubscribeId);
   }
 
@@ -122,18 +121,7 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   _initBranchStuff() {
-    _getInstallReferringLink().then((String link) {
-      _installReferring_link = link;
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
-          _installReferring_link);
-    });
-    _getBranchRefCode().then((String refcode) {
-      _pfRefCode = refcode;
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, _pfRefCode);
-    });
-
+    _initBranchIoPlugin();
     _getGoogleAddId().then((String googleaddid) {
       SharedPrefHelper.internal().saveToSharedPref(
           ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, googleaddid);
@@ -148,20 +136,26 @@ class SplashScreenState extends State<SplashScreen>
     return value;
   }
 
-  Future<String> _getBranchRefCode() async {
-    String value;
+  Future<String> _initBranchIoPlugin() async {
+    Map<dynamic, dynamic> value = new Map();
     try {
-      value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-    } catch (e) {}
-    return value;
-  }
+      value = await branch_io_platform.invokeMethod('_initBranchIoPlugin');
+      print("<<<<<<<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>>>>>>>>>>>>>");
+      print(value);
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
+          value["installReferring_link"]);
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, value["refCodeFromBranch"]);
+    } catch (e) {
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
+          "");
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, "");
 
-  Future<String> _getInstallReferringLink() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-    } catch (e) {}
-    return value;
+    }
+    return "";
   }
 
   Future<String> _getFirebaseToken() async {

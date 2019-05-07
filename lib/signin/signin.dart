@@ -63,6 +63,30 @@ class SignInPageState extends State<SignInPage> {
   }
 
   getLocalStorageValues() {
+     Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
+    getbranchRefCode.then((value) {
+      if (value.length > 0) {
+       _pfRefCode = value;
+      
+       print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
+       print(_pfRefCode);
+      } else {
+        _pfRefCode = "";
+      }
+    });
+    Future<dynamic> getbranchReferringLink = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
+    getbranchReferringLink.then((value) {
+      if (value.length > 0) {
+       _installReferring_link = value;
+      print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
+      print(_installReferring_link);
+      } else {
+        _installReferring_link = "";
+      }
+    });
+
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
     firebasedeviceid.then((value) {
@@ -73,31 +97,7 @@ class SignInPageState extends State<SignInPage> {
       }
     });
 
-    Future<dynamic> installReferringlinkFromBranch = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
-    installReferringlinkFromBranch.then((value) {
-      if (value.length > 0) {
-        _installReferring_link = value;
-      } else {
-        _getInstallReferringLink().then((String link) {
-          setState(() {
-            _installReferring_link = link;
-          });
-        });
-      }
-    });
-
-    Future<dynamic> pfRefCodeFromBranch = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
-    pfRefCodeFromBranch.then((value) {
-      if (value.length > 0) {
-        _pfRefCode = value;
-      } else {
-        _getBranchRefCode().then((String refcode) {
-          _pfRefCode = refcode;
-        });
-      }
-    });
+   
     Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
     googleAddId_from_local.then((value) {
@@ -137,25 +137,6 @@ class SignInPageState extends State<SignInPage> {
     return value;
   }
 
-  Future<String> _getBranchRefCode() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-    } catch (e) {
-      print(e);
-    }
-    return value;
-  }
-
-  Future<String> _getInstallReferringLink() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-    } catch (e) {
-      print(e);
-    }
-    return value;
-  }
 
   showLoader(bool bShow) {
     AppConfig.of(context)
@@ -214,8 +195,20 @@ class SignInPageState extends State<SignInPage> {
       "googleaddid": googleAddId,
       "serial": androidInfo.androidId,
       "refCode": _pfRefCode,
+       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
+
+    if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
 
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
