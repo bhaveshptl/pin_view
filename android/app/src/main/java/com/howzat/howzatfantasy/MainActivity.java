@@ -62,7 +62,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initBranchPlugin();
-        initBranchSession();
         initPushNotifications();
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
@@ -73,7 +72,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     public void onStart() {
         super.onStart();
         initBranchPlugin();
-        initBranchSession();
     }
 
     private void initBranchPlugin(){
@@ -84,6 +82,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
                     if (error == null) {
                         Log.i("BRANCH SDK", referringParams.toString());
+                        initBranchSession();
                     } else {
                         Log.i("BRANCH SDK", error.getMessage());
                     }
