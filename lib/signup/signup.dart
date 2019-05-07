@@ -33,11 +33,9 @@ class SignupState extends State<Signup> {
   String googleAddId = "";
   bool _obscureText = true;
   String _installAndroid_link;
-
   bool _bShowReferralInput = false;
   String _installReferring_link = "";
   Map<String, dynamic> androidDeviceInfoMap;
-  String _installReferringLink = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
@@ -61,6 +59,21 @@ class SignupState extends State<Signup> {
   }
 
   getLocalStorageValues() {
+    _getInstallReferringLink().then((String link) {
+      _installReferring_link = link;
+      print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
+      print(_installReferring_link);
+    });
+
+    _getBranchRefCode().then((String refcode) {
+      _pfRefCode = refcode;
+      setState(() {
+        _referralCodeController.text = _pfRefCode;
+      });
+       print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
+       print(_pfRefCode);
+    });
+
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
     firebasedeviceid.then((value) {
@@ -70,37 +83,7 @@ class SignupState extends State<Signup> {
         _getFirebaseToken();
       }
     });
-    Future<dynamic> installReferringlinkFromBranch = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
-    installReferringlinkFromBranch.then((value) {
-      if (value.length > 0) {
-        _installReferring_link = value;
-      } else {
-        _getInstallReferringLink().then((String link) {
-          _installReferring_link = link;
-          setState(() {
-            _installReferring_link = link;
-          });
-        });
-      }
-    });
-    Future<dynamic> pfRefCodeFromBranch = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
-    pfRefCodeFromBranch.then((value) {
-      if (value.length > 0) {
-        _pfRefCode = value;
-        setState(() {
-          _referralCodeController.text = _pfRefCode;
-        });
-      } else {
-        _getBranchRefCode().then((String refcode) {
-          _pfRefCode = refcode;
-          setState(() {
-            _referralCodeController.text = _pfRefCode;
-          });
-        });
-      }
-    });
+
     Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
     googleAddId_from_local.then((value) {
@@ -136,21 +119,6 @@ class SignupState extends State<Signup> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
   }
 
-  _initBranchStuff() {
-    _getBranchRefCode().then((String refcode) {
-      _pfRefCode = refcode;
-      setState(() {
-        _referralCodeController.text = _pfRefCode;
-      });
-    });
-
-    _getInstallReferringLink().then((String installReferringLink) {
-      setState(() {
-        _installReferringLink = installReferringLink;
-      });
-    });
-  }
-
   showLoader(bool bShow) {
     AppConfig.of(context)
         .store
@@ -158,10 +126,13 @@ class SignupState extends State<Signup> {
   }
 
   Future<String> _getBranchRefCode() async {
-    String value;
+    String value = "";
     try {
       value = await branch_io_platform.invokeMethod('_getBranchRefCode');
-    } catch (e) {}
+      print(value);
+    } catch (e) {
+      print(e);
+    }
     return value;
   }
 
@@ -175,10 +146,13 @@ class SignupState extends State<Signup> {
   }
 
   Future<String> _getInstallReferringLink() async {
-    String value;
+    String value = "";
     try {
       value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
-    } catch (e) {}
+      print(value);
+    } catch (e) {
+      print(e);
+    }
     return value;
   }
 
