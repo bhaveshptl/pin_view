@@ -33,9 +33,11 @@ class SignupState extends State<Signup> {
   String googleAddId = "";
   bool _obscureText = true;
   String _installAndroid_link;
+
   bool _bShowReferralInput = false;
   String _installReferring_link = "";
   Map<String, dynamic> androidDeviceInfoMap;
+  String _installReferringLink = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
@@ -59,42 +61,46 @@ class SignupState extends State<Signup> {
   }
 
   getLocalStorageValues() {
-    Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
-    getbranchRefCode.then((value) {
-      if (value.length > 0) {
-       _pfRefCode = value;
-      setState(() {
-        _referralCodeController.text = _pfRefCode;
-      });
-       print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
-       print(_pfRefCode);
-      } else {
-        _pfRefCode = "";
-      }
-    });
-    Future<dynamic> getbranchReferringLink = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
-    getbranchReferringLink.then((value) {
-      if (value.length > 0) {
-       _installReferring_link = value;
-      print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
-      print(_installReferring_link);
-      } else {
-        _installReferring_link = "";
-      }
-    });
-
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
     firebasedeviceid.then((value) {
-      if (value.length > 0) {
+      if (value != null && value.length > 0) {
         _deviceId = value;
       } else {
         _getFirebaseToken();
       }
     });
-
+    Future<dynamic> installReferringlinkFromBranch = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
+    installReferringlinkFromBranch.then((value) {
+      if (value != null && value.length > 0) {
+        _installReferring_link = value;
+      } else {
+        _getInstallReferringLink().then((String link) {
+          _installReferring_link = link;
+          setState(() {
+            _installReferring_link = link;
+          });
+        });
+      }
+    });
+    Future<dynamic> pfRefCodeFromBranch = SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
+    pfRefCodeFromBranch.then((value) {
+      if (value != null && value.length > 0) {
+        _pfRefCode = value;
+        setState(() {
+          _referralCodeController.text = _pfRefCode;
+        });
+      } else {
+        _getBranchRefCode().then((String refcode) {
+          _pfRefCode = refcode;
+          setState(() {
+            _referralCodeController.text = _pfRefCode;
+          });
+        });
+      }
+    });
     Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
     googleAddId_from_local.then((value) {
@@ -130,13 +136,34 @@ class SignupState extends State<Signup> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
   }
 
+  _initBranchStuff() {
+    _getBranchRefCode().then((String refcode) {
+      _pfRefCode = refcode;
+      setState(() {
+        _referralCodeController.text = _pfRefCode;
+      });
+    });
+
+    _getInstallReferringLink().then((String installReferringLink) {
+      setState(() {
+        _installReferringLink = installReferringLink;
+      });
+    });
+  }
+
   showLoader(bool bShow) {
     AppConfig.of(context)
         .store
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
-  
+  Future<String> _getBranchRefCode() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getBranchRefCode');
+    } catch (e) {}
+    return value;
+  }
 
   Future<String> getAndroidDeviceInfo() async {
     String value;
@@ -147,7 +174,13 @@ class SignupState extends State<Signup> {
     return value;
   }
 
- 
+  Future<String> _getInstallReferringLink() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
+    } catch (e) {}
+    return value;
+  }
 
   _showReferralInput() {
     setState(() {

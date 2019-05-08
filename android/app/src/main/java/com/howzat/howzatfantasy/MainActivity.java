@@ -42,25 +42,24 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
-import io.flutter.plugin.common.MethodChannel.Result;
-import java.io.IOException;
 
+import java.io.IOException;
+import java.util.function.Function;
 
 
 public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
     private static final String RAZORPAY_IO_CHANNEL = "com.algorin.pf.razorpay";
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
-    private Result branchIoResult;
-    private HashMap<String, String> branchIoResultData;
-    private MyHelperClass myHeperClass;
-    private String firebaseToken="";
-    private String installReferring_link = "";
-    private JSONObject installParams;
-    private JSONObject sessionParams;
-    private JSONObject referringParams;
-    private String refCodeFromBranch = "";
-    private String googleAdId="";
+    MyHelperClass myHeperClass;
+    String firebaseToken = "";
+    String installReferring_link = "";
+    JSONObject installParams;
+    String refCodeFromBranch = "";
+    String googleAdId = "";
+
+    Function callback;
+    boolean bBranchLodead = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,25 +73,162 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     public void onStart() {
         super.onStart();
+        initBranchPlugin();
+    }
+
+    private void initBranchPlugin() {
+        final Intent intent = getIntent();
+        try {
+            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    bBranchLodead = true;
+                    if (error == null) {
+                        initBranchSession(referringParams);
+                        Log.i("BRANCH SDK", referringParams.toString());
+                    } else {
+                        initBranchSession(referringParams);
+                        Log.i("BRANCH SDK", error.getMessage());
+                    }
+                }
+            }, intent.getData(), this);
+        } catch (Exception e) {
+            initBranchSession(null);
+        }
+    }
+
+    private void getBranchData(MethodChannel.Result result) {
+        final Intent intent = getIntent();
+        try {
+            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    JSONObject object;
+                    if (error == null) {
+                        object = initBranchSession(referringParams);
+                        Log.i("BRANCH SDK", referringParams.toString());
+                    } else {
+                        object = initBranchSession(referringParams);
+                        Log.i("BRANCH SDK", error.getMessage());
+                    }
+                    result.success(object.toString());
+                }
+            }, intent.getData(), this);
+        } catch (Exception e) {
+            JSONObject object = initBranchSession(null);
+            result.success(object.toString());
+        }
     }
 
 
+    private JSONObject initBranchSession(JSONObject referringParams) {
 
+        JSONObject object = new JSONObject();
+
+        String refCodeFromBranchTrail0 = "";
+        String refCodeFromBranchTrail1 = "";
+        String refCodeFromBranchTrail2 = "";
+        String installReferring_link0 = "";
+        String installReferring_link1 = "";
+        String installReferring_link2 = "";
+        try {
+            myHeperClass = new MyHelperClass();
+
+            if (referringParams != null) {
+                installReferring_link0 = (String) referringParams.get("~referring_link");
+                Log.i("BRANCH SDK link1", installReferring_link0);
+                refCodeFromBranchTrail0 = myHeperClass.getQueryParmValueFromUrl(installReferring_link0, "refCode");
+            }
+        } catch (Exception e) {
+        }
+
+        try {
+            JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+            installReferring_link1 = (String) installParams.get("~referring_link");
+            Log.i("BRANCH SDK link1", installReferring_link1);
+            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link1, "refCode");
+        } catch (Exception e) {
+        }
+
+        try {
+            JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
+            installReferring_link2 = (String) sessionParams.get("~referring_link");
+            Log.i("BRANCH SDK link1", installReferring_link2);
+            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "refCode");
+        } catch (Exception e) {
+        }
+
+        if (refCodeFromBranchTrail0 != null && refCodeFromBranchTrail0.length() > 2) {
+            refCodeFromBranch = refCodeFromBranchTrail0;
+        } else if (refCodeFromBranchTrail1 != null && refCodeFromBranchTrail1.length() > 2) {
+            refCodeFromBranch = refCodeFromBranchTrail1;
+        } else {
+            refCodeFromBranch = refCodeFromBranchTrail2;
+        }
+        Log.i("BRANCH SDK refCode", refCodeFromBranch);
+
+        if (installReferring_link0 != null && installReferring_link0 != "") {
+            installReferring_link = installReferring_link0;
+            Log.i("BRANCH SDK link0", installReferring_link0);
+        } else if (installReferring_link1 != null && installReferring_link1 != "") {
+            installReferring_link = installReferring_link1;
+            Log.i("BRANCH SDK link1", installReferring_link1);
+        } else if (installReferring_link2 != null && installReferring_link2 != "") {
+            installReferring_link = installReferring_link2;
+            Log.i("BRANCH SDK link2", installReferring_link2);
+        }
+        Log.i("BRANCH SDK", installReferring_link);
+        try {
+            object.put("installReferring_link", installReferring_link);
+            object.put("refCodeFromBranch", refCodeFromBranch);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return object;
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        this.setIntent(intent);
+    }
 
     protected void initFlutterChannels() {
         new MethodChannel(getFlutterView(), BRANCH_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
             public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-                if (methodCall.method.equals("_initBranchIoPlugin")) {
-                    branchIoResult=result;
-                    initBranchPlugin();
+                if (methodCall.method.equals("_getBranchRefCode")) {
+                    String pfRefCode = (String) getRefCodeUsingBranch();
+
+                    result.success(pfRefCode);
                 }
-                if(methodCall.method.equals("_getGoogleAddId")){
-                    String googleAddId = (String)getGoogleAddId();
+                if (methodCall.method.equals("_initBranchIoPlugin")) {
+                    if (bBranchLodead) {
+                        JSONObject object = new JSONObject();
+                        String pfRefCode = (String) getRefCodeUsingBranch();
+                        String installReferring_link = (String) getInstallReferringLink();
+                        try {
+                            object.put("installReferring_link", installReferring_link);
+                            object.put("refCodeFromBranch", pfRefCode);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        result.success(object.toString());
+                    } else {
+                        getBranchData(result);
+                    }
+
+                }
+                if (methodCall.method.equals("_getInstallReferringLink")) {
+                    String installReferring_link = (String) getInstallReferringLink();
+                    result.success(installReferring_link);
+                }
+                if (methodCall.method.equals("_getGoogleAddId")) {
+                    String googleAddId = (String) getGoogleAddId();
                     result.success(googleAddId);
                 }
-                if(methodCall.method.equals("_getAndroidDeviceInfo")){
-                    String deviceInfo = (String)getDeviceInfo();
+                if (methodCall.method.equals("_getAndroidDeviceInfo")) {
+                    String deviceInfo = (String) getDeviceInfo();
                     result.success(deviceInfo);
                 }
             }
@@ -118,159 +254,22 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                 if (methodCall.method.equals("_getFirebaseToken")) {
                     String firebaseToken = getFireBaseToken();
-                        result.success(firebaseToken);
-                }
-                else if(methodCall.method.equals("_subscribeToFirebaseTopic")){
+                    result.success(firebaseToken);
+                } else if (methodCall.method.equals("_subscribeToFirebaseTopic")) {
                     String fcmTopic = methodCall.arguments();
                     subscribeToFirebaseTopic(fcmTopic);
-                    result.success("Subscribed to PF fcm topic"+fcmTopic);
-                }
-                else {
+                    result.success("Subscribed to PF fcm topic" + fcmTopic);
+                } else {
                     result.notImplemented();
                 }
 
             }
         });
-
     }
-
 
     /*Bracnch Io related code*/
-    private void initBranchPlugin(){
-        final Intent intent = getIntent();
-        branchIoResultData = new HashMap<>();
-        try {
-            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
-                @Override
-                public void onInitFinished(JSONObject _referringParams, BranchError error) {
-                    if (error == null) {
-                        Log.i("BRANCH SDK", _referringParams.toString());
-
-                        referringParams=_referringParams;
-                        initBranchSession();
-                    } else {
-                        Log.i("BRANCH SDK", error.getMessage());
-                        branchIoResult.error("UNAVAILABLE", error.getMessage(), null);
-
-                    }
-                }
-            }, intent.getData(), this);
-        } catch (Exception e) {
-            branchIoResult.error("UNAVAILABLE", "Failed to Init Branch", null);
-        }
-    }
-
-
-    private void initBranchSession(){
-        installParams = Branch.getInstance().getFirstReferringParams();
-        sessionParams = Branch.getInstance().getLatestReferringParams();
-        myHeperClass = new MyHelperClass();
-        String installReferring_link_Trail1 ="";
-        String installReferring_link_Trail2 ="";
-        String installReferring_link_Trail3 ="";
-        try {
-            installReferring_link_Trail1 = (String) referringParams.get("~referring_link");
-
-        } catch (Exception e) {
-        }
-        try {
-            installReferring_link_Trail2 = (String) installParams.get("~referring_link");
-        } catch (Exception e) {
-        }
-        try {
-            installReferring_link_Trail3 = (String) sessionParams.get("~referring_link");
-
-        } catch (Exception e) {
-        }
-
-        if (installReferring_link_Trail1 != null && installReferring_link_Trail1.length() > 2) {
-            installReferring_link = installReferring_link_Trail1;
-            branchIoResultData.put("installReferring_link", installReferring_link);
-        } else if  (installReferring_link_Trail2 != null && installReferring_link_Trail2.length() > 2) {
-            installReferring_link = installReferring_link_Trail2;
-            branchIoResultData.put("installReferring_link", installReferring_link);
-        }
-        else if(installReferring_link_Trail3 != null && installReferring_link_Trail3.length() > 2){
-            installReferring_link = installReferring_link_Trail3;
-            branchIoResultData.put("installReferring_link", installReferring_link);
-        }
-        else{
-            installReferring_link="";
-            branchIoResultData.put("installReferring_link", installReferring_link);
-        }
-        //RefCode
-        String refCodeFromBranchTrail1 = "";
-        String refCodeFromBranchTrail2 = "";
-        String refCodeFromBranchTrail3 = "";
-        try {
-            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link_Trail1, "refCode");
-
-        } catch (Exception e) {
-        }
-        try {
-            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link_Trail2, "refCode");
-
-        } catch (Exception e) {
-        }
-        try {
-            refCodeFromBranchTrail3 = myHeperClass.getQueryParmValueFromUrl(installReferring_link_Trail3, "refCode");
-
-        } catch (Exception e) {
-        }
-
-        if (refCodeFromBranchTrail1 != null && refCodeFromBranchTrail1.length() > 2) {
-            refCodeFromBranch = refCodeFromBranchTrail1;
-            branchIoResultData.put("refCodeFromBranch", refCodeFromBranch);
-
-        } else if  (refCodeFromBranchTrail2 != null && refCodeFromBranchTrail2.length() > 2) {
-            refCodeFromBranch = refCodeFromBranchTrail2;
-            branchIoResultData.put("refCodeFromBranch", refCodeFromBranch);
-        }
-        else if(refCodeFromBranchTrail3 != null && refCodeFromBranchTrail3.length() > 2){
-            refCodeFromBranch = refCodeFromBranchTrail3;
-            branchIoResultData.put("refCodeFromBranch", refCodeFromBranch);
-        }
-        else{
-            refCodeFromBranch="";
-            branchIoResultData.put("refCodeFromBranch", refCodeFromBranch);
-        }
-
-        branchIoResultData.put("refCodeFromBranch", refCodeFromBranch);
-        branchIoResultData.put("installReferring_link", installReferring_link);
-        branchIoResult.success(branchIoResultData);
-
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        this.setIntent(intent);
-    }
-
-    public void getRefCodeUsingBranch() {
-        String refCodeFromBranchTrail1 = "";
-        String refCodeFromBranchTrail2 = "";
-        try {
-            myHeperClass = new MyHelperClass();
-            JSONObject installParams = Branch.getInstance().getFirstReferringParams();
-            String installReferring_link = (String) installParams.get("~referring_link");
-            refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link, "refCode");
-
-            JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
-            String installReferring_link2 = (String) sessionParams.get("~referring_link");
-            refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "refCode");
-
-        } catch (Exception e) {
-
-        }
-        if (refCodeFromBranchTrail1 != null && refCodeFromBranchTrail1.length() > 2) {
-            refCodeFromBranch = refCodeFromBranchTrail1;
-
-        } else {
-            refCodeFromBranch = refCodeFromBranchTrail2;
-
-        }
-
-
+    public String getRefCodeUsingBranch() {
+        return refCodeFromBranch;
     }
 
 
@@ -297,13 +296,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return branchQueryParms;
     }
 
-    public void getInstallReferringLink() {
-       installParams = Branch.getInstance().getFirstReferringParams();
-        try {
-            installReferring_link = (String) installParams.get("~referring_link");
-        } catch (Exception e) {
-        }
-
+    public String getInstallReferringLink() {
+        Log.i("BRANCH SDK link2", installReferring_link);
+        return installReferring_link;
     }
 
     public void startPayment(Map<String, Object> arguments) {
@@ -435,7 +430,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             }
         }
 
-        String fmChannelName="news";
+        String fmChannelName = "news";
         FirebaseMessaging.getInstance().subscribeToTopic(fmChannelName)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -453,12 +448,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             return;
                         }
                         String token = task.getResult().getToken();
-                        firebaseToken=token;
+                        firebaseToken = token;
                     }
                 });
     }
 
-    private String getFireBaseToken(){
+    private String getFireBaseToken() {
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
@@ -467,23 +462,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             return;
                         }
                         String token = task.getResult().getToken();
-                        firebaseToken=token;
+                        firebaseToken = token;
 
                     }
                 });
         return firebaseToken;
     }
 
-    private void subscribeToFirebaseTopic(String topicName){
-        try{
+    private void subscribeToFirebaseTopic(String topicName) {
+        try {
             FirebaseMessaging.getInstance().subscribeToTopic(topicName);
-        }catch(Exception e) {
+        } catch (Exception e) {
 
         }
 
     }
 
-    private   void fetchAdvertisingID(final Activity current_activity) {
+    private void fetchAdvertisingID(final Activity current_activity) {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         if (googleAPI.isGooglePlayServicesAvailable(current_activity) == ConnectionResult.SUCCESS) {
             new Thread(new Runnable() {
@@ -513,22 +508,22 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
-    private   void setTheGoogleId(String AdId) {
+    private void setTheGoogleId(String AdId) {
         googleAdId = AdId;
     }
 
-    private String getGoogleAddId(){
+    private String getGoogleAddId() {
         fetchAdvertisingID(this);
         return googleAdId;
     }
 
 
-    private String  getDeviceInfo(){
+    private String getDeviceInfo() {
         JSONObject params = new JSONObject();
         JSONObject emailList = new JSONObject();
         final DeviceInfo deviceData = new DeviceInfo();
         final Map<String, String> deviceInfoList = deviceData.getDeviceInfoMap(this);
-        try{
+        try {
             params.put("versionCode", BuildConfig.VERSION_CODE);
             params.put("versionName", BuildConfig.VERSION_NAME);
             params.put("uid", deviceInfoList.get("device_ID"));
@@ -551,12 +546,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 emailIndex++;
             }
             params.put("googleEmailList", emailList);
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
-       return params.toString();
+        return params.toString();
     }
-
 
 
 }

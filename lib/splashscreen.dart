@@ -43,8 +43,6 @@ class SplashScreenState extends State<SplashScreen>
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
-  String _installReferring_link = "";
-  String _pfRefCode = "";
 
   @override
   void initState() {
@@ -62,6 +60,8 @@ class SplashScreenState extends State<SplashScreen>
     await updateStringTable();
     setLoadingPercentage(30.0);
     final initData = await getInitData();
+
+    await _initBranchIoPlugin();
 
     await setInitData(initData);
     setLoadingPercentage(60.0);
@@ -121,7 +121,7 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   _initBranchStuff() {
-    _initBranchIoPlugin();
+    // _initBranchIoPlugin();
     _getGoogleAddId().then((String googleaddid) {
       SharedPrefHelper.internal().saveToSharedPref(
           ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, googleaddid);
@@ -136,10 +136,11 @@ class SplashScreenState extends State<SplashScreen>
     return value;
   }
 
-  Future<String> _initBranchIoPlugin() async {
+  _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      value = await branch_io_platform.invokeMethod('_initBranchIoPlugin');
+      final value = json
+          .decode(await branch_io_platform.invokeMethod('_initBranchIoPlugin'));
       print("<<<<<<<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>>>>>>>>>>>>>");
       print(value);
       SharedPrefHelper.internal().saveToSharedPref(
@@ -149,13 +150,10 @@ class SplashScreenState extends State<SplashScreen>
           ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, value["refCodeFromBranch"]);
     } catch (e) {
       SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
-          "");
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, "");
-
+          ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH, "");
+      SharedPrefHelper.internal()
+          .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, "");
     }
-    return "";
   }
 
   Future<String> _getFirebaseToken() async {
