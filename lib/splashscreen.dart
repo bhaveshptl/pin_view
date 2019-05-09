@@ -139,8 +139,11 @@ class SplashScreenState extends State<SplashScreen>
   _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      final value = json
-          .decode(await branch_io_platform.invokeMethod('_initBranchIoPlugin'));
+      final value = json.decode(
+        await branch_io_platform.invokeMethod('_initBranchIoPlugin').timeout(
+              Duration(seconds: 10),
+            ),
+      );
       print("<<<<<<<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>>>>>>>>>>>>>");
       print(value);
       SharedPrefHelper.internal().saveToSharedPref(
