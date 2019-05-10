@@ -146,7 +146,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             int smallimage=this.getResources().getIdentifier("push_logo", "drawable", "com.howzat.howzatfantasy");
             notificationBuilder
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.drawable.notification_icon_small)
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
