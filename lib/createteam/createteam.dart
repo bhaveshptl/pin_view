@@ -480,8 +480,16 @@ class CreateTeamState extends State<CreateTeam>
   /// and vice captain selection.
   ///
   void _showChooseCaptain() {
-    _selectedPlayers.sort((a, b) {
-      return a.playingStyleId - b.playingStyleId;
+    // _selectedPlayers.sort((a, b) {
+    //   return a.playingStyleId - b.playingStyleId;
+    // });
+    var players = [];
+    _fanTeamRules.styles.forEach((style) {
+      _selectedPlayers.forEach((player) {
+        if (style.id == player.playingStyleId) {
+          players.add(player);
+        }
+      });
     });
     Navigator.of(context).push(
       FantasyPageRoute(
