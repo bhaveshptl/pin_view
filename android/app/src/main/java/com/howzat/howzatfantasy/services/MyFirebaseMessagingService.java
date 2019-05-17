@@ -146,7 +146,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             int smallimage=this.getResources().getIdentifier("push_logo", "drawable", "com.howzat.howzatfantasy");
             notificationBuilder
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.drawable.notification_icon_small)
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
@@ -154,7 +154,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setDefaults(Notification.DEFAULT_VIBRATE | Notification.FLAG_SHOW_LIGHTS | Notification.DEFAULT_SOUND )
                     .setSound(defaultSoundUri)
                     .setStyle(bigPictureStyle)
-                    .setColor(Color.parseColor("#003064"))
+                    .setColor(Color.parseColor("#d32518"))
                     .setContentIntent(pendingIntent);
 
             /* Since android Oreo notification channel is needed*/
