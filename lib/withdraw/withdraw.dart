@@ -1435,8 +1435,11 @@ class WithdrawState extends State<Withdraw>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppConfig.of(context).theme["tabIndicatorColor"],
+          indicatorColor: Colors.white,
           indicatorWeight: 4.0,
+          labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
           tabs: _withdrawModes.keys.map((k) {
             return Tab(
               child: Text(k.toUpperCase()),
