@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
@@ -868,7 +869,10 @@ class WithdrawState extends State<Withdraw>
     return SingleChildScrollView(
       child: Form(
         key: _paytmFormKey,
-        child: !_bIsMobileVerified
+        child: ((_withdrawModes["paytm"] as List).indexOf("mobile") != -1 &&
+                    !_bIsMobileVerified) ||
+                ((_withdrawModes["paytm"] as List).indexOf("pan card") != -1 &&
+                    !_bIsKYCVerified)
             ? Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Column(
@@ -888,6 +892,7 @@ class WithdrawState extends State<Withdraw>
                             },
                             children: [
                               getMobileVerificationWidget(context, 4),
+                              getKYCVerificationWidget(context),
                             ],
                           ),
                         ),
@@ -1124,7 +1129,10 @@ class WithdrawState extends State<Withdraw>
 
   Widget getBankWithdrawWidget(BuildContext context) {
     return SingleChildScrollView(
-      child: !_bIsMobileVerified || !_bIsKYCVerified
+      child: ((_withdrawModes["bank"] as List).indexOf("mobile") != -1 &&
+                  !_bIsMobileVerified) ||
+              ((_withdrawModes["bank"] as List).indexOf("pan card") != -1 &&
+                  !_bIsKYCVerified)
           ? Padding(
               padding: EdgeInsets.all(8.0),
               child: Column(
@@ -1427,11 +1435,8 @@ class WithdrawState extends State<Withdraw>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicatorColor: AppConfig.of(context).theme["tabIndicatorColor"],
           indicatorWeight: 4.0,
-          labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
           tabs: _withdrawModes.keys.map((k) {
             return Tab(
               child: Text(k.toUpperCase()),
