@@ -254,6 +254,7 @@ class SignupState extends State<Signup> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           AuthResult(res, _scaffoldKey).processResult(() {});
+          onLoginAuthenticate(json.decode(res.body));
         } else {
           final dynamic response =
               json.decode(res.body).cast<String, dynamic>();
@@ -408,6 +409,23 @@ class SignupState extends State<Signup> {
         });
       }
     });
+  }
+
+  Future<String> onLoginAuthenticate(Map<String, dynamic> loginData) async {
+    print(loginData);
+    String userId = loginData["user_id"].toString();
+    Map<String, String> signupdata = new Map();
+    signupdata["registrationID"] = loginData["user_id"];
+    signupdata["transactionID"] = loginData["user_id"];
+    signupdata["description"] = loginData["user_id"];
+    try {
+      String value = await branch_io_platform.invokeMethod(
+          'trackAndSetBranchUserIdentity', userId);
+      String trackValue = await branch_io_platform.invokeMethod(
+          'branchLifecycleEventSigniup', signupdata);
+    } catch (e) {
+      print(e);
+    }
   }
 
   _launchSignIn() {

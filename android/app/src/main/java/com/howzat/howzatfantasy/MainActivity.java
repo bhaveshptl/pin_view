@@ -16,8 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.branch.indexing.BranchUniversalObject;
 import io.branch.referral.Branch;
 import io.branch.referral.BranchError;
+import io.branch.referral.util.BRANCH_STANDARD_EVENT;
+import io.branch.referral.util.BranchContentSchema;
+import io.branch.referral.util.BranchEvent;
+import io.branch.referral.util.ContentMetadata;
+import io.branch.referral.util.CurrencyType;
+import io.branch.referral.util.ProductCategory;
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -231,6 +238,35 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String installReferring_link = (String) getInstallReferringLink();
                     result.success(installReferring_link);
                 }
+                if (methodCall.method.equals("_getInstallReferringLink")) {
+                    String installReferring_link = (String) getInstallReferringLink();
+                    result.success(installReferring_link);
+                }
+                if (methodCall.method.equals("trackAndSetBranchUserIdentity")) {
+                    String userId = methodCall.arguments();
+                    trackAndSetBranchUserIdentity(userId);
+                    result.success("Branch Io user Identity added ");
+                }
+                if (methodCall.method.equals("branchUserLogout")) {
+                    branchUserLogout();
+                    result.success("Branch Io user Logout done");
+                }
+
+                if (methodCall.method.equals("setBranchUniversalObject")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    setBranchUniversalObject(arguments);
+                    result.success("Branch Io Universal Object added");
+                }
+                if (methodCall.method.equals("branchLifecycleEventSigniup")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    branchLifecycleEventSigniup(arguments);
+                    result.success("Branch Io  Lifecycle Event Signiup added");
+                }
+                if (methodCall.method.equals("branchEventInitPurchase")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    branchEventInitPurchase(arguments);
+                    result.success("Branch Io  Lifecycle Event Signiup added");
+                }
                 if (methodCall.method.equals("_getGoogleAddId")) {
                     String googleAddId = (String) getGoogleAddId();
                     result.success(googleAddId);
@@ -280,8 +316,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return refCodeFromBranch;
     }
 
-
-    public Map<String, String> getBranchQueryParms() {
+    private Map<String, String> getBranchQueryParms() {
         myHeperClass = new MyHelperClass();
         Map<String, String> branchQueryParms = new HashMap<String, String>();
         JSONObject installParams = Branch.getInstance().getFirstReferringParams();
@@ -308,6 +343,51 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         Log.i("BRANCH SDK link2", installReferring_link);
         return installReferring_link;
     }
+
+    private void trackAndSetBranchUserIdentity(String userId){
+        Branch.getInstance().setIdentity(userId);
+    }
+
+    private void branchUserLogout(){
+        Branch.getInstance().logout();
+    }
+
+    private void  setBranchUniversalObject(Map<String, Object> arguments){
+        BranchUniversalObject buo = new BranchUniversalObject()
+                .setCanonicalIdentifier((String)arguments.get("canonicalIdentifier"))
+                .setTitle((String)arguments.get("title"))
+                .setContentDescription((String)arguments.get("contentDescription"))
+                .setContentImageUrl((String)arguments.get("contentImageUrl"));
+
+        buo.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
+        buo.setLocalIndexMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
+
+        buo.setContentMetadata(
+                new ContentMetadata()
+                        .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
+                        .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
+
+                        .setContentSchema(BranchContentSchema.COMMERCE_PRODUCT))
+                .addKeyWord("keyword1")
+                .addKeyWord("keyword2");
+    }
+
+    private void branchLifecycleEventSigniup(Map<String, Object> arguments){
+        new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
+                .setTransactionID((String)arguments.get("transactionID"))
+                .setDescription((String)arguments.get("description"))
+                .addCustomDataProperty("registrationID", "12345")
+                .logEvent(MainActivity.this);
+    }
+    private void branchEventInitPurchase(Map<String, Object> arguments){
+        new BranchEvent(BRANCH_STANDARD_EVENT.INITIATE_PURCHASE)
+                .setTransactionID((String)arguments.get("transactionID"))
+                .setDescription((String)arguments.get("description"))
+                .addCustomDataProperty("registrationID", "12345")
+                .logEvent(MainActivity.this);
+    }
+
+
 
     public void startPayment(Map<String, Object> arguments) {
         /*
