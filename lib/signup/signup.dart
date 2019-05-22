@@ -243,10 +243,6 @@ class SignupState extends State<Signup> {
       } catch (e) {}
     }
 
-    print(
-        "<<<<<<<<<<<<<<<<<<<Signup Context non socila>>>>>>>>>>>>>>>>>>>>>>>");
-    print(_payload["context"].toString());
-
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
     req.body = json.encode(_payload);
@@ -383,8 +379,6 @@ class SignupState extends State<Signup> {
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
 
-    print("<<<<<<<<<<<<<<<<<<<Signup Context>>>>>>>>>>>>>>>>>>>>>>>");
-    print(_payload["context"].toString());
     http.Client()
         .post(
       BaseUrl().apiUrl +
@@ -401,6 +395,7 @@ class SignupState extends State<Signup> {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
         );
+         onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         setState(() {
@@ -411,21 +406,34 @@ class SignupState extends State<Signup> {
     });
   }
 
-  Future<String> onLoginAuthenticate(Map<String, dynamic> loginData) async {
-    print(loginData);
-    String userId = loginData["user_id"].toString();
-    Map<String, String> signupdata = new Map();
-    signupdata["registrationID"] = loginData["user_id"];
-    signupdata["transactionID"] = loginData["user_id"];
-    signupdata["description"] = loginData["user_id"];
+  onLoginAuthenticate(Map<String, dynamic> loginData) {
+    branchLifecycleEventSigniup(loginData);
+    trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+  }
+
+  Future<String> trackAndSetBranchUserIdentity(String userId) async {
+    String value;
     try {
-      String value = await branch_io_platform.invokeMethod(
+      value = await branch_io_platform.invokeMethod(
           'trackAndSetBranchUserIdentity', userId);
-      String trackValue = await branch_io_platform.invokeMethod(
-          'branchLifecycleEventSigniup', signupdata);
     } catch (e) {
       print(e);
     }
+    return value;
+  }
+
+  Future<String> branchLifecycleEventSigniup(
+      Map<String, dynamic> loginData) async {
+    Map<dynamic, dynamic> signupdata = new Map();
+    signupdata["registrationID"] = loginData["user_id"];
+    signupdata["transactionID"] = loginData["login_name"];
+    signupdata["description"] = loginData["channelId"];
+    String trackValue;
+    try {
+      String trackValue = await branch_io_platform.invokeMethod(
+          'branchLifecycleEventSigniup', signupdata);
+    } catch (e) {}
+    return trackValue;
   }
 
   _launchSignIn() {

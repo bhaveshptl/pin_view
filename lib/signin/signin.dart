@@ -63,14 +63,14 @@ class SignInPageState extends State<SignInPage> {
   }
 
   getLocalStorageValues() {
-     Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
+    Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
     getbranchRefCode.then((value) {
       if (value.length > 0) {
-       _pfRefCode = value;
-      
-       print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
-       print(_pfRefCode);
+        _pfRefCode = value;
+
+        print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
+        print(_pfRefCode);
       } else {
         _pfRefCode = "";
       }
@@ -79,9 +79,9 @@ class SignInPageState extends State<SignInPage> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
     getbranchReferringLink.then((value) {
       if (value.length > 0) {
-       _installReferring_link = value;
-      print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
-      print(_installReferring_link);
+        _installReferring_link = value;
+        print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
+        print(_installReferring_link);
       } else {
         _installReferring_link = "";
       }
@@ -97,7 +97,6 @@ class SignInPageState extends State<SignInPage> {
       }
     });
 
-   
     Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
     googleAddId_from_local.then((value) {
@@ -136,7 +135,6 @@ class SignInPageState extends State<SignInPage> {
     } catch (e) {}
     return value;
   }
-
 
   showLoader(bool bShow) {
     AppConfig.of(context)
@@ -195,20 +193,20 @@ class SignInPageState extends State<SignInPage> {
       "googleaddid": googleAddId,
       "serial": androidInfo.androidId,
       "refCode": _pfRefCode,
-       "branchinstallReferringlink": _installReferring_link,
+      "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
 
     if (_installReferring_link.length > 0) {
-        var uri = Uri.parse(_installReferring_link);
-        uri.queryParameters.forEach((k, v) {
-          try {
-            _payload["context"][k] = v;
-          } catch (e) {
-            print(e);
-          }
-        });
-      }
+      var uri = Uri.parse(_installReferring_link);
+      uri.queryParameters.forEach((k, v) {
+        try {
+          _payload["context"][k] = v;
+        } catch (e) {
+          print(e);
+        }
+      });
+    }
 
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
@@ -225,9 +223,7 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["googleEmailList"] =
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
-    print(
-        "<<<<<<<<<<<<<<<<<<<Sign in  Context non social>>>>>>>>>>>>>>>>>>>>>>>");
-    print(_payload["context"].toString());
+
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.LOGIN_URL));
     req.body = json.encode(_payload);
@@ -236,6 +232,7 @@ class SignInPageState extends State<SignInPage> {
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(() {});
+        onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         setState(() {
@@ -335,8 +332,6 @@ class SignInPageState extends State<SignInPage> {
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
 
-    print("<<<<<<<<<<<<<<<<<<<Signin  Context social>>>>>>>>>>>>>>>>>>>>>>>");
-    print(_payload["context"].toString());
     http.Client()
         .post(
       BaseUrl().apiUrl +
@@ -353,6 +348,7 @@ class SignInPageState extends State<SignInPage> {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
         );
+         onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         setState(() {
@@ -376,6 +372,23 @@ class SignInPageState extends State<SignInPage> {
       _scaffoldKey.currentState.showSnackBar(
           SnackBar(content: Text(strings.get("PASSWORD_CHANGED"))));
     }
+  }
+
+  onLoginAuthenticate(Map<String, dynamic> loginData) {
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>on Login Auth>>>>>>>>>>>>>>>>>>>>");
+    print(loginData);
+    trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+  }
+
+  Future<String> trackAndSetBranchUserIdentity(String userId) async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod(
+          'trackAndSetBranchUserIdentity', userId);
+    } catch (e) {
+      print(e);
+    }
+    return value;
   }
 
   @override
