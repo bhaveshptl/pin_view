@@ -35,6 +35,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   final flutterWebviewPlugin = FlutterWebviewPlugin();
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
+  static const branch_io_platform =
+      const MethodChannel('com.algorin.pf.branch');
   Map<String, dynamic> lastPaymentMethod;
   Map<String, Map<String, dynamic>> selectedPaymentMethod = {};
   TextEditingController phoneController = TextEditingController();
@@ -82,6 +84,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   processSuccessResponse(Map<String, dynamic> payload) {
+    print("<<<<<<<<<<<<<<Procees succes response>>>>>>>>>>>>");
+    print(payload);
     showLoader(false);
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
@@ -90,6 +94,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
+      print("Response");
+      print(response);
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
@@ -658,10 +664,84 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       if ((response["authStatus"] as String).toLowerCase() ==
           "Declined".toLowerCase()) {
         _showTransactionFailed(response);
+        branchEventTransactionFailed(response);
       } else {
         Navigator.of(context).pop(result);
       }
     }
+  }
+
+  Future<String> branchEventTransactionFailed(
+      Map<String, dynamic> transactionData) async {
+    Map<dynamic, dynamic> trackdata = new Map();
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionData["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString();
+    String timeinString = date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
+    trackdata["txnDate"] = dateinString;
+    trackdata["txnTime"] = timeinString;
+    trackdata["txnAmount"] = transactionData["amount"];
+    trackdata["orderId"] = transactionData["orderId"];
+    trackdata["channelId"] = transactionData["channelId"];
+    trackdata["paymentOption"] = transactionData["paymentOption"];
+    trackdata["paymentMode"] = transactionData["paymentMode"];
+    trackdata["promoCode"] = transactionData["promoCode"];
+    trackdata["bonusAmount"] = transactionData["bonusAmount"];
+    trackdata["gateway"] = transactionData["gateway"];
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
+    trackdata["errorCode"] = transactionData["errorCode"];
+    trackdata["txnId"] = transactionData["txnId"];
+    trackdata["appPage"] = "paymentmodePage";
+    String trackStatus;
+    try {
+      String trackStatus = await branch_io_platform.invokeMethod(
+          'branchEventTransactionFailed', trackdata);
+    } catch (e) {}
+    return trackStatus;
+  }
+
+  Future<String> branchEventTransactionSuccess(
+      Map<String, dynamic> transactionData) async {
+    Map<dynamic, dynamic> trackdata = new Map();
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionData["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString();
+    String timeinString = date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
+    trackdata["txnDate"] = dateinString;
+    trackdata["txnTime"] = timeinString;
+    trackdata["txnAmount"] = transactionData["amount"];
+    trackdata["orderId"] = transactionData["orderId"];
+    trackdata["channelId"] = transactionData["channelId"];
+    trackdata["paymentOption"] = transactionData["paymentOption"];
+    trackdata["paymentMode"] = transactionData["paymentMode"];
+    trackdata["promoCode"] = transactionData["promoCode"];
+    trackdata["bonusAmount"] = transactionData["bonusAmount"];
+    trackdata["gateway"] = transactionData["gateway"];
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
+    trackdata["txnId"] = transactionData["txnId"];
+    trackdata["appPage"] = "paymentmodePage";
+    String trackStatus;
+    try {
+      String trackStatus = await branch_io_platform.invokeMethod(
+          'branchEventTransactionSuccess', trackdata);
+    } catch (e) {}
+    return trackStatus;
   }
 
   _showTransactionFailed(Map<String, dynamic> transactionResult) async {

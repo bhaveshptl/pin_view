@@ -267,6 +267,17 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     branchEventInitPurchase(arguments);
                     result.success("Branch Io  Lifecycle Event Signiup added");
                 }
+                if (methodCall.method.equals("branchEventTransactionFailed")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    branchEventTransactionFailed(arguments);
+                    result.success("Branch Io  Lifecycle Event Transation Failed  added");
+                }
+                if (methodCall.method.equals("branchEventTransactionSuccess")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    branchEventTransactionSuccess(arguments);
+                    result.success("Branch Io  Lifecycle Event Transation Success added");
+                }
+
                 if (methodCall.method.equals("_getGoogleAddId")) {
                     String googleAddId = (String) getGoogleAddId();
                     result.success(googleAddId);
@@ -386,6 +397,48 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 .addCustomDataProperty("registrationID", "12345")
                 .logEvent(MainActivity.this);
     }
+
+    private void branchEventTransactionFailed(Map<String, Object> arguments){
+        new BranchEvent("transactionfailed")
+                .setTransactionID((String)arguments.get("txnId"))
+                .setDescription((String)arguments.get("channelId"))
+                .addCustomDataProperty("txnTime", (String)arguments.get("txnTime"))
+                .addCustomDataProperty("txnDate", (String)arguments.get("txnDate"))
+                .addCustomDataProperty("txnAmount", (String)arguments.get("txnAmount"))
+                .addCustomDataProperty("orderId", (String)arguments.get("orderId"))
+                .addCustomDataProperty("paymentOption", (String)arguments.get("paymentOption"))
+                .addCustomDataProperty("paymentMode", (String)arguments.get("paymentMode"))
+                .addCustomDataProperty("promoCode", (String)arguments.get("promoCode"))
+                .addCustomDataProperty("bonusAmount", (String)arguments.get("bonusAmount"))
+                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
+                .addCustomDataProperty("firstDepositor", (String)arguments.get("firstDepositor"))
+                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
+                .addCustomDataProperty("errorCode", (String)arguments.get("errorCode"))
+                .logEvent(MainActivity.this);
+    }
+
+    private void branchEventTransactionSuccess(Map<String, Object> arguments){
+        new BranchEvent("transactionfailed")
+                .setTransactionID((String)arguments.get("txnId"))
+                .setDescription((String)arguments.get("channelId"))
+                .addCustomDataProperty("txnTime", (String)arguments.get("txnTime"))
+                .addCustomDataProperty("txnDate", (String)arguments.get("txnDate"))
+                .addCustomDataProperty("txnAmount", (String)arguments.get("txnAmount"))
+                .addCustomDataProperty("orderId", (String)arguments.get("orderId"))
+                .addCustomDataProperty("paymentOption", (String)arguments.get("paymentOption"))
+                .addCustomDataProperty("paymentMode", (String)arguments.get("paymentMode"))
+                .addCustomDataProperty("promoCode", (String)arguments.get("promoCode"))
+                .addCustomDataProperty("bonusAmount", (String)arguments.get("bonusAmount"))
+                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
+                .addCustomDataProperty("firstDepositor", (String)arguments.get("firstDepositor"))
+                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
+                .addCustomDataProperty("errorCode", (String)arguments.get("errorCode"))
+                .logEvent(MainActivity.this);
+    }
+
+
+
+
 
 
 
