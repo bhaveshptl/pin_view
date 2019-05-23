@@ -1210,18 +1210,10 @@ class AddCashState extends State<AddCash> {
         date.second.toString();
     trackdata["txnDate"] = dateinString;
     trackdata["txnTime"] = timeinString;
-    trackdata["txnAmount"] = transactionData["amount"];
-    trackdata["orderId"] = transactionData["orderId"];
-    trackdata["channelId"] = transactionData["channelId"];
-    trackdata["paymentOption"] = transactionData["paymentOption"];
-    trackdata["paymentMode"] = transactionData["paymentMode"];
-    trackdata["promoCode"] = transactionData["promoCode"];
-    trackdata["bonusAmount"] = transactionData["bonusAmount"];
-    trackdata["gateway"] = transactionData["gateway"];
-    trackdata["firstDepositor"] = transactionData["firstDepositor"];
-    trackdata["errorCode"] = transactionData["errorCode"];
     trackdata["txnId"] = transactionData["txnId"];
-    trackdata["appPage"] = "addcashPage";
+    trackdata["appPage"] = "AddCashPage";
+    trackdata["data"] = transactionData;
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
     String trackStatus;
     try {
       String trackStatus = await branch_io_platform.invokeMethod(
@@ -1247,17 +1239,9 @@ class AddCashState extends State<AddCash> {
         date.second.toString();
     trackdata["txnDate"] = dateinString;
     trackdata["txnTime"] = timeinString;
-    trackdata["txnAmount"] = transactionData["amount"];
-    trackdata["orderId"] = transactionData["orderId"];
-    trackdata["channelId"] = transactionData["channelId"];
-    trackdata["paymentOption"] = transactionData["paymentOption"];
-    trackdata["paymentMode"] = transactionData["paymentMode"];
-    trackdata["promoCode"] = transactionData["promoCode"];
-    trackdata["bonusAmount"] = transactionData["bonusAmount"];
-    trackdata["gateway"] = transactionData["gateway"];
+    trackdata["appPage"] = "AddCashPage";
+    trackdata["data"] = transactionData;
     trackdata["firstDepositor"] = transactionData["firstDepositor"];
-    trackdata["txnId"] = transactionData["txnId"];
-    trackdata["appPage"] = "addcashPage";
     String trackStatus;
     try {
       String trackStatus = await branch_io_platform.invokeMethod(

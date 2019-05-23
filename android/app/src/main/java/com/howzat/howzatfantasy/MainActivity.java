@@ -355,20 +355,20 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return installReferring_link;
     }
 
-    private void trackAndSetBranchUserIdentity(String userId){
+    private void trackAndSetBranchUserIdentity(String userId) {
         Branch.getInstance().setIdentity(userId);
     }
 
-    private void branchUserLogout(){
+    private void branchUserLogout() {
         Branch.getInstance().logout();
     }
 
-    private void  setBranchUniversalObject(Map<String, Object> arguments){
+    private void setBranchUniversalObject(Map<String, Object> arguments) {
         BranchUniversalObject buo = new BranchUniversalObject()
-                .setCanonicalIdentifier((String)arguments.get("canonicalIdentifier"))
-                .setTitle((String)arguments.get("title"))
-                .setContentDescription((String)arguments.get("contentDescription"))
-                .setContentImageUrl((String)arguments.get("contentImageUrl"));
+                .setCanonicalIdentifier((String) arguments.get("canonicalIdentifier"))
+                .setTitle((String) arguments.get("title"))
+                .setContentDescription((String) arguments.get("contentDescription"))
+                .setContentImageUrl((String) arguments.get("contentImageUrl"));
 
         buo.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
         buo.setLocalIndexMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
@@ -383,56 +383,92 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 .addKeyWord("keyword2");
     }
 
-    private void branchLifecycleEventSigniup(Map<String, Object> arguments){
-        new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
-                .setTransactionID((String)arguments.get("transactionID"))
-                .setDescription((String)arguments.get("description"))
-                .addCustomDataProperty("registrationID", "12345")
-                .logEvent(MainActivity.this);
+    private void branchLifecycleEventSigniup(Map<String, Object> arguments) {
+
+        BranchEvent be = new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
+                .setTransactionID((String) arguments.get("transactionID"))
+                .setDescription("HOWZAT SIGN UP");
+        HashMap<String, String> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());
+            be.addCustomDataProperty((String) entry.getKey(), (String) entry.getValue());
+        }
+        be.logEvent(MainActivity.this);
+
     }
-    private void branchEventInitPurchase(Map<String, Object> arguments){
+
+
+    private void branchEventTransactionFailed(Map<String, Object> arguments) {
+        System.out.print(arguments.get("firstDepositor"));
+        System.out.print(arguments.get("firstDepositor"));
+        boolean isfirstDepositor=false;
+        String eventName="FIRST_DEPOSIT_FAILED";
+        isfirstDepositor= Boolean.parseBoolean((String)arguments.get("firstDepositor"));
+        if(!isfirstDepositor){
+            eventName ="REPEAT_DEPOSIT_FAILED";
+        }
+
+        BranchEvent be = new BranchEvent(eventName)
+                .setTransactionID((String) arguments.get("txnId"))
+                .setDescription(("HOWZAT DEPOSIT FAILED"));
+        be.addCustomDataProperty("txnTime", (String) arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", (String) arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", (String) arguments.get("appPage"));
+
+        HashMap<String, String> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());
+            be.addCustomDataProperty((String) entry.getKey(), (String) entry.getValue());
+        }
+        be.logEvent(MainActivity.this);
+
+        System.out.print(be);
+        System.out.print("final");
+    }
+
+    private void branchEventTransactionSuccess(Map<String, Object> arguments) {
+
+        boolean isfirstDepositor=false;
+        String eventName="FIRST_DEPOSIT_SUCCESS";
+        isfirstDepositor=Boolean.parseBoolean((String)arguments.get("firstDepositor"));
+        if(!isfirstDepositor){
+            eventName ="REPEAT_DEPOSIT_SUCCESS";
+        }
+
+
+        BranchEvent be = new BranchEvent(eventName)
+                .setTransactionID((String) arguments.get("txnId"))
+                .setDescription((String) arguments.get("HOWZAT DEPOSIT FAILED"));
+        be.addCustomDataProperty("txnTime", (String) arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", (String) arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", (String) arguments.get("appPage"));
+
+        HashMap<String, String> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            System.out.println("Key = " + entry.getKey() +
+                    ", Value = " + entry.getValue());
+            be.addCustomDataProperty((String) entry.getKey(), (String) entry.getValue());
+        }
+
+        be.logEvent(MainActivity.this);
+
+
+
+    }
+
+    private void branchEventInitPurchase(Map<String, Object> arguments) {
         new BranchEvent(BRANCH_STANDARD_EVENT.INITIATE_PURCHASE)
-                .setTransactionID((String)arguments.get("transactionID"))
-                .setDescription((String)arguments.get("description"))
+                .setTransactionID((String) arguments.get("transactionID"))
+                .setDescription((String) arguments.get("description"))
                 .addCustomDataProperty("registrationID", "12345")
-                .logEvent(MainActivity.this);
-    }
-
-    private void branchEventTransactionFailed(Map<String, Object> arguments){
-        new BranchEvent("transactionfailed")
-                .setTransactionID((String)arguments.get("txnId"))
-                .setDescription((String)arguments.get("channelId"))
-                .addCustomDataProperty("txnTime", (String)arguments.get("txnTime"))
-                .addCustomDataProperty("txnDate", (String)arguments.get("txnDate"))
-                .addCustomDataProperty("txnAmount", (String)arguments.get("txnAmount"))
-                .addCustomDataProperty("orderId", (String)arguments.get("orderId"))
-                .addCustomDataProperty("paymentOption", (String)arguments.get("paymentOption"))
-                .addCustomDataProperty("paymentMode", (String)arguments.get("paymentMode"))
-                .addCustomDataProperty("promoCode", (String)arguments.get("promoCode"))
-                .addCustomDataProperty("bonusAmount", (String)arguments.get("bonusAmount"))
-                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
-                .addCustomDataProperty("firstDepositor", (String)arguments.get("firstDepositor"))
-                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
-                .addCustomDataProperty("errorCode", (String)arguments.get("errorCode"))
-                .logEvent(MainActivity.this);
-    }
-
-    private void branchEventTransactionSuccess(Map<String, Object> arguments){
-        new BranchEvent("transactionsuccess")
-                .setTransactionID((String)arguments.get("txnId"))
-                .setDescription((String)arguments.get("channelId"))
-                .addCustomDataProperty("txnTime", (String)arguments.get("txnTime"))
-                .addCustomDataProperty("txnDate", (String)arguments.get("txnDate"))
-                .addCustomDataProperty("txnAmount", (String)arguments.get("txnAmount"))
-                .addCustomDataProperty("orderId", (String)arguments.get("orderId"))
-                .addCustomDataProperty("paymentOption", (String)arguments.get("paymentOption"))
-                .addCustomDataProperty("paymentMode", (String)arguments.get("paymentMode"))
-                .addCustomDataProperty("promoCode", (String)arguments.get("promoCode"))
-                .addCustomDataProperty("bonusAmount", (String)arguments.get("bonusAmount"))
-                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
-                .addCustomDataProperty("firstDepositor", (String)arguments.get("firstDepositor"))
-                .addCustomDataProperty("gateway", (String)arguments.get("gateway"))
-                .addCustomDataProperty("errorCode", (String)arguments.get("errorCode"))
                 .logEvent(MainActivity.this);
     }
 

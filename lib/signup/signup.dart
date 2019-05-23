@@ -395,7 +395,7 @@ class SignupState extends State<Signup> {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
         );
-         onLoginAuthenticate(json.decode(res.body));
+        onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         setState(() {
@@ -428,6 +428,7 @@ class SignupState extends State<Signup> {
     signupdata["registrationID"] = loginData["user_id"];
     signupdata["transactionID"] = loginData["login_name"];
     signupdata["description"] = loginData["channelId"];
+    signupdata["data"] = loginData;
     String trackValue;
     try {
       String trackValue = await branch_io_platform.invokeMethod(
