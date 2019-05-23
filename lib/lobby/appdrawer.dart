@@ -681,7 +681,8 @@ class AppDrawerState extends State<AppDrawer> {
                     ],
                   ),
                 ),
-                AppConfig.of(context).channelId == '9'
+                AppConfig.of(context).channelId == '9' ||
+                        AppConfig.of(context).channelId == '14'
                     ? Container()
                     : ListTile(
                         title: Text('Become A Partner'),
