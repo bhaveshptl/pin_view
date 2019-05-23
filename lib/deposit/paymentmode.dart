@@ -112,8 +112,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           );
         } else {
           _showTransactionFailed(response);
+          branchEventTransactionFailed(response);
         }
       } else {
+        branchEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
       }
     });

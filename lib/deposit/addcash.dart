@@ -53,7 +53,7 @@ class AddCashState extends State<AddCash> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const branch_io_platform =
-      const MethodChannel('com.algorin.pf.branch');    
+      const MethodChannel('com.algorin.pf.branch');
   static const _kFontFam = 'MyFlutterApp';
   IconData gift_1 = const IconData(0xe800, fontFamily: _kFontFam);
 
@@ -1184,15 +1184,16 @@ class AddCashState extends State<AddCash> {
           );
         } else {
           _showTransactionFailed(response);
-         // branchEventTransactionFailed(response);
+          branchEventTransactionFailed(response);
         }
       } else {
+        branchEventTransactionSuccess(response);
         Navigator.of(context).pop(result);
       }
     }
   }
 
-   Future<String> branchEventTransactionFailed(
+  Future<String> branchEventTransactionFailed(
       Map<String, dynamic> transactionData) async {
     Map<dynamic, dynamic> trackdata = new Map();
     DateTime date = DateTime.fromMillisecondsSinceEpoch(

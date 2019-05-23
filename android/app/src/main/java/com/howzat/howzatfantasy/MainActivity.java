@@ -418,7 +418,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private void branchEventTransactionSuccess(Map<String, Object> arguments){
-        new BranchEvent("transactionfailed")
+        new BranchEvent("transactionsuccess")
                 .setTransactionID((String)arguments.get("txnId"))
                 .setDescription((String)arguments.get("channelId"))
                 .addCustomDataProperty("txnTime", (String)arguments.get("txnTime"))
@@ -435,12 +435,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 .addCustomDataProperty("errorCode", (String)arguments.get("errorCode"))
                 .logEvent(MainActivity.this);
     }
-
-
-
-
-
-
 
     public void startPayment(Map<String, Object> arguments) {
         /*
