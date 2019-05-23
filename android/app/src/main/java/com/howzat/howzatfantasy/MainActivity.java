@@ -402,11 +402,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
 
     private void branchEventTransactionFailed(Map<String, Object> arguments) {
-        System.out.print(arguments.get("firstDepositor"));
-        System.out.print(arguments.get("firstDepositor"));
+
         boolean isfirstDepositor=false;
         String eventName="FIRST_DEPOSIT_FAILED";
-        isfirstDepositor= Boolean.parseBoolean((String)arguments.get("firstDepositor"));
+        isfirstDepositor= Boolean.parseBoolean(""+arguments.get("firstDepositor"));
         if(!isfirstDepositor){
             eventName ="REPEAT_DEPOSIT_FAILED";
         }
@@ -414,53 +413,44 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         BranchEvent be = new BranchEvent(eventName)
                 .setTransactionID((String) arguments.get("txnId"))
                 .setDescription(("HOWZAT DEPOSIT FAILED"));
-        be.addCustomDataProperty("txnTime", (String) arguments.get("txnTime"));
-        be.addCustomDataProperty("txnDate", (String) arguments.get("txnDate"));
-        be.addCustomDataProperty("appPage", (String) arguments.get("appPage"));
+        be.addCustomDataProperty("txnTime", ""+ arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", ""+ arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage",  ""+arguments.get("appPage"));
 
         HashMap<String, String> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, String> entry : data.entrySet()) {
-            System.out.println("Key = " + entry.getKey() +
-                    ", Value = " + entry.getValue());
-            be.addCustomDataProperty((String) entry.getKey(), (String) entry.getValue());
+            be.addCustomDataProperty(entry.getKey(), ""+entry.getValue());
         }
         be.logEvent(MainActivity.this);
 
-        System.out.print(be);
-        System.out.print("final");
     }
 
     private void branchEventTransactionSuccess(Map<String, Object> arguments) {
-
         boolean isfirstDepositor=false;
         String eventName="FIRST_DEPOSIT_SUCCESS";
-        isfirstDepositor=Boolean.parseBoolean((String)arguments.get("firstDepositor"));
+        isfirstDepositor=Boolean.parseBoolean(""+arguments.get("firstDepositor"));
         if(!isfirstDepositor){
             eventName ="REPEAT_DEPOSIT_SUCCESS";
         }
 
-
         BranchEvent be = new BranchEvent(eventName)
                 .setTransactionID((String) arguments.get("txnId"))
                 .setDescription((String) arguments.get("HOWZAT DEPOSIT FAILED"));
-        be.addCustomDataProperty("txnTime", (String) arguments.get("txnTime"));
-        be.addCustomDataProperty("txnDate", (String) arguments.get("txnDate"));
-        be.addCustomDataProperty("appPage", (String) arguments.get("appPage"));
+        be.addCustomDataProperty("txnTime", ""+ arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", ""+ arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", ""+ arguments.get("appPage"));
 
         HashMap<String, String> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, String> entry : data.entrySet()) {
-            System.out.println("Key = " + entry.getKey() +
-                    ", Value = " + entry.getValue());
-            be.addCustomDataProperty((String) entry.getKey(), (String) entry.getValue());
+
+            be.addCustomDataProperty(entry.getKey(), ""+entry.getValue());
         }
 
         be.logEvent(MainActivity.this);
-
-
 
     }
 

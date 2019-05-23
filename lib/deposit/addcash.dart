@@ -204,8 +204,10 @@ class AddCashState extends State<AddCash> {
           );
         } else {
           _showTransactionFailed(response);
+          branchEventTransactionFailed(response);
         }
       } else {
+        branchEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
       }
     });
