@@ -454,7 +454,7 @@ class SignupState extends State<Signup> {
       Map<String, dynamic> loginData) async {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"];
-    signupdata["transactionID"] = loginData["login_name"];
+    signupdata["transactionID"] = loginData["user_id"];
     signupdata["description"] = loginData["channelId"];
     signupdata["data"] = loginData;
     String trackValue;
