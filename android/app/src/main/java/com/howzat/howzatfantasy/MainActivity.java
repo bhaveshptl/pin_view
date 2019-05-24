@@ -81,6 +81,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     public void onStart() {
         super.onStart();
         initBranchPlugin();
+
+
     }
 
     private void initBranchPlugin() {
@@ -94,6 +96,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     if (error == null) {
                         initBranchSession(referringParams);
                         Log.i("BRANCH SDK", referringParams.toString());
+
                     } else {
                         initBranchSession(referringParams);
                         Log.i("BRANCH SDK", error.getMessage());
@@ -259,23 +262,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 }
                 if (methodCall.method.equals("branchLifecycleEventSigniup")) {
                     Map<String, Object> arguments = methodCall.arguments();
-                    branchLifecycleEventSigniup(arguments);
-                    result.success("Branch Io  Lifecycle Event Signiup added");
+                    String channelResult=branchLifecycleEventSigniup(arguments);
+                    result.success(channelResult);
                 }
                 if (methodCall.method.equals("branchEventInitPurchase")) {
                     Map<String, Object> arguments = methodCall.arguments();
-                    branchEventInitPurchase(arguments);
-                    result.success("Branch Io  Lifecycle Event Signiup added");
+                    String channelResult=branchEventInitPurchase(arguments);
+                    result.success(channelResult);
                 }
                 if (methodCall.method.equals("branchEventTransactionFailed")) {
                     Map<String, Object> arguments = methodCall.arguments();
-                    branchEventTransactionFailed(arguments);
-                    result.success("Branch Io  Lifecycle Event Transation Failed  added");
+                    String channelResult=branchEventTransactionFailed(arguments);
+                    result.success(channelResult);
                 }
                 if (methodCall.method.equals("branchEventTransactionSuccess")) {
                     Map<String, Object> arguments = methodCall.arguments();
-                    branchEventTransactionSuccess(arguments);
-                    result.success("Branch Io  Lifecycle Event Transation Success added");
+                    String channelResult=branchEventTransactionSuccess(arguments);
+                    result.success(channelResult);
                 }
 
                 if (methodCall.method.equals("_getGoogleAddId")) {
@@ -383,25 +386,24 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 .addKeyWord("keyword2");
     }
 
-    private void branchLifecycleEventSigniup(Map<String, Object> arguments) {
-
+    private String branchLifecycleEventSigniup(Map<String, Object> arguments) {
         BranchEvent be = new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
-                .setTransactionID((String) arguments.get("transactionID"))
+                .setTransactionID(""+arguments.get("transactionID"))
                 .setDescription("HOWZAT SIGN UP");
-        HashMap<String, String> data = new HashMap();
+        HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            System.out.println("Key = " + entry.getKey() +
-                    ", Value = " + entry.getValue());
-            be.addCustomDataProperty((String) entry.getKey(), (String) entry.getValue());
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+
+            be.addCustomDataProperty((String) entry.getKey(), ""+entry.getValue());
         }
         be.logEvent(MainActivity.this);
+        return "Sign Up Track event added";
 
     }
 
 
-    private void branchEventTransactionFailed(Map<String, Object> arguments) {
+    private String branchEventTransactionFailed(Map<String, Object> arguments) {
 
         boolean isfirstDepositor=false;
         String eventName="FIRST_DEPOSIT_FAILED";
@@ -411,23 +413,25 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
 
         BranchEvent be = new BranchEvent(eventName)
-                .setTransactionID((String) arguments.get("txnId"))
+                .setTransactionID(""+arguments.get("txnId"))
                 .setDescription(("HOWZAT DEPOSIT FAILED"));
         be.addCustomDataProperty("txnTime", ""+ arguments.get("txnTime"));
         be.addCustomDataProperty("txnDate", ""+ arguments.get("txnDate"));
         be.addCustomDataProperty("appPage",  ""+arguments.get("appPage"));
 
-        HashMap<String, String> data = new HashMap();
+        HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
-        for (Map.Entry<String, String> entry : data.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
             be.addCustomDataProperty(entry.getKey(), ""+entry.getValue());
         }
         be.logEvent(MainActivity.this);
 
+        return " Add Cash Failed Event added";
+
     }
 
-    private void branchEventTransactionSuccess(Map<String, Object> arguments) {
+    private String branchEventTransactionSuccess(Map<String, Object> arguments) {
         boolean isfirstDepositor=false;
         String eventName="FIRST_DEPOSIT_SUCCESS";
         isfirstDepositor=Boolean.parseBoolean(""+arguments.get("firstDepositor"));
@@ -435,31 +439,36 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             eventName ="REPEAT_DEPOSIT_SUCCESS";
         }
 
+
         BranchEvent be = new BranchEvent(eventName)
-                .setTransactionID((String) arguments.get("txnId"))
-                .setDescription((String) arguments.get("HOWZAT DEPOSIT FAILED"));
+                .setTransactionID(""+arguments.get("txnId"))
+                .setDescription("HOWZAT DEPOSIT FAILED");
         be.addCustomDataProperty("txnTime", ""+ arguments.get("txnTime"));
         be.addCustomDataProperty("txnDate", ""+ arguments.get("txnDate"));
         be.addCustomDataProperty("appPage", ""+ arguments.get("appPage"));
 
-        HashMap<String, String> data = new HashMap();
+        HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
-        for (Map.Entry<String, String> entry : data.entrySet()) {
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
 
             be.addCustomDataProperty(entry.getKey(), ""+entry.getValue());
         }
 
         be.logEvent(MainActivity.this);
 
+        return " Add Cash Success Event added";
+
     }
 
-    private void branchEventInitPurchase(Map<String, Object> arguments) {
+    private String branchEventInitPurchase(Map<String, Object> arguments) {
         new BranchEvent(BRANCH_STANDARD_EVENT.INITIATE_PURCHASE)
                 .setTransactionID((String) arguments.get("transactionID"))
                 .setDescription((String) arguments.get("description"))
                 .addCustomDataProperty("registrationID", "12345")
                 .logEvent(MainActivity.this);
+
+        return "";
     }
 
     public void startPayment(Map<String, Object> arguments) {

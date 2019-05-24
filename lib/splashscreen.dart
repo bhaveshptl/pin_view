@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
-
+import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/profilepages/update.dart';
@@ -224,10 +224,17 @@ class SplashScreenState extends State<SplashScreen>
 
   getInitData() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    double version = 0.0;
+    if (Platform.isAndroid) {
+      version = double.parse(packageInfo.version);
+    }
+    if (Platform.isIOS) {
+      version = 3.40;
+    }
     http.Request req =
         http.Request("POST", Uri.parse(widget.apiBaseUrl + ApiUtil.INIT_DATA));
     req.body = json.encode({
-      "version": double.parse(packageInfo.version),
+      "version": version,
       "channelId": widget.channelId,
     });
     return await HttpManager(http.Client())

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +30,8 @@ class EarnCashState extends State<EarnCash> {
   String refCode = "";
   String inviteUrl = "";
   String inviteMsg = "";
+  static const social_share_platform =
+      const MethodChannel('com.algorin.pf.socialshare');
 
   List<dynamic> _carousel = [];
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -95,7 +97,12 @@ class EarnCashState extends State<EarnCash> {
             " to download the Howzat app and use my code " +
             refCode +
             " to register.";
-    FlutterShareMe().shareToSystem(msg: inviteMsg);
+    if (Platform.isAndroid) {
+      FlutterShareMe().shareToSystem(msg: inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowIOS(inviteMsg);
+    }
   }
 
   _shareNowWhatsApp() {
@@ -108,7 +115,35 @@ class EarnCashState extends State<EarnCash> {
             " to download the Howzat app and use my code " +
             refCode +
             " to register.";
-    FlutterShareMe().shareToWhatsApp(msg: inviteMsg);
+
+    if (Platform.isAndroid) {
+      FlutterShareMe().shareToWhatsApp(msg: inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowWhatsAppIOS(inviteMsg);
+    }
+  }
+
+  Future<String> _shareNowWhatsAppIOS(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareViaWhatsApp', msg);
+    } catch (e) {
+      print("<<<<<<<<<<<<<Razorpay Response Fail>>>>>>>>>>>>");
+      print(e);
+    }
+    return value;
+  }
+
+  Future<String> _shareNowIOS(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareText', msg);
+    } catch (e) {
+      print("<<<<<<<<<<<<<Razorpay Response Fail>>>>>>>>>>>>");
+      print(e);
+    }
+    return value;
   }
 
   _shareNowFacebook() {
@@ -121,7 +156,13 @@ class EarnCashState extends State<EarnCash> {
             " to download the Howzat app and use my code " +
             refCode +
             " to register.";
-    FlutterShareMe().shareToFacebook(msg: inviteMsg);
+
+    if (Platform.isAndroid) {
+      FlutterShareMe().shareToFacebook(msg: inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowIOS(inviteMsg);
+    }
   }
 
   _shareNowGmail() {
@@ -134,7 +175,12 @@ class EarnCashState extends State<EarnCash> {
             " to download the Howzat app and use my code " +
             refCode +
             " to register.";
-    FlutterShareMe().shareToSystem(msg: inviteMsg);
+    if (Platform.isAndroid) {
+      FlutterShareMe().shareToSystem(msg: inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowIOS(inviteMsg);
+    }
   }
 
   @override

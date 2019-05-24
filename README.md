@@ -12,7 +12,10 @@ https://stackoverflow.com/questions/50187680/flutter-how-to-call-methods-in-dart
 
 https://stackoverflow.com/questions/49847513/is-there-a-way-to-get-the-future-from-setmethodcallhandler
 
+---->add debugShowCheckedModeBanner: false, in main Material App to remove the ribbon
 
+to format dart code
+shift+option+F
 
 ####################################################
 ##################  iOS          ###################
@@ -35,3 +38,15 @@ open -a Simulator
 #Keyboard Shortcuts
 to open ios keyboard in simulator=⇧(Option) + ⌘(Command) +K
                                  =⌘(Command) +K
+
+Format code = Ctrl+I                                 
+
+#FB plugin bug fix
+edit flutter_facebook_login.podspec in .pub-cache directory , change the content to be following:
+s.dependency 'FBSDKLoginKit', '4.39.1'
+s.dependency 'FBSDKCoreKit', '4.39.1' #<---add this, keep the same version with loginkit
+pod update FBSDKLoginKit
+pod deintegrate
+pod install
+
+

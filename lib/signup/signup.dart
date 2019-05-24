@@ -6,7 +6,7 @@ import 'package:device_info/device_info.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:package_info/package_info.dart';
-
+import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 import 'package:playfantasy/signin/signin.dart';
@@ -193,6 +193,21 @@ class SignupState extends State<Signup> {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
+    String model="";
+    String manufacturer="";
+    String serial="";
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      model=androidInfo.model;
+      manufacturer=androidInfo.manufacturer;
+      serial=androidInfo.androidId;
+    }
+    if (Platform.isIOS) {
+       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      model=iosInfo.model;
+      manufacturer="Apple";
+      serial="";
+    }
 
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
@@ -203,15 +218,15 @@ class SignupState extends State<Signup> {
     _payload["password"] = _password;
 
     if (Theme.of(context).platform == TargetPlatform.android) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+     
       _payload["context"] = {
         "refCode": _referralCodeController.text,
         "channel_id": HttpManager.channelId,
         "deviceId": _deviceId,
-        "model": androidInfo.model,
-        "manufacturer": androidInfo.manufacturer,
+        "model": model,
+        "manufacturer": manufacturer,
         "googleaddid": googleAddId,
-        "serial": androidInfo.androidId,
+        "serial": serial,
         "branchinstallReferringlink": _installReferring_link,
         "app_version_flutter": app_version_flutter
       };
@@ -334,9 +349,23 @@ class SignupState extends State<Signup> {
 
   _sendTokenToAuthenticate(String token, int authFor) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
+    String model="";
+    String manufacturer="";
+    String serial="";
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      model=androidInfo.model;
+      manufacturer=androidInfo.manufacturer;
+      serial=androidInfo.androidId;
+    }
+    if (Platform.isIOS) {
+       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      model=iosInfo.model;
+      manufacturer="Apple";
+      serial="";
+    }
     Map<String, dynamic> _payload = {};
     _payload["accessToken"] = token;
     _payload["context"] = {
@@ -344,11 +373,10 @@ class SignupState extends State<Signup> {
       "channel_id": HttpManager.channelId,
       "deviceId": _deviceId,
       "uid": "",
-      "model": androidInfo.model,
-      "platformType": androidInfo.version.baseOS,
-      "manufacturer": androidInfo.manufacturer,
+      "model": model,
+      "manufacturer":manufacturer,
       "googleaddid": googleAddId,
-      "serial": androidInfo.androidId,
+      "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
@@ -426,7 +454,7 @@ class SignupState extends State<Signup> {
       Map<String, dynamic> loginData) async {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"];
-    signupdata["transactionID"] = loginData["login_name"];
+    signupdata["transactionID"] = loginData["user_id"];
     signupdata["description"] = loginData["channelId"];
     signupdata["data"] = loginData;
     String trackValue;
