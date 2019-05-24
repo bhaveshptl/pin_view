@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info/device_info.dart';
@@ -39,7 +40,7 @@ class SignInPageState extends State<SignInPage> {
   String _installReferring_link = "";
   String _pfRefCode;
   bool bUpdateAppConfirmationShown = false;
-  Map<String, dynamic> androidDeviceInfoMap;
+  Map<dynamic, dynamic> androidDeviceInfoMap;
 
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -119,12 +120,12 @@ class SignInPageState extends State<SignInPage> {
   }
 
   Future<String> getAndroidDeviceInfo() async {
-    String value;
+    Map<dynamic,dynamic> value = new Map();
     try {
       value = await branch_io_platform.invokeMethod('_getAndroidDeviceInfo');
-      androidDeviceInfoMap = json.decode(value);
+      androidDeviceInfoMap = value;
     } catch (e) {}
-    return value;
+    return "";
   }
 
   Future<String> _getFirebaseToken() async {
@@ -179,19 +180,33 @@ class SignInPageState extends State<SignInPage> {
 
   _doSignIn(String _authName, String _password) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
+    String model="";
+    String manufacturer="";
+    String serial="";
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      model=androidInfo.model;
+      manufacturer=androidInfo.manufacturer;
+      serial=androidInfo.androidId;
+    }
+    if (Platform.isIOS) {
+       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      model=iosInfo.model;
+      manufacturer="Apple";
+      serial="";
+    }
     Map<String, dynamic> _payload = {};
     showLoader(true);
     _payload["value"] = {"auth_attribute": _authName, "password": _password};
     _payload["context"] = {
       "channel_id": HttpManager.channelId,
       "deviceId": _deviceId,
-      "model": androidInfo.model,
-      "manufacturer": androidInfo.manufacturer,
+      "model": model,
+      "manufacturer": manufacturer,
       "googleaddid": googleAddId,
-      "serial": androidInfo.androidId,
+      "serial": serial,
       "refCode": _pfRefCode,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
@@ -292,19 +307,34 @@ class SignInPageState extends State<SignInPage> {
 
   _sendTokenToAuthenticate(String token, int authFor) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
+    String model="";
+    String manufacturer="";
+    String serial="";
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      model=androidInfo.model;
+      manufacturer=androidInfo.manufacturer;
+      serial=androidInfo.androidId;
+    }
+    if (Platform.isIOS) {
+       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      model=iosInfo.model;
+      manufacturer="Apple";
+      serial="";
+    }
     Map<String, dynamic> _payload = {};
     _payload["accessToken"] = token;
     _payload["context"] = {
       "refCode": _pfRefCode,
       "channel_id": HttpManager.channelId,
       "deviceId": _deviceId,
-      "model": androidInfo.model,
-      "manufacturer": androidInfo.manufacturer,
+      "model": model,
+      "manufacturer": manufacturer,
       "googleaddid": googleAddId,
-      "serial": androidInfo.androidId,
+      "serial": serial,
     };
     if (_installReferring_link.length > 0) {
       var uri = Uri.parse(_installReferring_link);
