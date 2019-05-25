@@ -182,20 +182,20 @@ class SignInPageState extends State<SignInPage> {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
-    String model="";
-    String manufacturer="";
-    String serial="";
+    String model = "";
+    String manufacturer = "";
+    String serial = "";
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      model=androidInfo.model;
-      manufacturer=androidInfo.manufacturer;
-      serial=androidInfo.androidId;
+      model = androidInfo.model;
+      manufacturer = androidInfo.manufacturer;
+      serial = androidInfo.androidId;
     }
     if (Platform.isIOS) {
-       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model=iosInfo.model;
-      manufacturer="Apple";
-      serial="";
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      model = iosInfo.model;
+      manufacturer = "Apple";
+      serial = "";
     }
     Map<String, dynamic> _payload = {};
     showLoader(true);
@@ -309,21 +309,21 @@ class SignInPageState extends State<SignInPage> {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
-    String model="";
-    String manufacturer="";
-    String serial="";
+    String model = "";
+    String manufacturer = "";
+    String serial = "";
 
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      model=androidInfo.model;
-      manufacturer=androidInfo.manufacturer;
-      serial=androidInfo.androidId;
+      model = androidInfo.model;
+      manufacturer = androidInfo.manufacturer;
+      serial = androidInfo.androidId;
     }
     if (Platform.isIOS) {
-       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model=iosInfo.model;
-      manufacturer="Apple";
-      serial="";
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      model = iosInfo.model;
+      manufacturer = "Apple";
+      serial = "";
     }
     Map<String, dynamic> _payload = {};
     _payload["accessToken"] = token;
@@ -378,7 +378,7 @@ class SignInPageState extends State<SignInPage> {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
         );
-         onLoginAuthenticate(json.decode(res.body));
+        onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         setState(() {
@@ -464,7 +464,7 @@ class SignInPageState extends State<SignInPage> {
         child: Column(
           children: <Widget>[
             Image.network(
-                "https://dyrnmb8cbz1ud.cloudfront.net/images/banners_10/banner_howzat_referral_raf_50.png"),
+                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_50.png"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
