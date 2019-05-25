@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-
+import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
@@ -120,6 +120,9 @@ class AddCashState extends State<AddCash> {
     });
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
+    if (Platform.isIOS) {
+        initRazorpayNativePlugin();  
+    }
   }
 
   initWebview() {
@@ -155,13 +158,32 @@ class AddCashState extends State<AddCash> {
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
-    String value;
+    
+    Map<dynamic, dynamic> value = new Map();
     try {
       value =
           await razorpay_platform.invokeMethod('_openRazorpayNative', payload);
-    } catch (e) {}
-    return value;
+          showLoader(false);
+      if (Platform.isIOS) {
+        processSuccessResponse(value);  
+      }    
+    } catch (e) {
+      showLoader(false);
+    }
+    return "";
   }
+
+  Future<String> initRazorpayNativePlugin() async {
+      String value = "";
+    try {
+      value =
+          await razorpay_platform.invokeMethod('initRazorpayNativePlugin');
+          
+    } catch (e) {}
+    return "";
+  }
+
+  
 
   Future<dynamic> myUtilsHandler(MethodCall methodCall) async {
     switch (methodCall.method) {

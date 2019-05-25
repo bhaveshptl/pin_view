@@ -36,7 +36,7 @@ class SignupState extends State<Signup> {
 
   bool _bShowReferralInput = false;
   String _installReferring_link = "";
-  Map<String, dynamic> androidDeviceInfoMap;
+  Map<dynamic, dynamic> androidDeviceInfoMap;
   String _installReferringLink = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
@@ -166,12 +166,12 @@ class SignupState extends State<Signup> {
   }
 
   Future<String> getAndroidDeviceInfo() async {
-    String value;
+    Map<dynamic, dynamic> value;
     try {
       value = await branch_io_platform.invokeMethod('_getAndroidDeviceInfo');
-      androidDeviceInfoMap = json.decode(value);
+      androidDeviceInfoMap = value;
     } catch (e) {}
-    return value;
+    return "";
   }
 
   Future<String> _getInstallReferringLink() async {
@@ -452,9 +452,9 @@ class SignupState extends State<Signup> {
   Future<String> branchLifecycleEventSigniup(
       Map<String, dynamic> loginData) async {
     Map<dynamic, dynamic> signupdata = new Map();
-    signupdata["registrationID"] = loginData["user_id"];
-    signupdata["transactionID"] = loginData["user_id"];
-    signupdata["description"] = loginData["channelId"];
+    signupdata["registrationID"] = loginData["user_id"].toString();
+    signupdata["transactionID"] = loginData["user_id"].toString();
+    signupdata["description"] = "CHANNEL"+loginData["channelId"].toString()+"SIGNUP";
     signupdata["data"] = loginData;
     String trackValue;
     try {

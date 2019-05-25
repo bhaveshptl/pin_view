@@ -286,7 +286,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     result.success(googleAddId);
                 }
                 if (methodCall.method.equals("_getAndroidDeviceInfo")) {
-                    String deviceInfo = (String) getDeviceInfo();
+                    Map<String, Object> deviceInfo = getDeviceInfo();
                     result.success(deviceInfo);
                 }
             }
@@ -688,9 +688,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    private String getDeviceInfo() {
-        JSONObject params = new JSONObject();
-        JSONObject emailList = new JSONObject();
+
+    private Map<String, Object> getDeviceInfo() {
+            Map<String, Object> params = new HashMap<>();
+            Map<String, String> emailList = new HashMap();
         final DeviceInfo deviceData = new DeviceInfo();
         final Map<String, String> deviceInfoList = deviceData.getDeviceInfoMap(this);
         try {
@@ -719,7 +720,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         } catch (Exception e) {
 
         }
-        return params.toString();
+        return params;
     }
 
 
