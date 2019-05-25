@@ -40,7 +40,7 @@ class SignInPageState extends State<SignInPage> {
   String _installReferring_link = "";
   String _pfRefCode;
   bool bUpdateAppConfirmationShown = false;
-  Map<String, dynamic> androidDeviceInfoMap;
+  Map<dynamic, dynamic> androidDeviceInfoMap;
 
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -120,10 +120,10 @@ class SignInPageState extends State<SignInPage> {
   }
 
   Future<String> getAndroidDeviceInfo() async {
-    String value = "";
+    Map<dynamic, dynamic> value;
     try {
       value = await branch_io_platform.invokeMethod('_getAndroidDeviceInfo');
-      androidDeviceInfoMap = json.decode(value);
+      androidDeviceInfoMap = value;
     } catch (e) {}
     return "";
   }

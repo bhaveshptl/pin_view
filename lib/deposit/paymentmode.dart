@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-
+import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/deposit/initpay.dart';
@@ -56,15 +56,35 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     );
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
+    if (Platform.isIOS) {
+        initRazorpayNativePlugin();  
+    }
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
-    String value;
+    
+    Map<dynamic, dynamic> value = new Map();
     try {
       value =
           await razorpay_platform.invokeMethod('_openRazorpayNative', payload);
+          showLoader(false);
+          if (Platform.isIOS) {
+           processSuccessResponse(value);  
+      }
+    } catch (e) {
+       showLoader(false);
+    }
+    return "";
+  }
+
+  Future<String> initRazorpayNativePlugin() async {
+      String value = "";
+    try {
+      value =
+          await razorpay_platform.invokeMethod('initRazorpayNativePlugin');
+          
     } catch (e) {}
-    return value;
+    return "";
   }
 
   Future<dynamic> myUtilsHandler(MethodCall methodCall) async {

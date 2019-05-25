@@ -38,6 +38,7 @@ import Firebase
         ) -> Bool {
         /* Flutter Channel Init*/
         controller = window?.rootViewController as? FlutterViewController;
+        razorpay = Razorpay.initWithKey(razorpayProdKey, andDelegate: self);
         RAZORPAY_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.razorpay",binaryMessenger: controller)
         BRANCH_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.branch",binaryMessenger: controller)
         PF_FCM_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.fcm",binaryMessenger: controller)
@@ -100,7 +101,7 @@ import Firebase
     }
     
     private func initBranchPlugin(didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?){
-        Branch.setUseTestBranchKey(true)
+        Branch.setUseTestBranchKey(false);
         Branch.getInstance().initSession(launchOptions: launchOptions) { (params, error) in
             
             self.initBranchSession();
@@ -143,25 +144,30 @@ import Firebase
     }
     
     private func initFlutterChannels(){
-        razorpay = Razorpay.initWithKey(razorpayProdKey, andDelegate: self);
+        
         RAZORPAY_IO_CHANNEL.setMethodCallHandler({
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
             self.RAZORPAY_IO_CHANNEL.setMethodCallHandler({
                 [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                guard call.method == "_openRazorpayNative" else {
-                    result(FlutterMethodNotImplemented)
-                    return
+                if(call.method == "initRazorpayNativePlugin"){
+                    result("Razorpay Init done");
                 }
-                self?.razorpay_result=result;
-                let razorpayInitArgue = call.arguments as? [String: AnyObject] ;
-                let product_name = razorpayInitArgue!["name"] as? String;
-                let prefill_email = razorpayInitArgue!["email"] as? String
-                let prefill_phone = razorpayInitArgue!["phone"] as? String
-                let product_amount = razorpayInitArgue!["amount"] as? String
-                let product_orderId = razorpayInitArgue!["orderId"] as? String
-                let product_method = razorpayInitArgue!["method"] as? String
-                let product_image = razorpayInitArgue!["image"] as? String
-                self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
+                else if(call.method == "_openRazorpayNative"){
+                    self?.razorpay_result=result;
+                    let razorpayInitArgue = call.arguments as? [String: AnyObject] ;
+                    let product_name = razorpayInitArgue!["name"] as? String;
+                    let prefill_email = razorpayInitArgue!["email"] as? String
+                    let prefill_phone = razorpayInitArgue!["phone"] as? String
+                    let product_amount = razorpayInitArgue!["amount"] as? String
+                    let product_orderId = razorpayInitArgue!["orderId"] as? String
+                    let product_method = razorpayInitArgue!["method"] as? String
+                    let product_image = razorpayInitArgue!["image"] as? String
+                    self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
+                }
+                else{
+                   result(FlutterMethodNotImplemented)
+                }
+                
             })
         })
         
@@ -209,6 +215,67 @@ import Firebase
                 }
                 else if(call.method == "_getInstallReferringLink"){
                     let  channelResult:String=self!.installReferring_link;
+                    
+                    result(channelResult)
+                }
+                    
+                else if(call.method == "trackAndSetBranchUserIdentity"){
+                    let  channelResult:String="";
+                    Branch.getInstance().setIdentity(call.arguments as? String)
+                    result(channelResult);
+                }
+                else if(call.method == "branchLifecycleEventSigniup"){
+                    let  channelResult:String="";
+                    let argue = call.arguments as? NSDictionary;
+                    let data = argue!["data"]! as? [String: Any];
+
+                    let event = BranchEvent.standardEvent(.completeRegistration)
+                    event.transactionID = argue!["transactionID"] as? String;
+                    event.eventDescription = argue!["description"] as? String;
+                    event.customData["registrationID"] = argue!["registrationID"] as? String;
+                    event.customData["login_name"] = data!["login_name"]!;
+                    event.customData["channelId"] =  data!["channelId"]!;
+                    
+                    for (key , value) in data! {
+                        //event.customData[key+""] = value;
+                    }
+                    event.logEvent();
+                    result(channelResult);
+                }
+                else if(call.method == "branchEventTransactionFailed"){
+                    let  channelResult:String="";
+                    let argue = call.arguments as? NSDictionary;
+                    let data = argue!["data"]! as? NSDictionary;
+                    var  isfirstDepositor:Bool=false;
+                    var eventName:String="FIRST_DEPOSIT_FAILED";
+                    isfirstDepositor = argue!["firstDepositor"] as? Bool ?? false;
+                    if(!isfirstDepositor){
+                        eventName = "REPEAT_DEPOSIT_FAILED";
+                    }
+                    let event = BranchEvent.customEvent(withName:eventName)
+                    for (key, value) in data! {
+                        event.customData[key] = value;
+                    }
+                    event.logEvent();
+                    print("<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>");
+                    print(event);
+                    result(channelResult)
+                }
+                else if(call.method == "branchEventTransactionSuccess"){
+                    let  channelResult:String="";
+                    let argue = call.arguments as? NSDictionary;
+                    let data = argue!["data"]! as? NSDictionary;
+                    var  isfirstDepositor:Bool=false;
+                    var eventName:String="FIRST_DEPOSIT_SUCCESS";
+                    isfirstDepositor = argue!["firstDepositor"] as? Bool ?? false;
+                    if(!isfirstDepositor){
+                        eventName = "REPEAT_DEPOSIT_SUCCESS";
+                    }
+                    let event = BranchEvent.customEvent(withName:eventName)
+                    for (key, value) in data! {
+                        event.customData[key] = value;
+                    }
+                    event.logEvent();
                     
                     result(channelResult)
                 }
@@ -272,13 +339,9 @@ import Firebase
                 }
             })
         })
-        
-        
-        
     }
     
-    
-    
+
     internal func showPaymentForm(name: String, email:String, phone:String, amount:String,orderId:String, method:String,image:String){
         /* Function Usecase : Open  Razorpay Payment Window*/
         let options: [String:Any] = [
@@ -389,6 +452,29 @@ import Firebase
     }
     
     private func getInstallReferringLink(){
+        
+    }
+    
+    private func branchLifecycleEventSigniup(registrationID:String,transactionID:String,description:String,data: NSDictionary){
+        
+        
+        let event = BranchEvent.standardEvent(.completeRegistration)
+        event.transactionID = transactionID;
+        event.eventDescription = description;
+        event.customData["registrationID"] = registrationID;
+        let obj = data as NSDictionary
+        for (key, value) in obj {
+            
+            
+            print(key);
+            print(value);
+            event.customData[key] = value;
+        }
+        
+        event.logEvent()
+        
+        
+        
         
     }
     
