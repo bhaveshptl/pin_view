@@ -18,6 +18,8 @@ shift+option+F
 #################################################### 
 #To run app
 flutter run
+#To build
+flutter build ios --debug (or --profile or --release)
 ..................................
 to run on particular device 
 flutter run -d ZX1PC2JHXH

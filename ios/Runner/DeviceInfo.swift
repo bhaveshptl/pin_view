@@ -1,6 +1,7 @@
 
-import Foundation
-import CoreTelephony
+import Foundation;
+import CoreTelephony;
+import AdSupport;
 
 class DeviceInfo{
     
@@ -34,7 +35,7 @@ class DeviceInfo{
     static func getSerial() ->String {
         return "";
     }
-
+    
     static func getManufacturer() ->String {
         return "";
     }
@@ -42,7 +43,7 @@ class DeviceInfo{
     static func getOSVersion() ->String {
         return UIDevice.current.systemVersion;
     }
-
+    
     static func getNetworkOperator() ->String {
         let networkInfo: CTTelephonyNetworkInfo = CTTelephonyNetworkInfo();
         guard let carrier: CTCarrier = networkInfo.subscriberCellularProvider else {
@@ -78,7 +79,7 @@ class DeviceInfo{
         return getConnectionType();
     }
     
-   static func machineName() -> String {
+    static func machineName() -> String {
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)
@@ -88,7 +89,7 @@ class DeviceInfo{
         }
     }
     
-   static func getConnectionType() ->String{
+    static func getConnectionType() ->String{
         var tecnologyType:String;
         let networkInfo = CTTelephonyNetworkInfo()
         let networkString = networkInfo.currentRadioAccessTechnology
@@ -105,7 +106,7 @@ class DeviceInfo{
         return tecnologyType;
     }
     
-   static func getWiFiAddress() -> String? {
+    static func getWiFiAddress() -> String? {
         var address : String?
         // Get list of all interfaces on the local machine:
         var ifaddr : UnsafeMutablePointer<ifaddrs>?
@@ -135,6 +136,13 @@ class DeviceInfo{
         return address
     }
     
-
-
+    
+    static func identifierForAdvertising() -> String? {
+        guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+            return ""}
+        return ASIdentifierManager.shared().advertisingIdentifier.uuidString;
+    }
+    
+    
+    
 }

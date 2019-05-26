@@ -50,7 +50,7 @@ import Firebase
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         
-        
+       
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -280,7 +280,8 @@ import Firebase
                     result(channelResult)
                 }
                 else if(call.method == "_getGoogleAddId"){
-                    let  channelResult:String=""
+                    var  channelResult:String="";
+                    channelResult=DeviceInfo.identifierForAdvertising()!;
                     result(channelResult)
                 }
                 else if(call.method == "_getAndroidDeviceInfo"){
