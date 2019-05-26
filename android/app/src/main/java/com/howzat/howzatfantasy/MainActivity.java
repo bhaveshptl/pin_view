@@ -119,7 +119,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 @Override
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
                     Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    JSONObject object;
+                    Map<String, String> object;
                     if (error == null) {
                         object = initBranchSession(referringParams);
                         Log.i("BRANCH SDK", referringParams.toString());
@@ -127,24 +127,24 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         object = initBranchSession(referringParams);
                         Log.i("BRANCH SDK", error.getMessage());
                     }
-                    result.success(object.toString());
+                    result.success(object);
                     Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 }
             }, intent.getData(), this);
         } catch (Exception e) {
             Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             Log.i("BRANCH SDK", e.getMessage());
-            JSONObject object = initBranchSession(null);
-            result.success(object.toString());
+
+            Map<String, String> object = initBranchSession(null);
+            result.success(object);
             Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
     }
 
 
-    private JSONObject initBranchSession(JSONObject referringParams) {
+    private Map<String, String> initBranchSession(JSONObject referringParams) {
         Log.i("BRANCH SDK", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        JSONObject object = new JSONObject();
-
+        Map<String, String> object = new HashMap();
         String refCodeFromBranchTrail0 = "";
         String refCodeFromBranchTrail1 = "";
         String refCodeFromBranchTrail2 = "";
@@ -196,12 +196,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             installReferring_link = installReferring_link2;
             Log.i("BRANCH SDK link2", installReferring_link2);
         }
-        try {
-            object.put("installReferring_link", installReferring_link);
-            object.put("refCodeFromBranch", refCodeFromBranch);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+
+        object.put("installReferring_link", installReferring_link);
+        object.put("refCodeFromBranch", refCodeFromBranch);
         Log.i("BRANCH SDK", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         return object;
     }
@@ -222,15 +219,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 }
                 if (methodCall.method.equals("_initBranchIoPlugin")) {
                     if (bBranchLodead) {
-                        JSONObject object = new JSONObject();
+                        Map<String, String> object = new HashMap();
                         String pfRefCode = (String) getRefCodeUsingBranch();
                         String installReferring_link = (String) getInstallReferringLink();
-                        try {
-                            object.put("installReferring_link", installReferring_link);
-                            object.put("refCodeFromBranch", pfRefCode);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        object.put("installReferring_link", installReferring_link);
+                        object.put("refCodeFromBranch", pfRefCode);
+
                         result.success(object.toString());
                     } else {
                         getBranchData(result);
