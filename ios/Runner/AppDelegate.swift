@@ -25,7 +25,8 @@ import Firebase
     private var SOCIAL_SHARE_CHANNEL:FlutterMethodChannel!;
     private var razorpay_result: FlutterResult!
     private var device_info_result: FlutterResult!
-    
+    private var bBranchLodead:Bool = false;
+    private var app_launchOptions: [UIApplicationLaunchOptionsKey: Any]?;
     //var window: UIWindow?
     let gcmMessageIDKey = "gcm.message_id"
     var weUser: WEGUser!
@@ -50,7 +51,7 @@ import Firebase
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         
-       
+        
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -75,10 +76,10 @@ import Firebase
     }
     
     private func  getFireBaseToken()-> String{
-        var token:String;
-        token=""
+        var token:String = "";
         InstanceID.instanceID().instanceID { (result, error) in
             if let error = error {
+                print(error);
             } else if let result = result {
                 token=result.token;
             }
@@ -87,10 +88,11 @@ import Firebase
         
     }
     
-    private func subscribeToFirebaseTopic(topicName:String){
+    private func subscribeToFirebaseTopic(topicName:String)->String {
         Messaging.messaging().subscribe(toTopic: topicName) { error in
             
         }
+        return "Subscribed to the firebase topic"+topicName;
         
     }
     
@@ -103,44 +105,108 @@ import Firebase
     private func initBranchPlugin(didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?){
         Branch.setUseTestBranchKey(false);
         Branch.getInstance().initSession(launchOptions: launchOptions) { (params, error) in
-            
-            self.initBranchSession();
-            //print(params as? [String: AnyObject] ?? {});
-            if(params!["+clicked_branch_link"]! as? Int == 1){
-                self.installReferring_link=params!["~referring_link"]! as! String;
-                if params!["refCode"] as? String  != nil {
-                    print("I am  also in");
-                    self.refCodeFromBranch=params!["refCode"]! as! String;
-                }
+            self.bBranchLodead = true;
+            if let error = error {
+                print(error);
+            } else if let params = params {
+              self.initBranchSession(branchResultData:params as? [String: AnyObject]);
             }
-            else  {
-                self.initBranchSession();
+        }
+    }
+    
+    private func getBranchData(result: FlutterResult){
+        var object = [String : String]();
+        if (app_launchOptions != nil){
+            Branch.getInstance().initSession(launchOptions: app_launchOptions) { (params, error) in
+                if let error = error {
+                    print(error);
+                } else if let params = params {
+                  object=self.initBranchSession(branchResultData:params as? [String: AnyObject]);
+                 }
+               
             }
-            
-            if (self.eventSink != nil) {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
-                    let jsonString = String(data: jsonData, encoding: String.Encoding.utf8)
-                    self.eventSink!(jsonString)
-                } catch {
-                    print("BRANCH IO FLUTTER IOS ERROR")
-                    print(error)
+        }
+        result(object);
+    }
+    
+    
+    private func initBranchSession(branchResultData branchData:[String: AnyObject]?)->[String:String]{
+        print("<<<<<<<<<<<Branch>>>>>>>>>>>>");
+        var object = [String : String]();
+        var refCodeFromBranchTrail0:String = "";
+        var refCodeFromBranchTrail1:String = "";
+        var refCodeFromBranchTrail2:String = "";
+        var installReferring_link0:String = "";
+        var installReferring_link1:String = "";
+        var installReferring_link2:String = "";
+        let installParams = Branch.getInstance().getFirstReferringParams();
+        let sessionParams = Branch.getInstance().getLatestReferringParams();
+        
+        if branchData != nil {
+             print(branchData!);
+            if(branchData!["+clicked_branch_link"] != nil){
+                if(branchData!["+clicked_branch_link"]! as? Int == 1){
+                    installReferring_link0=branchData!["~referring_link"]! as? String ?? "";
+                    if branchData!["refCode"] as? String  != nil {
+                        refCodeFromBranchTrail0=branchData!["refCode"]! as? String ?? "";
+                    }
+                    else{
+                        refCodeFromBranchTrail0=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                    }
                 }
-            } else {
-                print("Branch IO eventSink is nil")
             }
         }
         
-    }
-    
-    private func initBranchSession(){
-        let sessionParams = Branch.getInstance().getLatestReferringParams();
-        print("<<<<<<<<BRanch Io Init>>>>>>>>>>>>>>");
-        print(sessionParams);
-        let installParams = Branch.getInstance().getFirstReferringParams();
-        print("<<<<<<<<BRanch Io Init>>>>>>>>>>>>>>");
-        print(installParams);
+        if installParams != nil {
+            print(installParams!);
+            if(installParams!["+clicked_branch_link"] != nil){
+                if(installParams!["+clicked_branch_link"]! as? Int == 1){
+                    installReferring_link1=installParams!["~referring_link"]! as? String ?? "";
+                    if installParams!["refCode"] as? String  != nil {
+                        refCodeFromBranchTrail1=installParams!["refCode"]! as? String ?? "";
+                    }
+                    else{
+                        refCodeFromBranchTrail1=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                    }
+                }
+            }
+        }
         
+        if sessionParams != nil {
+            print(sessionParams!);
+            if(sessionParams!["+clicked_branch_link"] != nil){
+                if(sessionParams!["+clicked_branch_link"]! as? Int == 1){
+                    installReferring_link2=sessionParams!["~referring_link"]! as? String ?? "";
+                    if sessionParams!["refCode"] as? String  != nil {
+                        refCodeFromBranchTrail2=sessionParams!["refCode"]! as? String ?? "";
+                    }
+                    else{
+                        refCodeFromBranchTrail2=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                    }
+                }
+            }
+        }
+        
+        if (installReferring_link0 != "") {
+            installReferring_link = installReferring_link0;
+            
+        } else if (installReferring_link1 != "") {
+            installReferring_link = installReferring_link1;
+           
+        } else if (installReferring_link2 != "") {
+            installReferring_link = installReferring_link2;
+        }
+        
+        if (refCodeFromBranchTrail0.count > 2) {
+            refCodeFromBranch = refCodeFromBranchTrail0;
+        } else if (refCodeFromBranchTrail1.count > 2) {
+            refCodeFromBranch = refCodeFromBranchTrail1;
+        } else {
+            refCodeFromBranch = refCodeFromBranchTrail2;
+        }
+        object["installReferring_link"] = installReferring_link;
+        object["refCodeFromBranch"] = refCodeFromBranch;
+        return object;
     }
     
     private func initFlutterChannels(){
@@ -155,17 +221,20 @@ import Firebase
                 else if(call.method == "_openRazorpayNative"){
                     self?.razorpay_result=result;
                     let razorpayInitArgue = call.arguments as? [String: AnyObject] ;
-                    let product_name = razorpayInitArgue!["name"] as? String;
-                    let prefill_email = razorpayInitArgue!["email"] as? String
-                    let prefill_phone = razorpayInitArgue!["phone"] as? String
-                    let product_amount = razorpayInitArgue!["amount"] as? String
-                    let product_orderId = razorpayInitArgue!["orderId"] as? String
-                    let product_method = razorpayInitArgue!["method"] as? String
-                    let product_image = razorpayInitArgue!["image"] as? String
-                    self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
+                    if(razorpayInitArgue != nil){
+                        let product_name = razorpayInitArgue!["name"] as? String ;
+                        let prefill_email = razorpayInitArgue!["email"] as? String;
+                        let prefill_phone = razorpayInitArgue!["phone"] as? String;
+                        let product_amount = razorpayInitArgue!["amount"] as? String;
+                        let product_orderId = razorpayInitArgue!["orderId"] as? String;
+                        let product_method = razorpayInitArgue!["method"] as? String;
+                        let product_image = razorpayInitArgue!["image"] as? String;
+                        self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
+                    }
+                   
                 }
                 else{
-                   result(FlutterMethodNotImplemented)
+                    result(FlutterMethodNotImplemented)
                 }
                 
             })
@@ -211,6 +280,14 @@ import Firebase
                 }
                 else if(call.method == "_initBranchIoPlugin"){
                     let  channelResult:String=""
+                    if (self!.bBranchLodead) {
+                        var object = [String : String]();
+                        object["installReferring_link"] = self!.installReferring_link;
+                        object["refCodeFromBranch"] = self!.refCodeFromBranch;
+                        result(object);
+                    } else {
+                        self!.getBranchData(result:result);
+                    }
                     result(channelResult)
                 }
                 else if(call.method == "_getInstallReferringLink"){
@@ -228,7 +305,7 @@ import Firebase
                     let  channelResult:String="";
                     let argue = call.arguments as? NSDictionary;
                     let data = argue!["data"]! as? [String: Any];
-
+                    
                     let event = BranchEvent.standardEvent(.completeRegistration)
                     event.transactionID = argue!["transactionID"] as? String;
                     event.eventDescription = argue!["description"] as? String;
@@ -301,18 +378,19 @@ import Firebase
                 if(call.method == "_getFirebaseToken"){
                     var  channelResult:String="";
                     if(self!.firebaseToken.count>4){
-                        
                         channelResult=self!.firebaseToken;
                     }
                     else{
-                        
                         channelResult=self!.getFireBaseToken();
                     }
                     result(channelResult)
                 }
                 else if(call.method == "_subscribeToFirebaseTopic"){
                     let topic=call.arguments as? String;
-                    let  channelResult:String=""
+                    var  channelResult:String = "";
+                    if(topic != nil){
+                      channelResult=self!.subscribeToFirebaseTopic(topicName:topic!);
+                    }
                     result(channelResult)
                 }
                 else{
@@ -328,11 +406,11 @@ import Firebase
                 [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
                 if(call.method == "shareViaWhatsApp"){
                     
-                     SocialShare.shareViaWhatsApp(msg:call.arguments as! String)
+                    SocialShare.shareViaWhatsApp(msg:call.arguments as! String)
                 }
                 if(call.method == "shareText"){
                     SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String)
-                   
+                    
                 }
                     
                 else{
@@ -342,7 +420,7 @@ import Firebase
         })
     }
     
-
+    
     internal func showPaymentForm(name: String, email:String, phone:String, amount:String,orderId:String, method:String,image:String){
         /* Function Usecase : Open  Razorpay Payment Window*/
         let options: [String:Any] = [
@@ -448,48 +526,22 @@ import Firebase
     
     
     
-    private func getRefCodeUsingBranch(){
-        
-    }
     
-    private func getInstallReferringLink(){
-        
-    }
     
     private func branchLifecycleEventSigniup(registrationID:String,transactionID:String,description:String,data: NSDictionary){
-        
-        
         let event = BranchEvent.standardEvent(.completeRegistration)
         event.transactionID = transactionID;
         event.eventDescription = description;
         event.customData["registrationID"] = registrationID;
         let obj = data as NSDictionary
         for (key, value) in obj {
-            
-            
             print(key);
             print(value);
             event.customData[key] = value;
         }
-        
-        event.logEvent()
-        
-        
-        
-        
+        event.logEvent();
     }
     
-    
-    private func fetchAdvertisingID(){
-        
-    }
-    
-    private func  setTheGoogleId(AdId:String){
-        
-    }
-    private func getGoogleAddId(){
-        
-    }
     
     private func getDeviceInfo(deviceinfoResult: FlutterResult){
         let deviceInfoDict: NSDictionary = [
@@ -511,7 +563,7 @@ import Firebase
         device_info_result(deviceInfoDict)
     }
     
-   
+    
     override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
         if let messageID = userInfo[gcmMessageIDKey] {
             print("Message ID: \(messageID)")
@@ -521,7 +573,6 @@ import Firebase
     
     override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                               fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
         if let messageID = userInfo[gcmMessageIDKey] {
             print("Message ID: \(messageID)")
         }

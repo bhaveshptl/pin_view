@@ -10,11 +10,24 @@ class MyDeviceInfo{
     }
     
     static func getVersionCode() ->String {
-        return Bundle.main.infoDictionary!["CFBundleVersion"]!as! String;
+        var versionCode:String = "";
+        if(Bundle.main.infoDictionary != nil){
+            if(Bundle.main.infoDictionary!["CFBundleVersion"] != nil){
+                versionCode = Bundle.main.infoDictionary!["CFBundleVersion"]!as! String;
+            }
+        }
+        return versionCode;
     }
     
     static func getVersionName() ->String {
-        return Bundle.main.infoDictionary!["CFBundleShortVersionString"]!as! String;
+        
+        var versionName:String = "";
+        if(Bundle.main.infoDictionary != nil){
+            if(Bundle.main.infoDictionary!["CFBundleShortVersionString"] != nil){
+                versionName = Bundle.main.infoDictionary!["CFBundleShortVersionString"]!as! String;
+            }
+        }
+        return versionName;
     }
     
     static func getUID() ->String {
@@ -24,11 +37,9 @@ class MyDeviceInfo{
         else {
             return "";
         }
-        
     }
     
     static func getModel() ->String {
-        
         return machineName();
     }
     
@@ -60,15 +71,17 @@ class MyDeviceInfo{
     }
     
     static func getPackageName() ->String {
-        
-        return Bundle.main.bundleIdentifier!;
+        if(Bundle.main.bundleIdentifier != nil){
+              return Bundle.main.bundleIdentifier!;
+        }
+        else{
+            return ""
+        }
     }
     
     static func getDeviceIPAddress() ->String {
-        var ipAddress:String;
-        ipAddress=""
+        var ipAddress:String = "";
         if let addr = getWiFiAddress() {
-            print(addr)
             ipAddress=addr
         }
         

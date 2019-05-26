@@ -20,6 +20,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		BE1F541A229A620D00610497 /* MyDeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F5419229A620C00610497 /* MyDeviceInfo.swift */; };
+		BE4B930C229A951C00C4959C /* MyHelperClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4B930B229A951C00C4959C /* MyHelperClass.swift */; };
 		BEF8229A229856890091C6FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BEF82299229856890091C6FB /* GoogleService-Info.plist */; };
 		BEF8229C229856980091C6FB /* SocialShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF8229B229856980091C6FB /* SocialShare.swift */; };
 /* End PBXBuildFile section */
@@ -59,6 +60,7 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE1F5419229A620C00610497 /* MyDeviceInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyDeviceInfo.swift; sourceTree = "<group>"; };
+		BE4B930B229A951C00C4959C /* MyHelperClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyHelperClass.swift; sourceTree = "<group>"; };
 		BEF82299229856890091C6FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BEF8229B229856980091C6FB /* SocialShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialShare.swift; sourceTree = "<group>"; };
 		CBF45DEA5D71D20B56C90D7D /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,6 +137,7 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				BE1F5419229A620C00610497 /* MyDeviceInfo.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				BE4B930B229A951C00C4959C /* MyHelperClass.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -380,6 +383,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				BE4B930C229A951C00C4959C /* MyHelperClass.swift in Sources */,
 				BE1F541A229A620D00610497 /* MyDeviceInfo.swift in Sources */,
 				BEF8229C229856980091C6FB /* SocialShare.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
