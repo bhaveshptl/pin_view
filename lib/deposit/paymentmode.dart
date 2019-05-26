@@ -653,10 +653,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 ? payload["paymentType"].toLowerCase()
                 : "card",
             "image": AppConfig.of(context).channelId == '3'
-                ? "https://dyrnmb8cbz1ud.cloudfront.net/images/logo.png"
+                ? "https://d2cbroser6kssl.cloudfront.net/images/logo.png"
                 : (AppConfig.of(context).channelId == '9'
-                    ? "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/smart11_logo.png"
-                    : "https://dyrnmb8cbz1ud.cloudfront.net/images/icons/howzat_logo.png")
+                    ? "https://d2cbroser6kssl.cloudfront.net/images/icons/smart11_logo.png"
+                    : "https://d2cbroser6kssl.cloudfront.net/images/icons/howzat_logo.png")
           });
         } else {
           _scaffoldKey.currentState.showSnackBar(
@@ -714,7 +714,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     trackdata["appPage"] = "PaymentModePage";
     trackdata["data"] = transactionData;
     trackdata["firstDepositor"] = transactionData["firstDepositor"];
-    
+
     String trackStatus;
     try {
       String trackStatus = await branch_io_platform.invokeMethod(
