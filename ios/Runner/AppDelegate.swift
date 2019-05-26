@@ -281,7 +281,7 @@ import Firebase
                 }
                 else if(call.method == "_getGoogleAddId"){
                     var  channelResult:String="";
-                    channelResult=DeviceInfo.identifierForAdvertising()!;
+                    channelResult=MyDeviceInfo.identifierForAdvertising()!;
                     result(channelResult)
                 }
                 else if(call.method == "_getAndroidDeviceInfo"){
@@ -493,20 +493,20 @@ import Firebase
     
     private func getDeviceInfo(deviceinfoResult: FlutterResult){
         let deviceInfoDict: NSDictionary = [
-            "versionCode":DeviceInfo.getVersionCode(),
-            "versionName":DeviceInfo.getVersionName(),
-            "uid":DeviceInfo.getUID(),
-            "model":DeviceInfo.getModel(),
+            "versionCode":MyDeviceInfo.getVersionCode(),
+            "versionName":MyDeviceInfo.getVersionName(),
+            "uid":MyDeviceInfo.getUID(),
+            "model":MyDeviceInfo.getModel(),
             "serial":"",
             "manufacturer":"Apple",
-            "version":DeviceInfo.getOSVersion(),
-            "network_operator":DeviceInfo.getNetworkOperator(),
-            "packageName":DeviceInfo.getPackageName(),
+            "version":MyDeviceInfo.getOSVersion(),
+            "network_operator":MyDeviceInfo.getNetworkOperator(),
+            "packageName":MyDeviceInfo.getPackageName(),
             "baseRevisionCode":"",
             "firstInstallTime":"",
             "lastUpdateTime":"",
-            "device_ip_":DeviceInfo.getDeviceIPAddress(),
-            "network_type":DeviceInfo.getNetworkType(),
+            "device_ip_":MyDeviceInfo.getDeviceIPAddress(),
+            "network_type":MyDeviceInfo.getNetworkType(),
         ]
         device_info_result(deviceInfoDict)
     }

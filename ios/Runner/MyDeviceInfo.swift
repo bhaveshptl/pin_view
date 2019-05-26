@@ -3,7 +3,7 @@ import Foundation;
 import CoreTelephony;
 import AdSupport;
 
-class DeviceInfo{
+class MyDeviceInfo{
     
     static func postRequest() -> [String:String] {
         return ["someData" : "someData"]
