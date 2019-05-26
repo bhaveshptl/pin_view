@@ -103,7 +103,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
-  processSuccessResponse(Map<String, dynamic> payload) {
+  processSuccessResponse(Map<dynamic, dynamic> payload) {
     print("<<<<<<<<<<<<<<Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);

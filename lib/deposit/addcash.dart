@@ -201,7 +201,7 @@ class AddCashState extends State<AddCash> {
         );
   }
 
-  processSuccessResponse(Map<String, dynamic> payload) {
+  processSuccessResponse(Map<dynamic, dynamic> payload) {
     showLoader(false);
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
