@@ -204,7 +204,7 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = iosInfo.model;
+      model = androidDeviceInfoMap["model"];
       manufacturer = "Apple";
       serial = "";
     }
@@ -359,7 +359,7 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = iosInfo.model;
+      model = androidDeviceInfoMap["model"];
       manufacturer = "Apple";
       serial = "";
     }

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
-
+import 'package:flutter/services.dart';
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -64,6 +65,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   Map<String, dynamic> l1UpdatePackate = {};
   bool waitForPredictionDataToViewSheet = false;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  static const social_share_platform =
+      const MethodChannel('com.algorin.pf.socialshare');
 
   @override
   initState() {
@@ -77,6 +80,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     _getContestSheets(0);
     if (_mapContestSheets.length == 0) {
       getMyContestMySheets();
+    }
+    if (Platform.isIOS) {
+      initSocialShareChannel();
     }
   }
 
@@ -393,7 +399,32 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
     String inviteMsg = AppConfig.of(context).appName.toUpperCase() +
         " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
 
-    FlutterShareMe().shareToSystem(msg: inviteMsg);
+    if (Platform.isAndroid) {
+      FlutterShareMe().shareToSystem(msg: inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowIOS(inviteMsg);
+    }
+  }
+
+  Future<String> _shareNowIOS(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareText', msg);
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+
+  Future<String> initSocialShareChannel() async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('initSocialShareChannel');
+    } catch (e) {
+      print(e);
+    }
+    return value;
   }
 
   _getContestSheets(int offset) async {

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter/services.dart';
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -65,6 +66,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   bool bIsAllTeamsRequestInProgress = false;
   Map<String, dynamic> l1UpdatePackate = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  static const social_share_platform =
+      const MethodChannel('com.algorin.pf.socialshare');
+  
 
   MyTeam teamToView;
   ScrollController controller;
@@ -96,6 +100,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     initAllTeams();
     _getInitData();
     controller = new ScrollController()..addListener(_scrollListener);
+    if (Platform.isIOS) {
+      initSocialShareChannel();
+    }
   }
 
   initAllTeams() async {
@@ -608,7 +615,33 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     String inviteMsg =
         "Join my HOWZAT $contestVisibility Contest! Use the contest code $contestCode in Howzat to join! \n $contestShareUrl";
 
-    FlutterShareMe().shareToSystem(msg: inviteMsg);
+    
+    if (Platform.isAndroid) {
+      FlutterShareMe().shareToSystem(msg: inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowIOS(inviteMsg);
+    }
+  }
+
+  Future<String> _shareNowIOS(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareText', msg);
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+
+  Future<String> initSocialShareChannel() async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('initSocialShareChannel');
+    } catch (e) {
+      print(e);
+    }
+    return value;
   }
 
   _getContestTeams(int offset, int limit) async {
