@@ -403,15 +403,17 @@ import Firebase
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
             self.SOCIAL_SHARE_CHANNEL.setMethodCallHandler({
                 [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
+                if(call.method == "initSocialShareChannel"){
+                    result("Social Share");
+                }
                 if(call.method == "shareViaWhatsApp"){
-                    
-                    SocialShare.shareViaWhatsApp(msg:call.arguments as! String)
+                    SocialShare.shareViaWhatsApp(msg:call.arguments as! String);
+                     result("Social Share");
                 }
                 if(call.method == "shareText"){
-                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String)
-                    
+                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                     result("Social Share");
                 }
-                    
                 else{
                     result(FlutterMethodNotImplemented)
                 }
@@ -436,7 +438,7 @@ import Firebase
                 "method":method
             ],
             "theme": [
-                "color": "#F37254"
+                "color": "#d32518"
             ]
         ]
         print(options);
