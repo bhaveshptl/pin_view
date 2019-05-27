@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -56,7 +56,7 @@ class LeagueDetailState extends State<LeagueDetail>
   int _sportType;
   List<MyTeam> _myTeams;
   String title = "Contest".toUpperCase();
-
+  bool isIos =false;
   bool bIsPredictionAvailable = false;
   List<MySheet> _mySheets;
   Prediction predictionData;
@@ -90,6 +90,10 @@ class LeagueDetailState extends State<LeagueDetail>
         activeTabIndex = tabController.index;
       });
     });
+
+    if (Platform.isIOS) {
+      isIos=true;
+    }
   }
 
   _onWsMsg(data) {
@@ -1214,7 +1218,7 @@ class LeagueDetailState extends State<LeagueDetail>
                                 .title
                                 .copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w900,
+                                  fontWeight: isIos ? FontWeight.w600 : FontWeight.w900 ,
                                 ),
                           ),
                           onPressed: () {

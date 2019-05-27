@@ -74,5 +74,20 @@
 	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
 	<key>WEGLicenseCode</key>
 	<string>~47b6585d</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Howzat uses  location to know your Indian State </string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Howzat uses  location to know your Indian State </string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Howzat requires access to the Photo Library to upload Identity document  </string>
+	<key>NSCameraUsageDescription</key>
+	<string>Howzat requires access to the camera to upload Identity document  </string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Need microphone access for uploading videos</string>
 </dict>
 </plist>
