@@ -216,44 +216,43 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
     }
     _payload["password"] = _password;
-      _payload["context"] = {
-        "refCode": _referralCodeController.text,
-        "channel_id": HttpManager.channelId,
-        "deviceId": _deviceId,
-        "model": model,
-        "manufacturer": manufacturer,
-        "googleaddid": googleAddId,
-        "serial": serial,
-        "branchinstallReferringlink": _installReferring_link,
-        "app_version_flutter": app_version_flutter
-      };
-      if (_installReferring_link.length > 0) {
-        var uri = Uri.parse(_installReferring_link);
-        uri.queryParameters.forEach((k, v) {
-          try {
-            _payload["context"][k] = v;
-          } catch (e) {
-            print(e);
-          }
-        });
-      }
+    _payload["context"] = {
+      "refCode": _referralCodeController.text,
+      "channel_id": HttpManager.channelId,
+      "deviceId": _deviceId,
+      "model": model,
+      "manufacturer": manufacturer,
+      "googleaddid": googleAddId,
+      "serial": serial,
+      "branchinstallReferringlink": _installReferring_link,
+      "app_version_flutter": app_version_flutter
+    };
+    if (_installReferring_link.length > 0) {
+      var uri = Uri.parse(_installReferring_link);
+      uri.queryParameters.forEach((k, v) {
+        try {
+          _payload["context"][k] = v;
+        } catch (e) {
+          print(e);
+        }
+      });
+    }
 
-      try {
-        _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
-        _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
-        _payload["context"]["network_operator"] =
-            androidDeviceInfoMap["network_operator"];
-        _payload["context"]["firstInstallTime"] =
-            androidDeviceInfoMap["firstInstallTime"];
-        _payload["context"]["lastUpdateTime"] =
-            androidDeviceInfoMap["lastUpdateTime"];
-        _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
-        _payload["context"]["network_type"] =
-            androidDeviceInfoMap["network_type"];
-        _payload["context"]["googleEmailList"] =
-            json.encode(androidDeviceInfoMap["googleEmailList"]);
-      } catch (e) {}
-    
+    try {
+      _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
+      _payload["context"]["network_operator"] =
+          androidDeviceInfoMap["network_operator"];
+      _payload["context"]["firstInstallTime"] =
+          androidDeviceInfoMap["firstInstallTime"];
+      _payload["context"]["lastUpdateTime"] =
+          androidDeviceInfoMap["lastUpdateTime"];
+      _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
+      _payload["context"]["network_type"] =
+          androidDeviceInfoMap["network_type"];
+      _payload["context"]["googleEmailList"] =
+          json.encode(androidDeviceInfoMap["googleEmailList"]);
+    } catch (e) {}
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
@@ -452,7 +451,8 @@ class SignupState extends State<Signup> {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"].toString();
     signupdata["transactionID"] = loginData["user_id"].toString();
-    signupdata["description"] = "CHANNEL"+loginData["channelId"].toString()+"SIGNUP";
+    signupdata["description"] =
+        "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
     signupdata["data"] = loginData;
     String trackValue;
     try {
@@ -511,7 +511,7 @@ class SignupState extends State<Signup> {
         child: Column(
           children: <Widget>[
             Image.network(
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_50.png"),
+                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
