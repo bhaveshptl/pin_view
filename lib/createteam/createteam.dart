@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
-
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -47,7 +47,7 @@ class CreateTeamState extends State<CreateTeam>
   int _selectedPlayersCount = 0;
   final double TEAM_LOGO_HEIGHT = 48.0;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  bool isIos =false;
   Player _captain;
   Player _vCaptain;
   String _sortedBy;
@@ -116,6 +116,9 @@ class CreateTeamState extends State<CreateTeam>
       }
     });
     floatButtonWidget = Icon(Icons.navigate_next);
+    if (Platform.isIOS) {
+      isIos=true;
+    }
   }
 
   _getSportsType() async {
@@ -1131,7 +1134,7 @@ class CreateTeamState extends State<CreateTeam>
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w900,
+                                    fontWeight: isIos? FontWeight.w600 : FontWeight.w900 ,
                                   ),
                         ),
                         onPressed: () {
@@ -1165,7 +1168,7 @@ class CreateTeamState extends State<CreateTeam>
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
                                     color: Colors.white,
-                                    fontWeight: FontWeight.w900,
+                                    fontWeight: isIos ? FontWeight.w600 : FontWeight.w900,
                                   ),
                         ),
                         onPressed: _selectedPlayers.length !=

@@ -139,7 +139,9 @@ class SplashScreenState extends State<SplashScreen>
   _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      final value = await branch_io_platform.invokeMethod('_initBranchIoPlugin').timeout(Duration(seconds: 10));
+      final value = await branch_io_platform
+          .invokeMethod('_initBranchIoPlugin')
+          .timeout(Duration(seconds: 10));
       print("<<<<<<<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>>>>>>>>>>>>>");
       print(value);
       SharedPrefHelper.internal().saveToSharedPref(
@@ -221,18 +223,19 @@ class SplashScreenState extends State<SplashScreen>
   getInitData() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     double version = 0.0;
+    bool isIos =false;
     if (Platform.isAndroid) {
       version = double.parse(packageInfo.version);
+      isIos=false;
     }
     if (Platform.isIOS) {
       version = 3.40;
+      isIos=true;
     }
     http.Request req =
         http.Request("POST", Uri.parse(widget.apiBaseUrl + ApiUtil.INIT_DATA));
-    req.body = json.encode({
-      "version": version,
-      "channelId": widget.channelId,
-    });
+    req.body = json.encode(
+        {"version": version, "channelId": widget.channelId, "isIos": isIos});
     return await HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
@@ -288,7 +291,9 @@ class SplashScreenState extends State<SplashScreen>
                   )
                 : (AppConfig.of(context).channelId == "10"
                     ? BoxDecoration(color: Theme.of(context).primaryColor)
-                    : null),
+                    : (AppConfig.of(context).channelId == "13"
+                        ? BoxDecoration(color: Theme.of(context).primaryColor)
+                        : null)),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,

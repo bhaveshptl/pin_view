@@ -193,7 +193,7 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = iosInfo.model;
+      model = androidDeviceInfoMap["model"];
       manufacturer = "Apple";
       serial = "";
     }
@@ -321,7 +321,7 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = iosInfo.model;
+      model = androidDeviceInfoMap["model"];
       manufacturer = "Apple";
       serial = "";
     }

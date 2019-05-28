@@ -43,7 +43,8 @@ dependencies:
   permission:
     git:
       url: git://github.com/bhaveshptl/permission.git
-
+  # use flutter_webview_plugin: ^0.3.5 for ios
+  # use flutter_webview_plugin: ^0.2.1+2 for android 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2

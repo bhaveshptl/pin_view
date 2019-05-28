@@ -9,7 +9,7 @@ import FirebaseMessaging
 import Firebase
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocol {
+@objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocolWithData {
     private var controller : FlutterViewController!;
     private var razorpay: Razorpay!
     private var razorpayProdKey:String="rzp_live_jpaEKwXwl8iWX6";
@@ -39,7 +39,6 @@ import Firebase
         ) -> Bool {
         /* Flutter Channel Init*/
         controller = window?.rootViewController as? FlutterViewController;
-        razorpay = Razorpay.initWithKey(razorpayProdKey, andDelegate: self);
         RAZORPAY_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.razorpay",binaryMessenger: controller)
         BRANCH_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.branch",binaryMessenger: controller)
         PF_FCM_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.fcm",binaryMessenger: controller)
@@ -404,15 +403,17 @@ import Firebase
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
             self.SOCIAL_SHARE_CHANNEL.setMethodCallHandler({
                 [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
+                if(call.method == "initSocialShareChannel"){
+                    result("Social Share");
+                }
                 if(call.method == "shareViaWhatsApp"){
-                    
-                    SocialShare.shareViaWhatsApp(msg:call.arguments as! String)
+                    SocialShare.shareViaWhatsApp(msg:call.arguments as! String);
+                     result("Social Share");
                 }
                 if(call.method == "shareText"){
-                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String)
-                    
+                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                     result("Social Share");
                 }
-                    
                 else{
                     result(FlutterMethodNotImplemented)
                 }
@@ -423,41 +424,60 @@ import Firebase
     
     internal func showPaymentForm(name: String, email:String, phone:String, amount:String,orderId:String, method:String,image:String){
         /* Function Usecase : Open  Razorpay Payment Window*/
+        razorpay = Razorpay.initWithKey(razorpayProdKey, andDelegateWithData: self);
         let options: [String:Any] = [
             "amount" :amount ,
             "description": "Add Cash",
             "image": image,
             "name": name,
+            "currency":"INR",
             "order_id":orderId,
             "prefill": [
                 "contact": phone,
-                "email": email
+                "email": email,
+                "method":method
             ],
             "theme": [
-                "color": "#F37254"
+                "color": "#d32518"
             ]
         ]
+        print(options);
         razorpay.open(options)
     }
     
     
     
-    public func onPaymentError(_ code: Int32, description str: String){
+    
+    public func onPaymentError(_ code: Int32, description str: String,andData response: [AnyHashable : Any]?){
         /* Function Usecase : Call on Razorpay Payment Failed*/
         print("<<<<<<<<<<< Payment Failed >>>>>>>>>>>>>>>>>>>>>>>>>>>");
         // RAZORPAY_IO_CHANNEL.invokeMethod("onRazorPayPaymentFail", arguments: str);
+        print(str);
         razorpay_result(FlutterError(code: "0",
                                      message: str,
                                      details: nil))
     }
     
-    public func onPaymentSuccess(_ payment_id: String){
+    //andData response: [AnyHashable : Any]?
+    public func onPaymentSuccess(_ payment_id: String,andData response: [AnyHashable : Any]?){
         print("<<<<<<<<<<< Payment Success >>>>>>>>>>>>>>>>>>>>>>>>>>>");
         /* Function Usecase : Call on Razorpay Payment success*/
+        print(payment_id);
+        print(response!);
+        var dict : Dictionary = Dictionary<AnyHashable,Any>();
+        if(response != nil){
+             dict=response!;
+        }
+        let razorpay_signature : String = dict["razorpay_signature"] as? String ?? "";
+        let razorpay_order_id : String = dict["razorpay_order_id"] as? String ?? "";
         var response = [String : String]()
-        response["message"] = payment_id
-        response["code"] = "1"
-        razorpay_result(response)
+        response["paymentId"] = payment_id
+        response["signature"] = razorpay_signature;
+        response["orderId"] = razorpay_order_id;
+        response["status"] = "paid";
+        print(response);
+        razorpay_result(response);
+        
     }
     
     private func  webengageTrackUser(trackType:String,value:String)-> String{

@@ -47,6 +47,9 @@ class EarnCashState extends State<EarnCash> {
     super.initState();
     setReferralDetails();
     _getBanners();
+    if (Platform.isIOS) {
+      initSocialShareChannel();
+    }
   }
 
   setReferralDetails() async {
@@ -124,12 +127,21 @@ class EarnCashState extends State<EarnCash> {
     }
   }
 
+  Future<String> initSocialShareChannel() async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('initSocialShareChannel');
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
+
   Future<String> _shareNowWhatsAppIOS(String msg) async {
     String value;
     try {
       value = await social_share_platform.invokeMethod('shareViaWhatsApp', msg);
     } catch (e) {
-      print("<<<<<<<<<<<<<Razorpay Response Fail>>>>>>>>>>>>");
       print(e);
     }
     return value;
@@ -140,7 +152,6 @@ class EarnCashState extends State<EarnCash> {
     try {
       value = await social_share_platform.invokeMethod('shareText', msg);
     } catch (e) {
-      print("<<<<<<<<<<<<<Razorpay Response Fail>>>>>>>>>>>>");
       print(e);
     }
     return value;

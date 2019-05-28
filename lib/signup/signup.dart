@@ -204,7 +204,7 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = iosInfo.model;
+      model = androidDeviceInfoMap["model"];
       manufacturer = "Apple";
       serial = "";
     }
@@ -216,8 +216,6 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
     }
     _payload["password"] = _password;
-
-    if (Theme.of(context).platform == TargetPlatform.android) {
       _payload["context"] = {
         "refCode": _referralCodeController.text,
         "channel_id": HttpManager.channelId,
@@ -255,7 +253,7 @@ class SignupState extends State<Signup> {
         _payload["context"]["googleEmailList"] =
             json.encode(androidDeviceInfoMap["googleEmailList"]);
       } catch (e) {}
-    }
+    
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
@@ -361,7 +359,7 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = iosInfo.model;
+      model = androidDeviceInfoMap["model"];
       manufacturer = "Apple";
       serial = "";
     }
