@@ -60,7 +60,6 @@ PODS:
   - flutter_downloader (0.0.1):
     - Flutter
   - flutter_facebook_login (0.0.1):
-    - FBSDKCoreKit (~> 4.29)
     - FBSDKLoginKit (~> 4.29)
     - Flutter
   - flutter_share_me (0.0.1):
@@ -221,7 +220,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: c796d50864dc822a3c06c9c1c1444b37732b795b
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   flutter_downloader: 058b9c41564a90500f67f3e432e3524613a7fd83
-  flutter_facebook_login: 8bc56c00da11c675107d8db8c546688ff70ce184
+  flutter_facebook_login: 8570fe85a9b988b19503530a85bfce2b3b847145
   flutter_share_me: dd04bcb65a595f76bd2fa0537df08fffc5a04903
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   google_sign_in: 27e70a98b529f0b076d4b19f231b81da28b1750b

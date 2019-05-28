@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-
+import 'dart:io';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -20,11 +20,15 @@ class InitPayState extends State<InitPay> {
   bool isWebviewLoaded = false;
   Map<String, String> depositResponse;
   final flutterWebviewPlugin = FlutterWebviewPlugin();
+  bool isIos =false;
 
   @override
   void initState() {
     super.initState();
     setWebview();
+    if (Platform.isIOS) {
+      isIos=true;
+    }
   }
 
   setWebview() async {
@@ -67,7 +71,7 @@ class InitPayState extends State<InitPay> {
   Widget build(BuildContext context) {
     return isWebviewLoaded
         ? WebviewScaffold(
-            url: widget.url,
+            url: isIos?Uri.encodeFull(widget.url):widget.url,
             withJavascript: true,
             enableAppScheme: true,
             withLocalStorage: true,

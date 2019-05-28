@@ -47,12 +47,31 @@
 	<string>127323253930</string>
 	<key>FacebookDisplayName</key>
 	<string>Howzat</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>whatsapp</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Howzat requires access to the camera to upload Identity document  </string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Howzat uses  location to know your Indian State </string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Howzat uses  location to know your Indian State </string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Need microphone access for uploading videos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Howzat requires access to the Photo Library to upload Identity document  </string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -70,24 +89,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>branch_key</key>
-	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
 	<key>WEGLicenseCode</key>
 	<string>~47b6585d</string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Howzat uses  location to know your Indian State </string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Howzat uses  location to know your Indian State </string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Howzat requires access to the Photo Library to upload Identity document  </string>
-	<key>NSCameraUsageDescription</key>
-	<string>Howzat requires access to the camera to upload Identity document  </string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Need microphone access for uploading videos</string>
+	<key>branch_key</key>
+	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
 </dict>
 </plist>
