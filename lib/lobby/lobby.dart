@@ -67,7 +67,11 @@ class LobbyState extends State<Lobby>
   @override
   initState() {
     super.initState();
-    _controller = TabController(vsync: this, length: 3);
+    _mapSportTypes = {
+      "CRICKET": 1,
+      "FOOTBALL": 2,
+    };
+    _controller = TabController(vsync: this, length: _mapSportTypes.length);
     _getBanners();
     _getSportsType();
     _controller.addListener(() {
@@ -78,10 +82,6 @@ class LobbyState extends State<Lobby>
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
     });
-    _mapSportTypes = {
-      "CRICKET": 1,
-      "FOOTBALL": 2,
-    };
   }
 
   @override

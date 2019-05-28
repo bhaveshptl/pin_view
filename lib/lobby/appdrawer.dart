@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -33,6 +34,9 @@ class AppDrawerState extends State<AppDrawer> {
   String cookie;
   bool bIsUserVerified = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  MethodChannel browserLaunchChannel =
+      const MethodChannel('com.algorin.pf.browser');
 
   @override
   void initState() {
@@ -619,6 +623,37 @@ class AppDrawerState extends State<AppDrawer> {
                     ),
                   ),
                 )
+              ],
+            ),
+          ),
+          Card(
+            color: Theme.of(context).primaryColor,
+            elevation: 3.0,
+            child: Column(
+              children: <Widget>[
+                ListTile(
+                  leading: Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: Image.asset("images/logo.png"),
+                  ),
+                  title: Text(
+                    'JUNGLEE RUMMY',
+                    style: Theme.of(context).primaryTextTheme.headline.copyWith(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  subtitle: Text(
+                    "India's Most Trusted Rummy Site",
+                    style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                  onTap: () {
+                    browserLaunchChannel.invokeMethod(
+                        "launchInBrowser", "https://ei3k.app.link/howzat");
+                  },
+                ),
               ],
             ),
           ),

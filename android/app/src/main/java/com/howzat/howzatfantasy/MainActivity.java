@@ -2,6 +2,7 @@ package com.howzat.howzatfantasy;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -53,11 +54,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.io.IOException;
 import java.util.function.Function;
 
-
 public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
     private static final String RAZORPAY_IO_CHANNEL = "com.algorin.pf.razorpay";
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
+    private static final String BROWSER_LAUNCH_CHANNEL = "com.algorin.pf.browser";
     MyHelperClass myHeperClass;
     String firebaseToken = "";
     String installReferring_link = "";
@@ -81,7 +82,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     public void onStart() {
         super.onStart();
         initBranchPlugin();
-
 
     }
 
@@ -140,7 +140,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
     }
-
 
     private Map<String, String> initBranchSession(JSONObject referringParams) {
         Log.i("BRANCH SDK", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
@@ -209,97 +208,99 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     protected void initFlutterChannels() {
-        new MethodChannel(getFlutterView(), BRANCH_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
-            @Override
-            public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-                if (methodCall.method.equals("_getBranchRefCode")) {
-                    String pfRefCode = (String) getRefCodeUsingBranch();
+        new MethodChannel(getFlutterView(), BRANCH_IO_CHANNEL)
+                .setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                        if (methodCall.method.equals("_getBranchRefCode")) {
+                            String pfRefCode = (String) getRefCodeUsingBranch();
 
-                    result.success(pfRefCode);
-                }
-                if (methodCall.method.equals("_initBranchIoPlugin")) {
-                    if (bBranchLodead) {
-                        Map<String, String> object = new HashMap();
-                        String pfRefCode = (String) getRefCodeUsingBranch();
-                        String installReferring_link = (String) getInstallReferringLink();
-                        object.put("installReferring_link", installReferring_link);
-                        object.put("refCodeFromBranch", pfRefCode);
+                            result.success(pfRefCode);
+                        }
+                        if (methodCall.method.equals("_initBranchIoPlugin")) {
+                            if (bBranchLodead) {
+                                Map<String, String> object = new HashMap();
+                                String pfRefCode = (String) getRefCodeUsingBranch();
+                                String installReferring_link = (String) getInstallReferringLink();
+                                object.put("installReferring_link", installReferring_link);
+                                object.put("refCodeFromBranch", pfRefCode);
 
-                        result.success(object.toString());
-                    } else {
-                        getBranchData(result);
+                                result.success(object.toString());
+                            } else {
+                                getBranchData(result);
+                            }
+
+                        }
+                        if (methodCall.method.equals("_getInstallReferringLink")) {
+                            String installReferring_link = (String) getInstallReferringLink();
+                            result.success(installReferring_link);
+                        }
+                        if (methodCall.method.equals("_getInstallReferringLink")) {
+                            String installReferring_link = (String) getInstallReferringLink();
+                            result.success(installReferring_link);
+                        }
+                        if (methodCall.method.equals("trackAndSetBranchUserIdentity")) {
+                            String userId = methodCall.arguments();
+                            trackAndSetBranchUserIdentity(userId);
+                            result.success("Branch Io user Identity added ");
+                        }
+                        if (methodCall.method.equals("branchUserLogout")) {
+                            branchUserLogout();
+                            result.success("Branch Io user Logout done");
+                        }
+
+                        if (methodCall.method.equals("setBranchUniversalObject")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            setBranchUniversalObject(arguments);
+                            result.success("Branch Io Universal Object added");
+                        }
+                        if (methodCall.method.equals("branchLifecycleEventSigniup")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            String channelResult = branchLifecycleEventSigniup(arguments);
+                            result.success(channelResult);
+                        }
+                        if (methodCall.method.equals("branchEventInitPurchase")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            String channelResult = branchEventInitPurchase(arguments);
+                            result.success(channelResult);
+                        }
+                        if (methodCall.method.equals("branchEventTransactionFailed")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            String channelResult = branchEventTransactionFailed(arguments);
+                            result.success(channelResult);
+                        }
+                        if (methodCall.method.equals("branchEventTransactionSuccess")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            String channelResult = branchEventTransactionSuccess(arguments);
+                            result.success(channelResult);
+                        }
+
+                        if (methodCall.method.equals("_getGoogleAddId")) {
+                            String googleAddId = (String) getGoogleAddId();
+                            result.success(googleAddId);
+                        }
+                        if (methodCall.method.equals("_getAndroidDeviceInfo")) {
+                            Map<String, Object> deviceInfo = getDeviceInfo();
+                            result.success(deviceInfo);
+                        }
                     }
+                });
+        new MethodChannel(getFlutterView(), RAZORPAY_IO_CHANNEL)
+                .setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                        if (methodCall.method.equals("_openRazorpayNative")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            startPayment(arguments);
+                            String razocode = "testrazo";
+                            result.success(razocode);
 
-                }
-                if (methodCall.method.equals("_getInstallReferringLink")) {
-                    String installReferring_link = (String) getInstallReferringLink();
-                    result.success(installReferring_link);
-                }
-                if (methodCall.method.equals("_getInstallReferringLink")) {
-                    String installReferring_link = (String) getInstallReferringLink();
-                    result.success(installReferring_link);
-                }
-                if (methodCall.method.equals("trackAndSetBranchUserIdentity")) {
-                    String userId = methodCall.arguments();
-                    trackAndSetBranchUserIdentity(userId);
-                    result.success("Branch Io user Identity added ");
-                }
-                if (methodCall.method.equals("branchUserLogout")) {
-                    branchUserLogout();
-                    result.success("Branch Io user Logout done");
-                }
+                        } else {
+                            result.notImplemented();
+                        }
 
-                if (methodCall.method.equals("setBranchUniversalObject")) {
-                    Map<String, Object> arguments = methodCall.arguments();
-                    setBranchUniversalObject(arguments);
-                    result.success("Branch Io Universal Object added");
-                }
-                if (methodCall.method.equals("branchLifecycleEventSigniup")) {
-                    Map<String, Object> arguments = methodCall.arguments();
-                    String channelResult=branchLifecycleEventSigniup(arguments);
-                    result.success(channelResult);
-                }
-                if (methodCall.method.equals("branchEventInitPurchase")) {
-                    Map<String, Object> arguments = methodCall.arguments();
-                    String channelResult=branchEventInitPurchase(arguments);
-                    result.success(channelResult);
-                }
-                if (methodCall.method.equals("branchEventTransactionFailed")) {
-                    Map<String, Object> arguments = methodCall.arguments();
-                    String channelResult=branchEventTransactionFailed(arguments);
-                    result.success(channelResult);
-                }
-                if (methodCall.method.equals("branchEventTransactionSuccess")) {
-                    Map<String, Object> arguments = methodCall.arguments();
-                    String channelResult=branchEventTransactionSuccess(arguments);
-                    result.success(channelResult);
-                }
-
-                if (methodCall.method.equals("_getGoogleAddId")) {
-                    String googleAddId = (String) getGoogleAddId();
-                    result.success(googleAddId);
-                }
-                if (methodCall.method.equals("_getAndroidDeviceInfo")) {
-                    Map<String, Object> deviceInfo = getDeviceInfo();
-                    result.success(deviceInfo);
-                }
-            }
-        });
-        new MethodChannel(getFlutterView(), RAZORPAY_IO_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
-            @Override
-            public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-                if (methodCall.method.equals("_openRazorpayNative")) {
-                    Map<String, Object> arguments = methodCall.arguments();
-                    startPayment(arguments);
-                    String razocode = "testrazo";
-                    result.success(razocode);
-
-                } else {
-                    result.notImplemented();
-                }
-
-            }
-        });
+                    }
+                });
 
         new MethodChannel(getFlutterView(), PF_FCM_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
@@ -317,9 +318,22 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
             }
         });
+
+        new MethodChannel(getFlutterView(), BROWSER_LAUNCH_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                        if (methodCall.method.equals("launchInBrowser")) {
+                            String linkUrl = methodCall.arguments();
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(linkUrl));
+                            startActivity(browserIntent);
+                        } else {
+                            result.notImplemented();
+                        }
+                    }
+                });
     }
 
-    /*Bracnch Io related code*/
+    /* Bracnch Io related code */
     public String getRefCodeUsingBranch() {
         return refCodeFromBranch;
     }
@@ -370,54 +384,47 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         buo.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
         buo.setLocalIndexMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
 
-        buo.setContentMetadata(
-                new ContentMetadata()
-                        .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
-                        .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
+        buo.setContentMetadata(new ContentMetadata().addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
+                .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
 
-                        .setContentSchema(BranchContentSchema.COMMERCE_PRODUCT))
-                .addKeyWord("keyword1")
-                .addKeyWord("keyword2");
+                .setContentSchema(BranchContentSchema.COMMERCE_PRODUCT)).addKeyWord("keyword1").addKeyWord("keyword2");
     }
 
     private String branchLifecycleEventSigniup(Map<String, Object> arguments) {
         BranchEvent be = new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
-                .setTransactionID(""+arguments.get("transactionID"))
-                .setDescription("HOWZAT SIGN UP");
+                .setTransactionID("" + arguments.get("transactionID")).setDescription("HOWZAT SIGN UP");
         HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
 
-            be.addCustomDataProperty((String) entry.getKey(), ""+entry.getValue());
+            be.addCustomDataProperty((String) entry.getKey(), "" + entry.getValue());
         }
         be.logEvent(MainActivity.this);
         return "Sign Up Track event added";
 
     }
 
-
     private String branchEventTransactionFailed(Map<String, Object> arguments) {
 
-        boolean isfirstDepositor=false;
-        String eventName="FIRST_DEPOSIT_FAILED";
-        isfirstDepositor= Boolean.parseBoolean(""+arguments.get("firstDepositor"));
-        if(!isfirstDepositor){
-            eventName ="REPEAT_DEPOSIT_FAILED";
+        boolean isfirstDepositor = false;
+        String eventName = "FIRST_DEPOSIT_FAILED";
+        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
+        if (!isfirstDepositor) {
+            eventName = "REPEAT_DEPOSIT_FAILED";
         }
 
-        BranchEvent be = new BranchEvent(eventName)
-                .setTransactionID(""+arguments.get("txnId"))
+        BranchEvent be = new BranchEvent(eventName).setTransactionID("" + arguments.get("txnId"))
                 .setDescription(("HOWZAT DEPOSIT FAILED"));
-        be.addCustomDataProperty("txnTime", ""+ arguments.get("txnTime"));
-        be.addCustomDataProperty("txnDate", ""+ arguments.get("txnDate"));
-        be.addCustomDataProperty("appPage",  ""+arguments.get("appPage"));
+        be.addCustomDataProperty("txnTime", "" + arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", "" + arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", "" + arguments.get("appPage"));
 
         HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
-            be.addCustomDataProperty(entry.getKey(), ""+entry.getValue());
+            be.addCustomDataProperty(entry.getKey(), "" + entry.getValue());
         }
         be.logEvent(MainActivity.this);
 
@@ -426,27 +433,25 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private String branchEventTransactionSuccess(Map<String, Object> arguments) {
-        boolean isfirstDepositor=false;
-        String eventName="FIRST_DEPOSIT_SUCCESS";
-        isfirstDepositor=Boolean.parseBoolean(""+arguments.get("firstDepositor"));
-        if(!isfirstDepositor){
-            eventName ="REPEAT_DEPOSIT_SUCCESS";
+        boolean isfirstDepositor = false;
+        String eventName = "FIRST_DEPOSIT_SUCCESS";
+        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
+        if (!isfirstDepositor) {
+            eventName = "REPEAT_DEPOSIT_SUCCESS";
         }
 
-
-        BranchEvent be = new BranchEvent(eventName)
-                .setTransactionID(""+arguments.get("txnId"))
+        BranchEvent be = new BranchEvent(eventName).setTransactionID("" + arguments.get("txnId"))
                 .setDescription("HOWZAT DEPOSIT FAILED");
-        be.addCustomDataProperty("txnTime", ""+ arguments.get("txnTime"));
-        be.addCustomDataProperty("txnDate", ""+ arguments.get("txnDate"));
-        be.addCustomDataProperty("appPage", ""+ arguments.get("appPage"));
+        be.addCustomDataProperty("txnTime", "" + arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", "" + arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", "" + arguments.get("appPage"));
 
         HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
 
-            be.addCustomDataProperty(entry.getKey(), ""+entry.getValue());
+            be.addCustomDataProperty(entry.getKey(), "" + entry.getValue());
         }
 
         be.logEvent(MainActivity.this);
@@ -458,8 +463,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private String branchEventInitPurchase(Map<String, Object> arguments) {
         new BranchEvent(BRANCH_STANDARD_EVENT.INITIATE_PURCHASE)
                 .setTransactionID((String) arguments.get("transactionID"))
-                .setDescription((String) arguments.get("description"))
-                .addCustomDataProperty("registrationID", "12345")
+                .setDescription((String) arguments.get("description")).addCustomDataProperty("registrationID", "12345")
                 .logEvent(MainActivity.this);
 
         return "";
@@ -467,7 +471,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     public void startPayment(Map<String, Object> arguments) {
         /*
-          You need to pass current activity in order to let Razorpay create CheckoutActivity
+         * You need to pass current activity in order to let Razorpay create
+         * CheckoutActivity
          */
         final Activity activity = this;
 
@@ -477,7 +482,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             JSONObject options = new JSONObject();
             options.put("name", (String) arguments.get("name"));
             options.put("description", "Add Cash");
-            //You can omit the image option to fetch the image from dashboard
+            // You can omit the image option to fetch the image from dashboard
             options.put("image", (String) arguments.get("image"));
             options.put("currency", "INR");
             options.put("amount", (String) arguments.get("amount"));
@@ -494,12 +499,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
             co.open(activity, options);
         } catch (Exception e) {
-            Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(activity, "Error in payment: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
-
 
     @SuppressWarnings("unused")
     @Override
@@ -522,7 +525,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
-
     public void onRazorPayPaymentFail(String response, PaymentData data) {
         JSONObject object = new JSONObject();
         try {
@@ -534,19 +536,20 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         }
 
-        new MethodChannel(getFlutterView(), RAZORPAY_IO_CHANNEL).invokeMethod("onRazorPayPaymentFail", object.toString(), new MethodChannel.Result() {
-            @Override
-            public void success(Object o) {
-            }
+        new MethodChannel(getFlutterView(), RAZORPAY_IO_CHANNEL).invokeMethod("onRazorPayPaymentFail",
+                object.toString(), new MethodChannel.Result() {
+                    @Override
+                    public void success(Object o) {
+                    }
 
-            @Override
-            public void error(String s, String s1, Object o) {
-            }
+                    @Override
+                    public void error(String s, String s1, Object o) {
+                    }
 
-            @Override
-            public void notImplemented() {
-            }
-        });
+                    @Override
+                    public void notImplemented() {
+                    }
+                });
     }
 
     public void onRazorPayPaymentSuccess(String razorpayPaymentID, PaymentData data) {
@@ -560,37 +563,37 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         }
 
-        new MethodChannel(getFlutterView(), RAZORPAY_IO_CHANNEL).invokeMethod("onRazorPayPaymentSuccess", object.toString(), new MethodChannel.Result() {
-            @Override
-            public void success(Object o) {
-            }
+        new MethodChannel(getFlutterView(), RAZORPAY_IO_CHANNEL).invokeMethod("onRazorPayPaymentSuccess",
+                object.toString(), new MethodChannel.Result() {
+                    @Override
+                    public void success(Object o) {
+                    }
 
-            @Override
-            public void error(String s, String s1, Object o) {
-            }
+                    @Override
+                    public void error(String s, String s1, Object o) {
+                    }
 
-            @Override
-            public void notImplemented() {
-            }
-        });
+                    @Override
+                    public void notImplemented() {
+                    }
+                });
     }
 
-    /*Firebase Push notification*/
+    /* Firebase Push notification */
     public void initPushNotifications() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Create channel to show notifications.
             String channelId = "fcm_default_channel";
             String channelName = "News";
-            NotificationManager notificationManager =
-                    getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(new NotificationChannel(channelId,
-                    channelName, NotificationManager.IMPORTANCE_LOW));
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(
+                    new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
         }
 
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
                 Object value = getIntent().getExtras().get(key);
-                //  Log.d(TAG, "Key: " + key + " Value: " + value);
+                // Log.d(TAG, "Key: " + key + " Value: " + value);
             }
         }
 
@@ -681,11 +684,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return googleAdId;
     }
 
-
-
     private Map<String, Object> getDeviceInfo() {
-            Map<String, Object> params = new HashMap<>();
-            Map<String, String> emailList = new HashMap();
+        Map<String, Object> params = new HashMap<>();
+        Map<String, String> emailList = new HashMap();
         final DeviceInfo deviceData = new DeviceInfo();
         final Map<String, String> deviceInfoList = deviceData.getDeviceInfoMap(this);
         try {
@@ -716,6 +717,5 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
         return params;
     }
-
 
 }
