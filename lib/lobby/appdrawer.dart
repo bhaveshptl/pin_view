@@ -634,7 +634,7 @@ class AppDrawerState extends State<AppDrawer> {
                 ListTile(
                   leading: Padding(
                     padding: EdgeInsets.all(4.0),
-                    child: Image.asset("images/logo.png"),
+                    child: Image.asset("images/junglee.png"),
                   ),
                   title: Text(
                     'JUNGLEE RUMMY',
