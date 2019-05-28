@@ -78,6 +78,8 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
 	</dict>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Howzat uses  location to know your Indian State </string>
@@ -89,5 +91,6 @@
 	<string>Howzat requires access to the camera to upload Identity document  </string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need microphone access for uploading videos</string>
+	<key>ITSAppUsesNonExemptEncryption</key><false/>
 </dict>
 </plist>
