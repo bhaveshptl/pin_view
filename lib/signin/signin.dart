@@ -464,7 +464,7 @@ class SignInPageState extends State<SignInPage> {
         child: Column(
           children: <Widget>[
             Image.network(
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_50.png"),
+                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
