@@ -426,10 +426,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 weUser.setBirthDate(arguments.get("value"));
                 return "Birth Day track added";
             case "setPhoneNumber":
-                weUser.setPhoneNumber("+551155256325");
+                weUser.setPhoneNumber(arguments.get("value"));
                 return "Phone Number track added";
             case "setFirstName":
-                weUser.setPhoneNumber(arguments.get("value"));
+                weUser.setFirstName(arguments.get("value"));
                 return "Login Track added";
             case "setGender":
                 String gendel=arguments.get("value");
@@ -503,12 +503,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
         weAnalytics.track("COMPLETE_LOGIN", addCustomDataProperty);
 
-        String loginType = (String)arguments.get("loginType");
-        System.out.print(loginType);
-        Map<String, Object> loginTypeAttribute = new HashMap<>();
-        loginTypeAttribute.put("trackingType",loginType);
-        loginTypeAttribute.put("value",loginType);
-        webengageCustomAttributeTrackUser(loginTypeAttribute);
+        weUser.setAttribute("loginType", "" + (String)arguments.get("loginType"));
+
+
+        if(data.get("email_id") != null){
+
+            weUser.setEmail((String)data.get("email_id"));
+        }
+        if(data.get("mobile") != null){
+
+            weUser.setPhoneNumber("+91"+(String)data.get("mobile"));
+        }
+        if(data.get("first_name") != null){
+            weUser.setFirstName((String)data.get("first_name"));
+        }
+        if(data.get("last_name") != null){
+            weUser.setLastName((String)data.get("last_name"));
+        }
         return "Web engage Login Track event added";
 
     }

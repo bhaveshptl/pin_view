@@ -425,49 +425,8 @@ class SignInPageState extends State<SignInPage> {
   onLoginAuthenticate(Map<String, dynamic> loginData) {
     print("<<<<<<<<<Login Data>>>>>>>>>");
     print(loginData);
-
-    
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
     webEngageUserLogin(loginData["user_id"].toString(), loginData);
-    
-    // if(loginData["email_id"] != null){
-    // Map<dynamic, dynamic> eventdata = new Map();
-    // eventdata["trackType"] = "setEmail";
-    // eventdata["value"] = loginData["email_id"];
-    // AnalyticsManager.webengageTrackUser(eventdata);
-    // }
-
-    // if(loginData["mobile"] != null){
-    //   print("<<<<<<<<<Login Data 1>>>>>>>>>");
-    // Map<dynamic, dynamic> eventdata = new Map();
-    // eventdata["trackType"] = "setPhoneNumber";
-    // eventdata["value"] = loginData["mobile"];
-    // AnalyticsManager.webengageTrackUser(eventdata);
-    // }
-
-    // if(loginData["first_name"] != null){
-    //   print("<<<<<<<<<Login Data 2>>>>>>>>>");
-    // Map<dynamic, dynamic> eventdata = new Map();
-    // eventdata["trackType"] = "setFirstName";
-    // eventdata["value"] = loginData["first_name"].toString();
-    // AnalyticsManager.webengageTrackUser(eventdata);
-    // }
-
-    // if(loginData["last_name"] != null){
-    //   print("<<<<<<<<<Login Data 3>>>>>>>>>");
-    // Map<dynamic, dynamic> eventdata = new Map();
-    // eventdata["trackType"] = "setLastName";
-    // eventdata["value"] = loginData["last_name"].toString();
-    // AnalyticsManager.webengageTrackUser(eventdata);
-    //}
-
-
-    // Map<dynamic, dynamic> usernameData = new Map();
-    // usernameData["trackType"] = "login_name";
-    // usernameData["value"] = loginData["login_name:"];
-    // AnalyticsManager.webengageCustomAttributeTrackUser(usernameData);
-
-    
   }
 
   
