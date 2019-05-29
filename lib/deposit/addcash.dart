@@ -54,6 +54,8 @@ class AddCashState extends State<AddCash> {
       const MethodChannel('com.algorin.pf.razorpay');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
   static const _kFontFam = 'MyFlutterApp';
   IconData gift_1 = const IconData(0xe800, fontFamily: _kFontFam);
 
@@ -121,7 +123,7 @@ class AddCashState extends State<AddCash> {
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
-        initRazorpayNativePlugin();  
+      initRazorpayNativePlugin();
     }
   }
 
@@ -158,15 +160,14 @@ class AddCashState extends State<AddCash> {
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
-    
     Map<dynamic, dynamic> value = new Map();
     try {
       value =
           await razorpay_platform.invokeMethod('_openRazorpayNative', payload);
-          showLoader(false);
+      showLoader(false);
       if (Platform.isIOS) {
-        processSuccessResponse(value);  
-      }    
+        processSuccessResponse(value);
+      }
     } catch (e) {
       showLoader(false);
     }
@@ -174,16 +175,12 @@ class AddCashState extends State<AddCash> {
   }
 
   Future<String> initRazorpayNativePlugin() async {
-      String value = "";
+    String value = "";
     try {
-      value =
-          await razorpay_platform.invokeMethod('initRazorpayNativePlugin');
-          
+      value = await razorpay_platform.invokeMethod('initRazorpayNativePlugin');
     } catch (e) {}
     return "";
   }
-
-  
 
   Future<dynamic> myUtilsHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
@@ -227,9 +224,11 @@ class AddCashState extends State<AddCash> {
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
         }
       } else {
         branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
       }
     });
@@ -1209,6 +1208,7 @@ class AddCashState extends State<AddCash> {
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
         }
       } else {
         branchEventTransactionSuccess(response);
@@ -1270,6 +1270,63 @@ class AddCashState extends State<AddCash> {
     try {
       String trackStatus = await branch_io_platform.invokeMethod(
           'branchEventTransactionSuccess', trackdata);
+    } catch (e) {}
+    return trackStatus;
+  }
+
+  Future<String> webengageEventTransactionFailed(
+      Map<String, dynamic> transactionData) async {
+    Map<dynamic, dynamic> trackdata = new Map();
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionData["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString();
+    String timeinString = date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
+    trackdata["txnDate"] = dateinString;
+    trackdata["txnTime"] = timeinString;
+    trackdata["txnId"] = transactionData["txnId"];
+    trackdata["appPage"] = "AddCashPage";
+    trackdata["data"] = transactionData;
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
+    String trackStatus;
+    try {
+      String trackStatus = await webengage_platform.invokeMethod(
+          'webEngageTransactionFailed', trackdata);
+    } catch (e) {}
+    return trackStatus;
+  }
+
+  Future<String> webengageEventTransactionSuccess(
+      Map<String, dynamic> transactionData) async {
+    Map<dynamic, dynamic> trackdata = new Map();
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionData["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString();
+    String timeinString = date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
+    trackdata["txnDate"] = dateinString;
+    trackdata["txnTime"] = timeinString;
+    trackdata["appPage"] = "AddCashPage";
+    trackdata["data"] = transactionData;
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
+    String trackStatus;
+    try {
+      String trackStatus = await webengage_platform.invokeMethod(
+          'webEngageTransactionSuccess', trackdata);
     } catch (e) {}
     return trackStatus;
   }

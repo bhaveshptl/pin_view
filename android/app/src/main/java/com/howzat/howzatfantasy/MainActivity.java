@@ -53,19 +53,31 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 import java.util.function.Function;
+import com.webengage.sdk.android.WebEngageConfig;
+import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
+import com.webengage.sdk.android.WebEngage;
+import com.webengage.sdk.android.WebEngageConfig;
+import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
+
+import com.webengage.sdk.android.Analytics;
+import com.webengage.sdk.android.User;
+import com.webengage.sdk.android.utils.Gender;
+
 
 public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
     private static final String RAZORPAY_IO_CHANNEL = "com.algorin.pf.razorpay";
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
     private static final String BROWSER_LAUNCH_CHANNEL = "com.algorin.pf.browser";
+    private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
     MyHelperClass myHeperClass;
     String firebaseToken = "";
     String installReferring_link = "";
     JSONObject installParams;
     String refCodeFromBranch = "";
     String googleAdId = "";
-
+    private Analytics weAnalytics;
+    private User weUser;
     Function callback;
     boolean bBranchLodead = false;
 
@@ -76,12 +88,25 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
         initFlutterChannels();
+        initWebEngage();
     }
 
     @Override
     public void onStart() {
         super.onStart();
         initBranchPlugin();
+
+    }
+
+    private void initWebEngage(){
+
+        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
+                .setWebEngageKey("~47b6585d")
+                .setDebugMode(true) // only in development mode
+                .build();
+        this.getApplication().registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
+        weAnalytics = WebEngage.get().analytics();
+        weUser=WebEngage.get().user();
 
     }
 
@@ -331,7 +356,200 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         }
                     }
                 });
+        new MethodChannel(getFlutterView(), WEBENGAGE_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+            @Override
+            public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+
+                if (methodCall.method.equals("webEngageEventSigniup")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult = webEngageEventSigniup(arguments);
+                    result.success(channelResult);
+                }
+
+                if (methodCall.method.equals("webEngageEventLogin")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult = webEngageEventLogin(arguments);
+                    result.success(channelResult);
+                }
+
+                if (methodCall.method.equals("webEngageTransactionFailed")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult = webEngageTransactionFailed(arguments);
+                    result.success(channelResult);
+                }
+                if (methodCall.method.equals("webEngageTransactionSuccess")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult = webEngageTransactionSuccess(arguments);
+                    result.success(channelResult);
+                }
+                else if (methodCall.method.equals("webengageTrackUser")) {
+                    Map<String, String> arguments = methodCall.arguments();
+                    String channelResult =webengageTrackUser(arguments);
+                    result.success(channelResult);
+                } else if(methodCall.method.equals("webengageCustomAttributeTrackUser")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult =webengageCustomAttributeTrackUser(arguments);
+                    result.success(channelResult);
+                }
+                else if (methodCall.method.equals("webengageTrackEvent")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult =webengageTrackEvent(arguments);
+                    result.success(channelResult);
+                }
+                else if(methodCall.method.equals("trackEventsWithAttributes")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult =trackEventsWithAttributes(arguments);
+                    result.success(channelResult);
+                }
+                else {
+                    result.notImplemented();
+                }
+
+            }
+        });
     }
+
+    /****************Web Engage Stuff***************/
+    private String  webengageTrackUser(Map<String, String> arguments){
+        String trackType=arguments.get("trackingType");
+        switch(trackType){
+            case "login":
+                weUser.login(arguments.get("value"));
+                return "Login Track added";
+            case "logout":
+                weUser.logout();
+                return "Logout To Tracking event done";
+            case "setEmail":
+                weUser.setEmail(arguments.get("value"));
+                return "Email track   added";
+            case "setBirthDate":
+                weUser.setBirthDate(arguments.get("value"));
+                return "Birth Day track added";
+            case "setPhoneNumber":
+                weUser.setPhoneNumber("+551155256325");
+                return "Phone Number track added";
+            case "setFirstName":
+                weUser.setPhoneNumber(arguments.get("value"));
+                return "Login Track added";
+            case "setGender":
+                String gendel=arguments.get("value");
+                if(gendel=="male"){
+                    weUser.setGender(Gender.MALE);
+                }
+                else if (gendel=="female"){
+                    weUser.setGender(Gender.FEMALE);
+                }
+                else{
+                    weUser.setGender(Gender.OTHER);
+                }
+                return "User Gender  added";
+            case "setLastName":
+                weUser.setLastName(arguments.get("value"));
+                return "Last Name  Track added";
+            default:
+                return "No Such tracking type found ";
+        }
+    }
+
+    private String  webengageCustomAttributeTrackUser(Map<String, Object> arguments){
+        String trackType=(String)arguments.get("trackingType");
+        String value=(String)arguments.get("value");
+        weUser.setAttribute(trackType, value);
+        return "User " + trackType + " tracking added";
+    }
+
+    private String webengageTrackEvent(Map<String, Object> arguments){
+        /*Track Event without any Attributes*/
+        String eventName=(String)arguments.get("eventName");
+        boolean priority=false;
+        priority=(boolean)arguments.get("priority");
+        weAnalytics.track(eventName,new Analytics.Options().setHighReportingPriority(priority));
+        return "Event "+eventName+ "" +" added";
+    }
+
+    private String trackEventsWithAttributes(Map<String, Object> arguments){
+        /*Track Event with  Attributes*/
+        String eventName=(String)arguments.get("eventName");
+        boolean priority=(boolean)arguments.get("priority");
+        Map<String, Object> addedAttributes = new HashMap<>();
+        addedAttributes=(Map)arguments.get("data");
+        weAnalytics.track(eventName,addedAttributes,new Analytics.Options().setHighReportingPriority(priority));
+        return "Event "+eventName+ "" +"added";
+    }
+
+
+
+    private String webEngageEventSigniup(Map<String, Object> arguments) {
+
+        Map<String, Object> addCustomDataProperty = new HashMap<>();
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
+        }
+
+        weAnalytics.track("COMPLETE_REGISTRATION", addCustomDataProperty);
+
+        return "Web engage Sign Up Track event added";
+
+    }
+
+    private String webEngageEventLogin(Map<String, Object> arguments) {
+        Map<String, Object> addCustomDataProperty = new HashMap<>();
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
+        }
+        weAnalytics.track("COMPLETE_LOGIN", addCustomDataProperty);
+        return "Web engage Login Track event added";
+
+    }
+
+    private String webEngageTransactionFailed(Map<String, Object> arguments) {
+
+        boolean isfirstDepositor = false;
+        String eventName = "FIRST_DEPOSIT_FAILED";
+        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
+        if (!isfirstDepositor) {
+            eventName = "REPEAT_DEPOSIT_FAILED";
+        }
+
+        Map<String, Object> addCustomDataProperty = new HashMap<>();
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
+        }
+
+        weAnalytics.track(eventName, addCustomDataProperty);
+        return " Add Cash Failed Event added";
+
+    }
+
+    private String webEngageTransactionSuccess(Map<String, Object> arguments) {
+        boolean isfirstDepositor = false;
+        String eventName = "FIRST_DEPOSIT_SUCCESS";
+        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
+        if (!isfirstDepositor) {
+            eventName = "REPEAT_DEPOSIT_SUCCESS";
+        }
+        Map<String, Object> addCustomDataProperty = new HashMap<>();
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
+        }
+        weAnalytics.track(eventName, addCustomDataProperty);
+        return " Add Cash Success Event added";
+
+    }
+
+
 
     /* Bracnch Io related code */
     public String getRefCodeUsingBranch() {

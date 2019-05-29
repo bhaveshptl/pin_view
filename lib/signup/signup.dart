@@ -42,6 +42,8 @@ class SignupState extends State<Signup> {
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -433,6 +435,50 @@ class SignupState extends State<Signup> {
   onLoginAuthenticate(Map<String, dynamic> loginData) {
     branchLifecycleEventSigniup(loginData);
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+    webEngageUserLogin(loginData["user_id"].toString(), loginData);
+  }
+
+  Future<String> webEngageUserLogin(
+      String userId, Map<String, dynamic> loginData) async {
+    String result = "";
+    Map<dynamic, dynamic> data = new Map();
+    data["trackingType"] = "login";
+    data["value"] = userId;
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
+      webEngageEventSigniup(loginData);
+
+      print("Web engage>>>>>>>>>>>>>>>");
+      print(result);
+    } catch (e) {
+      print("Web engage>>>>>>>>>>>>>>>");
+
+      print(e);
+    }
+    return "";
+  }
+
+  Future<String> webEngageEventSigniup(Map<String, dynamic> loginData) async {
+    Map<dynamic, dynamic> signupdata = new Map();
+    signupdata["registrationID"] = loginData["user_id"].toString();
+    signupdata["transactionID"] = loginData["user_id"].toString();
+    signupdata["description"] =
+        "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    signupdata["data"] = loginData;
+    String trackValue;
+    try {
+      String trackValue = await webengage_platform.invokeMethod(
+          'webEngageEventSigniup', signupdata);
+      print("Web engage>>>>>>>>>>>>>>>");
+
+      print(trackValue);
+    } catch (e) {
+      print("Web engage>>>>>>>>>>>>>>>");
+
+      print(e);
+    }
+    return trackValue;
   }
 
   Future<String> trackAndSetBranchUserIdentity(String userId) async {

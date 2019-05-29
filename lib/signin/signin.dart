@@ -50,6 +50,8 @@ class SignInPageState extends State<SignInPage> {
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
   static const IconData gplus_squared =
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
@@ -405,9 +407,48 @@ class SignInPageState extends State<SignInPage> {
   }
 
   onLoginAuthenticate(Map<String, dynamic> loginData) {
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>on Login Auth>>>>>>>>>>>>>>>>>>>>");
     print(loginData);
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+    webEngageUserLogin(loginData["user_id"].toString(), loginData);
+  }
+
+  Future<String> webEngageUserLogin(
+      String userId, Map<String, dynamic> loginData) async {
+    String result = "";
+    Map<dynamic, dynamic> data = new Map();
+    data["trackingType"] = "login";
+    data["value"] = userId;
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
+
+      print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage login>>>>>>>>>>>>>>>>>>>>");
+      print(result);
+      webEngageEventLogin(loginData);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+  Future<String> webEngageEventLogin(Map<String, dynamic> loginData) async {
+    Map<dynamic, dynamic> signupdata = new Map();
+    signupdata["registrationID"] = loginData["user_id"].toString();
+    signupdata["transactionID"] = loginData["user_id"].toString();
+    signupdata["description"] =
+        "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    signupdata["data"] = loginData;
+    String trackValue;
+    try {
+      String trackValue = await webengage_platform.invokeMethod(
+          'webEngageEventLogin', signupdata);
+      print("<<<<<<<<<<web engage user login event>>>>>>>");
+      print(trackValue);
+    } catch (e) {
+      print("<<<<<<<<<<web engage user login event>>>>>>>");
+      print(e);
+    }
+    return trackValue;
   }
 
   Future<String> trackAndSetBranchUserIdentity(String userId) async {
