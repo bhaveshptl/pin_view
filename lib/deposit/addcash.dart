@@ -19,6 +19,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/deposit/paymentmode.dart';
 import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -125,6 +126,11 @@ class AddCashState extends State<AddCash> {
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
     }
+
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "ADDCASH_PAGE_VISITED";
+    eventdata["priority"] = "true";
+    AnalyticsManager.webengageTrackEvent(eventdata);
   }
 
   initWebview() {
@@ -1017,6 +1023,17 @@ class AddCashState extends State<AddCash> {
   }
 
   proceedToPaymentMode(int amount) async {
+
+    Map<dynamic, dynamic> eventdata = new Map();
+    Map<dynamic, dynamic> addcashPageData = new Map();
+    addcashPageData["user_selected_amount"]=amount.toString();
+    addcashPageData["promoCode"]=promoController.text;
+    addcashPageData["channelId"]=AppConfig.of(context).channelId;
+    addcashPageData["Repeat_Transaction"]=bRepeatTransaction;
+    eventdata["eventName"] = "PROCEED_TO_PAYMENTMODE";
+    eventdata["data"] = addcashPageData;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+
     showLoader(true);
 
     http.Request req = http.Request(
@@ -1145,6 +1162,12 @@ class AddCashState extends State<AddCash> {
     });
 
     showLoader(true);
+
+    /*Web Engage  Event*/
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
+    eventdata["data"] = payload;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
 
     if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(

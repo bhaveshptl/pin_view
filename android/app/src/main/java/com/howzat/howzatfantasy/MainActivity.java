@@ -460,9 +460,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private String webengageTrackEvent(Map<String, Object> arguments){
         /*Track Event without any Attributes*/
-        String eventName=(String)arguments.get("eventName");
-        boolean priority=false;
-        priority=(boolean)arguments.get("priority");
+        System.out.print((String)arguments.get("eventName"));
+        String eventName=""+(String)arguments.get("eventName");
+        boolean priority=true;
         weAnalytics.track(eventName,new Analytics.Options().setHighReportingPriority(priority));
         return "Event "+eventName+ "" +" added";
     }
@@ -470,14 +470,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private String trackEventsWithAttributes(Map<String, Object> arguments){
         /*Track Event with  Attributes*/
         String eventName=(String)arguments.get("eventName");
-        boolean priority=(boolean)arguments.get("priority");
+        boolean priority=true;
         Map<String, Object> addedAttributes = new HashMap<>();
         addedAttributes=(Map)arguments.get("data");
         weAnalytics.track(eventName,addedAttributes,new Analytics.Options().setHighReportingPriority(priority));
         return "Event "+eventName+ "" +"added";
     }
-
-
 
     private String webEngageEventSigniup(Map<String, Object> arguments) {
 
@@ -504,6 +502,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
         }
         weAnalytics.track("COMPLETE_LOGIN", addCustomDataProperty);
+
+        String loginType = (String)arguments.get("loginType");
+        System.out.print(loginType);
+        Map<String, Object> loginTypeAttribute = new HashMap<>();
+        loginTypeAttribute.put("trackingType",loginType);
+        loginTypeAttribute.put("value",loginType);
+        webengageCustomAttributeTrackUser(loginTypeAttribute);
         return "Web engage Login Track event added";
 
     }

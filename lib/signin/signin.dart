@@ -21,6 +21,7 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class SignInPage extends StatefulWidget {
   SignInPage();
@@ -39,6 +40,7 @@ class SignInPageState extends State<SignInPage> {
   List<dynamic> _languages;
   String _installReferring_link = "";
   String _pfRefCode;
+  String _userSelectedLoginType="";
   bool bUpdateAppConfirmationShown = false;
   Map<dynamic, dynamic> androidDeviceInfoMap;
 
@@ -145,6 +147,13 @@ class SignInPageState extends State<SignInPage> {
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
+  bool isNumeric(String s) {
+  if(s == null) {
+    return false;
+  }
+  return double.parse(s, (e) => null) != null;
+}
+
   updateStringTable(Map<String, dynamic> language) async {
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.UPDATE_LANGUAGE_TABLE));
@@ -181,6 +190,11 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
+    if(!isNumeric(_authName)){
+     _userSelectedLoginType="FORM_EMAIL";
+    }else{
+      _userSelectedLoginType="FORM_MOBILE";
+    }
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
@@ -262,6 +276,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doGoogleLogin(BuildContext context) async {
+    _userSelectedLoginType="GOOGLE";
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
       scopes: [
@@ -287,6 +302,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doFacebookLogin(BuildContext context) async {
+    _userSelectedLoginType="FACEBOOK";
     showLoader(true);
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
@@ -407,11 +423,54 @@ class SignInPageState extends State<SignInPage> {
   }
 
   onLoginAuthenticate(Map<String, dynamic> loginData) {
+    print("<<<<<<<<<Login Data>>>>>>>>>");
     print(loginData);
+
+    
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
     webEngageUserLogin(loginData["user_id"].toString(), loginData);
+    
+    // if(loginData["email_id"] != null){
+    // Map<dynamic, dynamic> eventdata = new Map();
+    // eventdata["trackType"] = "setEmail";
+    // eventdata["value"] = loginData["email_id"];
+    // AnalyticsManager.webengageTrackUser(eventdata);
+    // }
+
+    // if(loginData["mobile"] != null){
+    //   print("<<<<<<<<<Login Data 1>>>>>>>>>");
+    // Map<dynamic, dynamic> eventdata = new Map();
+    // eventdata["trackType"] = "setPhoneNumber";
+    // eventdata["value"] = loginData["mobile"];
+    // AnalyticsManager.webengageTrackUser(eventdata);
+    // }
+
+    // if(loginData["first_name"] != null){
+    //   print("<<<<<<<<<Login Data 2>>>>>>>>>");
+    // Map<dynamic, dynamic> eventdata = new Map();
+    // eventdata["trackType"] = "setFirstName";
+    // eventdata["value"] = loginData["first_name"].toString();
+    // AnalyticsManager.webengageTrackUser(eventdata);
+    // }
+
+    // if(loginData["last_name"] != null){
+    //   print("<<<<<<<<<Login Data 3>>>>>>>>>");
+    // Map<dynamic, dynamic> eventdata = new Map();
+    // eventdata["trackType"] = "setLastName";
+    // eventdata["value"] = loginData["last_name"].toString();
+    // AnalyticsManager.webengageTrackUser(eventdata);
+    //}
+
+
+    // Map<dynamic, dynamic> usernameData = new Map();
+    // usernameData["trackType"] = "login_name";
+    // usernameData["value"] = loginData["login_name:"];
+    // AnalyticsManager.webengageCustomAttributeTrackUser(usernameData);
+
+    
   }
 
+  
   Future<String> webEngageUserLogin(
       String userId, Map<String, dynamic> loginData) async {
     String result = "";
@@ -425,16 +484,19 @@ class SignInPageState extends State<SignInPage> {
       print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage login>>>>>>>>>>>>>>>>>>>>");
       print(result);
       webEngageEventLogin(loginData);
+
     } catch (e) {
       print(e);
     }
     return "";
   }
 
+
   Future<String> webEngageEventLogin(Map<String, dynamic> loginData) async {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"].toString();
     signupdata["transactionID"] = loginData["user_id"].toString();
+    signupdata["loginType"] = _userSelectedLoginType;
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
     signupdata["data"] = loginData;

@@ -19,6 +19,7 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -433,9 +434,17 @@ class SignupState extends State<Signup> {
   }
 
   onLoginAuthenticate(Map<String, dynamic> loginData) {
+    print("<<<<<<<<Signupdata Data>>>>>>>");
+    print(loginData);
+
     branchLifecycleEventSigniup(loginData);
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
     webEngageUserLogin(loginData["user_id"].toString(), loginData);
+
+    Map<dynamic, dynamic> usernameData = new Map();
+    usernameData["trackType"] = "login_name";
+    usernameData["value"] = loginData["login_name:"];
+    AnalyticsManager.webengageCustomAttributeTrackUser(usernameData);
   }
 
   Future<String> webEngageUserLogin(
