@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 
@@ -28,6 +29,8 @@ RouteLauncher routeLauncher = new RouteLauncher();
 class RouteLauncher {
   RouteLauncher._internal();
   factory RouteLauncher() => RouteLauncher._internal();
+  MethodChannel browserLaunchChannel =
+      const MethodChannel('com.algorin.pf.browser');
 
   showLoader(context, bool bShow) {
     AppConfig.of(context).store.dispatch(
@@ -133,6 +136,10 @@ class RouteLauncher {
         break;
       case "UPDATE":
         _performUpdateCheck(context, onComplete: onComplete);
+        break;
+      case "RUMMY":
+        browserLaunchChannel.invokeMethod(
+            "launchInBrowser", "https://ei3k.app.link/howzat");
         break;
       default:
     }
