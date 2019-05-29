@@ -666,6 +666,11 @@ extension AppDelegate : MessagingDelegate {
         Messaging.messaging().subscribe(toTopic: "news") { error in
             print("Subscribed to news topic")
         }
+        
+        Messaging.messaging().subscribe(toTopic: "ios_news") { error in
+            print("Subscribed to ios_news topic")
+        }
+        
     }
     func messaging(_ messaging: Messaging, didReceive remoteMessage: MessagingRemoteMessage) {
         print("Received data message: \(remoteMessage.appData)")
