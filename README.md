@@ -3,6 +3,11 @@ flutter run
 # To give signup build
 flutter build apk --release
 
+#local.properties
+flutter.channelId=10
+flutter.buildType=prod
+
+
 ####################################################
 ##################  Native code  ###################
 #################################################### 

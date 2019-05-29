@@ -37,6 +37,8 @@ class AppDrawerState extends State<AppDrawer> {
 
   MethodChannel browserLaunchChannel =
       const MethodChannel('com.algorin.pf.browser');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');    
 
   @override
   void initState() {
@@ -85,8 +87,33 @@ class AppDrawerState extends State<AppDrawer> {
     http.Client().get(
       BaseUrl().apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {});
+    ).then((http.Response res) {
+      print(res);
+      webEngageEventLogout();
+    });
   }
+
+
+  Future<String> webEngageEventLogout() async {
+    String result ="";
+    Map<dynamic, dynamic> data = new Map();
+    data["trackingType"] = "logout";
+    data["value"] = "";
+    try {
+      result = await webengage_platform.invokeMethod(
+          'webengageTrackUser', data);
+
+          print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage logout>>>>>>>>>>>>>>>>>>>>");
+          print(result);
+       
+          
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+
 
   _onVerify() {
     Navigator.of(context).push(

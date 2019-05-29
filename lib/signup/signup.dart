@@ -42,6 +42,8 @@ class SignupState extends State<Signup> {
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -216,44 +218,43 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
     }
     _payload["password"] = _password;
-      _payload["context"] = {
-        "refCode": _referralCodeController.text,
-        "channel_id": HttpManager.channelId,
-        "deviceId": _deviceId,
-        "model": model,
-        "manufacturer": manufacturer,
-        "googleaddid": googleAddId,
-        "serial": serial,
-        "branchinstallReferringlink": _installReferring_link,
-        "app_version_flutter": app_version_flutter
-      };
-      if (_installReferring_link.length > 0) {
-        var uri = Uri.parse(_installReferring_link);
-        uri.queryParameters.forEach((k, v) {
-          try {
-            _payload["context"][k] = v;
-          } catch (e) {
-            print(e);
-          }
-        });
-      }
+    _payload["context"] = {
+      "refCode": _referralCodeController.text,
+      "channel_id": HttpManager.channelId,
+      "deviceId": _deviceId,
+      "model": model,
+      "manufacturer": manufacturer,
+      "googleaddid": googleAddId,
+      "serial": serial,
+      "branchinstallReferringlink": _installReferring_link,
+      "app_version_flutter": app_version_flutter
+    };
+    if (_installReferring_link.length > 0) {
+      var uri = Uri.parse(_installReferring_link);
+      uri.queryParameters.forEach((k, v) {
+        try {
+          _payload["context"][k] = v;
+        } catch (e) {
+          print(e);
+        }
+      });
+    }
 
-      try {
-        _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
-        _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
-        _payload["context"]["network_operator"] =
-            androidDeviceInfoMap["network_operator"];
-        _payload["context"]["firstInstallTime"] =
-            androidDeviceInfoMap["firstInstallTime"];
-        _payload["context"]["lastUpdateTime"] =
-            androidDeviceInfoMap["lastUpdateTime"];
-        _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
-        _payload["context"]["network_type"] =
-            androidDeviceInfoMap["network_type"];
-        _payload["context"]["googleEmailList"] =
-            json.encode(androidDeviceInfoMap["googleEmailList"]);
-      } catch (e) {}
-    
+    try {
+      _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
+      _payload["context"]["network_operator"] =
+          androidDeviceInfoMap["network_operator"];
+      _payload["context"]["firstInstallTime"] =
+          androidDeviceInfoMap["firstInstallTime"];
+      _payload["context"]["lastUpdateTime"] =
+          androidDeviceInfoMap["lastUpdateTime"];
+      _payload["context"]["device_ip_"] = androidDeviceInfoMap["device_ip_"];
+      _payload["context"]["network_type"] =
+          androidDeviceInfoMap["network_type"];
+      _payload["context"]["googleEmailList"] =
+          json.encode(androidDeviceInfoMap["googleEmailList"]);
+    } catch (e) {}
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
@@ -434,6 +435,50 @@ class SignupState extends State<Signup> {
   onLoginAuthenticate(Map<String, dynamic> loginData) {
     branchLifecycleEventSigniup(loginData);
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+    webEngageUserLogin(loginData["user_id"].toString(), loginData);
+  }
+
+  Future<String> webEngageUserLogin(
+      String userId, Map<String, dynamic> loginData) async {
+    String result = "";
+    Map<dynamic, dynamic> data = new Map();
+    data["trackingType"] = "login";
+    data["value"] = userId;
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
+      webEngageEventSigniup(loginData);
+
+      print("Web engage>>>>>>>>>>>>>>>");
+      print(result);
+    } catch (e) {
+      print("Web engage>>>>>>>>>>>>>>>");
+
+      print(e);
+    }
+    return "";
+  }
+
+  Future<String> webEngageEventSigniup(Map<String, dynamic> loginData) async {
+    Map<dynamic, dynamic> signupdata = new Map();
+    signupdata["registrationID"] = loginData["user_id"].toString();
+    signupdata["transactionID"] = loginData["user_id"].toString();
+    signupdata["description"] =
+        "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    signupdata["data"] = loginData;
+    String trackValue;
+    try {
+      String trackValue = await webengage_platform.invokeMethod(
+          'webEngageEventSigniup', signupdata);
+      print("Web engage>>>>>>>>>>>>>>>");
+
+      print(trackValue);
+    } catch (e) {
+      print("Web engage>>>>>>>>>>>>>>>");
+
+      print(e);
+    }
+    return trackValue;
   }
 
   Future<String> trackAndSetBranchUserIdentity(String userId) async {
@@ -452,7 +497,8 @@ class SignupState extends State<Signup> {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"].toString();
     signupdata["transactionID"] = loginData["user_id"].toString();
-    signupdata["description"] = "CHANNEL"+loginData["channelId"].toString()+"SIGNUP";
+    signupdata["description"] =
+        "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
     signupdata["data"] = loginData;
     String trackValue;
     try {

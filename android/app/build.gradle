@@ -226,6 +226,8 @@ dependencies {
     implementation 'com.razorpay:checkout:1.4.9'
     implementation 'com.google.firebase:firebase-messaging:17.4.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation 'com.webengage:android-sdk:3.+'
+    implementation 'com.google.android.gms:play-services-ads:15.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
