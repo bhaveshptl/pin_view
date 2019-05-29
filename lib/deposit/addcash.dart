@@ -38,6 +38,7 @@ class AddCashState extends State<AddCash> {
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
   bool bRepeatTransaction = true;
+  bool isIos=false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -121,7 +122,8 @@ class AddCashState extends State<AddCash> {
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
-        initRazorpayNativePlugin();  
+        initRazorpayNativePlugin();
+        isIos=true;  
     }
   }
 
@@ -363,7 +365,7 @@ class AddCashState extends State<AddCash> {
                           style: TextStyle(
                             fontSize: Theme.of(context)
                                 .primaryTextTheme
-                                .display1
+                                .subhead //subhead
                                 .fontSize,
                           ),
                         ),
@@ -440,7 +442,7 @@ class AddCashState extends State<AddCash> {
                                     : "No Bonus"),
                                 style: Theme.of(context)
                                     .primaryTextTheme
-                                    .subhead
+                                    .body1 //body1
                                     .copyWith(
                                       color: (amount >=
                                                   widget
