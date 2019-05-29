@@ -756,6 +756,7 @@ class AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                 Divider(height: 2.0),
+                isIos?Container():
                 ListTile(
                   title: Text('Check For Update'),
                   onTap: () {

@@ -6,21 +6,24 @@ import UIKit;
 
 class SocialShare{
     
-    static func shareViaWhatsApp(msg:String){
+    static func shareViaWhatsApp(msg:String)-> Bool{
         let msg = msg
         let urlWhats = "whatsapp://send?text=\(msg)";
+        var isOpened=false;
         if let urlString = urlWhats.addingPercentEncoding(withAllowedCharacters: NSCharacterSet.urlQueryAllowed) {
             if let whatsappURL = NSURL(string: urlString) {
                 
                 if UIApplication.shared.canOpenURL(whatsappURL as URL) {
                      //UIApplication.shared.openURL(whatsappURL as URL)
                     UIApplication.shared.open(whatsappURL as URL)
+                    isOpened=true;
                     
                 } else {
-                    // Cannot open whatsapp
+                    isOpened=false;
                 }
             }
         }
+        return isOpened;
     }
     
     static func shareText(viewController: UIViewController!,msg:String){

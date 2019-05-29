@@ -146,6 +146,7 @@ class EarnCashState extends State<EarnCash> {
       value = await social_share_platform.invokeMethod('shareViaWhatsApp', msg);
     } catch (e) {
       print(e);
+      _shareNowIOS(msg);
     }
     return value;
   }

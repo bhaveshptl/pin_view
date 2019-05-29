@@ -368,10 +368,13 @@ class AddCashState extends State<AddCash> {
                         child: Text(
                           strings.rupee + amount.toString(),
                           style: TextStyle(
-                            fontSize: Theme.of(context)
+                            fontSize:isIos? Theme.of(context)
                                 .primaryTextTheme
-                                .subhead //subhead
-                                .fontSize,
+                                .subhead 
+                                .fontSize : Theme.of(context)
+                                .primaryTextTheme
+                                .display1 
+                                .fontSize
                           ),
                         ),
                       ),
@@ -445,9 +448,26 @@ class AddCashState extends State<AddCash> {
                                         getFirstDepositBonusAmount(amount) +
                                         " Bonus")
                                     : "No Bonus"),
-                                style: Theme.of(context)
+                                style:isIos? Theme.of(context)
                                     .primaryTextTheme
-                                    .body1 //body1
+                                    .body1 
+                                    .copyWith(
+                                      color: (amount >=
+                                                  widget
+                                                      .depositData
+                                                      .chooseAmountData
+                                                      .bonusArray[0]["min"] &&
+                                              amount <=
+                                                  widget
+                                                      .depositData
+                                                      .chooseAmountData
+                                                      .bonusArray[0]["max"])
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ):Theme.of(context)
+                                    .primaryTextTheme
+                                    .subhead 
                                     .copyWith(
                                       color: (amount >=
                                                   widget
