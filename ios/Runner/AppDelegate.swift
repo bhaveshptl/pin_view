@@ -23,6 +23,7 @@ import Firebase
     private var PF_FCM_CHANNEL:FlutterMethodChannel!;
     private var WEBENGAGE_CHANNEL:FlutterMethodChannel!;
     private var SOCIAL_SHARE_CHANNEL:FlutterMethodChannel!;
+    private var BROWSER_LAUNCH_CHANNEL:FlutterMethodChannel!;
     private var razorpay_result: FlutterResult!
     private var device_info_result: FlutterResult!
     private var bBranchLodead:Bool = false;
@@ -237,7 +238,33 @@ import Firebase
                 }
                 
             })
-        })
+        });
+
+        BROWSER_LAUNCH_CHANNEL.setMethodCallHandler({
+            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
+            self.RAZORPAY_IO_CHANNEL.setMethodCallHandler({
+                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
+                if(call.method == "launchInBrowser"){
+                    let weburl=call.arguments as? String;
+                    guard let url = URL(string: weburl!) else {
+                   return //be safe
+                     }
+
+          if #available(iOS 10.0, *) {
+                   UIApplication.shared.open(url, options: [:], completionHandler: nil)
+           } else {
+                 UIApplication.shared.openURL(url)
+              }
+                    result("Broser Opened");
+                }
+                else{
+                    result(FlutterMethodNotImplemented)
+                }
+                
+            })
+        });
+
+        
         
         WEBENGAGE_CHANNEL.setMethodCallHandler({
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
