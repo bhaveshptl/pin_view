@@ -19,6 +19,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/deposit/paymentmode.dart';
 import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -55,6 +56,8 @@ class AddCashState extends State<AddCash> {
       const MethodChannel('com.algorin.pf.razorpay');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
   static const _kFontFam = 'MyFlutterApp';
   IconData gift_1 = const IconData(0xe800, fontFamily: _kFontFam);
 
@@ -125,6 +128,11 @@ class AddCashState extends State<AddCash> {
         initRazorpayNativePlugin();
         isIos=true;  
     }
+
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "ADDCASH_PAGE_VISITED";
+    eventdata["priority"] = "true";
+    AnalyticsManager.webengageTrackEvent(eventdata);
   }
 
   initWebview() {
@@ -160,15 +168,14 @@ class AddCashState extends State<AddCash> {
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
-    
     Map<dynamic, dynamic> value = new Map();
     try {
       value =
           await razorpay_platform.invokeMethod('_openRazorpayNative', payload);
-          showLoader(false);
+      showLoader(false);
       if (Platform.isIOS) {
-        processSuccessResponse(value);  
-      }    
+        processSuccessResponse(value);
+      }
     } catch (e) {
       showLoader(false);
     }
@@ -176,16 +183,12 @@ class AddCashState extends State<AddCash> {
   }
 
   Future<String> initRazorpayNativePlugin() async {
-      String value = "";
+    String value = "";
     try {
-      value =
-          await razorpay_platform.invokeMethod('initRazorpayNativePlugin');
-          
+      value = await razorpay_platform.invokeMethod('initRazorpayNativePlugin');
     } catch (e) {}
     return "";
   }
-
-  
 
   Future<dynamic> myUtilsHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
@@ -229,9 +232,11 @@ class AddCashState extends State<AddCash> {
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
         }
       } else {
         branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
       }
     });
@@ -1020,6 +1025,17 @@ class AddCashState extends State<AddCash> {
   }
 
   proceedToPaymentMode(int amount) async {
+
+    Map<dynamic, dynamic> eventdata = new Map();
+    Map<dynamic, dynamic> addcashPageData = new Map();
+    addcashPageData["user_selected_amount"]=amount.toString();
+    addcashPageData["promoCode"]=promoController.text;
+    addcashPageData["channelId"]=AppConfig.of(context).channelId;
+    addcashPageData["Repeat_Transaction"]=bRepeatTransaction;
+    eventdata["eventName"] = "PROCEED_TO_PAYMENTMODE";
+    eventdata["data"] = addcashPageData;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+
     showLoader(true);
 
     http.Request req = http.Request(
@@ -1149,6 +1165,12 @@ class AddCashState extends State<AddCash> {
 
     showLoader(true);
 
+    /*Web Engage  Event*/
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
+    eventdata["data"] = payload;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+
     if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
@@ -1211,6 +1233,7 @@ class AddCashState extends State<AddCash> {
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
         }
       } else {
         branchEventTransactionSuccess(response);
@@ -1272,6 +1295,63 @@ class AddCashState extends State<AddCash> {
     try {
       String trackStatus = await branch_io_platform.invokeMethod(
           'branchEventTransactionSuccess', trackdata);
+    } catch (e) {}
+    return trackStatus;
+  }
+
+  Future<String> webengageEventTransactionFailed(
+      Map<String, dynamic> transactionData) async {
+    Map<dynamic, dynamic> trackdata = new Map();
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionData["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString();
+    String timeinString = date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
+    trackdata["txnDate"] = dateinString;
+    trackdata["txnTime"] = timeinString;
+    trackdata["txnId"] = transactionData["txnId"];
+    trackdata["appPage"] = "AddCashPage";
+    trackdata["data"] = transactionData;
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
+    String trackStatus;
+    try {
+      String trackStatus = await webengage_platform.invokeMethod(
+          'webEngageTransactionFailed', trackdata);
+    } catch (e) {}
+    return trackStatus;
+  }
+
+  Future<String> webengageEventTransactionSuccess(
+      Map<String, dynamic> transactionData) async {
+    Map<dynamic, dynamic> trackdata = new Map();
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(transactionData["date"].toString()));
+    String dateinString = date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString();
+    String timeinString = date.hour.toString() +
+        ":" +
+        date.minute.toString() +
+        ":" +
+        date.second.toString();
+    trackdata["txnDate"] = dateinString;
+    trackdata["txnTime"] = timeinString;
+    trackdata["appPage"] = "AddCashPage";
+    trackdata["data"] = transactionData;
+    trackdata["firstDepositor"] = transactionData["firstDepositor"];
+    String trackStatus;
+    try {
+      String trackStatus = await webengage_platform.invokeMethod(
+          'webEngageTransactionSuccess', trackdata);
     } catch (e) {}
     return trackStatus;
   }

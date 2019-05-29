@@ -21,6 +21,7 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class SignInPage extends StatefulWidget {
   SignInPage();
@@ -39,6 +40,7 @@ class SignInPageState extends State<SignInPage> {
   List<dynamic> _languages;
   String _installReferring_link = "";
   String _pfRefCode;
+  String _userSelectedLoginType="";
   bool bUpdateAppConfirmationShown = false;
   Map<dynamic, dynamic> androidDeviceInfoMap;
 
@@ -50,6 +52,8 @@ class SignInPageState extends State<SignInPage> {
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
   static const IconData gplus_squared =
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
@@ -143,6 +147,13 @@ class SignInPageState extends State<SignInPage> {
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
+  bool isNumeric(String s) {
+  if(s == null) {
+    return false;
+  }
+  return double.parse(s, (e) => null) != null;
+}
+
   updateStringTable(Map<String, dynamic> language) async {
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.UPDATE_LANGUAGE_TABLE));
@@ -179,6 +190,11 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
+    if(!isNumeric(_authName)){
+     _userSelectedLoginType="FORM_EMAIL";
+    }else{
+      _userSelectedLoginType="FORM_MOBILE";
+    }
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String app_version_flutter = packageInfo.version;
@@ -260,6 +276,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doGoogleLogin(BuildContext context) async {
+    _userSelectedLoginType="GOOGLE";
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
       scopes: [
@@ -285,6 +302,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doFacebookLogin(BuildContext context) async {
+    _userSelectedLoginType="FACEBOOK";
     showLoader(true);
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
@@ -405,9 +423,53 @@ class SignInPageState extends State<SignInPage> {
   }
 
   onLoginAuthenticate(Map<String, dynamic> loginData) {
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>on Login Auth>>>>>>>>>>>>>>>>>>>>");
+    print("<<<<<<<<<Login Data>>>>>>>>>");
     print(loginData);
     trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+    webEngageUserLogin(loginData["user_id"].toString(), loginData);
+  }
+
+  
+  Future<String> webEngageUserLogin(
+      String userId, Map<String, dynamic> loginData) async {
+    String result = "";
+    Map<dynamic, dynamic> data = new Map();
+    data["trackingType"] = "login";
+    data["value"] = userId;
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
+
+      print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage login>>>>>>>>>>>>>>>>>>>>");
+      print(result);
+      webEngageEventLogin(loginData);
+
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+
+  Future<String> webEngageEventLogin(Map<String, dynamic> loginData) async {
+    Map<dynamic, dynamic> signupdata = new Map();
+    signupdata["registrationID"] = loginData["user_id"].toString();
+    signupdata["transactionID"] = loginData["user_id"].toString();
+    signupdata["loginType"] = _userSelectedLoginType;
+    signupdata["description"] =
+        "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    signupdata["data"] = loginData;
+    String trackValue;
+    try {
+      String trackValue = await webengage_platform.invokeMethod(
+          'webEngageEventLogin', signupdata);
+      print("<<<<<<<<<<web engage user login event>>>>>>>");
+      print(trackValue);
+    } catch (e) {
+      print("<<<<<<<<<<web engage user login event>>>>>>>");
+      print(e);
+    }
+    return trackValue;
   }
 
   Future<String> trackAndSetBranchUserIdentity(String userId) async {

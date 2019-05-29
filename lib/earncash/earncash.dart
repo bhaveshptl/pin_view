@@ -539,25 +539,25 @@ class EarnCashState extends State<EarnCash> {
                         //     ],
                         //   ),
                         // ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Text(
-                                  "That's it!  You get ₹$refAAmount and your friend gets ₹$refBAmount when both of you have verified your mobile numbers.",
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .body2
-                                      .copyWith(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
+                        // Padding(
+                        //   padding: EdgeInsets.only(top: 8.0),
+                        //   child: Row(
+                        //     children: <Widget>[
+                        //       Expanded(
+                        //         child: Text(
+                        //           "That's it!  You get ₹$refAAmount and your friend gets ₹$refBAmount when both of you have verified your mobile numbers.",
+                        //           style: Theme.of(context)
+                        //               .primaryTextTheme
+                        //               .body2
+                        //               .copyWith(
+                        //                 color: Colors.black87,
+                        //                 fontWeight: FontWeight.w500,
+                        //               ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // )
                       ],
                     ),
                   ),

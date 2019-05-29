@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-
+import 'package:flutter/services.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/signin/signin.dart';
@@ -37,6 +37,8 @@ class AppDrawerState extends State<AppDrawer> {
 
   MethodChannel browserLaunchChannel =
       const MethodChannel('com.algorin.pf.browser');
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');    
 
   @override
   void initState() {
@@ -85,8 +87,33 @@ class AppDrawerState extends State<AppDrawer> {
     http.Client().get(
       BaseUrl().apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
-    ).then((http.Response res) {});
+    ).then((http.Response res) {
+      print(res);
+      webEngageEventLogout();
+    });
   }
+
+
+  Future<String> webEngageEventLogout() async {
+    String result ="";
+    Map<dynamic, dynamic> data = new Map();
+    data["trackingType"] = "logout";
+    data["value"] = "";
+    try {
+      result = await webengage_platform.invokeMethod(
+          'webengageTrackUser', data);
+
+          print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage logout>>>>>>>>>>>>>>>>>>>>");
+          print(result);
+       
+          
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+
 
   _onVerify() {
     Navigator.of(context).push(
