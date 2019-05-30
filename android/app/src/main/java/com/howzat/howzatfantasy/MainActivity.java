@@ -426,10 +426,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 weUser.setBirthDate(arguments.get("value"));
                 return "Birth Day track added";
             case "setPhoneNumber":
-                weUser.setPhoneNumber("+551155256325");
+                weUser.setPhoneNumber(arguments.get("value"));
                 return "Phone Number track added";
             case "setFirstName":
-                weUser.setPhoneNumber(arguments.get("value"));
+                weUser.setFirstName(arguments.get("value"));
                 return "Login Track added";
             case "setGender":
                 String gendel=arguments.get("value");
@@ -460,9 +460,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private String webengageTrackEvent(Map<String, Object> arguments){
         /*Track Event without any Attributes*/
-        String eventName=(String)arguments.get("eventName");
-        boolean priority=false;
-        priority=(boolean)arguments.get("priority");
+        System.out.print((String)arguments.get("eventName"));
+        String eventName=""+(String)arguments.get("eventName");
+        boolean priority=true;
         weAnalytics.track(eventName,new Analytics.Options().setHighReportingPriority(priority));
         return "Event "+eventName+ "" +" added";
     }
@@ -470,14 +470,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private String trackEventsWithAttributes(Map<String, Object> arguments){
         /*Track Event with  Attributes*/
         String eventName=(String)arguments.get("eventName");
-        boolean priority=(boolean)arguments.get("priority");
+        boolean priority=true;
         Map<String, Object> addedAttributes = new HashMap<>();
         addedAttributes=(Map)arguments.get("data");
         weAnalytics.track(eventName,addedAttributes,new Analytics.Options().setHighReportingPriority(priority));
         return "Event "+eventName+ "" +"added";
     }
-
-
 
     private String webEngageEventSigniup(Map<String, Object> arguments) {
 
@@ -504,6 +502,24 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
         }
         weAnalytics.track("COMPLETE_LOGIN", addCustomDataProperty);
+
+        weUser.setAttribute("loginType", "" + (String)arguments.get("loginType"));
+
+
+        if(data.get("email_id") != null){
+
+            weUser.setEmail((String)data.get("email_id"));
+        }
+        if(data.get("mobile") != null){
+
+            weUser.setPhoneNumber("+91"+(String)data.get("mobile"));
+        }
+        if(data.get("first_name") != null){
+            weUser.setFirstName((String)data.get("first_name"));
+        }
+        if(data.get("last_name") != null){
+            weUser.setLastName((String)data.get("last_name"));
+        }
         return "Web engage Login Track event added";
 
     }

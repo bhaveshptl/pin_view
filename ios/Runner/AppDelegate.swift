@@ -23,6 +23,7 @@ import Firebase
     private var PF_FCM_CHANNEL:FlutterMethodChannel!;
     private var WEBENGAGE_CHANNEL:FlutterMethodChannel!;
     private var SOCIAL_SHARE_CHANNEL:FlutterMethodChannel!;
+    private var BROWSER_LAUNCH_CHANNEL:FlutterMethodChannel!;
     private var razorpay_result: FlutterResult!
     private var device_info_result: FlutterResult!
     private var bBranchLodead:Bool = false;
@@ -44,6 +45,7 @@ import Firebase
         PF_FCM_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.fcm",binaryMessenger: controller)
         WEBENGAGE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.webengage",binaryMessenger: controller)
         SOCIAL_SHARE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.socialshare",binaryMessenger: controller)
+        BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller)
         /* Init Services*/
         initPushNotifications(application);
         initFlutterChannels();
@@ -108,7 +110,7 @@ import Firebase
             if let error = error {
                 print(error);
             } else if let params = params {
-              self.initBranchSession(branchResultData:params as? [String: AnyObject]);
+                self.initBranchSession(branchResultData:params as? [String: AnyObject]);
             }
         }
     }
@@ -120,9 +122,9 @@ import Firebase
                 if let error = error {
                     print(error);
                 } else if let params = params {
-                  object=self.initBranchSession(branchResultData:params as? [String: AnyObject]);
-                 }
-               
+                    object=self.initBranchSession(branchResultData:params as? [String: AnyObject]);
+                }
+                
             }
         }
         result(object);
@@ -142,7 +144,7 @@ import Firebase
         let sessionParams = Branch.getInstance().getLatestReferringParams();
         
         if branchData != nil {
-             print(branchData!);
+            print(branchData!);
             if(branchData!["+clicked_branch_link"] != nil){
                 if(branchData!["+clicked_branch_link"]! as? Int == 1){
                     installReferring_link0=branchData!["~referring_link"]! as? String ?? "";
@@ -191,7 +193,7 @@ import Firebase
             
         } else if (installReferring_link1 != "") {
             installReferring_link = installReferring_link1;
-           
+            
         } else if (installReferring_link2 != "") {
             installReferring_link = installReferring_link2;
         }
@@ -230,15 +232,41 @@ import Firebase
                         let product_image = razorpayInitArgue!["image"] as? String;
                         self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
                     }
-                   
+                    
                 }
                 else{
                     result(FlutterMethodNotImplemented)
                 }
                 
             })
-        })
+        });
         
+        BROWSER_LAUNCH_CHANNEL.setMethodCallHandler({
+            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
+            self.BROWSER_LAUNCH_CHANNEL.setMethodCallHandler({
+                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
+                if(call.method == "launchInBrowser"){
+                    let weburl=call.arguments as? String;
+                    guard let url = URL(string: weburl!) else {
+                        result(FlutterMethodNotImplemented)
+                        return //be safe
+                    }
+                    
+                    if #available(iOS 10.0, *) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        UIApplication.shared.openURL(url)
+                    }
+                    result("Broser Opened");
+                }
+                else{
+                    result(FlutterMethodNotImplemented)
+                }
+                
+            })
+        });
+        
+    
         WEBENGAGE_CHANNEL.setMethodCallHandler({
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
             self.WEBENGAGE_CHANNEL.setMethodCallHandler({
@@ -388,7 +416,7 @@ import Firebase
                     let topic=call.arguments as? String;
                     var  channelResult:String = "";
                     if(topic != nil){
-                      channelResult=self!.subscribeToFirebaseTopic(topicName:topic!);
+                        channelResult=self!.subscribeToFirebaseTopic(topicName:topic!);
                     }
                     result(channelResult)
                 }
@@ -407,12 +435,19 @@ import Firebase
                     result("Social Share");
                 }
                 if(call.method == "shareViaWhatsApp"){
-                    SocialShare.shareViaWhatsApp(msg:call.arguments as! String);
-                     result("Social Share");
+                    let isWhatsAppOpened:Bool = SocialShare.shareViaWhatsApp(msg:call.arguments as! String);
+                    if(isWhatsAppOpened){
+                        result("Social Share");
+                    }
+                    else{
+                        result(FlutterError(code: "0",message: "Failed to open WhatsApp",
+                                                         details: nil));
+                    }
+                    
                 }
                 if(call.method == "shareText"){
                     SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
-                     result("Social Share");
+                    result("Social Share");
                 }
                 else{
                     result(FlutterMethodNotImplemented)
@@ -466,7 +501,7 @@ import Firebase
         print(response!);
         var dict : Dictionary = Dictionary<AnyHashable,Any>();
         if(response != nil){
-             dict=response!;
+            dict=response!;
         }
         let razorpay_signature : String = dict["razorpay_signature"] as? String ?? "";
         let razorpay_order_id : String = dict["razorpay_order_id"] as? String ?? "";

@@ -7,6 +7,8 @@ import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:flutter/services.dart';
+
 
 class AnalyticsManager {
   String source;
@@ -19,6 +21,8 @@ class AnalyticsManager {
   static DateTime _lastBatchUploadTime;
   static List<Event> analyticsEvents = [];
   static DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  static const webengage_platform =
+      const MethodChannel('com.algorin.pf.webengage');
 
   AnalyticsManager._internal();
   factory AnalyticsManager() => AnalyticsManager._internal();
@@ -140,4 +144,49 @@ class AnalyticsManager {
   setSource(String source) {
     source = source;
   }
+
+  static Future<String> webengageTrackEvent(Map<dynamic, dynamic> data) async {
+    String result = "";
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageTrackEvent', data);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+  static Future<String> trackEventsWithAttributes(Map<dynamic, dynamic> data) async {
+    String result = "";
+    try {
+      result =
+          await webengage_platform.invokeMethod('trackEventsWithAttributes', data);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+  static Future<String> webengageTrackUser(Map<dynamic, dynamic> data) async {
+    String result = "";
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+  static Future<String> webengageCustomAttributeTrackUser(Map<dynamic, dynamic> data) async {
+    String result = "";
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageCustomAttributeTrackUser', data);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
 }

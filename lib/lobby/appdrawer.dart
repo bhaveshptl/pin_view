@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-
+import 'package:flutter/services.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/signin/signin.dart';
@@ -23,6 +23,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'dart:io';
 
 class AppDrawer extends StatefulWidget {
   @override
@@ -33,6 +34,7 @@ class AppDrawerState extends State<AppDrawer> {
   User _user;
   String cookie;
   bool bIsUserVerified = false;
+  bool isIos =false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   MethodChannel browserLaunchChannel =
@@ -46,6 +48,9 @@ class AppDrawerState extends State<AppDrawer> {
 
     getUserInfo();
     getTempUserObject();
+    if (Platform.isIOS) {
+      isIos=true;
+    }
   }
 
   getUserInfo() async {
@@ -102,18 +107,11 @@ class AppDrawerState extends State<AppDrawer> {
     try {
       result = await webengage_platform.invokeMethod(
           'webengageTrackUser', data);
-
-          print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage logout>>>>>>>>>>>>>>>>>>>>");
-          print(result);
-       
-          
     } catch (e) {
       print(e);
     }
     return "";
   }
-
-
 
   _onVerify() {
     Navigator.of(context).push(
@@ -138,7 +136,13 @@ class AppDrawerState extends State<AppDrawer> {
     switch (name) {
       case "SCORING":
         title = "SCORING SYSTEM";
-        url = BaseUrl().staticPageUrls["SCORING"] + "#ScoringSystem";
+        if(!isIos){
+          url = BaseUrl().staticPageUrls["SCORING"] + "#ScoringSystem";
+        }
+        else{
+          url = BaseUrl().staticPageUrls["SCORING"];
+        }
+        
         break;
       case "HELP":
         title = "HELP";
@@ -164,7 +168,7 @@ class AppDrawerState extends State<AppDrawer> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: url,
+              url: isIos?Uri.encodeFull(url):url,
               clearCache: true,
               appBar: AppBar(
                 title: Text(
@@ -752,6 +756,7 @@ class AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                 Divider(height: 2.0),
+                isIos?Container():
                 ListTile(
                   title: Text('Check For Update'),
                   onTap: () {

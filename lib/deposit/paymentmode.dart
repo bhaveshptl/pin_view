@@ -15,6 +15,7 @@ import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
@@ -61,6 +62,11 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
     }
+    
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "PAYMENTMODE_PAGE_VISITED";
+    eventdata["priority"] = "true";
+    AnalyticsManager.webengageTrackEvent(eventdata);
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
