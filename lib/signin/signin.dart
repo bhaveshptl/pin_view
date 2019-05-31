@@ -782,7 +782,7 @@ class SignInPageState extends State<SignInPage> {
                     ],
                   ),
                   AppConfig.of(context).channelId != '3' &&
-                          AppConfig.of(context).channelId != '10'
+                          AppConfig.of(context).channelId != '10' && AppConfig.of(context).channelId != '13'
                       ? Column(
                           children: <Widget>[
                             Row(

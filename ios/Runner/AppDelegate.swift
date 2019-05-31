@@ -52,7 +52,6 @@ import Firebase
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         
-        
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -232,12 +231,10 @@ import Firebase
                         let product_image = razorpayInitArgue!["image"] as? String;
                         self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
                     }
-                    
                 }
                 else{
                     result(FlutterMethodNotImplemented)
                 }
-                
             })
         });
         
@@ -251,7 +248,6 @@ import Firebase
                         result(FlutterMethodNotImplemented)
                         return //be safe
                     }
-                    
                     if #available(iOS 10.0, *) {
                         UIApplication.shared.open(url, options: [:], completionHandler: nil)
                     } else {
@@ -266,17 +262,39 @@ import Firebase
             })
         });
         
-    
         WEBENGAGE_CHANNEL.setMethodCallHandler({
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
             self.WEBENGAGE_CHANNEL.setMethodCallHandler({
                 [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
+                
+                if(call.method=="webEngageEventSigniup"){
+                    let  channelResult:String=""
+                    result(channelResult);
+                }
+                if(call.method=="webEngageEventLogin"){
+                    let  channelResult:String=""
+                    result(channelResult);
+                }
+                if(call.method=="webEngageTransactionFailed"){
+                    let  channelResult:String=""
+                    result(channelResult);
+                }
+                if(call.method=="webEngageTransactionSuccess"){
+                    let  channelResult:String=""
+                    result(channelResult);
+                }
                 if(call.method == "webengageTrackUser"){
                     let argue = call.arguments as? NSDictionary;
-                    let trackType = argue!["trackType"] as? String;
-                    let value = argue!["value"] as? String;
-                    self?.webengageTrackUser(trackType:trackType!,value:value!);
-                    let  channelResult:String=""
+                    let  channelResult:String="";
+                    if(argue != nil){
+                        let trackType = argue!["trackType"] as? String;
+                        let value = argue!["value"] as? String;
+                        if(trackType != nil ){
+                            if(value != nil){
+                             self?.webengageTrackUser(trackType:trackType!,value:value!);
+                            }
+                        }
+                    }
                     result(channelResult)
                 }
                 else if (call.method == "webengageCustomAttributeTrackUser"){
@@ -441,7 +459,7 @@ import Firebase
                     }
                     else{
                         result(FlutterError(code: "0",message: "Failed to open WhatsApp",
-                                                         details: nil));
+                                            details: nil));
                     }
                     
                 }

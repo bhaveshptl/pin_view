@@ -135,7 +135,7 @@ DEPENDENCIES:
   - Firebase/Messaging
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `.symlinks/flutter/ios-release`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
   - flutter_facebook_login (from `.symlinks/plugins/flutter_facebook_login/ios`)
   - flutter_share_me (from `.symlinks/plugins/flutter_share_me/ios`)
@@ -181,7 +181,7 @@ EXTERNAL SOURCES:
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: ".symlinks/flutter/ios-release"
   flutter_downloader:
     :path: ".symlinks/plugins/flutter_downloader/ios"
   flutter_facebook_login:

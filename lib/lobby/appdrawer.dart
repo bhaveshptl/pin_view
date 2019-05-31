@@ -94,8 +94,9 @@ class AppDrawerState extends State<AppDrawer> {
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       print(res);
-      webEngageEventLogout();
+      
     });
+    webEngageEventLogout();
   }
 
 

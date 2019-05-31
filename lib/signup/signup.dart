@@ -418,6 +418,7 @@ class SignupState extends State<Signup> {
       body: json.encode(_payload),
     )
         .then((http.Response res) {
+          showLoader(false);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
@@ -431,6 +432,7 @@ class SignupState extends State<Signup> {
         });
       }
     });
+    showLoader(false);
   }
 
   onLoginAuthenticate(Map<String, dynamic> loginData) {
