@@ -20,7 +20,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
-
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 class Signup extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new SignupState();
@@ -34,7 +34,7 @@ class SignupState extends State<Signup> {
   String googleAddId = "";
   bool _obscureText = true;
   String _installAndroid_link;
-
+  bool isIos = false;
   bool _bShowReferralInput = false;
   String _installReferring_link = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
@@ -54,13 +54,16 @@ class SignupState extends State<Signup> {
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
       const IconData(0xf308, fontFamily: _kFontFam);
-
+  
   @override
   void initState() {
     super.initState();
 
     getLocalStorageValues();
     getAndroidDeviceInfo().then((String value) {});
+    if (Platform.isIOS) {
+      isIos = true;
+    }
   }
 
   getLocalStorageValues() {
@@ -418,6 +421,7 @@ class SignupState extends State<Signup> {
       body: json.encode(_payload),
     )
         .then((http.Response res) {
+          showLoader(false);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
@@ -431,6 +435,7 @@ class SignupState extends State<Signup> {
         });
       }
     });
+    showLoader(false);
   }
 
   onLoginAuthenticate(Map<String, dynamic> loginData) {
@@ -515,6 +520,27 @@ class SignupState extends State<Signup> {
           'branchLifecycleEventSigniup', signupdata);
     } catch (e) {}
     return trackValue;
+  }
+
+  openTermsAndConditionsPage(){
+    String url = "";
+    String title = "";
+    title = "TERMS AND CONDITIONS";
+    url = BaseUrl().staticPageUrls["TERMS"];
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: isIos ? Uri.encodeFull(url) : url,
+              clearCache: true,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   _launchSignIn() {
@@ -684,7 +710,7 @@ class SignupState extends State<Signup> {
                                                 .title
                                                 .copyWith(
                                                   color: Colors.white,
-                                                  fontWeight: FontWeight.w800,
+                                                  fontWeight: FontWeight.normal,
                                                 ),
                                           ),
                                         ),
@@ -807,7 +833,9 @@ class SignupState extends State<Signup> {
                           decoration: TextDecoration.underline,
                         ),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    openTermsAndConditionsPage();
+                  },
                 )
               ],
             ),
@@ -818,7 +846,7 @@ class SignupState extends State<Signup> {
                 children: <Widget>[
                   Text(
                     "Already a Member? ",
-                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                    style: Theme.of(context).primaryTextTheme.subtitle.copyWith(
                           color: Colors.grey.shade600,
                         ),
                     textAlign: TextAlign.center,
@@ -827,7 +855,7 @@ class SignupState extends State<Signup> {
                     child: Text(
                       " Login Now.",
                       style:
-                          Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          Theme.of(context).primaryTextTheme.title.copyWith(
                                 color: Theme.of(context).primaryColor,
                                 fontWeight: FontWeight.w500,
                                 decoration: TextDecoration.underline,
