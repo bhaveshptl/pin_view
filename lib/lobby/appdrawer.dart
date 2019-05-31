@@ -34,13 +34,13 @@ class AppDrawerState extends State<AppDrawer> {
   User _user;
   String cookie;
   bool bIsUserVerified = false;
-  bool isIos =false;
+  bool isIos = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   MethodChannel browserLaunchChannel =
       const MethodChannel('com.algorin.pf.browser');
   static const webengage_platform =
-      const MethodChannel('com.algorin.pf.webengage');    
+      const MethodChannel('com.algorin.pf.webengage');
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class AppDrawerState extends State<AppDrawer> {
     getUserInfo();
     getTempUserObject();
     if (Platform.isIOS) {
-      isIos=true;
+      isIos = true;
     }
   }
 
@@ -98,15 +98,14 @@ class AppDrawerState extends State<AppDrawer> {
     });
   }
 
-
   Future<String> webEngageEventLogout() async {
-    String result ="";
+    String result = "";
     Map<dynamic, dynamic> data = new Map();
     data["trackingType"] = "logout";
     data["value"] = "";
     try {
-      result = await webengage_platform.invokeMethod(
-          'webengageTrackUser', data);
+      result =
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
     } catch (e) {
       print(e);
     }
@@ -136,13 +135,12 @@ class AppDrawerState extends State<AppDrawer> {
     switch (name) {
       case "SCORING":
         title = "SCORING SYSTEM";
-        if(!isIos){
+        if (!isIos) {
           url = BaseUrl().staticPageUrls["SCORING"] + "#ScoringSystem";
-        }
-        else{
+        } else {
           url = BaseUrl().staticPageUrls["SCORING"];
         }
-        
+
         break;
       case "HELP":
         title = "HELP";
@@ -168,7 +166,7 @@ class AppDrawerState extends State<AppDrawer> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: isIos?Uri.encodeFull(url):url,
+              url: isIos ? Uri.encodeFull(url) : url,
               clearCache: true,
               appBar: AppBar(
                 title: Text(
@@ -658,32 +656,45 @@ class AppDrawerState extends State<AppDrawer> {
             ),
           ),
           Card(
-            color: Theme.of(context).primaryColor,
+            color: Color.fromRGBO(255, 246, 219, 1),
             elevation: 3.0,
-            child: Column(
+            child: Stack(
+              alignment: Alignment.bottomRight,
               children: <Widget>[
-                ListTile(
-                  leading: Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Image.asset("images/junglee.png"),
-                  ),
-                  title: Text(
-                    'JUNGLEE RUMMY',
-                    style: Theme.of(context).primaryTextTheme.headline.copyWith(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  subtitle: Text(
-                    "India's Most Trusted Rummy Site",
-                    style: Theme.of(context).primaryTextTheme.body1.copyWith(
-                          color: Colors.white,
-                        ),
-                  ),
-                  onTap: () {
-                    browserLaunchChannel.invokeMethod(
-                        "launchInBrowser", "https://ei3k.app.link/howzat");
-                  },
+                Column(
+                  children: <Widget>[
+                    ListTile(
+                      leading: Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: Image.asset("images/junglee.png"),
+                      ),
+                      title: Text(
+                        'Junglee Rummy',
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .headline
+                            .copyWith(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      subtitle: Text(
+                        "India's Most Trusted Rummy Site",
+                        style:
+                            Theme.of(context).primaryTextTheme.body1.copyWith(
+                                  color: Colors.black,
+                                ),
+                      ),
+                      onTap: () {
+                        browserLaunchChannel.invokeMethod(
+                            "launchInBrowser", "https://ei3k.app.link/howzat");
+                      },
+                    ),
+                  ],
+                ),
+                Image.asset(
+                  "images/new.png",
+                  height: 64.0,
                 ),
               ],
             ),
@@ -756,13 +767,14 @@ class AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                 Divider(height: 2.0),
-                isIos?Container():
-                ListTile(
-                  title: Text('Check For Update'),
-                  onTap: () {
-                    _performUpdateCheck();
-                  },
-                ),
+                isIos
+                    ? Container()
+                    : ListTile(
+                        title: Text('Check For Update'),
+                        onTap: () {
+                          _performUpdateCheck();
+                        },
+                      ),
                 Divider(height: 2.0),
                 BaseUrl().staticPageUrls["BLOG"] != null
                     ? Column(
