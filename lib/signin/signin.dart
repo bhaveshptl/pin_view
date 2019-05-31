@@ -654,7 +654,7 @@ class SignInPageState extends State<SignInPage> {
                                       .title
                                       .copyWith(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w700,
+                                        fontWeight: FontWeight.normal,
                                       ),
                                 ),
                               ),
@@ -756,7 +756,7 @@ class SignInPageState extends State<SignInPage> {
                       Text(
                         "Not a Member yet?",
                         style:
-                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                            Theme.of(context).primaryTextTheme.subtitle.copyWith(
                                   color: Colors.grey.shade600,
                                 ),
                       ),
@@ -770,10 +770,10 @@ class SignInPageState extends State<SignInPage> {
                             "Register now",
                             style: Theme.of(context)
                                 .primaryTextTheme
-                                .subhead
+                                .title
                                 .copyWith(
                                   color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w500,
                                   decoration: TextDecoration.underline,
                                 ),
                           ),
