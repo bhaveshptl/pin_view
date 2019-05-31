@@ -138,6 +138,7 @@ class RouteLauncher {
         _performUpdateCheck(context, onComplete: onComplete);
         break;
       case "RUMMY":
+        onComplete();
         browserLaunchChannel.invokeMethod(
             "launchInBrowser", "https://ei3k.app.link/howzat");
         break;
