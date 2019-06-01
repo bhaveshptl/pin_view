@@ -214,7 +214,6 @@ class SignupState extends State<Signup> {
       manufacturer = "Apple";
       serial = "";
     }
-
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
       _payload["phone"] = _authName;
@@ -479,6 +478,16 @@ class SignupState extends State<Signup> {
     signupdata["transactionID"] = loginData["user_id"].toString();
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    String  phone = "";
+    String  email =""; 
+    if (isMobileNumber(_authName)) {
+     phone = _authName;
+    } else {
+     email = _authName;
+    }
+    signupdata["phone"] =phone;
+    signupdata["email"] = email;
+
     signupdata["data"] = loginData;
     String trackValue;
     try {

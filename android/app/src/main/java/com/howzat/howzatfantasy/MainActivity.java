@@ -481,6 +481,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         Map<String, Object> addCustomDataProperty = new HashMap<>();
         HashMap<String, Object> data = new HashMap();
+        String email = (String)arguments.get("email");
+        String phone = (String)arguments.get("phone");
+
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
@@ -489,6 +492,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         weAnalytics.track("COMPLETE_REGISTRATION", addCustomDataProperty);
 
+        if(email !=null && email.length()>3){
+            weUser.setEmail(email);
+            System.out.println(email);
+        }
+        if(phone !=null && phone.length()>3){
+            weUser.setPhoneNumber("+91"+phone);
+        }
         return "Web engage Sign Up Track event added";
 
     }
@@ -864,7 +874,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         }
                         String token = task.getResult().getToken();
                         firebaseToken = token;
-
+                        WebEngage.get().setRegistrationID(token);
                     }
                 });
         return firebaseToken;
