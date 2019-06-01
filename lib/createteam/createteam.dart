@@ -21,6 +21,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/createteam/playingstyletab.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class TeamCreationMode {
   static const int CREATE_TEAM = 1;
@@ -119,6 +120,7 @@ class CreateTeamState extends State<CreateTeam>
     if (Platform.isIOS) {
       isIos=true;
     }
+     webEngageCreateTeamInitiatedEvent();
   }
 
   _getSportsType() async {
@@ -627,6 +629,7 @@ class CreateTeamState extends State<CreateTeam>
   }
 
   _getTeamToSave() {
+    webEngageCreatedTeamEvent();
     Map<String, dynamic> team = {
       "matchId": widget.league.matchId,
       "leagueId": widget.l1Data.league.id,
@@ -647,6 +650,47 @@ class CreateTeamState extends State<CreateTeam>
     }
 
     return team;
+  }
+
+   webEngageCreateTeamInitiatedEvent(){
+    DateTime now = new DateTime.now();
+    DateTime date = new DateTime(now.year, now.month, now.day);
+    Map<dynamic, dynamic> eventdata = new Map();
+    Map<String, dynamic> webengageTeamData = new Map();
+    webengageTeamData["MatchId"]=widget.league.matchId;
+    webengageTeamData["LeagueId"]=widget.l1Data.league.id;
+    webengageTeamData["SeriesId"]=widget.league.series.id;
+    webengageTeamData["MatchDate"]=date.toString();
+    webengageTeamData["MatchName"]=widget.l1Data.league.name;
+    webengageTeamData["SportType"]=_sportType;
+    webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
+    webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
+    webengageTeamData["Format"]="";
+    eventdata["eventName"] = "CREATE_TEAM_INITIATED";
+    eventdata["data"] = webengageTeamData;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+    print(webengageTeamData);
+  }
+  webEngageCreatedTeamEvent() {
+    DateTime now = new DateTime.now();
+    DateTime date = new DateTime(now.year, now.month, now.day);
+    Map<String, dynamic> webengageTeamData = new Map();
+    webengageTeamData["MatchId"]=widget.league.matchId;
+    webengageTeamData["LeagueId"]=widget.l1Data.league.id;
+    webengageTeamData["SeriesId"]=widget.league.series.id;
+    webengageTeamData["MatchDate"]=date.toString();
+    webengageTeamData["MatchName"]=widget.l1Data.league.name;
+    webengageTeamData["SportType"]=_sportType;
+    webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
+    webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
+    webengageTeamData["Format"]="";
+    webengageTeamData["SelectedCaptain"]=_captain.name;
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "TEAM_CREATED";
+    eventdata["data"] = webengageTeamData;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+     print("<<<<<<<<<<<<<<<<<<<<<<<<<<webengageTeamData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    print(webengageTeamData);
   }
 
   void _onSaveCaptains(Player captain, Player viceCaptain) {

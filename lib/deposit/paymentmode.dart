@@ -627,7 +627,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "isFirstDeposit": widget.paymentMode["isFirstDeposit"],
       "native": true,
     };
-
+    webEngagePaymentInitEvent(paymentModeDetails);
     int index = 0;
     payload.forEach((key, value) {
       if (index != 0) {
@@ -676,6 +676,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     } else {
       initPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
     }
+  }
+
+  webEngagePaymentInitEvent(Map<String, dynamic> paymentModeDetails) {
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "PAYMENT_INIT_FROM_PAYMENTMODEPAGE";
+    eventdata["data"] = paymentModeDetails;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
 
   initPayment(String url) async {

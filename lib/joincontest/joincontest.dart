@@ -17,6 +17,7 @@ import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;
@@ -100,6 +101,7 @@ class JoinContestState extends State<JoinContest> {
         widget.contest,
       );
     } else {
+       webEngageJoinContestEvent();
       http.Request req = http.Request(
           "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_CONTEST));
       req.body = json.encode({
@@ -209,6 +211,36 @@ class JoinContestState extends State<JoinContest> {
     ).whenComplete(() {
       showLoader(false);
     });
+  }
+
+  webEngageJoinContestEvent(){
+   DateTime now = new DateTime.now();
+   DateTime date = new DateTime(now.year, now.month, now.day);
+   Map<dynamic, dynamic> eventdata = new Map();
+    Map<String, dynamic> webengageTeamData = new Map();
+    webengageTeamData["TeamId"]=widget.league.matchId;
+    webengageTeamData["MatchId"]=widget.league.matchId;
+    webengageTeamData["ContestId"]=widget.league.matchId;
+    webengageTeamData["LeagueId"]=widget.l1Data.league.id;
+    webengageTeamData["SeriesId"]=widget.league.series.id;
+    webengageTeamData["MatchDate"]=date.toString();
+    webengageTeamData["MatchName"]=widget.l1Data.league.name;
+    webengageTeamData["EntryFee"]=widget.contest.entryFee;
+    webengageTeamData["PrizeType"]=widget.contest.prizeType;
+     webengageTeamData["InningsId"]=widget.l1Data.league.inningsId;
+    webengageTeamData["contestCode"]=widget.contest.contestJoinCode;
+    webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
+    webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
+    webengageTeamData["Winningpool"]="";
+    webengageTeamData["SeriesName"]=widget.league.series.name;
+    webengageTeamData["Noofwinners"]=widget.contest.prizeDetails[0]["noOfPrizes"];
+    webengageTeamData["SeatLeft"]=widget. contest.size - widget.contest.joined;
+    webengageTeamData["Totaloccupancy"]=widget.contest.joined;
+    eventdata["eventName"] ="CONTEST_JOINED";
+    eventdata["data"] = webengageTeamData;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+    print("<<<<<<<<<<<<<<<<<<<<<<<<WE>>>>>>>>>>>>>>>>>>");
+    print(webengageTeamData);
   }
 
   showLoader(bool bShow) {
