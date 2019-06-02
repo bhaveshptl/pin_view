@@ -63,10 +63,18 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       initRazorpayNativePlugin();
     }
     
+    webengagePaymentModeInitEvent();
+  }
+
+   webengagePaymentModeInitEvent(){
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "PAYMENTMODE_PAGE_VISITED";
-    eventdata["priority"] = "true";
-    AnalyticsManager.webengageTrackEvent(eventdata);
+    Map<String,dynamic> data =Map();
+    data["promoCode"]=widget.promoCode;
+    data["depositAmount"]= widget.amount;
+    data["channelId"]= HttpManager.channelId;
+    eventdata["data"] = data;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {

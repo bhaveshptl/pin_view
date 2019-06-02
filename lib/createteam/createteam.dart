@@ -665,11 +665,13 @@ class CreateTeamState extends State<CreateTeam>
     webengageTeamData["SportType"]=_sportType;
     webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
     webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
-    webengageTeamData["Format"]="";
+    webengageTeamData["SeriesTypeInfo"]=widget.league.series.seriesTypeInfo;
+    webengageTeamData["SeriesStartDate"]=getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
+    webengageTeamData["SeriesEndDate"]=getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
     eventdata["eventName"] = "CREATE_TEAM_INITIATED";
+    webengageTeamData["Format"]="";
     eventdata["data"] = webengageTeamData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-    print(webengageTeamData);
   }
   webEngageCreatedTeamEvent() {
     DateTime now = new DateTime.now();
@@ -685,12 +687,28 @@ class CreateTeamState extends State<CreateTeam>
     webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
     webengageTeamData["Format"]="";
     webengageTeamData["SelectedCaptain"]=_captain.name;
+    webengageTeamData["SeriesTypeInfo"]=widget.league.series.seriesTypeInfo;
+    webengageTeamData["SeriesStartDate"]=getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
+    webengageTeamData["SeriesEndDate"]=getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "TEAM_CREATED";
     eventdata["data"] = webengageTeamData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-     print("<<<<<<<<<<<<<<<<<<<<<<<<<<webengageTeamData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    print(webengageTeamData);
+  }
+
+
+  String getReadableDateFromTimeStamp(String timeStamp){
+     String convertedDate ="";
+    if(timeStamp.length>0){
+   DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(timeStamp));
+    convertedDate= date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString(); 
+    }
+    return convertedDate;
   }
 
   void _onSaveCaptains(Player captain, Player viceCaptain) {

@@ -227,20 +227,36 @@ class JoinContestState extends State<JoinContest> {
     webengageTeamData["MatchName"]=widget.l1Data.league.name;
     webengageTeamData["EntryFee"]=widget.contest.entryFee;
     webengageTeamData["PrizeType"]=widget.contest.prizeType;
-     webengageTeamData["InningsId"]=widget.l1Data.league.inningsId;
+    webengageTeamData["InningsId"]=widget.l1Data.league.inningsId;
     webengageTeamData["contestCode"]=widget.contest.contestJoinCode;
     webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
     webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
-    webengageTeamData["Winningpool"]="";
+    webengageTeamData["Winningpool"]=widget.contest.prizeDetails[0]["totalPrizeAmount"];
     webengageTeamData["SeriesName"]=widget.league.series.name;
     webengageTeamData["Noofwinners"]=widget.contest.prizeDetails[0]["noOfPrizes"];
     webengageTeamData["SeatLeft"]=widget. contest.size - widget.contest.joined;
     webengageTeamData["Totaloccupancy"]=widget.contest.joined;
+    webengageTeamData["SeriesTypeInfo"]=widget.league.series.seriesTypeInfo;
+    webengageTeamData["SeriesStartDate"]=getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
+    webengageTeamData["SeriesEndDate"]=getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
     eventdata["eventName"] ="CONTEST_JOINED";
     eventdata["data"] = webengageTeamData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-    print("<<<<<<<<<<<<<<<<<<<<<<<<WE>>>>>>>>>>>>>>>>>>");
-    print(webengageTeamData);
+  }
+  
+  String getReadableDateFromTimeStamp(String timeStamp){
+    String convertedDate ="";
+    if(timeStamp.length>0){
+   DateTime date = DateTime.fromMillisecondsSinceEpoch(
+        int.parse(timeStamp));
+    convertedDate= date.day.toString() +
+        "-" +
+        date.month.toString() +
+        "-" +
+        date.year.toString(); 
+    }
+    return convertedDate;
+   
   }
 
   showLoader(bool bShow) {
