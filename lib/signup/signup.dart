@@ -39,6 +39,7 @@ class SignupState extends State<Signup> {
   String _installReferring_link = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
   String _installReferringLink = "";
+  String chosenloginTypeByUser = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
@@ -217,9 +218,12 @@ class SignupState extends State<Signup> {
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
       _payload["phone"] = _authName;
+      chosenloginTypeByUser = "FORM_MOBILE";
     } else {
       _payload["email"] = _authName;
+      chosenloginTypeByUser = "FORM_EMAIL";
     }
+     
     _payload["password"] = _password;
     _payload["context"] = {
       "refCode": _referralCodeController.text,
@@ -232,6 +236,7 @@ class SignupState extends State<Signup> {
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
+
     if (_installReferring_link.length > 0) {
       var uri = Uri.parse(_installReferring_link);
       uri.queryParameters.forEach((k, v) {
@@ -316,6 +321,7 @@ class SignupState extends State<Signup> {
           (GoogleSignInAuthentication _googleSignInAuthentication) {
             _sendTokenToAuthenticate(
                 _googleSignInAuthentication.accessToken, 1);
+             chosenloginTypeByUser="GOOGLE";   
           },
         ).whenComplete(() {
           showLoader(false);
@@ -336,6 +342,7 @@ class SignupState extends State<Signup> {
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         _sendTokenToAuthenticate(result.accessToken.token, 2);
+        chosenloginTypeByUser="FACEBOOK";
         break;
       case FacebookLoginStatus.cancelledByUser:
         showLoader(false);
@@ -487,7 +494,7 @@ class SignupState extends State<Signup> {
     }
     signupdata["phone"] =phone;
     signupdata["email"] = email;
-
+    signupdata["chosenloginTypeByUser"]=chosenloginTypeByUser ;
     signupdata["data"] = loginData;
     String trackValue;
     try {

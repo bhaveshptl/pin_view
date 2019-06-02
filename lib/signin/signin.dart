@@ -455,7 +455,7 @@ class SignInPageState extends State<SignInPage> {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"].toString();
     signupdata["transactionID"] = loginData["user_id"].toString();
-    signupdata["loginType"] = _userSelectedLoginType;
+    signupdata["chosenloginTypeByUser"] = _userSelectedLoginType;
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
     signupdata["data"] = loginData;

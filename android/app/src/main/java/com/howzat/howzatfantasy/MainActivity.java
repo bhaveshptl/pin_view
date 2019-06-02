@@ -499,6 +499,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(phone !=null && phone.length()>3){
             weUser.setPhoneNumber("+91"+phone);
         }
+        System.out.print((String)arguments.get("chosenloginTypeByUser"));
+        weUser.setAttribute("loginType", (String)arguments.get("chosenloginTypeByUser"));
+
         return "Web engage Sign Up Track event added";
 
     }
@@ -530,6 +533,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(data.get("last_name") != null){
             weUser.setLastName((String)data.get("last_name"));
         }
+        weUser.setAttribute("loginType", (String)arguments.get("chosenloginTypeByUser"));
         return "Web engage Login Track event added";
 
     }
