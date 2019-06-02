@@ -47,12 +47,7 @@ class SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     getRequiredData();
-    super.initState();
-
-    _getFirebaseToken();
-    _initBranchStuff();
-    _getGoogleAddId();
-    _subscribeToFirebaseTopic(widget.fcmSubscribeId);
+    super.initState();    
   }
 
   getRequiredData() async {
@@ -62,6 +57,9 @@ class SplashScreenState extends State<SplashScreen>
     final initData = await getInitData();
 
     await _initBranchIoPlugin();
+    await _getGoogleAddId();
+    await _getFirebaseToken();
+    await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
 
     await setInitData(initData);
     setLoadingPercentage(60.0);
@@ -120,18 +118,14 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  _initBranchStuff() {
-    // _initBranchIoPlugin();
-    _getGoogleAddId().then((String googleaddid) {
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, googleaddid);
-    });
-  }
 
   Future<String> _getGoogleAddId() async {
     String value;
     try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
+      value = await branch_io_platform.invokeMethod('_getGoogleAddId').timeout(Duration(seconds: 10));
+      print(value);
+      SharedPrefHelper.internal().saveToSharedPref(
+          ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, value);
     } catch (e) {}
     return value;
   }
@@ -142,8 +136,6 @@ class SplashScreenState extends State<SplashScreen>
       final value = await branch_io_platform
           .invokeMethod('_initBranchIoPlugin')
           .timeout(Duration(seconds: 10));
-      print("<<<<<<<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>>>>>>>>>>>>>");
-      print(value);
       SharedPrefHelper.internal().saveToSharedPref(
           ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
           value["installReferring_link"]);
@@ -160,7 +152,8 @@ class SplashScreenState extends State<SplashScreen>
   Future<String> _getFirebaseToken() async {
     String value;
     try {
-      value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken');
+      value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken').timeout(Duration(seconds: 10));
+      print(value);
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, value);
     } catch (e) {}
@@ -171,7 +164,8 @@ class SplashScreenState extends State<SplashScreen>
     String result;
     try {
       result = await firebase_fcm_platform.invokeMethod(
-          '_subscribeToFirebaseTopic', topicName);
+          '_subscribeToFirebaseTopic', topicName).timeout(Duration(seconds: 10));
+       print(result);    
     } catch (e) {
       print(e);
     }
