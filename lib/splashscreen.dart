@@ -47,7 +47,8 @@ class SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     getRequiredData();
-    super.initState();    
+    super.initState();
+    initServices();    
   }
 
   getRequiredData() async {
@@ -57,10 +58,6 @@ class SplashScreenState extends State<SplashScreen>
     final initData = await getInitData();
 
     await _initBranchIoPlugin();
-    await _getGoogleAddId();
-    await _getFirebaseToken();
-    await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
-
     await setInitData(initData);
     setLoadingPercentage(60.0);
     final result = await AuthCheck().checkStatus(widget.apiBaseUrl);
@@ -118,11 +115,18 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
+  initServices() async{
+    await _getGoogleAddId();
+    await _getFirebaseToken();
+    await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
+  }
+
 
   Future<String> _getGoogleAddId() async {
     String value;
     try {
       value = await branch_io_platform.invokeMethod('_getGoogleAddId').timeout(Duration(seconds: 10));
+      print("####Google Add ID#######");
       print(value);
       SharedPrefHelper.internal().saveToSharedPref(
           ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, value);
@@ -153,6 +157,7 @@ class SplashScreenState extends State<SplashScreen>
     String value;
     try {
       value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken').timeout(Duration(seconds: 10));
+      print("####Firebase Token#######");
       print(value);
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, value);
@@ -165,6 +170,7 @@ class SplashScreenState extends State<SplashScreen>
     try {
       result = await firebase_fcm_platform.invokeMethod(
           '_subscribeToFirebaseTopic', topicName).timeout(Duration(seconds: 10));
+       print("####FCM Topic#######");
        print(result);    
     } catch (e) {
       print(e);
