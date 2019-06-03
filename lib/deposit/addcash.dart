@@ -139,6 +139,14 @@ class AddCashState extends State<AddCash> {
     data["channelId"]= HttpManager.channelId;
     eventdata["data"] = data;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
+    /*Web engage Screen Data */
+    Map<dynamic, dynamic> screendata = new Map();
+    screendata["screenName"] = "ADDCASH";
+    Map<String,dynamic> screenAttributedata =Map();
+    screenAttributedata["screenname"]="Add Cash";
+    screendata["data"] = screenAttributedata;
+    AnalyticsManager.webengageAddScreenData(screendata);
+
   }
 
   initWebview() {

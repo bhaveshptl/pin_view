@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -59,6 +59,14 @@ class EarnCashState extends State<EarnCash> {
     refBAmount = widget.data["amountUserB"];
     inviteUrl = (widget.data["refLink"] as String).replaceAll("%3d", "=");
     inviteSteps = widget.data["inviteSteps"];
+
+    /*Web engage Screen Data */
+    Map<dynamic, dynamic> screendata = new Map();
+    screendata["screenName"] = "EARNCASH";
+    Map<String,dynamic> screenAttributedata =Map();
+    screenAttributedata["refCode"]=refCode;
+    screendata["data"] = screenAttributedata;
+    AnalyticsManager.webengageAddScreenData(screendata);
   }
 
   _getBanners() async {

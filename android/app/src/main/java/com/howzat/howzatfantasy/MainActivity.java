@@ -2,6 +2,7 @@ package com.howzat.howzatfantasy;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -401,6 +402,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String channelResult =trackEventsWithAttributes(arguments);
                     result.success(channelResult);
                 }
+                else if(methodCall.method.equals("webengageAddScreenData")){
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult =webengageAddScreenData(arguments);
+                    result.success(channelResult);
+                }
                 else {
                     result.notImplemented();
                 }
@@ -476,6 +482,18 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         weAnalytics.track(eventName,addedAttributes,new Analytics.Options().setHighReportingPriority(priority));
         return "Event "+eventName+ "" +"added";
     }
+    private String webengageAddScreenData(Map<String, Object> arguments){
+        System.out.println(arguments);
+        System.out.println(arguments);
+
+        String screenName=(String)arguments.get("screenName");
+        Map<String, Object> addedAttributes = new HashMap<>();
+        addedAttributes=(Map)arguments.get("data");
+        weAnalytics.screenNavigated(screenName,addedAttributes);
+        return "Screen Data added for the screen "+screenName;
+    }
+
+
 
     private String webEngageEventSigniup(Map<String, Object> arguments) {
 
@@ -505,6 +523,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return "Web engage Sign Up Track event added";
 
     }
+
+
 
     private String webEngageEventLogin(Map<String, Object> arguments) {
         Map<String, Object> addCustomDataProperty = new HashMap<>();
@@ -866,6 +886,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         firebaseToken = token;
                     }
                 });
+
+//        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
+//                .setPushSmallIcon(R.drawable.notification_icon_small)
+//                .setPushLargeIcon(R.drawable.notification_icon_small)
+//                .setPushAccentColor(Color.parseColor("#ff0000"))
+//                .build();
     }
 
     private String getFireBaseToken() {

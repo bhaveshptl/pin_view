@@ -189,4 +189,16 @@ class AnalyticsManager {
     return "";
   }
 
+  static Future<String> webengageAddScreenData(Map<dynamic, dynamic> data) async {
+    String result = "";
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageAddScreenData', data);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+
 }
