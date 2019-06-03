@@ -37,6 +37,7 @@ void main() async {
     appName: 'Smart11',
     channelId: channelId,
     showBackground: true,
+    disableBranchIOAttribution:false,
     apiBaseUrl: apiBaseUrl,
     carouselSlideTime: Duration(seconds: 5),
     child: StoreProvider(

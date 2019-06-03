@@ -9,6 +9,7 @@ class AppConfig extends InheritedWidget {
     @required this.appName,
     @required this.channelId,
     @required this.apiBaseUrl,
+    @required this.disableBranchIOAttribution,
     @required this.showBackground,
     @required Duration carouselSlideTime,
   }) : super(child: child);
@@ -18,6 +19,7 @@ class AppConfig extends InheritedWidget {
   final String channelId;
   final String apiBaseUrl;
   final bool showBackground;
+  final bool disableBranchIOAttribution;
   final Duration carouselSlideTime = Duration(seconds: 5);
 
   static AppConfig of(BuildContext context) {

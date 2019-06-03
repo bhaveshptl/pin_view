@@ -37,6 +37,7 @@ void main() async {
     appName: 'Howzat',
     channelId: channelId,
     showBackground: false,
+    disableBranchIOAttribution:false,
     apiBaseUrl: apiBaseUrl,
     carouselSlideTime: Duration(seconds: 10),
     child: StoreProvider(
