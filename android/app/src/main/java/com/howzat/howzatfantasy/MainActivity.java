@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import com.howzat.howzatfantasy.services.MyHelperClass;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +73,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
     private static final String BROWSER_LAUNCH_CHANNEL = "com.algorin.pf.browser";
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
+    private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
+
     MyHelperClass myHeperClass;
     String firebaseToken = "";
     String installReferring_link = "";
@@ -240,7 +244,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_getBranchRefCode")) {
                             String pfRefCode = (String) getRefCodeUsingBranch();
-
                             result.success(pfRefCode);
                         }
                         if (methodCall.method.equals("_initBranchIoPlugin")) {
@@ -411,6 +414,27 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     result.notImplemented();
                 }
 
+            }
+        });
+
+        new MethodChannel(getFlutterView(), UTILS_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+            @Override
+            public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                if (methodCall.method.equals("deleteInternalStorageFile")) {
+                    String filename = methodCall.arguments();
+                    deleteIfFileExist(filename);
+
+                    try{
+                        File internalFileDirectory =new File(Environment.getExternalStorageDirectory().getPath());
+                        deleteFileRecursive(internalFileDirectory,filename);
+                    }
+                    catch(Exception e){
+                        System.out.print(e);
+                    }
+
+                } else {
+                    result.notImplemented();
+                }
             }
         });
     }
@@ -957,6 +981,59 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         fetchAdvertisingID(this);
         return googleAdId;
     }
+
+
+
+    void deleteFileRecursive(File fileOrDirectory, String fileName) {
+        try{
+            if (fileOrDirectory.isDirectory()){
+                if(fileOrDirectory.exists()){
+                    System.out.print(fileOrDirectory);
+                    for (File child : fileOrDirectory.listFiles()){
+                        System.out.print(child);
+                        deleteFileRecursive(child,fileName);
+
+                    }
+                }
+            }
+
+        }catch(Exception e){
+            System.out.print(e);
+        }
+
+        System.out.print(fileOrDirectory);
+
+        try{
+            if(fileOrDirectory.isFile()){
+                if(fileOrDirectory.getName().endsWith(fileName)) {
+                    Boolean deleted = fileOrDirectory.delete();
+                    System.out.print(deleted);
+                }
+            }
+
+        }catch(Exception e){
+
+        }
+    }
+
+
+    public boolean deleteIfFileExist(String fname){
+        File applictionFile =  new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS)+ "/"+fname);
+        boolean deleted = false;
+
+        if(applictionFile != null && applictionFile.exists()){
+            deleted = applictionFile.delete();
+
+            if(!deleted){
+
+            }
+
+            System.out.print(deleted);
+        }
+        return deleted;
+    }
+
 
     private Map<String, Object> getDeviceInfo() {
         Map<String, Object> params = new HashMap<>();

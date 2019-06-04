@@ -21,6 +21,7 @@ import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+
 class Signup extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new SignupState();
@@ -46,6 +47,10 @@ class SignupState extends State<Signup> {
       const MethodChannel('com.algorin.pf.fcm');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
+  static const utils_platform =
+      const MethodChannel('com.algorin.pf.utils');
+    
+
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -55,7 +60,7 @@ class SignupState extends State<Signup> {
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
       const IconData(0xf308, fontFamily: _kFontFam);
-  
+
   @override
   void initState() {
     super.initState();
@@ -65,6 +70,7 @@ class SignupState extends State<Signup> {
     if (Platform.isIOS) {
       isIos = true;
     }
+    //deleteInternalStorageFile("howzat_fantasy.apk");
   }
 
   getLocalStorageValues() {
@@ -95,16 +101,24 @@ class SignupState extends State<Signup> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
     pfRefCodeFromBranch.then((value) {
       if (value != null && value.length > 0) {
-        _pfRefCode = value;
-        setState(() {
-          _referralCodeController.text = _pfRefCode;
-        });
-      } else {
-        _getBranchRefCode().then((String refcode) {
-          _pfRefCode = refcode;
+        bool disableBranchIOAttribution =
+            AppConfig.of(context).disableBranchIOAttribution;
+        if (!disableBranchIOAttribution) {
+          _pfRefCode = value;
           setState(() {
             _referralCodeController.text = _pfRefCode;
           });
+        }
+      } else {
+        _getBranchRefCode().then((String refcode) {
+          bool disableBranchIOAttribution =
+              AppConfig.of(context).disableBranchIOAttribution;
+          if (!disableBranchIOAttribution) {
+            _pfRefCode = refcode;
+            setState(() {
+              _referralCodeController.text = _pfRefCode;
+            });
+          }
         });
       }
     });
@@ -133,6 +147,15 @@ class SignupState extends State<Signup> {
     String value;
     try {
       value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken');
+      _deviceId = value;
+    } catch (e) {}
+    return value;
+  }
+
+  Future<String> deleteInternalStorageFile(String filename) async {
+    String value;
+    try {
+      value = await utils_platform.invokeMethod('deleteInternalStorageFile',filename);
       _deviceId = value;
     } catch (e) {}
     return value;
@@ -223,7 +246,7 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
       chosenloginTypeByUser = "FORM_EMAIL";
     }
-     
+
     _payload["password"] = _password;
     _payload["context"] = {
       "refCode": _referralCodeController.text,
@@ -237,17 +260,25 @@ class SignupState extends State<Signup> {
       "app_version_flutter": app_version_flutter
     };
 
-    if (_installReferring_link.length > 0) {
-      var uri = Uri.parse(_installReferring_link);
-      uri.queryParameters.forEach((k, v) {
-        try {
-          _payload["context"][k] = v;
-        } catch (e) {
-          print(e);
-        }
-      });
-    }
+    bool disableBranchIOAttribution =
+        AppConfig.of(context).disableBranchIOAttribution;
 
+    if (!disableBranchIOAttribution) {
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
+    } else {
+      _payload["context"]["utm_source"] = "Oppo";
+      _payload["context"]["utm_medium"] = "Oppo Store";
+      _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
@@ -263,6 +294,9 @@ class SignupState extends State<Signup> {
       _payload["context"]["googleEmailList"] =
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
+
+print("############################Sign Up _payload##########");
+    print(_payload["context"]);
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
@@ -321,7 +355,7 @@ class SignupState extends State<Signup> {
           (GoogleSignInAuthentication _googleSignInAuthentication) {
             _sendTokenToAuthenticate(
                 _googleSignInAuthentication.accessToken, 1);
-             chosenloginTypeByUser="GOOGLE";   
+            chosenloginTypeByUser = "GOOGLE";
           },
         ).whenComplete(() {
           showLoader(false);
@@ -342,7 +376,7 @@ class SignupState extends State<Signup> {
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         _sendTokenToAuthenticate(result.accessToken.token, 2);
-        chosenloginTypeByUser="FACEBOOK";
+        chosenloginTypeByUser = "FACEBOOK";
         break;
       case FacebookLoginStatus.cancelledByUser:
         showLoader(false);
@@ -389,16 +423,26 @@ class SignupState extends State<Signup> {
       "app_version_flutter": app_version_flutter
     };
 
-    if (_installReferring_link.length > 0) {
-      var uri = Uri.parse(_installReferring_link);
-      uri.queryParameters.forEach((k, v) {
-        try {
-          _payload["context"][k] = v;
-        } catch (e) {
-          print(e);
-        }
-      });
+    bool disableBranchIOAttribution =
+        AppConfig.of(context).disableBranchIOAttribution;
+
+    if (!disableBranchIOAttribution) {
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
+    } else {
+      _payload["context"]["utm_source"] = "Oppo";
+      _payload["context"]["utm_medium"] = "Oppo Store";
+      _payload["context"]["utm_campaign"] = "Oppo World Cup";
     }
+
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
@@ -427,7 +471,7 @@ class SignupState extends State<Signup> {
       body: json.encode(_payload),
     )
         .then((http.Response res) {
-          showLoader(false);
+      showLoader(false);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
@@ -485,16 +529,16 @@ class SignupState extends State<Signup> {
     signupdata["transactionID"] = loginData["user_id"].toString();
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
-    String  phone = "";
-    String  email =""; 
+    String phone = "";
+    String email = "";
     if (isMobileNumber(_authName)) {
-     phone = _authName;
+      phone = _authName;
     } else {
-     email = _authName;
+      email = _authName;
     }
-    signupdata["phone"] =phone;
+    signupdata["phone"] = phone;
     signupdata["email"] = email;
-    signupdata["chosenloginTypeByUser"]=chosenloginTypeByUser ;
+    signupdata["chosenloginTypeByUser"] = chosenloginTypeByUser;
     signupdata["data"] = loginData;
     String trackValue;
     try {
@@ -538,7 +582,7 @@ class SignupState extends State<Signup> {
     return trackValue;
   }
 
-  openTermsAndConditionsPage(){
+  openTermsAndConditionsPage() {
     String url = "";
     String title = "";
     title = "TERMS AND CONDITIONS";
@@ -870,12 +914,11 @@ class SignupState extends State<Signup> {
                   InkWell(
                     child: Text(
                       " Login Now.",
-                      style:
-                          Theme.of(context).primaryTextTheme.title.copyWith(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
-                              ),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
                     ),
                     onTap: () {
                       _launchSignIn();
