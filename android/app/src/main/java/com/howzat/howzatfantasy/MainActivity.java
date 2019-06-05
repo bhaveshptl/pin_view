@@ -450,13 +450,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 weUser.logout();
                 return "Logout To Tracking event done";
             case "setEmail":
-                weUser.setEmail(arguments.get("value"));
+                weUser.setHashedEmail(arguments.get("value"));
                 return "Email track   added";
             case "setBirthDate":
                 weUser.setBirthDate(arguments.get("value"));
                 return "Birth Day track added";
             case "setPhoneNumber":
-                weUser.setPhoneNumber(arguments.get("value"));
+                weUser.setHashedPhoneNumber(arguments.get("value"));
                 return "Phone Number track added";
             case "setFirstName":
                 weUser.setFirstName(arguments.get("value"));
@@ -535,12 +535,15 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         weAnalytics.track("COMPLETE_REGISTRATION", addCustomDataProperty);
 
         if(email !=null && email.length()>3){
-            weUser.setEmail(email);
+            weUser.setHashedEmail(email);
             System.out.println(email);
         }
+
         if(phone !=null && phone.length()>3){
-            weUser.setPhoneNumber("+91"+phone);
+           weUser.setHashedPhoneNumber(phone);
+
         }
+
         System.out.print((String)arguments.get("chosenloginTypeByUser"));
         weUser.setAttribute("loginType", (String)arguments.get("chosenloginTypeByUser"));
 
@@ -554,6 +557,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         Map<String, Object> addCustomDataProperty = new HashMap<>();
         HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
+        String email = (String)arguments.get("email");
+        String phone = (String)arguments.get("phone");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
@@ -563,13 +568,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         weUser.setAttribute("loginType", "" + (String)arguments.get("loginType"));
 
 
-        if(data.get("email_id") != null){
-
-            weUser.setEmail((String)data.get("email_id"));
+        if(email !=null && email.length()>3){
+            weUser.setHashedEmail(email);
+            System.out.println(email);
         }
-        if(data.get("mobile") != null){
-
-            weUser.setPhoneNumber("+91"+(String)data.get("mobile"));
+        if(phone !=null && phone.length()>3){
+            weUser.setHashedPhoneNumber(phone);
         }
         if(data.get("first_name") != null){
             weUser.setFirstName((String)data.get("first_name"));

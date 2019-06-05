@@ -486,8 +486,38 @@ class SignInPageState extends State<SignInPage> {
     signupdata["chosenloginTypeByUser"] = _userSelectedLoginType;
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    
+    String phone = "";
+    String email = "";
+
+
+print("#######Login Data######");
+    print(loginData);
+
+    print(loginData["mobile"]);
+
+    print("#######Login Data######");
+
+    loginData.putIfAbsent("email_id",() => "");
+    loginData.putIfAbsent("mobile",() => "");
+     
+     if(loginData["email_id"].length>3){
+        email = AnalyticsManager.dosha256Encoding(loginData["email_id"]);
+     }
+
+     if(loginData["mobile"].length>3){
+        phone = AnalyticsManager.dosha256Encoding("+91"+loginData["mobile"]);
+     }
+  
+     print("<<<<<<<<<<<<<<<<<Before removed ################");
+     print(loginData);
+    loginData.remove("email_id");
+    loginData.remove("mobile"); 
+     print("<<<<<<<<<<<<<<<<<After removed ################");
+    print(loginData);
     signupdata["data"] = loginData;
     String trackValue;
+   
     try {
       String trackValue = await webengage_platform.invokeMethod(
           'webEngageEventLogin', signupdata);

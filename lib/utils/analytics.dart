@@ -8,6 +8,9 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:crypto/src/digest_sink.dart';
 
 
 class AnalyticsManager {
@@ -198,6 +201,20 @@ class AnalyticsManager {
       print(e);
     }
     return "";
+  }
+
+
+
+  static String  dosha256Encoding(String dataString){
+    var bytes = utf8.encode(dataString); // data being hashed
+    var key = utf8.encode('tyu@789CVYUiophyRTyUItYuCRtErTTYUZAS');
+
+
+    //var digest = sha1.convert(bytes);
+
+     var hmacSha256 = new Hmac(sha256, key); // HMAC-SHA256
+    var digest = hmacSha256.convert(bytes);
+     return digest.toString();
   }
 
 

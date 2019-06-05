@@ -532,9 +532,9 @@ print("############################Sign Up _payload##########");
     String phone = "";
     String email = "";
     if (isMobileNumber(_authName)) {
-      phone = _authName;
+      phone = AnalyticsManager.dosha256Encoding("+91"+_authName);
     } else {
-      email = _authName;
+      email = AnalyticsManager.dosha256Encoding(_authName);
     }
     signupdata["phone"] = phone;
     signupdata["email"] = email;
