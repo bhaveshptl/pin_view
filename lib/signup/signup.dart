@@ -47,8 +47,7 @@ class SignupState extends State<Signup> {
       const MethodChannel('com.algorin.pf.fcm');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
-  static const utils_platform =
-      const MethodChannel('com.algorin.pf.utils');
+  
     
 
   final formKey = new GlobalKey<FormState>();
@@ -70,7 +69,7 @@ class SignupState extends State<Signup> {
     if (Platform.isIOS) {
       isIos = true;
     }
-    //deleteInternalStorageFile("howzat_fantasy.apk");
+    
   }
 
   getLocalStorageValues() {
@@ -152,14 +151,7 @@ class SignupState extends State<Signup> {
     return value;
   }
 
-  Future<String> deleteInternalStorageFile(String filename) async {
-    String value;
-    try {
-      value = await utils_platform.invokeMethod('deleteInternalStorageFile',filename);
-      _deviceId = value;
-    } catch (e) {}
-    return value;
-  }
+  
 
   _getFirebaseId() async {
     _deviceId = await SharedPrefHelper.internal()

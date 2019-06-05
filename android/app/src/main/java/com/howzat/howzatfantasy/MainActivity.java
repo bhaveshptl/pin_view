@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -421,17 +422,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             @Override
             public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                 if (methodCall.method.equals("deleteInternalStorageFile")) {
-                    String filename = methodCall.arguments();
-                    deleteIfFileExist(filename);
-
-                    try{
-                        File internalFileDirectory =new File(Environment.getExternalStorageDirectory().getPath());
-                        deleteFileRecursive(internalFileDirectory,filename);
-                    }
-                    catch(Exception e){
-                        System.out.print(e);
-                    }
-
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            String filename = methodCall.arguments();
+                            try{
+                                deleteIfFileExist(filename);
+                            }catch (Exception e){
+                            }
+                            try{
+                                File internalFileDirectory =new File(Environment.getExternalStorageDirectory().getPath());
+                                deleteFileRecursive(internalFileDirectory,filename);
+                            }
+                            catch(Exception e){
+                                System.out.print(e);
+                            }
+                        }
+                    });
                 } else {
                     result.notImplemented();
                 }
@@ -1023,20 +1030,20 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
 
     public boolean deleteIfFileExist(String fname){
-        File applictionFile =  new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS)+ "/"+fname);
         boolean deleted = false;
+        try{
+            File applictionFile =  new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS)+ "/"+fname);
 
-        if(applictionFile != null && applictionFile.exists()){
-            deleted = applictionFile.delete();
-
-            if(!deleted){
-
+            if(applictionFile != null && applictionFile.exists()){
+                deleted = applictionFile.delete();
+                System.out.print(deleted);
             }
 
-            System.out.print(deleted);
+        }catch (Exception e){
+
         }
-        return deleted;
+                return deleted;
     }
 
 

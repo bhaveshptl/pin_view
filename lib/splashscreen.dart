@@ -15,18 +15,21 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:permission/permission.dart';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
   final String apiBaseUrl;
   final String analyticsUrl;
   final String fcmSubscribeId;
+  final bool disableBranchIOAttribution;
 
   SplashScreen({
     this.apiBaseUrl,
     this.fcmSubscribeId,
     this.analyticsUrl,
     this.channelId,
+    this.disableBranchIOAttribution
   });
 
   @override
@@ -43,15 +46,20 @@ class SplashScreenState extends State<SplashScreen>
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
+  PermissionStatus permissionStatus = PermissionStatus.allow;
 
   @override
   void initState() {
     getRequiredData();
     super.initState();
-    initServices();    
+    initServices();
   }
 
   getRequiredData() async {
+    if(!widget.disableBranchIOAttribution){
+      await checkForPermission();
+    }
     setLoadingPercentage(0.0);
     await updateStringTable();
     setLoadingPercentage(30.0);
@@ -115,21 +123,22 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  initServices() async{
+  initServices() async {
     await _getGoogleAddId();
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
   }
 
-
   Future<String> _getGoogleAddId() async {
     String value;
     try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId').timeout(Duration(seconds: 10));
+      value = await branch_io_platform
+          .invokeMethod('_getGoogleAddId')
+          .timeout(Duration(seconds: 10));
       print("####Google Add ID#######");
       print(value);
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, value);
+      SharedPrefHelper.internal()
+          .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, value);
     } catch (e) {}
     return value;
   }
@@ -156,7 +165,9 @@ class SplashScreenState extends State<SplashScreen>
   Future<String> _getFirebaseToken() async {
     String value;
     try {
-      value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken').timeout(Duration(seconds: 10));
+      value = await firebase_fcm_platform
+          .invokeMethod('_getFirebaseToken')
+          .timeout(Duration(seconds: 10));
       print("####Firebase Token#######");
       print(value);
       SharedPrefHelper.internal()
@@ -168,10 +179,11 @@ class SplashScreenState extends State<SplashScreen>
   Future<String> _subscribeToFirebaseTopic(String topicName) async {
     String result;
     try {
-      result = await firebase_fcm_platform.invokeMethod(
-          '_subscribeToFirebaseTopic', topicName).timeout(Duration(seconds: 10));
-       print("####FCM Topic#######");
-       print(result);    
+      result = await firebase_fcm_platform
+          .invokeMethod('_subscribeToFirebaseTopic', topicName)
+          .timeout(Duration(seconds: 10));
+      print("####FCM Topic#######");
+      print(result);
     } catch (e) {
       print(e);
     }
@@ -220,17 +232,52 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
+  Future<String> deleteInternalStorageFile(String filename) async {
+    String value;
+    try {
+      value = await utils_platform.invokeMethod(
+          'deleteInternalStorageFile', filename);
+    } catch (e) {}
+    return value;
+  }
+
+  askForPermission() async {
+    final result =
+        await Permission.requestSinglePermission(PermissionName.WriteStorage);
+    if (result != null) {
+      setState(() {
+        permissionStatus = result;
+      });
+    }
+    return result;
+  }
+
+  checkForPermission() async {
+    List<Permissions> permissions =
+        await Permission.getPermissionStatus([PermissionName.WriteStorage]);
+    setState(() {
+      permissionStatus = permissions[0].permissionStatus;
+    });
+
+    if (permissions[0].permissionStatus != PermissionStatus.allow) {
+      final result = await askForPermission();
+      if (result == PermissionStatus.allow) {
+        deleteInternalStorageFile("howzat_fantasy.apk");
+      }
+    }
+  }
+
   getInitData() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     double version = 0.0;
-    bool isIos =false;
+    bool isIos = false;
     if (Platform.isAndroid) {
       version = double.parse(packageInfo.version);
-      isIos=false;
+      isIos = false;
     }
     if (Platform.isIOS) {
-      version = 3.40;
-      isIos=true;
+      version = 3.73;
+      isIos = true;
     }
     http.Request req =
         http.Request("POST", Uri.parse(widget.apiBaseUrl + ApiUtil.INIT_DATA));
