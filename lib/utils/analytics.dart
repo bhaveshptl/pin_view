@@ -207,7 +207,7 @@ class AnalyticsManager {
 
   static String  dosha256Encoding(String dataString){
     var bytes = utf8.encode(dataString); // data being hashed
-    var key = utf8.encode('tyu@789CVYUiophyRTyUItYuCRtErTTYUZAS');
+    var key = utf8.encode('tyu7CVYUiiop67XTHophyRTyUItYRtErTTYUZAS');
 
 
     //var digest = sha1.convert(bytes);
