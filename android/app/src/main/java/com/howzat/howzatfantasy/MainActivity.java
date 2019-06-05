@@ -567,6 +567,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         weUser.setAttribute("loginType", "" + (String)arguments.get("loginType"));
 
+        System.out.print(phone);
 
         if(email !=null && email.length()>3){
             weUser.setHashedEmail(email);
