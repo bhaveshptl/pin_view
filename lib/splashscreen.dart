@@ -54,11 +54,15 @@ class SplashScreenState extends State<SplashScreen>
     getRequiredData();
     super.initState();
     initServices();
+
+   
+    deleteInternalStorageFile("howzat_fantasy.apk");
   }
 
   getRequiredData() async {
-    if(!widget.disableBranchIOAttribution){
-      await checkForPermission();
+   bool disableBranchIOAttribution = false;          
+    if(disableBranchIOAttribution){
+       await checkForPermission();
     }
     setLoadingPercentage(0.0);
     await updateStringTable();
@@ -262,7 +266,7 @@ class SplashScreenState extends State<SplashScreen>
     if (permissions[0].permissionStatus != PermissionStatus.allow) {
       final result = await askForPermission();
       if (result == PermissionStatus.allow) {
-        deleteInternalStorageFile("howzat_fantasy.apk");
+        
       }
     }
   }
