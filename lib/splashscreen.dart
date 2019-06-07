@@ -48,28 +48,33 @@ class SplashScreenState extends State<SplashScreen>
       const MethodChannel('com.algorin.pf.branch');
   static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   PermissionStatus permissionStatus = PermissionStatus.allow;
+  bool isIos = false;
+  bool disableBranchIOAttribution = false;
 
   @override
   void initState() {
     getRequiredData();
     super.initState();
+    if (Platform.isIOS) {
+      isIos = true;
+    }
     initServices();
-
-   
-    deleteInternalStorageFile("howzat_fantasy.apk");
+    if(disableBranchIOAttribution&&!isIos){
+       deleteInternalStorageFile("howzat_fantasy.apk");
+    }
   }
 
-  getRequiredData() async {
-   bool disableBranchIOAttribution = false;          
-    if(disableBranchIOAttribution){
+  getRequiredData() async {        
+    if(disableBranchIOAttribution&&!isIos){
        await checkForPermission();
     }
     setLoadingPercentage(0.0);
     await updateStringTable();
     setLoadingPercentage(30.0);
     final initData = await getInitData();
-
-    await _initBranchIoPlugin();
+    if(!isIos){
+       await _initBranchIoPlugin();
+    }
     await setInitData(initData);
     setLoadingPercentage(60.0);
     final result = await AuthCheck().checkStatus(widget.apiBaseUrl);
@@ -128,9 +133,11 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   initServices() async {
-    
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
+    if(isIos){
+       await _initBranchIoPlugin();
+    }
   }
 
 
