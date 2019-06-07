@@ -61,15 +61,18 @@ class SignupState extends State<Signup> {
   @override
   void initState() {
     super.initState();
-
-    getLocalStorageValues();
-    getAndroidDeviceInfo().then((String value) {});
+    initServices();
     if (Platform.isIOS) {
       isIos = true;
     }
     
   }
 
+
+initServices() async {
+    await getLocalStorageValues();
+    await getAndroidDeviceInfo();
+}
   getLocalStorageValues() {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
@@ -207,10 +210,14 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
+
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
       _payload["phone"] = _authName;
@@ -377,7 +384,10 @@ print("############################Sign Up _payload##########");
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }

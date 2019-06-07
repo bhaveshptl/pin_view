@@ -64,17 +64,18 @@ class SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     super.initState();
-
-    getLocalStorageValues();
-    getAndroidDeviceInfo().then((String value) {});
-    deleteInternalStorageFile("howzat_fantasy.apk");
+    initServices();
+    //deleteInternalStorageFile("howzat_fantasy.apk");
   }
-
+  initServices() async {
+    await getLocalStorageValues();
+    await getAndroidDeviceInfo();
+}
   getLocalStorageValues() {
     Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
     getbranchRefCode.then((value) {
-      if (value.length > 0) {
+      if (value!=null && value.length > 0) {
         _pfRefCode = value;
 
         print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
@@ -86,7 +87,7 @@ class SignInPageState extends State<SignInPage> {
     Future<dynamic> getbranchReferringLink = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
     getbranchReferringLink.then((value) {
-      if (value.length > 0) {
+      if (value!=null && value.length > 0) {
         _installReferring_link = value;
         print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
         print(_installReferring_link);
@@ -98,7 +99,7 @@ class SignInPageState extends State<SignInPage> {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
     firebasedeviceid.then((value) {
-      if (value.length > 0) {
+      if (value!=null && value.length > 0) {
         _deviceId = value;
       } else {
         _getFirebaseToken();
@@ -204,7 +205,10 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
@@ -341,7 +345,10 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
