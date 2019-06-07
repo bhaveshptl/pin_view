@@ -632,6 +632,7 @@ import Firebase
             "lastUpdateTime":"",
             "device_ip_":MyDeviceInfo.getDeviceIPAddress(),
             "network_type":MyDeviceInfo.getNetworkType(),
+            "googleaddid":MyDeviceInfo.identifierForAdvertising()!
         ]
         device_info_result(deviceInfoDict)
     }

@@ -25,10 +25,10 @@ class InitPayState extends State<InitPay> {
   @override
   void initState() {
     super.initState();
-    setWebview();
     if (Platform.isIOS) {
       isIos = true;
     }
+    setWebview();
   }
 
   setWebview() async {

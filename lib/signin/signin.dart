@@ -104,28 +104,9 @@ class SignInPageState extends State<SignInPage> {
         _getFirebaseToken();
       }
     });
-
-    Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
-    googleAddId_from_local.then((value) {
-      if (value.length > 0) {
-        googleAddId = value;
-      } else {
-        _getGoogleAddId().then((String value) {
-          googleAddId = value;
-        });
-      }
-    });
   }
 
-  Future<String> _getGoogleAddId() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
-    } catch (e) {}
-    return value;
-  }
-
+  
   Future<String> getAndroidDeviceInfo() async {
     Map<dynamic, dynamic> value;
     try {
@@ -235,7 +216,6 @@ class SignInPageState extends State<SignInPage> {
       "deviceId": _deviceId,
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
       "refCode": _pfRefCode,
       "branchinstallReferringlink": _installReferring_link,
@@ -262,6 +242,7 @@ class SignInPageState extends State<SignInPage> {
     }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];
@@ -372,7 +353,6 @@ class SignInPageState extends State<SignInPage> {
       "deviceId": _deviceId,
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
     };
 
@@ -397,6 +377,7 @@ class SignInPageState extends State<SignInPage> {
 
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];

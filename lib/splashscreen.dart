@@ -128,24 +128,11 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   initServices() async {
-    await _getGoogleAddId();
+    
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
   }
 
-  Future<String> _getGoogleAddId() async {
-    String value;
-    try {
-      value = await branch_io_platform
-          .invokeMethod('_getGoogleAddId')
-          .timeout(Duration(seconds: 10));
-      print("####Google Add ID#######");
-      print(value);
-      SharedPrefHelper.internal()
-          .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, value);
-    } catch (e) {}
-    return value;
-  }
 
   _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();

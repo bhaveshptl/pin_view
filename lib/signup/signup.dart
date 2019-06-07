@@ -48,8 +48,6 @@ class SignupState extends State<Signup> {
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
   
-    
-
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -121,26 +119,9 @@ class SignupState extends State<Signup> {
         });
       }
     });
-    Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
-    googleAddId_from_local.then((value) {
-      if (value.length > 0) {
-        googleAddId = value;
-      } else {
-        _getGoogleAddId().then((String value) {
-          googleAddId = value;
-        });
-      }
-    });
   }
 
-  Future<String> _getGoogleAddId() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
-    } catch (e) {}
-    return value;
-  }
+  
 
   Future<String> _getFirebaseToken() async {
     String value;
@@ -246,7 +227,6 @@ class SignupState extends State<Signup> {
       "deviceId": _deviceId,
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
@@ -273,6 +253,7 @@ class SignupState extends State<Signup> {
     }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];
@@ -409,7 +390,6 @@ print("############################Sign Up _payload##########");
       "uid": "",
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
@@ -437,6 +417,7 @@ print("############################Sign Up _payload##########");
 
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];

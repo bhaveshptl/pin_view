@@ -1068,6 +1068,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             params.put("lastUpdateTime", deviceInfoList.get("lastUpdateTime"));
             params.put("device_ip_", deviceInfoList.get("device_IPv4"));
             params.put("network_type", deviceData.getConnectionType(this));
+            params.put("googleAdId",getGoogleAddId());
             List email = deviceData.getGoogleEmailList(this);
             int emailIndex = 1;
             for (Object s : email) {
