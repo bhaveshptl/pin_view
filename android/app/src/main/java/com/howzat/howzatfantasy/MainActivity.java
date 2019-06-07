@@ -107,7 +107,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private void initWebEngage(){
 
         WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
-                .setWebEngageKey("~47b6585d")
+                .setWebEngageKey("~47b65866")
                 .setDebugMode(true) // only in development mode
                 .build();
         this.getApplication().registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
