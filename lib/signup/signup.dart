@@ -253,10 +253,14 @@ initServices() async {
           }
         });
       }
-    } else {
+    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+      _payload["context"]["utm_source"] = "xiaomi";
+      _payload["context"]["utm_medium"] = "xiaomi-store";
+      _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
@@ -419,11 +423,16 @@ print("############################Sign Up _payload##########");
           }
         });
       }
-    } else {
+    } else if(AppConfig.of(context).privateAttributionName=="oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+      _payload["context"]["utm_source"] = "xiaomi";
+      _payload["context"]["utm_medium"] = "xiaomi-store";
+      _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
+
 
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];

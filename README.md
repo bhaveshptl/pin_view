@@ -54,3 +54,11 @@ pod deintegrate
 pod install
 
 
+#Private Attribution
+privateAttributionName
+
+values={
+    oppo,xiaomi
+}
+
+

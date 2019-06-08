@@ -38,6 +38,7 @@ void main() async {
     channelId: channelId,
     showBackground: false,
     disableBranchIOAttribution:false,
+    privateAttributionName:"",
     apiBaseUrl: apiBaseUrl,
     carouselSlideTime: Duration(seconds: 10),
     child: StoreProvider(

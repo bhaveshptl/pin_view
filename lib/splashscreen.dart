@@ -60,7 +60,7 @@ class SplashScreenState extends State<SplashScreen>
     }
     initServices();
     if(disableBranchIOAttribution&&!isIos){
-       deleteInternalStorageFile("howzat_fantasy.apk");
+       deleteInternalStorageFile("howzat_fantasy_"+AppConfig.of(context).privateAttributionName+".apk");
     }
   }
 
