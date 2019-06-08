@@ -42,6 +42,8 @@ class SignInPageState extends State<SignInPage> {
   String _pfRefCode;
   String _userSelectedLoginType = "";
   bool bUpdateAppConfirmationShown = false;
+  bool disableBranchIOAttribution = false;
+  bool isIos = false;
   Map<dynamic, dynamic> androidDeviceInfoMap;
 
   final formKey = new GlobalKey<FormState>();
@@ -65,7 +67,13 @@ class SignInPageState extends State<SignInPage> {
   void initState() {
     super.initState();
     initServices();
-    //deleteInternalStorageFile("howzat_fantasy.apk");
+    
+    if (Platform.isIOS) {
+      isIos = true;
+    }
+    if(disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    }
   }
   initServices() async {
     await getLocalStorageValues();

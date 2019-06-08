@@ -47,7 +47,7 @@ class SignupState extends State<Signup> {
       const MethodChannel('com.algorin.pf.fcm');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
-  
+  bool disableBranchIOAttribution = false;
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -65,7 +65,9 @@ class SignupState extends State<Signup> {
     if (Platform.isIOS) {
       isIos = true;
     }
-    
+    if(disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    }
   }
 
 

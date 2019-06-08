@@ -26,6 +26,7 @@ class AnalyticsManager {
   static DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');    
 
   AnalyticsManager._internal();
   factory AnalyticsManager() => AnalyticsManager._internal();
@@ -215,6 +216,15 @@ class AnalyticsManager {
      var hmacSha256 = new Hmac(sha256, key); // HMAC-SHA256
     var digest = hmacSha256.convert(bytes);
      return digest.toString();
+  }
+
+   static Future<String> deleteInternalStorageFile(String filename) async {
+    String value;
+    try {
+      value = await utils_platform.invokeMethod(
+          'deleteInternalStorageFile', filename);
+    } catch (e) {}
+    return value;
   }
 
 

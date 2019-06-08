@@ -8,6 +8,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/profilepages/update.dart';
 import 'package:playfantasy/signup/signup.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/authcheck.dart';
@@ -60,7 +61,7 @@ class SplashScreenState extends State<SplashScreen>
     }
     initServices();
     if(disableBranchIOAttribution&&!isIos){
-       deleteInternalStorageFile("howzat_fantasy_"+AppConfig.of(context).privateAttributionName+".apk");
+       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
     }
   }
 
@@ -230,14 +231,7 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  Future<String> deleteInternalStorageFile(String filename) async {
-    String value;
-    try {
-      value = await utils_platform.invokeMethod(
-          'deleteInternalStorageFile', filename);
-    } catch (e) {}
-    return value;
-  }
+  
 
   askForPermission() async {
     final result =
