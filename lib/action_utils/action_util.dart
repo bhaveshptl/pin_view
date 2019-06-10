@@ -68,6 +68,7 @@ class ActionUtil {
                     scaffoldKey.currentContext,
                     contest,
                     errorResponse,
+                    createContestPayload: createContestPayload,
                     onJoin: () {
                       launchJoinContest(
                         league: league,
@@ -84,7 +85,7 @@ class ActionUtil {
         ),
       );
 
-      if (createContestPayload != null) {
+      if (createContestPayload != null && result != null) {
         final response = json.decode(result);
         if (!response["error"]) {
           final createdContest = Contest.fromJson(response["contest"]);
@@ -102,6 +103,8 @@ class ActionUtil {
             scaffoldKey.currentContext,
             contest,
             response,
+            userBalance: balance,
+            createContestPayload: createContestPayload,
             onJoin: () {
               launchJoinContest(
                 league: league,
@@ -128,7 +131,9 @@ class ActionUtil {
 
   onJoinContestError(
       BuildContext context, Contest contest, Map<String, dynamic> errorResponse,
-      {Function onJoin, Map<String, dynamic> userBalance}) async {
+      {Function onJoin,
+      Map<String, dynamic> userBalance,
+      Map<String, dynamic> createContestPayload}) async {
     JoinContestError error;
     if (errorResponse["error"] == true) {
       error = JoinContestError([errorResponse["resultCode"]]);
@@ -136,10 +141,11 @@ class ActionUtil {
       error = JoinContestError(errorResponse["reasons"]);
     }
 
-    double bonusUsable =
-        contest.entryFee == null || contest.bonusAllowed == null
+    double bonusUsable = createContestPayload == null
+        ? (contest.entryFee == null || contest.bonusAllowed == null
             ? 0.0
-            : (contest.entryFee * contest.bonusAllowed) / 100;
+            : (contest.entryFee * contest.bonusAllowed) / 100)
+        : 0.0;
     double usableBonus = userBalance["bonusBalance"] > bonusUsable
         ? (bonusUsable > userBalance["playableBonus"]
             ? userBalance["playableBonus"]
@@ -164,7 +170,7 @@ class ActionUtil {
             },
             barrierDismissible: false,
           );
-          if (result["success"]) {
+          if (result["success"] && createContestPayload == null) {
             onJoin();
           }
           break;
