@@ -60,13 +60,13 @@ class SplashScreenState extends State<SplashScreen>
       isIos = true;
     }
     initServices();
-    if(disableBranchIOAttribution&&!isIos){
-       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile(PrivateAttribution.getApkNameToDelete());
     }
   }
 
-  getRequiredData() async {        
-    if(disableBranchIOAttribution&&!isIos){
+  getRequiredData() async { 
+    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
        await checkForPermission();
     }
     setLoadingPercentage(0.0);

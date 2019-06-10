@@ -65,8 +65,8 @@ class SignupState extends State<Signup> {
     if (Platform.isIOS) {
       isIos = true;
     }
-    if(disableBranchIOAttribution&&!isIos){
-       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile(PrivateAttribution.getApkNameToDelete());
     }
   }
 
@@ -104,7 +104,7 @@ initServices() async {
     pfRefCodeFromBranch.then((value) {
       if (value != null && value.length > 0) {
         bool disableBranchIOAttribution =
-            AppConfig.of(context).disableBranchIOAttribution;
+            PrivateAttribution.disableBranchIOAttribution;
         if (!disableBranchIOAttribution) {
           _pfRefCode = value;
           setState(() {
@@ -114,7 +114,7 @@ initServices() async {
       } else {
         _getBranchRefCode().then((String refcode) {
           bool disableBranchIOAttribution =
-              AppConfig.of(context).disableBranchIOAttribution;
+             PrivateAttribution.disableBranchIOAttribution;
           if (!disableBranchIOAttribution) {
             _pfRefCode = refcode;
             setState(() {
@@ -241,8 +241,7 @@ initServices() async {
       "app_version_flutter": app_version_flutter
     };
 
-    bool disableBranchIOAttribution =
-        AppConfig.of(context).disableBranchIOAttribution;
+    bool disableBranchIOAttribution =PrivateAttribution.disableBranchIOAttribution;
 
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
@@ -255,11 +254,11 @@ initServices() async {
           }
         });
       }
-    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
+    }  else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
@@ -411,8 +410,7 @@ print("############################Sign Up _payload##########");
       "app_version_flutter": app_version_flutter
     };
 
-    bool disableBranchIOAttribution =
-        AppConfig.of(context).disableBranchIOAttribution;
+    bool disableBranchIOAttribution =PrivateAttribution.disableBranchIOAttribution;
 
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
@@ -425,11 +423,11 @@ print("############################Sign Up _payload##########");
           }
         });
       }
-    } else if(AppConfig.of(context).privateAttributionName=="oppo") {
+    } else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";

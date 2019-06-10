@@ -71,8 +71,8 @@ class SignInPageState extends State<SignInPage> {
     if (Platform.isIOS) {
       isIos = true;
     }
-    if(disableBranchIOAttribution&&!isIos){
-       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile(PrivateAttribution.getApkNameToDelete());
     }
   }
   initServices() async {
@@ -234,8 +234,7 @@ class SignInPageState extends State<SignInPage> {
       "app_version_flutter": app_version_flutter
     };
 
-    bool disableBranchIOAttribution =
-        AppConfig.of(context).disableBranchIOAttribution;
+    bool disableBranchIOAttribution = PrivateAttribution.disableBranchIOAttribution;
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
         var uri = Uri.parse(_installReferring_link);
@@ -247,11 +246,11 @@ class SignInPageState extends State<SignInPage> {
           }
         });
       }
-    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
+    }  else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
@@ -375,8 +374,7 @@ class SignInPageState extends State<SignInPage> {
       "serial": serial,
     };
 
-    bool disableBranchIOAttribution =
-        AppConfig.of(context).disableBranchIOAttribution;
+    bool disableBranchIOAttribution = PrivateAttribution.disableBranchIOAttribution;
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
         var uri = Uri.parse(_installReferring_link);
@@ -388,11 +386,11 @@ class SignInPageState extends State<SignInPage> {
           }
         });
       }
-    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
+    }  else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
