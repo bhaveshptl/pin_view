@@ -129,3 +129,42 @@ class ApiUtil {
   static const QUIZ_USER_BALANCE = "/api/v2/lobby/quiz-userbalance";
   static const GET_BANNERS = "/api/v2/lobby/banners";
 }
+
+class PrivateAttribution{
+  
+  static bool disableBranchIOAttribution =false;
+  static String attributionNumber = "1";
+  static bool getdisableBranchIOAttribution(){
+       return disableBranchIOAttribution;
+  }
+  static String getPrivateAttributionName(){
+       var attributionName = attributionNumber; 
+     switch(attributionName) { 
+      case "1": 
+      return "oppo"; 
+      case "2":  
+      return "xiaomi";
+      default: 
+      return ""; 
+   } 
+  }
+
+  static String getApkNameToDelete(){
+    String apkNameToDelete = "";
+    var attributionName = attributionNumber;
+    switch(attributionName) { 
+      case "1": 
+      apkNameToDelete="howzat_fantasy_oppo.apk";
+      break;
+      case "2": 
+      apkNameToDelete="howzat_fantasy_xiaomi.apk"; 
+      break;
+      default: 
+      apkNameToDelete="howzat.apk";
+      break;
+   }
+   return apkNameToDelete;
+  }
+
+
+}
