@@ -40,8 +40,10 @@ class SignInPageState extends State<SignInPage> {
   List<dynamic> _languages;
   String _installReferring_link = "";
   String _pfRefCode;
-  String _userSelectedLoginType="";
+  String _userSelectedLoginType = "";
   bool bUpdateAppConfirmationShown = false;
+  bool disableBranchIOAttribution = false;
+  bool isIos = false;
   Map<dynamic, dynamic> androidDeviceInfoMap;
 
   final formKey = new GlobalKey<FormState>();
@@ -54,6 +56,8 @@ class SignInPageState extends State<SignInPage> {
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
+  static const utils_platform =
+      const MethodChannel('com.algorin.pf.utils');    
   static const IconData gplus_squared =
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
@@ -62,16 +66,24 @@ class SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     super.initState();
-
-    getLocalStorageValues();
-    getAndroidDeviceInfo().then((String value) {});
+    initServices();
+    
+    if (Platform.isIOS) {
+      isIos = true;
+    }
+    if(disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    }
   }
-
+  initServices() async {
+    await getLocalStorageValues();
+    await getAndroidDeviceInfo();
+}
   getLocalStorageValues() {
     Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
     getbranchRefCode.then((value) {
-      if (value.length > 0) {
+      if (value!=null && value.length > 0) {
         _pfRefCode = value;
 
         print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
@@ -83,7 +95,7 @@ class SignInPageState extends State<SignInPage> {
     Future<dynamic> getbranchReferringLink = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
     getbranchReferringLink.then((value) {
-      if (value.length > 0) {
+      if (value!=null && value.length > 0) {
         _installReferring_link = value;
         print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
         print(_installReferring_link);
@@ -95,34 +107,15 @@ class SignInPageState extends State<SignInPage> {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
     firebasedeviceid.then((value) {
-      if (value.length > 0) {
+      if (value!=null && value.length > 0) {
         _deviceId = value;
       } else {
         _getFirebaseToken();
       }
     });
-
-    Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
-    googleAddId_from_local.then((value) {
-      if (value.length > 0) {
-        googleAddId = value;
-      } else {
-        _getGoogleAddId().then((String value) {
-          googleAddId = value;
-        });
-      }
-    });
   }
 
-  Future<String> _getGoogleAddId() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
-    } catch (e) {}
-    return value;
-  }
-
+  
   Future<String> getAndroidDeviceInfo() async {
     Map<dynamic, dynamic> value;
     try {
@@ -141,6 +134,17 @@ class SignInPageState extends State<SignInPage> {
     return value;
   }
 
+  Future<String> deleteInternalStorageFile(String filename) async {
+    String value;
+    try {
+      value = await utils_platform.invokeMethod('deleteInternalStorageFile',filename);
+      _deviceId = value;
+    } catch (e) {}
+    return value;
+  }
+
+
+
   showLoader(bool bShow) {
     AppConfig.of(context)
         .store
@@ -148,11 +152,11 @@ class SignInPageState extends State<SignInPage> {
   }
 
   bool isNumeric(String s) {
-  if(s == null) {
-    return false;
+    if (s == null) {
+      return false;
+    }
+    return double.parse(s, (e) => null) != null;
   }
-  return double.parse(s, (e) => null) != null;
-}
 
   updateStringTable(Map<String, dynamic> language) async {
     http.Request req = http.Request(
@@ -190,10 +194,10 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doSignIn(String _authName, String _password) async {
-    if(!isNumeric(_authName)){
-     _userSelectedLoginType="FORM_EMAIL";
-    }else{
-      _userSelectedLoginType="FORM_MOBILE";
+    if (!isNumeric(_authName)) {
+      _userSelectedLoginType = "FORM_EMAIL";
+    } else {
+      _userSelectedLoginType = "FORM_MOBILE";
     }
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -209,7 +213,10 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
@@ -221,26 +228,37 @@ class SignInPageState extends State<SignInPage> {
       "deviceId": _deviceId,
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
       "refCode": _pfRefCode,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
 
-    if (_installReferring_link.length > 0) {
-      var uri = Uri.parse(_installReferring_link);
-      uri.queryParameters.forEach((k, v) {
-        try {
-          _payload["context"][k] = v;
-        } catch (e) {
-          print(e);
-        }
-      });
+    bool disableBranchIOAttribution =
+        AppConfig.of(context).disableBranchIOAttribution;
+    if (!disableBranchIOAttribution) {
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
+    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
+      _payload["context"]["utm_source"] = "Oppo";
+      _payload["context"]["utm_medium"] = "Oppo Store";
+      _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+      _payload["context"]["utm_source"] = "xiaomi";
+      _payload["context"]["utm_medium"] = "xiaomi-store";
+      _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
-
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];
@@ -276,7 +294,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doGoogleLogin(BuildContext context) async {
-    _userSelectedLoginType="GOOGLE";
+    _userSelectedLoginType = "GOOGLE";
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
       scopes: [
@@ -302,7 +320,7 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _doFacebookLogin(BuildContext context) async {
-    _userSelectedLoginType="FACEBOOK";
+    _userSelectedLoginType = "FACEBOOK";
     showLoader(true);
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
@@ -339,7 +357,10 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
@@ -351,21 +372,35 @@ class SignInPageState extends State<SignInPage> {
       "deviceId": _deviceId,
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
     };
-    if (_installReferring_link.length > 0) {
-      var uri = Uri.parse(_installReferring_link);
-      uri.queryParameters.forEach((k, v) {
-        try {
-          _payload["context"][k] = v;
-        } catch (e) {
-          print(e);
-        }
-      });
+
+    bool disableBranchIOAttribution =
+        AppConfig.of(context).disableBranchIOAttribution;
+    if (!disableBranchIOAttribution) {
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
+    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
+      _payload["context"]["utm_source"] = "Oppo";
+      _payload["context"]["utm_medium"] = "Oppo Store";
+      _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+      _payload["context"]["utm_source"] = "xiaomi";
+      _payload["context"]["utm_medium"] = "xiaomi-store";
+      _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
+
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];
@@ -429,7 +464,6 @@ class SignInPageState extends State<SignInPage> {
     webEngageUserLogin(loginData["user_id"].toString(), loginData);
   }
 
-  
   Future<String> webEngageUserLogin(
       String userId, Map<String, dynamic> loginData) async {
     String result = "";
@@ -443,31 +477,40 @@ class SignInPageState extends State<SignInPage> {
       print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage login>>>>>>>>>>>>>>>>>>>>");
       print(result);
       webEngageEventLogin(loginData);
-
     } catch (e) {
       print(e);
     }
     return "";
   }
 
-
   Future<String> webEngageEventLogin(Map<String, dynamic> loginData) async {
     Map<dynamic, dynamic> signupdata = new Map();
     signupdata["registrationID"] = loginData["user_id"].toString();
     signupdata["transactionID"] = loginData["user_id"].toString();
-    signupdata["loginType"] = _userSelectedLoginType;
+    signupdata["chosenloginTypeByUser"] = _userSelectedLoginType;
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    String phone = "";
+    String email = "";
+    loginData.putIfAbsent("email_id",() => "");
+    loginData.putIfAbsent("mobile",() => "");
+     
+     if(loginData["email_id"].length>3){
+        email = AnalyticsManager.dosha256Encoding(loginData["email_id"]);
+     }
+     if(loginData["mobile"].length>3){
+        phone = AnalyticsManager.dosha256Encoding("+91"+loginData["mobile"]);
+     }
+    signupdata["phone"] = phone;
+    signupdata["email"] = email;
+    loginData.remove("email_id");
+    loginData.remove("mobile"); 
     signupdata["data"] = loginData;
     String trackValue;
     try {
       String trackValue = await webengage_platform.invokeMethod(
           'webEngageEventLogin', signupdata);
-      print("<<<<<<<<<<web engage user login event>>>>>>>");
-      print(trackValue);
     } catch (e) {
-      print("<<<<<<<<<<web engage user login event>>>>>>>");
-      print(e);
     }
     return trackValue;
   }
@@ -755,10 +798,12 @@ class SignInPageState extends State<SignInPage> {
                     children: <Widget>[
                       Text(
                         "Not a Member yet?",
-                        style:
-                            Theme.of(context).primaryTextTheme.subtitle.copyWith(
-                                  color: Colors.grey.shade600,
-                                ),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .subtitle
+                            .copyWith(
+                              color: Colors.grey.shade600,
+                            ),
                       ),
                       InkWell(
                         onTap: () {
@@ -782,7 +827,8 @@ class SignInPageState extends State<SignInPage> {
                     ],
                   ),
                   AppConfig.of(context).channelId != '3' &&
-                          AppConfig.of(context).channelId != '10' && AppConfig.of(context).channelId != '13'
+                          AppConfig.of(context).channelId != '10' &&
+                          AppConfig.of(context).channelId != '13'
                       ? Column(
                           children: <Widget>[
                             Row(

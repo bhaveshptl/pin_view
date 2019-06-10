@@ -777,34 +777,34 @@ class AppDrawerState extends State<AppDrawer> {
                         },
                       ),
                 Divider(height: 2.0),
-                BaseUrl().staticPageUrls["BLOG"] != null
-                    ? Column(
-                        children: <Widget>[
-                          ListTile(
-                            title: Text('Blog'),
-                            onTap: () {
-                              _launchStaticPage("BLOG");
-                            },
-                          ),
-                          Divider(height: 2.0),
-                        ],
-                      )
-                    : Container(),
-                AppConfig.of(context).channelId == "10"
-                    ? Container()
-                    : BaseUrl().staticPageUrls["FORUM"] != null
-                        ? Column(
-                            children: <Widget>[
-                              ListTile(
-                                title: Text('Forum'),
-                                onTap: () {
-                                  _launchStaticPage("FORUM");
-                                },
-                              ),
-                              Divider(height: 2.0),
-                            ],
-                          )
-                        : Container(),
+                // BaseUrl().staticPageUrls["BLOG"] != null
+                //     ? Column(
+                //         children: <Widget>[
+                //           ListTile(
+                //             title: Text('Blog'),
+                //             onTap: () {
+                //               _launchStaticPage("BLOG");
+                //             },
+                //           ),
+                //           Divider(height: 2.0),
+                //         ],
+                //       )
+                //     : Container(),
+                // AppConfig.of(context).channelId == "10"
+                //     ? Container()
+                //     : BaseUrl().staticPageUrls["FORUM"] != null
+                //         ? Column(
+                //             children: <Widget>[
+                //               ListTile(
+                //                 title: Text('Forum'),
+                //                 onTap: () {
+                //                   _launchStaticPage("FORUM");
+                //                 },
+                //               ),
+                //               Divider(height: 2.0),
+                //             ],
+                //           )
+                //         : Container(),
                 ListTile(
                   title: Text('Terms And Conditions'),
                   onTap: () {

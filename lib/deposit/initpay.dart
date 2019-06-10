@@ -20,15 +20,15 @@ class InitPayState extends State<InitPay> {
   bool isWebviewLoaded = false;
   Map<String, String> depositResponse;
   final flutterWebviewPlugin = FlutterWebviewPlugin();
-  bool isIos =false;
+  bool isIos = false;
 
   @override
   void initState() {
     super.initState();
-    setWebview();
     if (Platform.isIOS) {
-      isIos=true;
+      isIos = true;
     }
+    setWebview();
   }
 
   setWebview() async {
@@ -55,10 +55,21 @@ class InitPayState extends State<InitPay> {
       });
     }
 
-    flutterWebviewPlugin.evalJavascript("document.cookie='" + cookie + "'");
-    setState(() {
-      isWebviewLoaded = true;
-    });
+    if (isIos) {
+      await flutterWebviewPlugin
+          .evalJavascript("document.cookie='" + cookie + "'");
+      Map<String, String> cookiesMap = await flutterWebviewPlugin.getCookies();
+      if (cookiesMap["pids"].length > 0) {
+        setState(() {
+          isWebviewLoaded = true;
+        });
+      }
+    } else {
+      flutterWebviewPlugin.evalJavascript("document.cookie='" + cookie + "'");
+      setState(() {
+        isWebviewLoaded = true;
+      });
+    }
   }
 
   @override
@@ -71,7 +82,7 @@ class InitPayState extends State<InitPay> {
   Widget build(BuildContext context) {
     return isWebviewLoaded
         ? WebviewScaffold(
-            url: isIos?Uri.encodeFull(widget.url):widget.url,
+            url: isIos ? Uri.encodeFull(widget.url) : widget.url,
             withJavascript: true,
             enableAppScheme: true,
             withLocalStorage: true,

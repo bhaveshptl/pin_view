@@ -8,6 +8,9 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:crypto/src/digest_sink.dart';
 
 
 class AnalyticsManager {
@@ -23,6 +26,7 @@ class AnalyticsManager {
   static DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');    
 
   AnalyticsManager._internal();
   factory AnalyticsManager() => AnalyticsManager._internal();
@@ -188,5 +192,40 @@ class AnalyticsManager {
     }
     return "";
   }
+
+  static Future<String> webengageAddScreenData(Map<dynamic, dynamic> data) async {
+    String result = "";
+    try {
+      result =
+          await webengage_platform.invokeMethod('webengageAddScreenData', data);
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
+
+
+  static String  dosha256Encoding(String dataString){
+    var bytes = utf8.encode(dataString); // data being hashed
+    var key = utf8.encode('tyu7CVYUiiop67XTHophyRTyUItYRtErTTYUZAS');
+
+
+    //var digest = sha1.convert(bytes);
+
+     var hmacSha256 = new Hmac(sha256, key); // HMAC-SHA256
+    var digest = hmacSha256.convert(bytes);
+     return digest.toString();
+  }
+
+   static Future<String> deleteInternalStorageFile(String filename) async {
+    String value;
+    try {
+      value = await utils_platform.invokeMethod(
+          'deleteInternalStorageFile', filename);
+    } catch (e) {}
+    return value;
+  }
+
 
 }

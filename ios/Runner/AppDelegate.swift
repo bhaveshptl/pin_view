@@ -403,7 +403,7 @@ import Firebase
                 }
                 else if(call.method == "_getGoogleAddId"){
                     var  channelResult:String="";
-                    channelResult=MyDeviceInfo.identifierForAdvertising()!;
+                    channelResult=MyDeviceInfo.identifierForAdvertising();
                     result(channelResult)
                 }
                 else if(call.method == "_getAndroidDeviceInfo"){
@@ -632,6 +632,7 @@ import Firebase
             "lastUpdateTime":"",
             "device_ip_":MyDeviceInfo.getDeviceIPAddress(),
             "network_type":MyDeviceInfo.getNetworkType(),
+            "googleaddid":MyDeviceInfo.identifierForAdvertising()
         ]
         device_info_result(deviceInfoDict)
     }

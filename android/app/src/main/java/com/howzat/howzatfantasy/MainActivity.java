@@ -2,8 +2,11 @@ package com.howzat.howzatfantasy;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,6 +16,7 @@ import com.howzat.howzatfantasy.services.MyHelperClass;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +74,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
     private static final String BROWSER_LAUNCH_CHANNEL = "com.algorin.pf.browser";
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
+    private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
+
     MyHelperClass myHeperClass;
     String firebaseToken = "";
     String installReferring_link = "";
@@ -101,7 +107,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private void initWebEngage(){
 
         WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
-                .setWebEngageKey("~47b6585d")
+                .setWebEngageKey("~47b65866")
                 .setDebugMode(true) // only in development mode
                 .build();
         this.getApplication().registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
@@ -239,7 +245,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_getBranchRefCode")) {
                             String pfRefCode = (String) getRefCodeUsingBranch();
-
                             result.success(pfRefCode);
                         }
                         if (methodCall.method.equals("_initBranchIoPlugin")) {
@@ -401,10 +406,42 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String channelResult =trackEventsWithAttributes(arguments);
                     result.success(channelResult);
                 }
+                else if(methodCall.method.equals("webengageAddScreenData")){
+                    Map<String, Object> arguments = methodCall.arguments();
+                    String channelResult =webengageAddScreenData(arguments);
+                    result.success(channelResult);
+                }
                 else {
                     result.notImplemented();
                 }
 
+            }
+        });
+
+        new MethodChannel(getFlutterView(), UTILS_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+            @Override
+            public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                if (methodCall.method.equals("deleteInternalStorageFile")) {
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            String filename = methodCall.arguments();
+                            try{
+                                deleteIfFileExist(filename);
+                            }catch (Exception e){
+                            }
+                            try{
+                                File internalFileDirectory =new File(Environment.getExternalStorageDirectory().getPath());
+                                deleteFileRecursive(internalFileDirectory,filename);
+                            }
+                            catch(Exception e){
+                                System.out.print(e);
+                            }
+                        }
+                    });
+                } else {
+                    result.notImplemented();
+                }
             }
         });
     }
@@ -420,13 +457,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 weUser.logout();
                 return "Logout To Tracking event done";
             case "setEmail":
-                weUser.setEmail(arguments.get("value"));
+                weUser.setHashedEmail(arguments.get("value"));
                 return "Email track   added";
             case "setBirthDate":
                 weUser.setBirthDate(arguments.get("value"));
                 return "Birth Day track added";
             case "setPhoneNumber":
-                weUser.setPhoneNumber(arguments.get("value"));
+                weUser.setHashedPhoneNumber(arguments.get("value"));
                 return "Phone Number track added";
             case "setFirstName":
                 weUser.setFirstName(arguments.get("value"));
@@ -476,11 +513,26 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         weAnalytics.track(eventName,addedAttributes,new Analytics.Options().setHighReportingPriority(priority));
         return "Event "+eventName+ "" +"added";
     }
+    private String webengageAddScreenData(Map<String, Object> arguments){
+        System.out.println(arguments);
+        System.out.println(arguments);
+
+        String screenName=(String)arguments.get("screenName");
+        Map<String, Object> addedAttributes = new HashMap<>();
+        addedAttributes=(Map)arguments.get("data");
+        weAnalytics.screenNavigated(screenName,addedAttributes);
+        return "Screen Data added for the screen "+screenName;
+    }
+
+
 
     private String webEngageEventSigniup(Map<String, Object> arguments) {
 
         Map<String, Object> addCustomDataProperty = new HashMap<>();
         HashMap<String, Object> data = new HashMap();
+        String email = (String)arguments.get("email");
+        String phone = (String)arguments.get("phone");
+
         data = (HashMap) arguments.get("data");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
@@ -489,14 +541,31 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         weAnalytics.track("COMPLETE_REGISTRATION", addCustomDataProperty);
 
+        if(email !=null && email.length()>3){
+            weUser.setHashedEmail(email);
+            System.out.println(email);
+        }
+
+        if(phone !=null && phone.length()>3){
+           weUser.setHashedPhoneNumber(phone);
+
+        }
+
+        System.out.print((String)arguments.get("chosenloginTypeByUser"));
+        weUser.setAttribute("loginType", (String)arguments.get("chosenloginTypeByUser"));
+
         return "Web engage Sign Up Track event added";
 
     }
+
+
 
     private String webEngageEventLogin(Map<String, Object> arguments) {
         Map<String, Object> addCustomDataProperty = new HashMap<>();
         HashMap<String, Object> data = new HashMap();
         data = (HashMap) arguments.get("data");
+        String email = (String)arguments.get("email");
+        String phone = (String)arguments.get("phone");
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             addCustomDataProperty.put(entry.getKey(), "" + entry.getValue());
@@ -505,14 +574,14 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         weUser.setAttribute("loginType", "" + (String)arguments.get("loginType"));
 
+        System.out.print(phone);
 
-        if(data.get("email_id") != null){
-
-            weUser.setEmail((String)data.get("email_id"));
+        if(email !=null && email.length()>3){
+            weUser.setHashedEmail(email);
+            System.out.println(email);
         }
-        if(data.get("mobile") != null){
-
-            weUser.setPhoneNumber("+91"+(String)data.get("mobile"));
+        if(phone !=null && phone.length()>3){
+            weUser.setHashedPhoneNumber(phone);
         }
         if(data.get("first_name") != null){
             weUser.setFirstName((String)data.get("first_name"));
@@ -520,6 +589,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(data.get("last_name") != null){
             weUser.setLastName((String)data.get("last_name"));
         }
+        weUser.setAttribute("loginType", (String)arguments.get("chosenloginTypeByUser"));
         return "Web engage Login Track event added";
 
     }
@@ -852,6 +922,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         firebaseToken = token;
                     }
                 });
+
+//        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
+//                .setPushSmallIcon(R.drawable.notification_icon_small)
+//                .setPushLargeIcon(R.drawable.notification_icon_small)
+//                .setPushAccentColor(Color.parseColor("#ff0000"))
+//                .build();
     }
 
     private String getFireBaseToken() {
@@ -864,7 +940,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         }
                         String token = task.getResult().getToken();
                         firebaseToken = token;
-
+                        WebEngage.get().setRegistrationID(token);
                     }
                 });
         return firebaseToken;
@@ -918,6 +994,59 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return googleAdId;
     }
 
+
+
+    void deleteFileRecursive(File fileOrDirectory, String fileName) {
+        try{
+            if (fileOrDirectory.isDirectory()){
+                if(fileOrDirectory.exists()){
+                    System.out.print(fileOrDirectory);
+                    for (File child : fileOrDirectory.listFiles()){
+                        System.out.print(child);
+                        deleteFileRecursive(child,fileName);
+
+                    }
+                }
+            }
+
+        }catch(Exception e){
+            System.out.print(e);
+        }
+
+        System.out.print(fileOrDirectory);
+
+        try{
+            if(fileOrDirectory.isFile()){
+                if(fileOrDirectory.getName().endsWith(fileName)) {
+                    Boolean deleted = fileOrDirectory.delete();
+                    System.out.print(deleted);
+                }
+            }
+
+        }catch(Exception e){
+
+        }
+    }
+
+
+    public boolean deleteIfFileExist(String fname){
+        boolean deleted = false;
+        try{
+            File applictionFile =  new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS)+ "/"+fname);
+
+            if(applictionFile != null && applictionFile.exists()){
+                deleted = applictionFile.delete();
+                System.out.print(deleted);
+            }
+
+        }catch (Exception e){
+
+        }
+                return deleted;
+    }
+
+
     private Map<String, Object> getDeviceInfo() {
         Map<String, Object> params = new HashMap<>();
         Map<String, String> emailList = new HashMap();
@@ -939,6 +1068,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             params.put("lastUpdateTime", deviceInfoList.get("lastUpdateTime"));
             params.put("device_ip_", deviceInfoList.get("device_IPv4"));
             params.put("network_type", deviceData.getConnectionType(this));
+            params.put("googleAdId",getGoogleAddId());
             List email = deviceData.getGoogleEmailList(this);
             int emailIndex = 1;
             for (Object s : email) {

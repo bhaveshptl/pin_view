@@ -63,10 +63,18 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       initRazorpayNativePlugin();
     }
     
+    webengagePaymentModeInitEvent();
+  }
+
+   webengagePaymentModeInitEvent(){
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "PAYMENTMODE_PAGE_VISITED";
-    eventdata["priority"] = "true";
-    AnalyticsManager.webengageTrackEvent(eventdata);
+    Map<String,dynamic> data =Map();
+    data["promoCode"]=widget.promoCode;
+    data["depositAmount"]= widget.amount;
+    data["channelId"]= HttpManager.channelId;
+    eventdata["data"] = data;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
@@ -627,7 +635,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "isFirstDeposit": widget.paymentMode["isFirstDeposit"],
       "native": true,
     };
-
+    webEngagePaymentInitEvent(paymentModeDetails);
     int index = 0;
     payload.forEach((key, value) {
       if (index != 0) {
@@ -676,6 +684,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     } else {
       initPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
     }
+  }
+
+  webEngagePaymentInitEvent(Map<String, dynamic> paymentModeDetails) {
+    Map<dynamic, dynamic> eventdata = new Map();
+    eventdata["eventName"] = "PAYMENT_INIT_FROM_PAYMENTMODEPAGE";
+    eventdata["data"] = paymentModeDetails;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
 
   initPayment(String url) async {

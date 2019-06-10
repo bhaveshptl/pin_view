@@ -127,12 +127,26 @@ class AddCashState extends State<AddCash> {
     if (Platform.isIOS) {
         initRazorpayNativePlugin();
         isIos=true;  
-    }
+    }  
+    webengageAddCashInitEvent();
+  }
 
+  webengageAddCashInitEvent(){
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "ADDCASH_PAGE_VISITED";
-    eventdata["priority"] = "true";
-    AnalyticsManager.webengageTrackEvent(eventdata);
+    Map<String,dynamic> data =Map();
+    data["isItARepeatTransaction"]=bRepeatTransaction;
+    data["channelId"]= HttpManager.channelId;
+    eventdata["data"] = data;
+    AnalyticsManager.trackEventsWithAttributes(eventdata);
+    /*Web engage Screen Data */
+    Map<dynamic, dynamic> screendata = new Map();
+    screendata["screenName"] = "ADDCASH";
+    Map<String,dynamic> screenAttributedata =Map();
+    screenAttributedata["screenname"]="Add Cash";
+    screendata["data"] = screenAttributedata;
+    AnalyticsManager.webengageAddScreenData(screendata);
+
   }
 
   initWebview() {

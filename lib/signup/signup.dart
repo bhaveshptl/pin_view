@@ -21,6 +21,7 @@ import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+
 class Signup extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => new SignupState();
@@ -39,12 +40,14 @@ class SignupState extends State<Signup> {
   String _installReferring_link = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
   String _installReferringLink = "";
+  String chosenloginTypeByUser = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
+  bool disableBranchIOAttribution = false;
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final TextEditingController _referralCodeController = TextEditingController();
@@ -54,18 +57,24 @@ class SignupState extends State<Signup> {
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
       const IconData(0xf308, fontFamily: _kFontFam);
-  
+
   @override
   void initState() {
     super.initState();
-
-    getLocalStorageValues();
-    getAndroidDeviceInfo().then((String value) {});
+    initServices();
     if (Platform.isIOS) {
       isIos = true;
     }
+    if(disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    }
   }
 
+
+initServices() async {
+    await getLocalStorageValues();
+    await getAndroidDeviceInfo();
+}
   getLocalStorageValues() {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
@@ -94,39 +103,30 @@ class SignupState extends State<Signup> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
     pfRefCodeFromBranch.then((value) {
       if (value != null && value.length > 0) {
-        _pfRefCode = value;
-        setState(() {
-          _referralCodeController.text = _pfRefCode;
-        });
-      } else {
-        _getBranchRefCode().then((String refcode) {
-          _pfRefCode = refcode;
+        bool disableBranchIOAttribution =
+            AppConfig.of(context).disableBranchIOAttribution;
+        if (!disableBranchIOAttribution) {
+          _pfRefCode = value;
           setState(() {
             _referralCodeController.text = _pfRefCode;
           });
-        });
-      }
-    });
-    Future<dynamic> googleAddId_from_local = SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID);
-    googleAddId_from_local.then((value) {
-      if (value.length > 0) {
-        googleAddId = value;
+        }
       } else {
-        _getGoogleAddId().then((String value) {
-          googleAddId = value;
+        _getBranchRefCode().then((String refcode) {
+          bool disableBranchIOAttribution =
+              AppConfig.of(context).disableBranchIOAttribution;
+          if (!disableBranchIOAttribution) {
+            _pfRefCode = refcode;
+            setState(() {
+              _referralCodeController.text = _pfRefCode;
+            });
+          }
         });
       }
     });
   }
 
-  Future<String> _getGoogleAddId() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
-    } catch (e) {}
-    return value;
-  }
+  
 
   Future<String> _getFirebaseToken() async {
     String value;
@@ -136,6 +136,8 @@ class SignupState extends State<Signup> {
     } catch (e) {}
     return value;
   }
+
+  
 
   _getFirebaseId() async {
     _deviceId = await SharedPrefHelper.internal()
@@ -210,7 +212,10 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
@@ -218,9 +223,12 @@ class SignupState extends State<Signup> {
     Map<String, dynamic> _payload = {};
     if (isMobileNumber(_authName)) {
       _payload["phone"] = _authName;
+      chosenloginTypeByUser = "FORM_MOBILE";
     } else {
       _payload["email"] = _authName;
+      chosenloginTypeByUser = "FORM_EMAIL";
     }
+
     _payload["password"] = _password;
     _payload["context"] = {
       "refCode": _referralCodeController.text,
@@ -228,24 +236,37 @@ class SignupState extends State<Signup> {
       "deviceId": _deviceId,
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
-    if (_installReferring_link.length > 0) {
-      var uri = Uri.parse(_installReferring_link);
-      uri.queryParameters.forEach((k, v) {
-        try {
-          _payload["context"][k] = v;
-        } catch (e) {
-          print(e);
-        }
-      });
-    }
 
+    bool disableBranchIOAttribution =
+        AppConfig.of(context).disableBranchIOAttribution;
+
+    if (!disableBranchIOAttribution) {
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
+    }  else if(AppConfig.of(context).privateAttributionName=="oppo") {
+      _payload["context"]["utm_source"] = "Oppo";
+      _payload["context"]["utm_medium"] = "Oppo Store";
+      _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+      _payload["context"]["utm_source"] = "xiaomi";
+      _payload["context"]["utm_medium"] = "xiaomi-store";
+      _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
+    }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];
@@ -259,6 +280,9 @@ class SignupState extends State<Signup> {
       _payload["context"]["googleEmailList"] =
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
+
+print("############################Sign Up _payload##########");
+    print(_payload["context"]);
 
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
@@ -317,6 +341,7 @@ class SignupState extends State<Signup> {
           (GoogleSignInAuthentication _googleSignInAuthentication) {
             _sendTokenToAuthenticate(
                 _googleSignInAuthentication.accessToken, 1);
+            chosenloginTypeByUser = "GOOGLE";
           },
         ).whenComplete(() {
           showLoader(false);
@@ -337,6 +362,7 @@ class SignupState extends State<Signup> {
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         _sendTokenToAuthenticate(result.accessToken.token, 2);
+        chosenloginTypeByUser = "FACEBOOK";
         break;
       case FacebookLoginStatus.cancelledByUser:
         showLoader(false);
@@ -364,7 +390,10 @@ class SignupState extends State<Signup> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      model = androidDeviceInfoMap["model"];
+      try{
+         model = androidDeviceInfoMap["model"];
+      }catch (e){
+      }
       manufacturer = "Apple";
       serial = "";
     }
@@ -377,24 +406,39 @@ class SignupState extends State<Signup> {
       "uid": "",
       "model": model,
       "manufacturer": manufacturer,
-      "googleaddid": googleAddId,
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter
     };
 
-    if (_installReferring_link.length > 0) {
-      var uri = Uri.parse(_installReferring_link);
-      uri.queryParameters.forEach((k, v) {
-        try {
-          _payload["context"][k] = v;
-        } catch (e) {
-          print(e);
-        }
-      });
+    bool disableBranchIOAttribution =
+        AppConfig.of(context).disableBranchIOAttribution;
+
+    if (!disableBranchIOAttribution) {
+      if (_installReferring_link.length > 0) {
+        var uri = Uri.parse(_installReferring_link);
+        uri.queryParameters.forEach((k, v) {
+          try {
+            _payload["context"][k] = v;
+          } catch (e) {
+            print(e);
+          }
+        });
+      }
+    } else if(AppConfig.of(context).privateAttributionName=="oppo") {
+      _payload["context"]["utm_source"] = "Oppo";
+      _payload["context"]["utm_medium"] = "Oppo Store";
+      _payload["context"]["utm_campaign"] = "Oppo World Cup";
+    } else if(AppConfig.of(context).privateAttributionName=="xiaomi"){
+      _payload["context"]["utm_source"] = "xiaomi";
+      _payload["context"]["utm_medium"] = "xiaomi-store";
+      _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
+
+
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
+      _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
       _payload["context"]["platformType"] = androidDeviceInfoMap["version"];
       _payload["context"]["network_operator"] =
           androidDeviceInfoMap["network_operator"];
@@ -421,7 +465,7 @@ class SignupState extends State<Signup> {
       body: json.encode(_payload),
     )
         .then((http.Response res) {
-          showLoader(false);
+      showLoader(false);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         AuthResult(res, _scaffoldKey).processResult(
           () {},
@@ -479,6 +523,16 @@ class SignupState extends State<Signup> {
     signupdata["transactionID"] = loginData["user_id"].toString();
     signupdata["description"] =
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
+    String phone = "";
+    String email = "";
+    if (isMobileNumber(_authName)) {
+      phone = AnalyticsManager.dosha256Encoding("+91"+_authName);
+    } else {
+      email = AnalyticsManager.dosha256Encoding(_authName);
+    }
+    signupdata["phone"] = phone;
+    signupdata["email"] = email;
+    signupdata["chosenloginTypeByUser"] = chosenloginTypeByUser;
     signupdata["data"] = loginData;
     String trackValue;
     try {
@@ -522,7 +576,7 @@ class SignupState extends State<Signup> {
     return trackValue;
   }
 
-  openTermsAndConditionsPage(){
+  openTermsAndConditionsPage() {
     String url = "";
     String title = "";
     title = "TERMS AND CONDITIONS";
@@ -854,12 +908,11 @@ class SignupState extends State<Signup> {
                   InkWell(
                     child: Text(
                       " Login Now.",
-                      style:
-                          Theme.of(context).primaryTextTheme.title.copyWith(
-                                color: Theme.of(context).primaryColor,
-                                fontWeight: FontWeight.w500,
-                                decoration: TextDecoration.underline,
-                              ),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
                     ),
                     onTap: () {
                       _launchSignIn();

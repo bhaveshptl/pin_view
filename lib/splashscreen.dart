@@ -8,6 +8,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/profilepages/update.dart';
 import 'package:playfantasy/signup/signup.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/authcheck.dart';
@@ -15,18 +16,21 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:permission/permission.dart';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
   final String apiBaseUrl;
   final String analyticsUrl;
   final String fcmSubscribeId;
+  final bool disableBranchIOAttribution;
 
   SplashScreen({
     this.apiBaseUrl,
     this.fcmSubscribeId,
     this.analyticsUrl,
     this.channelId,
+    this.disableBranchIOAttribution
   });
 
   @override
@@ -43,26 +47,35 @@ class SplashScreenState extends State<SplashScreen>
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
+  PermissionStatus permissionStatus = PermissionStatus.allow;
+  bool isIos = false;
+  bool disableBranchIOAttribution = false;
 
   @override
   void initState() {
     getRequiredData();
     super.initState();
-
-    _getFirebaseToken();
-    _initBranchStuff();
-    _getGoogleAddId();
-    _subscribeToFirebaseTopic(widget.fcmSubscribeId);
+    if (Platform.isIOS) {
+      isIos = true;
+    }
+    initServices();
+    if(disableBranchIOAttribution&&!isIos){
+       AnalyticsManager.deleteInternalStorageFile("howzat_fantasy_xiaomi.apk");
+    }
   }
 
-  getRequiredData() async {
+  getRequiredData() async {        
+    if(disableBranchIOAttribution&&!isIos){
+       await checkForPermission();
+    }
     setLoadingPercentage(0.0);
     await updateStringTable();
     setLoadingPercentage(30.0);
     final initData = await getInitData();
-
-    await _initBranchIoPlugin();
-
+    if(!isIos){
+       await _initBranchIoPlugin();
+    }
     await setInitData(initData);
     setLoadingPercentage(60.0);
     final result = await AuthCheck().checkStatus(widget.apiBaseUrl);
@@ -120,21 +133,14 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  _initBranchStuff() {
-    // _initBranchIoPlugin();
-    _getGoogleAddId().then((String googleaddid) {
-      SharedPrefHelper.internal().saveToSharedPref(
-          ApiUtil.SHARED_PREFERENCE_GOOGLE_ADDID, googleaddid);
-    });
+  initServices() async {
+    await _getFirebaseToken();
+    await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
+    if(isIos){
+       await _initBranchIoPlugin();
+    }
   }
 
-  Future<String> _getGoogleAddId() async {
-    String value;
-    try {
-      value = await branch_io_platform.invokeMethod('_getGoogleAddId');
-    } catch (e) {}
-    return value;
-  }
 
   _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();
@@ -142,8 +148,6 @@ class SplashScreenState extends State<SplashScreen>
       final value = await branch_io_platform
           .invokeMethod('_initBranchIoPlugin')
           .timeout(Duration(seconds: 10));
-      print("<<<<<<<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>>>>>>>>>>>>>");
-      print(value);
       SharedPrefHelper.internal().saveToSharedPref(
           ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH,
           value["installReferring_link"]);
@@ -160,7 +164,11 @@ class SplashScreenState extends State<SplashScreen>
   Future<String> _getFirebaseToken() async {
     String value;
     try {
-      value = await firebase_fcm_platform.invokeMethod('_getFirebaseToken');
+      value = await firebase_fcm_platform
+          .invokeMethod('_getFirebaseToken')
+          .timeout(Duration(seconds: 10));
+      print("####Firebase Token#######");
+      print(value);
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, value);
     } catch (e) {}
@@ -170,8 +178,11 @@ class SplashScreenState extends State<SplashScreen>
   Future<String> _subscribeToFirebaseTopic(String topicName) async {
     String result;
     try {
-      result = await firebase_fcm_platform.invokeMethod(
-          '_subscribeToFirebaseTopic', topicName);
+      result = await firebase_fcm_platform
+          .invokeMethod('_subscribeToFirebaseTopic', topicName)
+          .timeout(Duration(seconds: 10));
+      print("####FCM Topic#######");
+      print(result);
     } catch (e) {
       print(e);
     }
@@ -220,17 +231,45 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
+  
+
+  askForPermission() async {
+    final result =
+        await Permission.requestSinglePermission(PermissionName.WriteStorage);
+    if (result != null) {
+      setState(() {
+        permissionStatus = result;
+      });
+    }
+    return result;
+  }
+
+  checkForPermission() async {
+    List<Permissions> permissions =
+        await Permission.getPermissionStatus([PermissionName.WriteStorage]);
+    setState(() {
+      permissionStatus = permissions[0].permissionStatus;
+    });
+
+    if (permissions[0].permissionStatus != PermissionStatus.allow) {
+      final result = await askForPermission();
+      if (result == PermissionStatus.allow) {
+        
+      }
+    }
+  }
+
   getInitData() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     double version = 0.0;
-    bool isIos =false;
+    bool isIos = false;
     if (Platform.isAndroid) {
       version = double.parse(packageInfo.version);
-      isIos=false;
+      isIos = false;
     }
     if (Platform.isIOS) {
-      version = 3.40;
-      isIos=true;
+      version = 3.73;
+      isIos = true;
     }
     http.Request req =
         http.Request("POST", Uri.parse(widget.apiBaseUrl + ApiUtil.INIT_DATA));

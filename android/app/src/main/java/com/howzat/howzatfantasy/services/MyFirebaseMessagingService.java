@@ -27,6 +27,7 @@ import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.webengage.sdk.android.WebEngage;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -47,6 +48,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
+
+        Map<String, String> webengagedata = remoteMessage.getData();
+        if(webengagedata != null) {
+            if(webengagedata.containsKey("source") && "webengage".equals(webengagedata.get("source"))) {
+                WebEngage.get().receive(webengagedata);
+            }
+        }
 
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
@@ -93,8 +101,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onNewToken(String token) {
         Log.d(TAG, "Refreshed token: " + token);
-
         sendRegistrationToServer(token);
+        WebEngage.get().setRegistrationID(token);
     }
 
     private void scheduleJob() {

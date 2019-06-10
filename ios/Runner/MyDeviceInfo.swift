@@ -40,7 +40,8 @@ class MyDeviceInfo{
     }
     
     static func getModel() ->String {
-        let modelName = UIDevice.modelName;
+        var modelName:String = "";
+        modelName = UIDevice.modelName;
         print("<<<<<<<<<<<,Model Name>>>>>>>>>");
         return modelName;
     }
@@ -152,10 +153,12 @@ class MyDeviceInfo{
     }
     
     
-    static func identifierForAdvertising() -> String? {
-        guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
-            return ""}
-        return ASIdentifierManager.shared().advertisingIdentifier.uuidString;
+    static func identifierForAdvertising() -> String {
+        var addId:String = "";
+        if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+           addId=ASIdentifierManager.shared().advertisingIdentifier.uuidString;
+        }
+        return addId;
     }
     
     
