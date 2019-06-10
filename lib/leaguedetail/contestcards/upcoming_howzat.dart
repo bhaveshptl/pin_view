@@ -114,7 +114,7 @@ class UpcomingHowzatContest extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
-                                contest.prizeType == 1
+                                contest.prizeType == 1 && contest.entryFee > 0
                                     ? Padding(
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 2.0),
@@ -127,7 +127,9 @@ class UpcomingHowzatContest extends StatelessWidget {
                                       )
                                     : Container(),
                                 Text(
-                                  formatCurrency.format(contest.entryFee),
+                                  contest.entryFee > 0
+                                      ? formatCurrency.format(contest.entryFee)
+                                      : "FREE",
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .subhead
@@ -273,11 +275,11 @@ class UpcomingHowzatContest extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  contest.teamsAllowed > 1
+                  contest.guaranteed
                       ? Container(
                           padding: EdgeInsets.all(4.0),
-                          width: 24.0,
                           height: 24.0,
+                          constraints: BoxConstraints(minWidth: 24.0),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -286,18 +288,47 @@ class UpcomingHowzatContest extends StatelessWidget {
                             ),
                             borderRadius: BorderRadius.circular(4.0),
                           ),
-                          child: Tooltip(
-                            message: strings.get("MAXIMUM_ENTRY").replaceAll(
-                                "\$count", contest.teamsAllowed.toString()),
-                            child: Text(
-                              "M",
-                              style: TextStyle(
-                                color: Colors.indigo,
-                                fontSize: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .fontSize,
-                                fontWeight: FontWeight.bold,
+                          child: Text(
+                            "G",
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .fontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                      : Container(),
+                  contest.teamsAllowed > 1
+                      ? Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Container(
+                            padding: EdgeInsets.all(4.0),
+                            height: 24.0,
+                            constraints: BoxConstraints(minWidth: 24.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.grey.shade300,
+                              ),
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            child: Tooltip(
+                              message: strings.get("MAXIMUM_ENTRY").replaceAll(
+                                  "\$count", contest.teamsAllowed.toString()),
+                              child: Text(
+                                "M" + contest.teamsAllowed.toString(),
+                                style: TextStyle(
+                                  color: Colors.indigo,
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .fontSize,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
@@ -308,8 +339,8 @@ class UpcomingHowzatContest extends StatelessWidget {
                           padding: EdgeInsets.only(left: 8.0),
                           child: Container(
                             padding: EdgeInsets.all(4.0),
-                            width: 24.0,
                             height: 24.0,
+                            constraints: BoxConstraints(minWidth: 24.0),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -323,7 +354,7 @@ class UpcomingHowzatContest extends StatelessWidget {
                                   "\$bonusPercent",
                                   contest.bonusAllowed.toString()),
                               child: Text(
-                                "B",
+                                "B" + contest.bonusAllowed.toString() + "%",
                                 style: TextStyle(
                                   color: Color.fromRGBO(70, 165, 12, 1),
                                   fontSize: Theme.of(context)

@@ -125,7 +125,7 @@ class ResultContest extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            contest.prizeType == 1
+                            contest.prizeType == 1 && contest.entryFee > 0
                                 ? Padding(
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 2.0),
@@ -138,7 +138,9 @@ class ResultContest extends StatelessWidget {
                                   )
                                 : Container(),
                             Text(
-                              formatCurrency.format(contest.entryFee),
+                              contest.entryFee > 0
+                                  ? formatCurrency.format(contest.entryFee)
+                                  : "FREE",
                               style: bodyStyle,
                             ),
                           ],

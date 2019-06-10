@@ -514,7 +514,7 @@ class CreateContestState extends State<CreateContest> {
                                 ),
                                 ContestTypeRadio(
                                   defaultValue: _prizeType,
-                                  allowedContestType: [1, 2],
+                                  allowedContestType: allowedContestType,
                                   onValueChanged: (int value) {
                                     _prizeType = value;
                                   },
