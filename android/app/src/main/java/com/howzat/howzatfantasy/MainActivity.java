@@ -618,10 +618,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private String webEngageTransactionSuccess(Map<String, Object> arguments) {
         boolean isfirstDepositor = false;
-        String eventName = "FIRST_DEPOSIT_SUCCESS";
+        String eventName = "DEPOSIT_SUCCESS";
         isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
         if (!isfirstDepositor) {
-            eventName = "REPEAT_DEPOSIT_SUCCESS";
+            eventName = "DEPOSIT_SUCCESS";
         }
         Map<String, Object> addCustomDataProperty = new HashMap<>();
         HashMap<String, Object> data = new HashMap();

@@ -101,7 +101,7 @@ class JoinContestState extends State<JoinContest> {
         widget.contest,
       );
     } else {
-       webEngageJoinContestEvent();
+      
       http.Request req = http.Request(
           "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_CONTEST));
       req.body = json.encode({
@@ -124,6 +124,7 @@ class JoinContestState extends State<JoinContest> {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["error"] == false) {
+              webEngageJoinContestEvent();
               Navigator.of(context).pop(response["message"]);
             } else if (response["error"] == true) {
               Navigator.of(context).pop(response["message"]);
@@ -218,12 +219,12 @@ class JoinContestState extends State<JoinContest> {
    DateTime date = new DateTime(now.year, now.month, now.day);
    Map<dynamic, dynamic> eventdata = new Map();
     Map<String, dynamic> webengageTeamData = new Map();
-    webengageTeamData["TeamId"]=widget.league.matchId;
+    webengageTeamData["TeamId"]=_teamToJoin.id;
     webengageTeamData["MatchId"]=widget.league.matchId;
     webengageTeamData["ContestId"]=widget.league.matchId;
     webengageTeamData["LeagueId"]=widget.l1Data.league.id;
     webengageTeamData["SeriesId"]=widget.league.series.id;
-    webengageTeamData["MatchDate"]=date.toString();
+    webengageTeamData["MatchDate"]=widget.l1Data.league.rounds[0].matches[0].startTime;
     webengageTeamData["MatchName"]=widget.l1Data.league.name;
     webengageTeamData["EntryFee"]=widget.contest.entryFee;
     webengageTeamData["PrizeType"]=widget.contest.prizeType;
