@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info/device_info.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -65,16 +66,17 @@ class SignupState extends State<Signup> {
     if (Platform.isIOS) {
       isIos = true;
     }
-    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
-       AnalyticsManager.deleteInternalStorageFile(PrivateAttribution.getApkNameToDelete());
+    if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
+      AnalyticsManager.deleteInternalStorageFile(
+          PrivateAttribution.getApkNameToDelete());
     }
   }
 
-
-initServices() async {
+  initServices() async {
     await getLocalStorageValues();
     await getAndroidDeviceInfo();
-}
+  }
+
   getLocalStorageValues() {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
@@ -114,7 +116,7 @@ initServices() async {
       } else {
         _getBranchRefCode().then((String refcode) {
           bool disableBranchIOAttribution =
-             PrivateAttribution.disableBranchIOAttribution;
+              PrivateAttribution.disableBranchIOAttribution;
           if (!disableBranchIOAttribution) {
             _pfRefCode = refcode;
             setState(() {
@@ -126,8 +128,6 @@ initServices() async {
     });
   }
 
-  
-
   Future<String> _getFirebaseToken() async {
     String value;
     try {
@@ -136,8 +136,6 @@ initServices() async {
     } catch (e) {}
     return value;
   }
-
-  
 
   _getFirebaseId() async {
     _deviceId = await SharedPrefHelper.internal()
@@ -212,10 +210,9 @@ initServices() async {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      try{
-         model = androidDeviceInfoMap["model"];
-      }catch (e){
-      }
+      try {
+        model = androidDeviceInfoMap["model"];
+      } catch (e) {}
       manufacturer = "Apple";
       serial = "";
     }
@@ -241,7 +238,8 @@ initServices() async {
       "app_version_flutter": app_version_flutter
     };
 
-    bool disableBranchIOAttribution =PrivateAttribution.disableBranchIOAttribution;
+    bool disableBranchIOAttribution =
+        PrivateAttribution.disableBranchIOAttribution;
 
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
@@ -254,11 +252,11 @@ initServices() async {
           }
         });
       }
-    }  else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
+    } else if (PrivateAttribution.getPrivateAttributionName == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
+    } else if (PrivateAttribution.getPrivateAttributionName == "xiaomi") {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
@@ -280,7 +278,7 @@ initServices() async {
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
 
-print("############################Sign Up _payload##########");
+    print("############################Sign Up _payload##########");
     print(_payload["context"]);
 
     http.Request req =
@@ -354,7 +352,7 @@ print("############################Sign Up _payload##########");
   _doFacebookLogin(BuildContext context) async {
     showLoader(true);
     var facebookLogin = new FacebookLogin();
-    facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
+    facebookLogin.loginBehavior = FacebookLoginBehavior.nativeOnly;
     var result = await facebookLogin
         .logInWithReadPermissions(['email', 'public_profile']);
 
@@ -389,10 +387,9 @@ print("############################Sign Up _payload##########");
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      try{
-         model = androidDeviceInfoMap["model"];
-      }catch (e){
-      }
+      try {
+        model = androidDeviceInfoMap["model"];
+      } catch (e) {}
       manufacturer = "Apple";
       serial = "";
     }
@@ -410,7 +407,8 @@ print("############################Sign Up _payload##########");
       "app_version_flutter": app_version_flutter
     };
 
-    bool disableBranchIOAttribution =PrivateAttribution.disableBranchIOAttribution;
+    bool disableBranchIOAttribution =
+        PrivateAttribution.disableBranchIOAttribution;
 
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
@@ -423,16 +421,15 @@ print("############################Sign Up _payload##########");
           }
         });
       }
-    } else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
+    } else if (PrivateAttribution.getPrivateAttributionName == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
+    } else if (PrivateAttribution.getPrivateAttributionName == "xiaomi") {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
-
 
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
@@ -524,7 +521,7 @@ print("############################Sign Up _payload##########");
     String phone = "";
     String email = "";
     if (isMobileNumber(_authName)) {
-      phone = AnalyticsManager.dosha256Encoding("+91"+_authName);
+      phone = AnalyticsManager.dosha256Encoding("+91" + _authName);
     } else {
       email = AnalyticsManager.dosha256Encoding(_authName);
     }
@@ -610,7 +607,12 @@ print("############################Sign Up _payload##########");
           padding: EdgeInsets.all(8.0),
           child: Row(
             children: <Widget>[
-              Image.asset("images/logo_white.png"),
+              // Image.asset("images/logo_white.png"),
+              SvgPicture.asset(
+                "images/logo_white.svg",
+                color: Colors.white,
+                width: 40.0,
+              ),
               Padding(
                 padding: EdgeInsets.only(left: 8.0),
                 child: Image.asset(
@@ -623,19 +625,20 @@ print("############################Sign Up _payload##########");
         ),
         actions: <Widget>[
           Padding(
-            padding: EdgeInsets.all(10.0),
-            child: ColorButton(
+            padding: EdgeInsets.only(top: 10.0, bottom: 6.0),
+            child: FlatButton(
               onPressed: () {
                 _launchSignIn();
               },
-              child: Text(
-                "Login".toUpperCase(),
-                style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-                      color: Color.fromRGBO(25, 14, 4, 1),
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              color: Color.fromRGBO(243, 180, 81, 1),
+              child: Image.asset("images/loginButton.png"),
+              // Text(
+              //   "Login".toUpperCase(),
+              //   style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+              //         color: Color.fromRGBO(25, 14, 4, 1),
+              //         fontWeight: FontWeight.w700,
+              //       ),
+              // ),
+              // color: Color.fromRGBO(243, 180, 81, 1),
             ),
           )
         ],
@@ -643,8 +646,9 @@ print("############################Sign Up _payload##########");
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250.jpg"),
+            Image.asset("images/referral.png"),
+            // Image.network(
+            //     "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
@@ -663,7 +667,7 @@ print("############################Sign Up _payload##########");
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 48.0),
+              padding: EdgeInsets.only(left: 48.0, right: 40.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -675,6 +679,7 @@ print("############################Sign Up _payload##########");
                           child: Column(
                             children: <Widget>[
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
                                     child: Padding(
@@ -693,10 +698,15 @@ print("############################Sign Up _payload##########");
                                             TextInputType.emailAddress,
                                       ),
                                     ),
-                                  )
+                                  ),
+                                  Text(
+                                    " *",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ],
                               ),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
                                     child: Padding(
@@ -726,14 +736,19 @@ print("############################Sign Up _payload##########");
                                         obscureText: _obscureText,
                                       ),
                                     ),
-                                  )
+                                  ),
+                                  Text(
+                                    " *",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ],
                               ),
                               Row(
                                 children: <Widget>[
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsets.only(bottom: 16.0),
+                                      padding: EdgeInsets.only(
+                                          bottom: 16.0, right: 8.0),
                                       child: SimpleTextBox(
                                         controller: _referralCodeController,
                                         labelText: strings.get("REFERRAL_CODE"),
@@ -747,6 +762,7 @@ print("############################Sign Up _payload##########");
                                   Expanded(
                                     child: Container(
                                       height: 48.0,
+                                      padding: EdgeInsets.only(right: 8.0),
                                       child: ColorButton(
                                         onPressed: () {
                                           if (formKey.currentState.validate()) {
@@ -818,7 +834,8 @@ print("############################Sign Up _payload##########");
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                padding: EdgeInsets.only(
+                                    top: 8.0, bottom: 8.0, right: 8.0),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
@@ -838,7 +855,7 @@ print("############################Sign Up _payload##########");
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                padding: EdgeInsets.only(top: 8.0, right: 8.0),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
@@ -877,13 +894,17 @@ print("############################Sign Up _payload##########");
                   textAlign: TextAlign.center,
                 ),
                 InkWell(
-                  child: Text(
-                    "T&C.",
-                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w900,
-                          decoration: TextDecoration.underline,
-                        ),
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 8.0, bottom: 8.0, top: 8.0),
+                    child: Text(
+                      "T&C.",
+                      style:
+                          Theme.of(context).primaryTextTheme.caption.copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w900,
+                                decoration: TextDecoration.underline,
+                              ),
+                    ),
                   ),
                   onTap: () {
                     openTermsAndConditionsPage();
@@ -905,7 +926,7 @@ print("############################Sign Up _payload##########");
                   ),
                   InkWell(
                     child: Text(
-                      " Login Now.",
+                      " Login Now",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
                             color: Theme.of(context).primaryColor,
                             fontWeight: FontWeight.w500,

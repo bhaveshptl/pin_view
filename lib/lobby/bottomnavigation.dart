@@ -16,7 +16,7 @@ class LobbyBottomNavigation extends StatelessWidget {
       BottomNavigationBarItem(
         icon: Image.asset(
           activeIndex == 0 ? "images/home-select.png" : "images/home.png",
-          height: 32.0,
+          height: 28.0,
         ),
         title: Text(
           "Home",
@@ -34,7 +34,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           activeIndex == 1
               ? "images/my-matches-select.png"
               : "images/my-matches.png",
-          height: 32.0,
+          height: 28.0,
         ),
         title: Text(
           "My Matches",
@@ -53,7 +53,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           activeIndex == 2
               ? "images/add-cash-select.png"
               : "images/add-cash.png",
-          height: 32.0,
+          height: 28.0,
         ),
         title: Text(
           "Add Cash",
@@ -72,10 +72,28 @@ class LobbyBottomNavigation extends StatelessWidget {
           activeIndex == 3
               ? "images/raf-earn-select.png"
               : "images/refer-earn.png",
-          height: 32.0,
+          height: 28.0,
         ),
         title: Text(
           "Refer & Earn",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+          maxLines: 2,
+        ),
+      ),
+    );
+
+    items.add(
+      BottomNavigationBarItem(
+        icon: Image.asset(
+          activeIndex == 4 ? "images/menu-icon.png" : "images/menu-icon.png",
+          height: 28.0,
+          width: 24.0,
+        ),
+        title: Text(
+          "More",
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w600,
@@ -100,7 +118,7 @@ class LobbyBottomNavigation extends StatelessWidget {
             ),
       ),
       child: Container(
-        height: 72.0,
+        height: 64.0,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(

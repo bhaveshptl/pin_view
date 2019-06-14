@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/createteam/createteam.dart';
@@ -178,15 +179,16 @@ class TeamPreview extends StatelessWidget {
     bool bIsMediumDevice = MediaQuery.of(context).size.height < 1080;
     return Stack(
       children: <Widget>[
-        Column(
-          children: <Widget>[
-            Expanded(
-              child: Image.asset(
-                "images/ground-image.png",
+        ConstrainedBox(
+          constraints: BoxConstraints.expand(),
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("images/ground-image.png"),
                 fit: BoxFit.fill,
               ),
             ),
-          ],
+          ),
         ),
         ScaffoldPage(
           backgroundColor: Colors.transparent,
@@ -223,11 +225,17 @@ class TeamPreview extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset(
-                      "images/logo_white.png",
+                    SvgPicture.asset(
+                      "images/logo_white.svg",
                       color: Colors.white30,
+                      width: 32.0,
                       height: bIsSmallDevice ? 24.0 : 56.0,
                     ),
+                    // Image.asset(
+                    //   "images/logo_white.png",
+                    //   color: Colors.white30,
+                    //   height: bIsSmallDevice ? 24.0 : 56.0,
+                    // ),
                     Padding(
                       padding: EdgeInsets.only(left: 8.0),
                       child: Image.asset(

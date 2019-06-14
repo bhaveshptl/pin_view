@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info/device_info.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -56,8 +57,7 @@ class SignInPageState extends State<SignInPage> {
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
-  static const utils_platform =
-      const MethodChannel('com.algorin.pf.utils');    
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   static const IconData gplus_squared =
       const IconData(0xf0d4, fontFamily: _kFontFam);
   static const IconData facebook_squared =
@@ -67,23 +67,26 @@ class SignInPageState extends State<SignInPage> {
   void initState() {
     super.initState();
     initServices();
-    
+
     if (Platform.isIOS) {
       isIos = true;
     }
-    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
-       AnalyticsManager.deleteInternalStorageFile(PrivateAttribution.getApkNameToDelete());
+    if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
+      AnalyticsManager.deleteInternalStorageFile(
+          PrivateAttribution.getApkNameToDelete());
     }
   }
+
   initServices() async {
     await getLocalStorageValues();
     await getAndroidDeviceInfo();
-}
+  }
+
   getLocalStorageValues() {
     Future<dynamic> getbranchRefCode = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
     getbranchRefCode.then((value) {
-      if (value!=null && value.length > 0) {
+      if (value != null && value.length > 0) {
         _pfRefCode = value;
 
         print("<<<<<<<<<<<<<<Ref Code>>>>>>>>>>>>>");
@@ -95,7 +98,7 @@ class SignInPageState extends State<SignInPage> {
     Future<dynamic> getbranchReferringLink = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
     getbranchReferringLink.then((value) {
-      if (value!=null && value.length > 0) {
+      if (value != null && value.length > 0) {
         _installReferring_link = value;
         print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
         print(_installReferring_link);
@@ -107,7 +110,7 @@ class SignInPageState extends State<SignInPage> {
     Future<dynamic> firebasedeviceid = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
     firebasedeviceid.then((value) {
-      if (value!=null && value.length > 0) {
+      if (value != null && value.length > 0) {
         _deviceId = value;
       } else {
         _getFirebaseToken();
@@ -115,7 +118,6 @@ class SignInPageState extends State<SignInPage> {
     });
   }
 
-  
   Future<String> getAndroidDeviceInfo() async {
     Map<dynamic, dynamic> value;
     try {
@@ -137,13 +139,12 @@ class SignInPageState extends State<SignInPage> {
   Future<String> deleteInternalStorageFile(String filename) async {
     String value;
     try {
-      value = await utils_platform.invokeMethod('deleteInternalStorageFile',filename);
+      value = await utils_platform.invokeMethod(
+          'deleteInternalStorageFile', filename);
       _deviceId = value;
     } catch (e) {}
     return value;
   }
-
-
 
   showLoader(bool bShow) {
     AppConfig.of(context)
@@ -213,10 +214,9 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      try{
-         model = androidDeviceInfoMap["model"];
-      }catch (e){
-      }
+      try {
+        model = androidDeviceInfoMap["model"];
+      } catch (e) {}
       manufacturer = "Apple";
       serial = "";
     }
@@ -234,7 +234,8 @@ class SignInPageState extends State<SignInPage> {
       "app_version_flutter": app_version_flutter
     };
 
-    bool disableBranchIOAttribution = PrivateAttribution.disableBranchIOAttribution;
+    bool disableBranchIOAttribution =
+        PrivateAttribution.disableBranchIOAttribution;
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
         var uri = Uri.parse(_installReferring_link);
@@ -246,11 +247,11 @@ class SignInPageState extends State<SignInPage> {
           }
         });
       }
-    }  else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
+    } else if (PrivateAttribution.getPrivateAttributionName == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
+    } else if (PrivateAttribution.getPrivateAttributionName == "xiaomi") {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
@@ -356,10 +357,9 @@ class SignInPageState extends State<SignInPage> {
     }
     if (Platform.isIOS) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      try{
-         model = androidDeviceInfoMap["model"];
-      }catch (e){
-      }
+      try {
+        model = androidDeviceInfoMap["model"];
+      } catch (e) {}
       manufacturer = "Apple";
       serial = "";
     }
@@ -374,7 +374,8 @@ class SignInPageState extends State<SignInPage> {
       "serial": serial,
     };
 
-    bool disableBranchIOAttribution = PrivateAttribution.disableBranchIOAttribution;
+    bool disableBranchIOAttribution =
+        PrivateAttribution.disableBranchIOAttribution;
     if (!disableBranchIOAttribution) {
       if (_installReferring_link.length > 0) {
         var uri = Uri.parse(_installReferring_link);
@@ -386,11 +387,11 @@ class SignInPageState extends State<SignInPage> {
           }
         });
       }
-    }  else if(PrivateAttribution.getPrivateAttributionName=="oppo") {
+    } else if (PrivateAttribution.getPrivateAttributionName == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if(PrivateAttribution.getPrivateAttributionName=="xiaomi"){
+    } else if (PrivateAttribution.getPrivateAttributionName == "xiaomi") {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
@@ -442,11 +443,18 @@ class SignInPageState extends State<SignInPage> {
   }
 
   _showForgotPassword() async {
-    final result = await Navigator.of(context).push(
-      FantasyPageRoute(
-        pageBuilder: (context) => ForgotPassword(),
-        fullscreenDialog: true,
-      ),
+    // final result = await Navigator.of(context).push(
+    //   FantasyPageRoute(
+    //     pageBuilder: (context) => ForgotPassword(),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
+
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ForgotPassword();
+      },
     );
 
     if (result != null && result == true) {
@@ -490,26 +498,25 @@ class SignInPageState extends State<SignInPage> {
         "CHANNEL" + loginData["channelId"].toString() + "SIGNUP";
     String phone = "";
     String email = "";
-    loginData.putIfAbsent("email_id",() => "");
-    loginData.putIfAbsent("mobile",() => "");
-     
-     if(loginData["email_id"].length>3){
-        email = AnalyticsManager.dosha256Encoding(loginData["email_id"]);
-     }
-     if(loginData["mobile"].length>3){
-        phone = AnalyticsManager.dosha256Encoding("+91"+loginData["mobile"]);
-     }
+    loginData.putIfAbsent("email_id", () => "");
+    loginData.putIfAbsent("mobile", () => "");
+
+    if (loginData["email_id"].length > 3) {
+      email = AnalyticsManager.dosha256Encoding(loginData["email_id"]);
+    }
+    if (loginData["mobile"].length > 3) {
+      phone = AnalyticsManager.dosha256Encoding("+91" + loginData["mobile"]);
+    }
     signupdata["phone"] = phone;
     signupdata["email"] = email;
     loginData.remove("email_id");
-    loginData.remove("mobile"); 
+    loginData.remove("mobile");
     signupdata["data"] = loginData;
     String trackValue;
     try {
       String trackValue = await webengage_platform.invokeMethod(
           'webEngageEventLogin', signupdata);
-    } catch (e) {
-    }
+    } catch (e) {}
     return trackValue;
   }
 
@@ -533,7 +540,12 @@ class SignInPageState extends State<SignInPage> {
           padding: EdgeInsets.all(8.0),
           child: Row(
             children: <Widget>[
-              Image.asset("images/logo_white.png"),
+              SvgPicture.asset(
+                "images/logo_white.svg",
+                color: Colors.white,
+                width: 40.0,
+              ),
+              // Image.asset("images/logo_white.png"),
               Padding(
                 padding: EdgeInsets.only(left: 8.0),
                 child: Image.asset(
@@ -546,19 +558,20 @@ class SignInPageState extends State<SignInPage> {
         ),
         actions: <Widget>[
           Padding(
-            padding: EdgeInsets.all(10.0),
-            child: ColorButton(
+            padding: EdgeInsets.only(top: 10.0, bottom: 6.0),
+            child: FlatButton(
               onPressed: () {
                 _launchSignup(context);
               },
-              child: Text(
-                "Register".toUpperCase(),
-                style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-                      color: Color.fromRGBO(25, 14, 4, 1),
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              color: Color.fromRGBO(243, 180, 81, 1),
+              child: Image.asset("images/RegisterButton.png"),
+              // Text(
+              //   "Register".toUpperCase(),
+              //   style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+              //         color: Color.fromRGBO(25, 14, 4, 1),
+              //         fontWeight: FontWeight.w700,
+              //       ),
+              // ),
+              // color: Color.fromRGBO(243, 180, 81, 1),
             ),
           )
         ],
@@ -586,7 +599,7 @@ class SignInPageState extends State<SignInPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 48.0),
+              padding: EdgeInsets.only(left: 48.0, right: 40.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -598,13 +611,14 @@ class SignInPageState extends State<SignInPage> {
                           child: Column(
                             children: <Widget>[
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
                                       child: SimpleTextBox(
                                         onSaved: (val) => _authName = val,
-                                        labelText: "Username or Email",
+                                        labelText: "Email or mobile",
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings
@@ -615,10 +629,15 @@ class SignInPageState extends State<SignInPage> {
                                             TextInputType.emailAddress,
                                       ),
                                     ),
-                                  )
+                                  ),
+                                  Text(
+                                    " *",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ],
                               ),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
                                     child: SimpleTextBox(
@@ -644,7 +663,11 @@ class SignInPageState extends State<SignInPage> {
                                       },
                                       obscureText: _obscureText,
                                     ),
-                                  )
+                                  ),
+                                  Text(
+                                    " *",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ],
                               ),
                             ],
@@ -653,28 +676,31 @@ class SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      InkWell(
-                        onTap: () {
-                          _showForgotPassword();
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(4.0, 4.0, 0.0, 4.0),
-                          child: Text(
-                            strings.get("FORGOT_PASSWORD"),
-                            style: TextStyle(
-                              color: Colors.black54,
-                              decoration: TextDecoration.underline,
+                  Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        InkWell(
+                          onTap: () {
+                            _showForgotPassword();
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 0.0, 4.0),
+                            child: Text(
+                              strings.get("FORGOT_PASSWORD"),
+                              style: TextStyle(
+                                color: Colors.black54,
+                                decoration: TextDecoration.underline,
+                              ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0),
+                    padding: EdgeInsets.only(top: 8.0, right: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -706,7 +732,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0),
+                    padding: EdgeInsets.only(top: 8.0, right: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -752,7 +778,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -772,7 +798,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(

@@ -25,13 +25,12 @@ class SplashScreen extends StatefulWidget {
   final String fcmSubscribeId;
   final bool disableBranchIOAttribution;
 
-  SplashScreen({
-    this.apiBaseUrl,
-    this.fcmSubscribeId,
-    this.analyticsUrl,
-    this.channelId,
-    this.disableBranchIOAttribution
-  });
+  SplashScreen(
+      {this.apiBaseUrl,
+      this.fcmSubscribeId,
+      this.analyticsUrl,
+      this.channelId,
+      this.disableBranchIOAttribution});
 
   @override
   SplashScreenState createState() => SplashScreenState();
@@ -60,21 +59,22 @@ class SplashScreenState extends State<SplashScreen>
       isIos = true;
     }
     initServices();
-    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
-       AnalyticsManager.deleteInternalStorageFile(PrivateAttribution.getApkNameToDelete());
+    if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
+      AnalyticsManager.deleteInternalStorageFile(
+          PrivateAttribution.getApkNameToDelete());
     }
   }
 
-  getRequiredData() async { 
-    if(PrivateAttribution.disableBranchIOAttribution&&!isIos){
-       await checkForPermission();
+  getRequiredData() async {
+    if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
+      await checkForPermission();
     }
     setLoadingPercentage(0.0);
     await updateStringTable();
     setLoadingPercentage(30.0);
     final initData = await getInitData();
-    if(!isIos){
-       await _initBranchIoPlugin();
+    if (!isIos) {
+      await _initBranchIoPlugin();
     }
     await setInitData(initData);
     setLoadingPercentage(60.0);
@@ -136,11 +136,10 @@ class SplashScreenState extends State<SplashScreen>
   initServices() async {
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
-    if(isIos){
-       await _initBranchIoPlugin();
+    if (isIos) {
+      await _initBranchIoPlugin();
     }
   }
-
 
   _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();
@@ -231,8 +230,6 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  
-
   askForPermission() async {
     final result =
         await Permission.requestSinglePermission(PermissionName.WriteStorage);
@@ -253,9 +250,7 @@ class SplashScreenState extends State<SplashScreen>
 
     if (permissions[0].permissionStatus != PermissionStatus.allow) {
       final result = await askForPermission();
-      if (result == PermissionStatus.allow) {
-        
-      }
+      if (result == PermissionStatus.allow) {}
     }
   }
 
@@ -314,143 +309,144 @@ class SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            decoration: AppConfig.of(context).channelId == '3'
-                ? BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color.fromRGBO(198, 57, 39, 1),
-                        Color.fromRGBO(26, 43, 93, 1)
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  )
-                : (AppConfig.of(context).channelId == "10"
-                    ? BoxDecoration(color: Theme.of(context).primaryColor)
-                    : (AppConfig.of(context).channelId == "13"
-                        ? BoxDecoration(color: Theme.of(context).primaryColor)
-                        : null)),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      backgroundColor: Colors.white,
+      body: AppConfig.of(context).channelId == "10" ||
+              AppConfig.of(context).channelId == "13"
+          ? Container(
+              color: Colors.white,
+              child: Image.asset(
+                "images/splashscreen.png",
+                fit: BoxFit.fitWidth,
+                alignment: Alignment.topCenter,
+              ),
+            )
+          : Stack(
+              children: <Widget>[
+                Container(
+                  decoration: (AppConfig.of(context).channelId == "10" ||
+                          AppConfig.of(context).channelId == "13"
+                      ? BoxDecoration(color: Theme.of(context).primaryColor)
+                      : null),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    constraints: BoxConstraints(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.80,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                      child: Image.asset(
+                                        "images/logo_with_name.png",
+                                        height: MediaQuery.of(context)
+                                                .devicePixelRatio *
+                                            80.0,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                AppConfig.of(context).channelId == '3'
+                    ? Padding(
+                        padding: EdgeInsets.only(bottom: 32.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            Container(
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * 0.80,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(5.0),
-                                child: Image.asset(
-                                  "images/logo_with_name.png",
-                                  height:
-                                      MediaQuery.of(context).devicePixelRatio *
-                                          80.0,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Image.asset("images/pci.png"),
+                                  height: 40.0,
                                 ),
-                              ),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Image.asset("images/paytm.png"),
+                                  height: 40.0,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Image.asset("images/visa.png"),
+                                  height: 40.0,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Image.asset("images/master.png"),
+                                  height: 40.0,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Image.asset("images/amex.png"),
+                                  height: 40.0,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: Image.asset("images/cashfree.png"),
+                                  height: 40.0,
+                                ),
+                              ],
                             ),
                           ],
+                        ),
+                      )
+                    : Container(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                          EdgeInsets.only(bottom: 4.0, left: 8.0, right: 8.0),
+                      child: Text(
+                        "LOADING...",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: loadingPercent / 100,
+                            backgroundColor: Colors.white12,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-          AppConfig.of(context).channelId == '3'
-              ? Padding(
-                  padding: EdgeInsets.only(bottom: 32.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(4.0),
-                            child: Image.asset("images/pci.png"),
-                            height: 40.0,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(4.0),
-                            child: Image.asset("images/paytm.png"),
-                            height: 40.0,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(4.0),
-                            child: Image.asset("images/visa.png"),
-                            height: 40.0,
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(4.0),
-                            child: Image.asset("images/master.png"),
-                            height: 40.0,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(4.0),
-                            child: Image.asset("images/amex.png"),
-                            height: 40.0,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(4.0),
-                            child: Image.asset("images/cashfree.png"),
-                            height: 40.0,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              : Container(),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(bottom: 4.0, left: 8.0, right: 8.0),
-                child: Text(
-                  "LOADING...",
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: LinearProgressIndicator(
-                      value: loadingPercent / 100,
-                      backgroundColor: Colors.white12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+              ],
+            ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -222,6 +223,13 @@ class LobbyState extends State<Lobby>
         routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
           showLoader(false);
         });
+        break;
+      case 4:
+        Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => AppDrawer(),
+          ),
+        );
         break;
     }
   }
@@ -463,6 +471,12 @@ class LobbyState extends State<Lobby>
       });
     }
 
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 2,
+    );
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: ScaffoldPage(
@@ -472,27 +486,37 @@ class LobbyState extends State<Lobby>
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Container(
-                height: 32.0,
+              SvgPicture.asset(
+                "images/logo_white.svg",
+                color: Colors.white,
                 width: 32.0,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: Image.asset(
-                    "images/logo_white.png",
-                    width: 48.0,
-                  ),
-                ),
               ),
               ColorButton(
+                padding: EdgeInsets.only(
+                    left: 8.0, right: 6.0, top: 6.0, bottom: 6.0),
+                borderRadius: BorderRadius.circular(24.0),
+                color: Colors.white12,
+                elevation: 0.0,
                 child: Row(
                   children: <Widget>[
-                    Text(
-                      "ADD CASH",
-                      style:
-                          Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                              ),
+                    Image.asset(
+                      "images/add-cash-header.png",
+                      height: 24.0,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        formatCurrency.format(userBalance),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                      ),
+                    ),
+                    Image.asset(
+                      "images/header_add.png",
+                      height: 30.0,
                     ),
                   ],
                 ),
@@ -500,25 +524,25 @@ class LobbyState extends State<Lobby>
                   _launchAddCash();
                 },
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    FantasyPageRoute(
-                      pageBuilder: (context) => AppDrawer(),
-                    ),
-                  );
-                },
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5.0),
-                  child: Container(
-                    color: Color.fromRGBO(242, 242, 242, 1),
-                    child: Image.asset(
-                      "images/person-icon.png",
-                      height: 40.0,
-                    ),
-                  ),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () {
+              //     Navigator.of(context).push(
+              //       FantasyPageRoute(
+              //         pageBuilder: (context) => AppDrawer(),
+              //       ),
+              //     );
+              //   },
+              //   child: ClipRRect(
+              //     borderRadius: BorderRadius.circular(5.0),
+              //     child: Container(
+              //       color: Color.fromRGBO(242, 242, 242, 1),
+              //       child: Image.asset(
+              //         "images/person-icon.png",
+              //         height: 40.0,
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           automaticallyImplyLeading: false,
