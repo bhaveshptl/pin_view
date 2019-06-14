@@ -5,7 +5,7 @@ import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
-import 'package:playfantasy/utils/analytics.dart';
+
 
 class AuthCheck {
   AuthCheck();
@@ -36,41 +36,12 @@ class AuthCheck {
   }
 
   setWebEngageKeys(Map<String,dynamic> data){
-
     if(data["user_id"] != null){
       Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackType"] = "login";
-      setEmailBody["value"] = data["user_id"];
+      setEmailBody["trackingType"] = "login";
+      setEmailBody["value"] = data["user_id"].toString();
       AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-    if(data["email_id"] != null){
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackType"] = "setEmail";
-      setEmailBody["value"] = AnalyticsManager.dosha256Encoding(data["email_id"]);
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-
-    if(data["mobile"] != null){
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackType"] = "setPhoneNumber";
-      setEmailBody["value"] = AnalyticsManager.dosha256Encoding("+91"+data["mobile"]);
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-
-    if(data["first_name"] != null){
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackType"] = "setFirstName";
-      setEmailBody["value"] = AnalyticsManager.dosha256Encoding(data["first_name"]);
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-
-    if(data["setLastName"] != null){
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackType"] = "setLastName";
-      setEmailBody["value"] = AnalyticsManager.dosha256Encoding(data["last_name"]);
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-
-
+    } 
   }
+  
 }
