@@ -101,7 +101,7 @@ class JoinContestState extends State<JoinContest> {
         widget.contest,
       );
     } else {
-       webEngageJoinContestEvent();
+      webEngageJoinContestEvent();
       http.Request req = http.Request(
           "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_CONTEST));
       req.body = json.encode({
@@ -213,50 +213,54 @@ class JoinContestState extends State<JoinContest> {
     });
   }
 
-  webEngageJoinContestEvent(){
-   DateTime now = new DateTime.now();
-   DateTime date = new DateTime(now.year, now.month, now.day);
-   Map<dynamic, dynamic> eventdata = new Map();
+  webEngageJoinContestEvent() {
+    DateTime now = new DateTime.now();
+    DateTime date = new DateTime(now.year, now.month, now.day);
+    Map<dynamic, dynamic> eventdata = new Map();
     Map<String, dynamic> webengageTeamData = new Map();
-    webengageTeamData["TeamId"]=widget.league.matchId;
-    webengageTeamData["MatchId"]=widget.league.matchId;
-    webengageTeamData["ContestId"]=widget.league.matchId;
-    webengageTeamData["LeagueId"]=widget.l1Data.league.id;
-    webengageTeamData["SeriesId"]=widget.league.series.id;
-    webengageTeamData["MatchDate"]=date.toString();
-    webengageTeamData["MatchName"]=widget.l1Data.league.name;
-    webengageTeamData["EntryFee"]=widget.contest.entryFee;
-    webengageTeamData["PrizeType"]=widget.contest.prizeType;
-    webengageTeamData["InningsId"]=widget.l1Data.league.inningsId;
-    webengageTeamData["contestCode"]=widget.contest.contestJoinCode;
-    webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
-    webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
-    webengageTeamData["Winningpool"]=widget.contest.prizeDetails[0]["totalPrizeAmount"];
-    webengageTeamData["SeriesName"]=widget.league.series.name;
-    webengageTeamData["Noofwinners"]=widget.contest.prizeDetails[0]["noOfPrizes"];
-    webengageTeamData["SeatLeft"]=widget. contest.size - widget.contest.joined;
-    webengageTeamData["Totaloccupancy"]=widget.contest.joined;
-    webengageTeamData["SeriesTypeInfo"]=widget.league.series.seriesTypeInfo;
-    webengageTeamData["SeriesStartDate"]=getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
-    webengageTeamData["SeriesEndDate"]=getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
-    eventdata["eventName"] ="CONTEST_JOINED";
+    webengageTeamData["TeamId"] = widget.league.matchId;
+    webengageTeamData["MatchId"] = widget.league.matchId;
+    webengageTeamData["ContestId"] = widget.league.matchId;
+    webengageTeamData["LeagueId"] = widget.l1Data.league.id;
+    webengageTeamData["SeriesId"] = widget.league.series.id;
+    webengageTeamData["MatchDate"] = date.toString();
+    webengageTeamData["MatchName"] = widget.l1Data.league.name;
+    webengageTeamData["EntryFee"] = widget.contest.entryFee;
+    webengageTeamData["PrizeType"] = widget.contest.prizeType;
+    webengageTeamData["InningsId"] = widget.l1Data.league.inningsId;
+    webengageTeamData["contestCode"] = widget.contest.contestJoinCode;
+    webengageTeamData["Team2"] =
+        widget.l1Data.league.rounds[0].matches[0].teamB.name;
+    webengageTeamData["Team1"] =
+        widget.l1Data.league.rounds[0].matches[0].teamA.name;
+    webengageTeamData["Winningpool"] =
+        widget.contest.prizeDetails[0]["totalPrizeAmount"];
+    webengageTeamData["SeriesName"] = widget.league.series.name;
+    webengageTeamData["Noofwinners"] =
+        widget.contest.prizeDetails[0]["noOfPrizes"];
+    webengageTeamData["SeatLeft"] = widget.contest.size - widget.contest.joined;
+    webengageTeamData["Totaloccupancy"] = widget.contest.joined;
+    webengageTeamData["SeriesTypeInfo"] = widget.league.series.seriesTypeInfo;
+    webengageTeamData["SeriesStartDate"] =
+        getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
+    webengageTeamData["SeriesEndDate"] =
+        getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
+    eventdata["eventName"] = "CONTEST_JOINED";
     eventdata["data"] = webengageTeamData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
-  
-  String getReadableDateFromTimeStamp(String timeStamp){
-    String convertedDate ="";
-    if(timeStamp.length>0){
-   DateTime date = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(timeStamp));
-    convertedDate= date.day.toString() +
-        "-" +
-        date.month.toString() +
-        "-" +
-        date.year.toString(); 
+
+  String getReadableDateFromTimeStamp(String timeStamp) {
+    String convertedDate = "";
+    if (timeStamp.length > 0) {
+      DateTime date = DateTime.fromMillisecondsSinceEpoch(int.parse(timeStamp));
+      convertedDate = date.day.toString() +
+          "-" +
+          date.month.toString() +
+          "-" +
+          date.year.toString();
     }
     return convertedDate;
-   
   }
 
   showLoader(bool bShow) {
@@ -294,339 +298,386 @@ class JoinContestState extends State<JoinContest> {
         title: Text("My Teams".toUpperCase()),
         elevation: 0.0,
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          LeagueTitle(
-            league: widget.league,
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    "Choose a team to join the contest".toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).primaryTextTheme.title.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
+      body: _myUniqueTeams.length == 0
+          ? Column(
+              children: <Widget>[
+                LeagueTitle(
+                  league: widget.league,
                 ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: _myUniqueTeams.map((MyTeam team) {
-                  Player captain;
-                  Player vCaptain;
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "Create a team to join the contest".toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ),
+                )
+              ],
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                LeagueTitle(
+                  league: widget.league,
+                ),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          "Choose a team to join the contest".toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: _myUniqueTeams.map((MyTeam team) {
+                        Player captain;
+                        Player vCaptain;
 
-                  team.players.forEach((Player player) {
-                    if (team.captain == player.id) {
-                      captain = player;
-                    } else if (team.viceCaptain == player.id) {
-                      vCaptain = player;
-                    }
-                  });
+                        team.players.forEach((Player player) {
+                          if (team.captain == player.id) {
+                            captain = player;
+                          } else if (team.viceCaptain == player.id) {
+                            vCaptain = player;
+                          }
+                        });
 
-                  return Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                                side: BorderSide(
-                                  color: (_teamToJoin != null &&
-                                          _teamToJoin.id == team.id)
-                                      ? Colors.green
-                                      : Colors.transparent,
-                                  width: 1.0,
-                                )),
-                            clipBehavior: Clip.hardEdge,
-                            child: FlatButton(
-                              onPressed: () {
-                                setState(() {
-                                  _teamToJoin = team;
-                                });
-                              },
-                              padding: EdgeInsets.all(0.0),
-                              child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    height: 40.0,
-                                    color: Colors.grey.shade100,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                        return Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4.0),
+                                      side: BorderSide(
+                                        color: (_teamToJoin != null &&
+                                                _teamToJoin.id == team.id)
+                                            ? Colors.green
+                                            : Colors.transparent,
+                                        width: 1.0,
+                                      )),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: FlatButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _teamToJoin = team;
+                                      });
+                                    },
+                                    padding: EdgeInsets.all(0.0),
+                                    child: Column(
                                       children: <Widget>[
-                                        Row(
-                                          children: <Widget>[
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(right: 8.0),
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: (_teamToJoin ==
-                                                                null ||
-                                                            _teamToJoin.id !=
-                                                                team.id)
-                                                        ? Colors.black
-                                                        : Color.fromRGBO(
-                                                            70, 165, 12, 1),
-                                                    width: 1.0,
-                                                  ),
-                                                ),
-                                                padding: EdgeInsets.all(2.0),
-                                                child: (_teamToJoin == null ||
-                                                        _teamToJoin.id !=
-                                                            team.id)
-                                                    ? CircleAvatar(
-                                                        radius: 6.0,
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                      )
-                                                    : CircleAvatar(
-                                                        radius: 6.0,
-                                                        backgroundColor:
-                                                            Colors.white,
-                                                        child: CircleAvatar(
-                                                          radius: 6.0,
-                                                          backgroundColor:
-                                                              Color.fromRGBO(70,
-                                                                  165, 12, 1),
+                                        Container(
+                                          height: 40.0,
+                                          color: Colors.grey.shade100,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 16.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        right: 8.0),
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
+                                                          color: (_teamToJoin ==
+                                                                      null ||
+                                                                  _teamToJoin
+                                                                          .id !=
+                                                                      team.id)
+                                                              ? Colors.black
+                                                              : Color.fromRGBO(
+                                                                  70,
+                                                                  165,
+                                                                  12,
+                                                                  1),
+                                                          width: 1.0,
                                                         ),
                                                       ),
+                                                      padding:
+                                                          EdgeInsets.all(2.0),
+                                                      child: (_teamToJoin ==
+                                                                  null ||
+                                                              _teamToJoin.id !=
+                                                                  team.id)
+                                                          ? CircleAvatar(
+                                                              radius: 6.0,
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                            )
+                                                          : CircleAvatar(
+                                                              radius: 6.0,
+                                                              backgroundColor:
+                                                                  Colors.white,
+                                                              child:
+                                                                  CircleAvatar(
+                                                                radius: 6.0,
+                                                                backgroundColor:
+                                                                    Color
+                                                                        .fromRGBO(
+                                                                            70,
+                                                                            165,
+                                                                            12,
+                                                                            1),
+                                                              ),
+                                                            ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    team.name,
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .subhead
+                                                        .copyWith(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                              InkWell(
+                                                child: Container(
+                                                  height: 40.0,
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                    "Preview",
+                                                    style: Theme.of(context)
+                                                        .primaryTextTheme
+                                                        .button
+                                                        .copyWith(
+                                                          color: Colors.blue,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                        ),
+                                                  ),
+                                                ),
+                                                onTap: () {
+                                                  Navigator.of(context).push(
+                                                    FantasyPageRoute(
+                                                      pageBuilder: (BuildContext
+                                                              context) =>
+                                                          TeamPreview(
+                                                            myTeam: team,
+                                                            league:
+                                                                widget.league,
+                                                            l1Data:
+                                                                widget.l1Data,
+                                                            allowEditTeam: true,
+                                                            fanTeamRules: widget
+                                                                .l1Data
+                                                                .league
+                                                                .fanTeamRules,
+                                                          ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    right: BorderSide(
+                                                      width: 1.0,
+                                                      color:
+                                                          Colors.grey.shade200,
+                                                    ),
+                                                  ),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 16.0,
+                                                      vertical: 8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        "Captain",
+                                                        style: Theme.of(context)
+                                                            .primaryTextTheme
+                                                            .body1
+                                                            .copyWith(
+                                                              color:
+                                                                  Colors.orange,
+                                                            ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 4.0),
+                                                        child: Text(
+                                                          captain.name,
+                                                          style: Theme.of(
+                                                                  context)
+                                                              .primaryTextTheme
+                                                              .body1
+                                                              .copyWith(
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                            Text(
-                                              team.name,
-                                              style: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .subhead
-                                                  .copyWith(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w600,
+                                            Expanded(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    right: BorderSide(
+                                                      width: 1.0,
+                                                      color:
+                                                          Colors.grey.shade200,
+                                                    ),
                                                   ),
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 16.0,
+                                                      vertical: 8.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        "Vice Captain",
+                                                        style: Theme.of(context)
+                                                            .primaryTextTheme
+                                                            .body1
+                                                            .copyWith(
+                                                              color:
+                                                                  Colors.blue,
+                                                            ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 4.0),
+                                                        child: Text(
+                                                          vCaptain.name,
+                                                          style: Theme.of(
+                                                                  context)
+                                                              .primaryTextTheme
+                                                              .body1
+                                                              .copyWith(
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ],
-                                        ),
-                                        InkWell(
-                                          child: Container(
-                                            height: 40.0,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              "Preview",
-                                              style: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .button
-                                                  .copyWith(
-                                                    color: Colors.blue,
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                  ),
-                                            ),
-                                          ),
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                              FantasyPageRoute(
-                                                pageBuilder:
-                                                    (BuildContext context) =>
-                                                        TeamPreview(
-                                                          myTeam: team,
-                                                          league: widget.league,
-                                                          l1Data: widget.l1Data,
-                                                          allowEditTeam: true,
-                                                          fanTeamRules: widget
-                                                              .l1Data
-                                                              .league
-                                                              .fanTeamRules,
-                                                        ),
-                                              ),
-                                            );
-                                          },
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              right: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.grey.shade200,
-                                              ),
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 16.0,
-                                                vertical: 8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  "Captain",
-                                                  style: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .body1
-                                                      .copyWith(
-                                                        color: Colors.orange,
-                                                      ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 4.0),
-                                                  child: Text(
-                                                    captain.name,
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .body1
-                                                        .copyWith(
-                                                          color: Colors.black,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            border: Border(
-                                              right: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.grey.shade200,
-                                              ),
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 16.0,
-                                                vertical: 8.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  "Vice Captain",
-                                                  style: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .body1
-                                                      .copyWith(
-                                                        color: Colors.blue,
-                                                      ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      EdgeInsets.only(top: 4.0),
-                                                  child: Text(
-                                                    vCaptain.name,
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .body1
-                                                        .copyWith(
-                                                          color: Colors.black,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          Container(
-            height: 72.0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  spreadRadius: 1.0,
-                  blurRadius: 2.0,
-                  color: Colors.grey.shade300,
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    height: 48.0,
-                    padding: EdgeInsets.only(right: 8.0, left: 40.0),
-                    child: ColorButton(
-                      onPressed: () {
-                        _onCreateTeam(context);
-                      },
-                      color: Colors.orange,
-                      child: Text(
-                        "Create Team".toUpperCase(),
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                      ),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
-                Expanded(
-                  child: Container(
-                    height: 48.0,
-                    padding: EdgeInsets.only(left: 8.0, right: 40.0),
-                    child: ColorButton(
-                      onPressed: _teamToJoin == null
-                          ? null
-                          : () {
-                              if (widget.contest != null) {
-                                _joinContest(context);
-                              } else if (widget.createContestPayload != null) {
-                                _createAndJoinContest(context);
-                              }
-                            },
-                      child: Text(
-                        "Join now".toUpperCase(),
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                      ),
-                    ),
-                  ),
-                )
               ],
             ),
-          )
-        ],
+      bottomNavigationBar: Container(
+        height: 72.0,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              spreadRadius: 1.0,
+              blurRadius: 2.0,
+              color: Colors.grey.shade300,
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                height: 48.0,
+                padding: EdgeInsets.only(right: 8.0, left: 40.0),
+                child: ColorButton(
+                  onPressed: () {
+                    _onCreateTeam(context);
+                  },
+                  color: Colors.orange,
+                  child: Text(
+                    "Create Team".toUpperCase(),
+                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: 48.0,
+                padding: EdgeInsets.only(left: 8.0, right: 40.0),
+                child: ColorButton(
+                  onPressed: _teamToJoin == null
+                      ? null
+                      : () {
+                          if (widget.contest != null) {
+                            _joinContest(context);
+                          } else if (widget.createContestPayload != null) {
+                            _createAndJoinContest(context);
+                          }
+                        },
+                  child: Text(
+                    "Join now".toUpperCase(),
+                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

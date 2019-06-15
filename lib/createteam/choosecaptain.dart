@@ -439,7 +439,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                       child: ColorButton(
                         color: Colors.orange,
                         child: Text(
-                          "Team Preview",
+                          "Team Preview".toUpperCase(),
                           style: Theme.of(context)
                               .primaryTextTheme
                               .subhead
@@ -481,7 +481,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                       height: 48.0,
                       child: ColorButton(
                         child: Text(
-                          "Save Team",
+                          "Save Team".toUpperCase(),
                           style: Theme.of(context)
                               .primaryTextTheme
                               .subhead

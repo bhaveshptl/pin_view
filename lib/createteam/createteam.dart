@@ -48,7 +48,7 @@ class CreateTeamState extends State<CreateTeam>
   int _selectedPlayersCount = 0;
   final double TEAM_LOGO_HEIGHT = 48.0;
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
-  bool isIos =false;
+  bool isIos = false;
   Player _captain;
   Player _vCaptain;
   String _sortedBy;
@@ -118,9 +118,9 @@ class CreateTeamState extends State<CreateTeam>
     });
     floatButtonWidget = Icon(Icons.navigate_next);
     if (Platform.isIOS) {
-      isIos=true;
+      isIos = true;
     }
-     webEngageCreateTeamInitiatedEvent();
+    webEngageCreateTeamInitiatedEvent();
   }
 
   _getSportsType() async {
@@ -652,61 +652,68 @@ class CreateTeamState extends State<CreateTeam>
     return team;
   }
 
-   webEngageCreateTeamInitiatedEvent(){
+  webEngageCreateTeamInitiatedEvent() {
     DateTime now = new DateTime.now();
     DateTime date = new DateTime(now.year, now.month, now.day);
     Map<dynamic, dynamic> eventdata = new Map();
     Map<String, dynamic> webengageTeamData = new Map();
-    webengageTeamData["MatchId"]=widget.league.matchId;
-    webengageTeamData["LeagueId"]=widget.l1Data.league.id;
-    webengageTeamData["SeriesId"]=widget.league.series.id;
-    webengageTeamData["MatchDate"]=date.toString();
-    webengageTeamData["MatchName"]=widget.l1Data.league.name;
-    webengageTeamData["SportType"]=_sportType;
-    webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
-    webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
-    webengageTeamData["SeriesTypeInfo"]=widget.league.series.seriesTypeInfo;
-    webengageTeamData["SeriesStartDate"]=getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
-    webengageTeamData["SeriesEndDate"]=getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
+    webengageTeamData["MatchId"] = widget.league.matchId;
+    webengageTeamData["LeagueId"] = widget.l1Data.league.id;
+    webengageTeamData["SeriesId"] = widget.league.series.id;
+    webengageTeamData["MatchDate"] = date.toString();
+    webengageTeamData["MatchName"] = widget.l1Data.league.name;
+    webengageTeamData["SportType"] = _sportType;
+    webengageTeamData["Team1"] =
+        widget.l1Data.league.rounds[0].matches[0].teamA.name;
+    webengageTeamData["Team2"] =
+        widget.l1Data.league.rounds[0].matches[0].teamB.name;
+    webengageTeamData["SeriesTypeInfo"] = widget.league.series.seriesTypeInfo;
+    webengageTeamData["SeriesStartDate"] =
+        getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
+    webengageTeamData["SeriesEndDate"] =
+        getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
     eventdata["eventName"] = "CREATE_TEAM_INITIATED";
-    webengageTeamData["Format"]="";
+    webengageTeamData["Format"] = "";
     eventdata["data"] = webengageTeamData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
+
   webEngageCreatedTeamEvent() {
     DateTime now = new DateTime.now();
     DateTime date = new DateTime(now.year, now.month, now.day);
     Map<String, dynamic> webengageTeamData = new Map();
-    webengageTeamData["MatchId"]=widget.league.matchId;
-    webengageTeamData["LeagueId"]=widget.l1Data.league.id;
-    webengageTeamData["SeriesId"]=widget.league.series.id;
-    webengageTeamData["MatchDate"]=date.toString();
-    webengageTeamData["MatchName"]=widget.l1Data.league.name;
-    webengageTeamData["SportType"]=_sportType;
-    webengageTeamData["Team1"]=widget.l1Data.league.rounds[0].matches[0].teamA.name;
-    webengageTeamData["Team2"]=widget.l1Data.league.rounds[0].matches[0].teamB.name;
-    webengageTeamData["Format"]="";
-    webengageTeamData["SelectedCaptain"]=_captain.name;
-    webengageTeamData["SeriesTypeInfo"]=widget.league.series.seriesTypeInfo;
-    webengageTeamData["SeriesStartDate"]=getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
-    webengageTeamData["SeriesEndDate"]=getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
+    webengageTeamData["MatchId"] = widget.league.matchId;
+    webengageTeamData["LeagueId"] = widget.l1Data.league.id;
+    webengageTeamData["SeriesId"] = widget.league.series.id;
+    webengageTeamData["MatchDate"] = date.toString();
+    webengageTeamData["MatchName"] = widget.l1Data.league.name;
+    webengageTeamData["SportType"] = _sportType;
+    webengageTeamData["Team1"] =
+        widget.l1Data.league.rounds[0].matches[0].teamA.name;
+    webengageTeamData["Team2"] =
+        widget.l1Data.league.rounds[0].matches[0].teamB.name;
+    webengageTeamData["Format"] = "";
+    webengageTeamData["SelectedCaptain"] = _captain.name;
+    webengageTeamData["SeriesTypeInfo"] = widget.league.series.seriesTypeInfo;
+    webengageTeamData["SeriesStartDate"] =
+        getReadableDateFromTimeStamp(widget.league.series.startDate.toString());
+    webengageTeamData["SeriesEndDate"] =
+        getReadableDateFromTimeStamp(widget.league.series.endDate.toString());
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "TEAM_CREATED";
     eventdata["data"] = webengageTeamData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
 
-
-  String getReadableDateFromTimeStamp(String timeStamp){
-     String convertedDate ="";
-    if(timeStamp.length>0){
-   DateTime date = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(timeStamp));
-    convertedDate= date.day.toString() +
-        "-" +
-        date.month.toString() +
-        "-" +
-        date.year.toString(); 
+  String getReadableDateFromTimeStamp(String timeStamp) {
+    String convertedDate = "";
+    if (timeStamp.length > 0) {
+      DateTime date = DateTime.fromMillisecondsSinceEpoch(int.parse(timeStamp));
+      convertedDate = date.day.toString() +
+          "-" +
+          date.month.toString() +
+          "-" +
+          date.year.toString();
     }
     return convertedDate;
   }
@@ -1192,12 +1199,15 @@ class CreateTeamState extends State<CreateTeam>
                       child: ColorButton(
                         color: Colors.orange,
                         child: Text(
-                          "Team Preview",
-                          style:
-                              Theme.of(context).primaryTextTheme.title.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: isIos? FontWeight.w600 : FontWeight.w900 ,
-                                  ),
+                          "Team Preview".toUpperCase(),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white,
+                                fontWeight:
+                                    isIos ? FontWeight.w600 : FontWeight.w900,
+                              ),
                         ),
                         onPressed: () {
                           Navigator.of(context).push(
@@ -1226,12 +1236,15 @@ class CreateTeamState extends State<CreateTeam>
                       height: 48.0,
                       child: ColorButton(
                         child: Text(
-                          "Continue",
-                          style:
-                              Theme.of(context).primaryTextTheme.title.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: isIos ? FontWeight.w600 : FontWeight.w900,
-                                  ),
+                          "Continue".toUpperCase(),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white,
+                                fontWeight:
+                                    isIos ? FontWeight.w600 : FontWeight.w900,
+                              ),
                         ),
                         onPressed: _selectedPlayers.length !=
                                 _fanTeamRules.playersTotal

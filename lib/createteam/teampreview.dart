@@ -53,32 +53,47 @@ class TeamPreview extends StatelessWidget {
             children: <Widget>[
               Stack(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: Container(
-                      width: bIsSmallDevice
-                          ? 32.0
-                          : (bIsMediumDevice ? 40.0 : 48.0),
-                      height: bIsSmallDevice
-                          ? 32.0
-                          : (bIsMediumDevice ? 40.0 : 48.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 1.0,
-                            spreadRadius: 1.0,
-                            color: Colors.black38,
-                            offset: Offset(1, 2),
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: Container(
+                          width: bIsSmallDevice
+                              ? 32.0
+                              : (bIsMediumDevice ? 40.0 : 48.0),
+                          height: bIsSmallDevice
+                              ? 32.0
+                              : (bIsMediumDevice ? 40.0 : 48.0),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 1.0,
+                                spreadRadius: 1.0,
+                                color: Colors.black38,
+                                offset: Offset(1, 2),
+                              ),
+                            ],
+                            color: Colors.grey.shade300,
                           ),
-                        ],
-                        color: Colors.grey.shade300,
+                          child: CachedNetworkImage(
+                            imageUrl: player.jerseyUrl != null
+                                ? player.jerseyUrl
+                                : "",
+                          ),
+                        ),
                       ),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            player.jerseyUrl != null ? player.jerseyUrl : "",
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 2.0),
+                        child: Image.asset(
+                          "images/style-" +
+                              player.playingStyleId.toString() +
+                              ".png",
+                          height: 16.0,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   myTeam.captain == player.id
                       ? Container(

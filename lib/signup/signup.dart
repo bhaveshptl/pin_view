@@ -306,7 +306,9 @@ class SignupState extends State<Signup> {
         }
         showLoader(false);
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   bool isMobileNumber(String input) {

@@ -290,6 +290,8 @@ class SignInPageState extends State<SignInPage> {
         });
       }
       showLoader(false);
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 

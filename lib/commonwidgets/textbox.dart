@@ -92,7 +92,9 @@ class SimpleTextBox extends StatelessWidget {
         fillColor: Colors.white70,
         focusedBorder: focusedBorder,
         enabledBorder: enabledBorder,
-        contentPadding: contentPadding,
+        contentPadding: contentPadding == null
+            ? EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0)
+            : contentPadding,
         disabledBorder: disabledBorder,
         hasFloatingPlaceholder: alwaysShowPlaceholder,
         focusedErrorBorder: errorBorder,
