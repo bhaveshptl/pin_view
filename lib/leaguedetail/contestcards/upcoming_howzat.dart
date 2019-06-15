@@ -78,10 +78,7 @@ class UpcomingHowzatContest extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: Theme.of(context)
-                              .primaryTextTheme
-                              .headline
-                              .fontSize,
+                          fontSize: 30.0,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -132,7 +129,7 @@ class UpcomingHowzatContest extends StatelessWidget {
                                       : "FREE",
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .subhead
+                                      .title
                                       .copyWith(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

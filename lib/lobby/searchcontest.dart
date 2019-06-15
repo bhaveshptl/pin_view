@@ -69,7 +69,15 @@ class SearchContestState extends State<SearchContest> {
                 ),
               );
             }
-          } else if (res.statusCode == 401) {}
+          } else {
+            _scaffoldKey.currentState.showSnackBar(
+              SnackBar(
+                content: Text(
+                  "Contest not available. Please check contest code.",
+                ),
+              ),
+            );
+          }
         },
       );
     }

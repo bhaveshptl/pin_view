@@ -877,45 +877,44 @@ class CreateContestState extends State<CreateContest> {
               ),
             ),
           ),
-          Container(
-            height: 72.0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  spreadRadius: 1.0,
-                  blurRadius: 2.0,
-                  color: Colors.grey.shade300,
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  height: 48.0,
-                  child: ColorButton(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        "Create Contest".toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                      ),
-                    ),
-                    onPressed: () {
-                      _onCreateContest();
-                    },
+        ],
+      ),
+      bottomNavigationBar: Container(
+        height: 72.0,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              spreadRadius: 1.0,
+              blurRadius: 2.0,
+              color: Colors.grey.shade300,
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: 48.0,
+              child: ColorButton(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "Create Contest".toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
                   ),
                 ),
-              ],
+                onPressed: () {
+                  _onCreateContest();
+                },
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
