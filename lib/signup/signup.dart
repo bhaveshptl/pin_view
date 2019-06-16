@@ -648,9 +648,8 @@ class SignupState extends State<Signup> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.asset("images/referral.png"),
-            // Image.network(
-            //     "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250.jpg"),
+            Image.network(
+                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250_login.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
@@ -669,7 +668,7 @@ class SignupState extends State<Signup> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 48.0, right: 40.0),
+              padding: EdgeInsets.only(left: 56.0, right: 48.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

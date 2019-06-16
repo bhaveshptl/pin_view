@@ -135,7 +135,9 @@ class JoinContestState extends State<JoinContest> {
             }
           }
         },
-      );
+      ).whenComplete(() {
+        showLoader(false);
+      });
     }
   }
 
@@ -166,7 +168,9 @@ class JoinContestState extends State<JoinContest> {
             }
           }
         },
-      );
+      ).whenComplete(() {
+        showLoader(false);
+      });
     }
   }
 

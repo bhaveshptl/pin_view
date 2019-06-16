@@ -68,7 +68,6 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   static const social_share_platform =
       const MethodChannel('com.algorin.pf.socialshare');
-  
 
   MyTeam teamToView;
   ScrollController controller;
@@ -209,6 +208,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           });
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -615,7 +616,6 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     String inviteMsg =
         "Join my HOWZAT $contestVisibility Contest! Use the contest code $contestCode in Howzat to join! \n $contestShareUrl";
 
-    
     if (Platform.isAndroid) {
       FlutterShareMe().shareToSystem(msg: inviteMsg);
     }
@@ -637,7 +637,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   Future<String> initSocialShareChannel() async {
     String value;
     try {
-      value = await social_share_platform.invokeMethod('initSocialShareChannel');
+      value =
+          await social_share_platform.invokeMethod('initSocialShareChannel');
     } catch (e) {
       print(e);
     }
@@ -683,7 +684,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           return [];
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   squadStatus() {
@@ -735,7 +738,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           return json.decode(res.body);
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   @override

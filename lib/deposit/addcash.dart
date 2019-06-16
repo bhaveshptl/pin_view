@@ -39,7 +39,7 @@ class AddCashState extends State<AddCash> {
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
   bool bRepeatTransaction = true;
-  bool isIos=false;
+  bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -125,28 +125,27 @@ class AddCashState extends State<AddCash> {
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
-        initRazorpayNativePlugin();
-        isIos=true;  
-    }  
+      initRazorpayNativePlugin();
+      isIos = true;
+    }
     webengageAddCashInitEvent();
   }
 
-  webengageAddCashInitEvent(){
+  webengageAddCashInitEvent() {
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "ADDCASH_PAGE_VISITED";
-    Map<String,dynamic> data =Map();
-    data["isItARepeatTransaction"]=bRepeatTransaction;
-    data["channelId"]= HttpManager.channelId;
+    Map<String, dynamic> data = Map();
+    data["isItARepeatTransaction"] = bRepeatTransaction;
+    data["channelId"] = HttpManager.channelId;
     eventdata["data"] = data;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
     /*Web engage Screen Data */
     Map<dynamic, dynamic> screendata = new Map();
     screendata["screenName"] = "ADDCASH";
-    Map<String,dynamic> screenAttributedata =Map();
-    screenAttributedata["screenname"]="Add Cash";
+    Map<String, dynamic> screenAttributedata = Map();
+    screenAttributedata["screenname"] = "Add Cash";
     screendata["data"] = screenAttributedata;
     AnalyticsManager.webengageAddScreenData(screendata);
-
   }
 
   initWebview() {
@@ -253,6 +252,8 @@ class AddCashState extends State<AddCash> {
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -382,14 +383,15 @@ class AddCashState extends State<AddCash> {
                         child: Text(
                           strings.rupee + amount.toString(),
                           style: TextStyle(
-                            fontSize:isIos? Theme.of(context)
-                                .primaryTextTheme
-                                .subhead 
-                                .fontSize : Theme.of(context)
-                                .primaryTextTheme
-                                .display1 
-                                .fontSize
-                          ),
+                              fontSize: isIos
+                                  ? Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .fontSize
+                                  : Theme.of(context)
+                                      .primaryTextTheme
+                                      .display1
+                                      .fontSize),
                         ),
                       ),
                       Expanded(
@@ -462,41 +464,45 @@ class AddCashState extends State<AddCash> {
                                         getFirstDepositBonusAmount(amount) +
                                         " Bonus")
                                     : "No Bonus"),
-                                style:isIos? Theme.of(context)
-                                    .primaryTextTheme
-                                    .body1 
-                                    .copyWith(
-                                      color: (amount >=
-                                                  widget
-                                                      .depositData
-                                                      .chooseAmountData
-                                                      .bonusArray[0]["min"] &&
-                                              amount <=
-                                                  widget
-                                                      .depositData
-                                                      .chooseAmountData
-                                                      .bonusArray[0]["max"])
-                                          ? Theme.of(context).primaryColor
-                                          : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ):Theme.of(context)
-                                    .primaryTextTheme
-                                    .subhead 
-                                    .copyWith(
-                                      color: (amount >=
-                                                  widget
-                                                      .depositData
-                                                      .chooseAmountData
-                                                      .bonusArray[0]["min"] &&
-                                              amount <=
-                                                  widget
-                                                      .depositData
-                                                      .chooseAmountData
-                                                      .bonusArray[0]["max"])
-                                          ? Theme.of(context).primaryColor
-                                          : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                style: isIos
+                                    ? Theme.of(context)
+                                        .primaryTextTheme
+                                        .body1
+                                        .copyWith(
+                                          color: (amount >=
+                                                      widget
+                                                              .depositData
+                                                              .chooseAmountData
+                                                              .bonusArray[0]
+                                                          ["min"] &&
+                                                  amount <=
+                                                      widget
+                                                          .depositData
+                                                          .chooseAmountData
+                                                          .bonusArray[0]["max"])
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        )
+                                    : Theme.of(context)
+                                        .primaryTextTheme
+                                        .subhead
+                                        .copyWith(
+                                          color: (amount >=
+                                                      widget
+                                                              .depositData
+                                                              .chooseAmountData
+                                                              .bonusArray[0]
+                                                          ["min"] &&
+                                                  amount <=
+                                                      widget
+                                                          .depositData
+                                                          .chooseAmountData
+                                                          .bonusArray[0]["max"])
+                                              ? Theme.of(context).primaryColor
+                                              : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                               ),
                             )
                           ],
@@ -1059,13 +1065,12 @@ class AddCashState extends State<AddCash> {
   }
 
   proceedToPaymentMode(int amount) async {
-
     Map<dynamic, dynamic> eventdata = new Map();
     Map<dynamic, dynamic> addcashPageData = new Map();
-    addcashPageData["user_selected_amount"]=amount.toString();
-    addcashPageData["promoCode"]=promoController.text;
-    addcashPageData["channelId"]=AppConfig.of(context).channelId;
-    addcashPageData["Repeat_Transaction"]=bRepeatTransaction;
+    addcashPageData["user_selected_amount"] = amount.toString();
+    addcashPageData["promoCode"] = promoController.text;
+    addcashPageData["channelId"] = AppConfig.of(context).channelId;
+    addcashPageData["Repeat_Transaction"] = bRepeatTransaction;
     eventdata["eventName"] = "PROCEED_TO_PAYMENTMODE";
     eventdata["data"] = addcashPageData;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
@@ -1087,7 +1092,9 @@ class AddCashState extends State<AddCash> {
           return res.body;
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   validatePromo(int amount) async {
@@ -1105,7 +1112,9 @@ class AddCashState extends State<AddCash> {
           return res.body;
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   initPayment(Map<String, dynamic> paymentMode, int amount) async {
@@ -1230,6 +1239,8 @@ class AddCashState extends State<AddCash> {
                   ? "https://d2cbroser6kssl.cloudfront.net/images/icons/smart11_logo.png"
                   : "https://d2cbroser6kssl.cloudfront.net/images/icons/howzat_logo.png")
         });
+      }).whenComplete(() {
+        showLoader(false);
       });
     } else {
       startInitPayment(

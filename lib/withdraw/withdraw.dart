@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
@@ -110,6 +111,8 @@ class WithdrawState extends State<Withdraw>
           });
         }
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(_scaffoldKey.currentContext, false);
     });
   }
 
@@ -130,6 +133,8 @@ class WithdrawState extends State<Withdraw>
           _selectedAddressDocType = _addressList[0]["name"];
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(_scaffoldKey.currentContext, false);
     });
   }
 
@@ -711,6 +716,8 @@ class WithdrawState extends State<Withdraw>
           _mobileVerificationError = response["error"]["erroMessage"];
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(_scaffoldKey.currentContext, false);
     });
   }
 
@@ -736,6 +743,8 @@ class WithdrawState extends State<Withdraw>
           ),
         );
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(_scaffoldKey.currentContext, false);
     });
   }
 
@@ -853,7 +862,9 @@ class WithdrawState extends State<Withdraw>
           }
         }
       },
-    );
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
   }
 
   openWithdrawHistory(BuildContext context) {

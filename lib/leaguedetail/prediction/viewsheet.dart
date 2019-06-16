@@ -82,6 +82,8 @@ class ViewSheetState extends State<ViewSheet> {
           sheet = MySheet.fromJson(response);
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 

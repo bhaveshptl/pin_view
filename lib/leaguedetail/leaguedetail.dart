@@ -56,7 +56,7 @@ class LeagueDetailState extends State<LeagueDetail>
   int _sportType;
   List<MyTeam> _myTeams;
   String title = "Contest".toUpperCase();
-  bool isIos =false;
+  bool isIos = false;
   bool bIsPredictionAvailable = false;
   List<MySheet> _mySheets;
   Prediction predictionData;
@@ -92,7 +92,7 @@ class LeagueDetailState extends State<LeagueDetail>
     });
 
     if (Platform.isIOS) {
-      isIos=true;
+      isIos = true;
     }
   }
 
@@ -548,6 +548,8 @@ class LeagueDetailState extends State<LeagueDetail>
           _getMyContestMyTeams(_mapMyContests);
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -578,6 +580,8 @@ class LeagueDetailState extends State<LeagueDetail>
             _mapContestTeams = _mapContestMyTeams;
           });
         }
+      }).whenComplete(() {
+        showLoader(false);
       });
     }
   }
@@ -611,6 +615,8 @@ class LeagueDetailState extends State<LeagueDetail>
             _mapContestSheets = _mapContestMySheets;
           });
         }
+      }).whenComplete(() {
+        showLoader(false);
       });
     }
   }
@@ -1218,7 +1224,8 @@ class LeagueDetailState extends State<LeagueDetail>
                                 .title
                                 .copyWith(
                                   color: Colors.white,
-                                  fontWeight: isIos ? FontWeight.w600 : FontWeight.w900 ,
+                                  fontWeight:
+                                      isIos ? FontWeight.w600 : FontWeight.w900,
                                 ),
                           ),
                           onPressed: () {

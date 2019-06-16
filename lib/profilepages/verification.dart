@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 
@@ -79,6 +80,8 @@ class VerificationState extends State<Verification> {
           _selectedAddressDocType = _addressList[0]["name"];
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(scaffoldKey.currentContext, false);
     });
   }
 
@@ -135,6 +138,8 @@ class VerificationState extends State<Verification> {
           _setDocVerificationStatus();
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(scaffoldKey.currentContext, false);
     });
   }
 
@@ -223,6 +228,8 @@ class VerificationState extends State<Verification> {
           _emailVerificationError = response["error"]["erroMessage"];
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(scaffoldKey.currentContext, false);
     });
   }
 
@@ -250,6 +257,8 @@ class VerificationState extends State<Verification> {
           _mobileVerificationError = response["error"]["erroMessage"];
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(scaffoldKey.currentContext, false);
     });
   }
 
@@ -278,6 +287,8 @@ class VerificationState extends State<Verification> {
           ),
         );
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(scaffoldKey.currentContext, false);
     });
   }
 

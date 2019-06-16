@@ -502,6 +502,8 @@ class CreateContestState extends State<CreateContest> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: UnderlineTextBox(
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 4.0),
                                 labelText: strings.get("CONTEST_NAME"),
                                 controller: _nameController,
                               ),
@@ -526,6 +528,8 @@ class CreateContestState extends State<CreateContest> {
                               child: UnderlineTextBox(
                                 keyboardType: TextInputType.number,
                                 labelText: "Entry Fee (1 - 10,000)",
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 4.0),
                                 controller: _entryFeeController,
                                 validator: (value) {
                                   if (isNumeric(value)) {
@@ -547,6 +551,8 @@ class CreateContestState extends State<CreateContest> {
                               child: UnderlineTextBox(
                                 keyboardType: TextInputType.number,
                                 labelText: "Number of Entries (2-100)",
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 4.0),
                                 controller: _participantsController,
                                 validator: (value) {
                                   if (isNumeric(value)) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -37,7 +38,9 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
           });
         }
       },
-    );
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
   }
 
   onCancelTransaction(Map<String, dynamic> transaction) async {
@@ -60,7 +63,9 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
           });
         }
       },
-    );
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
   }
 
   @override

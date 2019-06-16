@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -17,6 +19,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   String _otpCookie;
   int _forgotPassMode = 1;
 
+  String msg = "";
   String password = "";
   bool bDigitsCountMatch = false;
   bool bLettersCountMatch = false;
@@ -79,15 +82,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             : strings.get("SOMETHING_WENT_WRONG");
         showMsg(error);
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(context, false);
     });
   }
 
   showMsg(String msg) {
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(msg),
-      ),
-    );
+    setState(() {
+      this.msg = msg;
+    });
+    Timer(Duration(seconds: 5), () {
+      setState(() {
+        this.msg = "";
+      });
+    });
+    // _scaffoldKey.currentState.showSnackBar(
+    //   SnackBar(
+    //     content: Text(msg),
+    //   ),
+    // );
   }
 
   String validateEmail(String value) {
@@ -151,41 +164,44 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       ),
       contentPadding: EdgeInsets.all(0.0),
       children: <Widget>[
-        Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Stack(
-              alignment: Alignment.centerRight,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        "FORGOT PASSWORD",
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                        textAlign: TextAlign.center,
+        Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Stack(
+                alignment: Alignment.centerRight,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "FORGOT PASSWORD",
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  InkWell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.close,
                       ),
                     ),
-                  ],
-                ),
-                InkWell(
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.close,
-                    ),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
                   ),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
         Padding(
           padding: EdgeInsets.all(16.0),
@@ -197,7 +213,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       children: <Widget>[
                         Expanded(
                           child: Text(
-                            strings.get("FORGOT_PASS_EMAIL"),
+                            "Enter Email or Mobile Number",
                             textAlign: TextAlign.justify,
                           ),
                         ),
@@ -229,9 +245,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                                 EdgeInsets.all(12.0),
                                           ),
                                           validator: (value) {
+                                            String emailError = validateEmail(
+                                                _authNameController.text);
+                                            String mobileError = validateMobile(
+                                                _authNameController.text);
                                             if (value.isEmpty) {
                                               return strings
                                                   .get("EMAIL_OR_MOBILE_ERROR");
+                                            } else if (value.indexOf("@") ==
+                                                -1) {
+                                              if ((!isNumeric(
+                                                          _authNameController
+                                                              .text) &&
+                                                      emailError != null) ||
+                                                  (isNumeric(_authNameController
+                                                          .text) &&
+                                                      mobileError != null)) {
+                                                return strings.get(
+                                                    "VALID_EMAIL_OR_MOBILE_ERROR");
+                                              }
                                             }
                                           },
                                           keyboardType:
@@ -247,28 +279,47 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         ),
                       ],
                     ),
+                    msg.length > 0
+                        ? Padding(
+                            padding: EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    msg,
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        : Container(),
                     Padding(
                       padding: const EdgeInsets.only(top: 24.0),
                       child: ColorButton(
                         onPressed: () {
-                          String emailError =
-                              validateEmail(_authNameController.text);
-                          String mobileError =
-                              validateMobile(_authNameController.text);
-                          if ((!isNumeric(_authNameController.text) &&
-                                  emailError != null) ||
-                              (isNumeric(_authNameController.text) &&
-                                  mobileError != null)) {
-                            showMsg(strings.get("VALID_EMAIL_OR_MOBILE_ERROR"));
-                          } else {
+                          // String emailError =
+                          //     validateEmail(_authNameController.text);
+                          // String mobileError =
+                          //     validateMobile(_authNameController.text);
+                          // if ((!isNumeric(_authNameController.text) &&
+                          //         emailError != null) ||
+                          //     (isNumeric(_authNameController.text) &&
+                          //         mobileError != null)) {
+                          //   showMsg(strings.get("VALID_EMAIL_OR_MOBILE_ERROR"));
+                          // } else {
+                          if (_formKey.currentState.validate()) {
                             _requestOTP();
                           }
+                          // }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 12.0),
                           child: Text(
-                            strings.get("REQUEST_OTP").toUpperCase(),
+                            "Submit".toUpperCase(),
                             style: Theme.of(context)
                                 .primaryTextTheme
                                 .title
@@ -510,6 +561,23 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 ],
                               ),
                             ),
+                            msg.length > 0
+                                ? Padding(
+                                    padding: EdgeInsets.only(top: 8.0),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Text(
+                                            msg,
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                : Container(),
                             Padding(
                               padding: const EdgeInsets.fromLTRB(
                                   8.0, 16.0, 8.0, 16.0),

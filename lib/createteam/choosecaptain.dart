@@ -39,6 +39,8 @@ class ChooseCaptain extends StatefulWidget {
 class ChooseCaptainState extends State<ChooseCaptain> {
   Player _captain;
   Player _vCaptain;
+  String sortBy = "type";
+  List<Player> sortedPlayers;
   double teamLogoHeight = 40.0;
 
   @override
@@ -46,6 +48,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
     super.initState();
     _captain = widget.captain;
     _vCaptain = widget.viceCaptain;
+    sortedPlayers = getSortedPlayers();
   }
 
   void _showErrorMessage(String _message) {
@@ -65,6 +68,30 @@ class ChooseCaptainState extends State<ChooseCaptain> {
         );
       },
     );
+  }
+
+  getSortedPlayers() {
+    List<Player> players = [];
+    switch (sortBy) {
+      case "type":
+        players = [];
+        widget.l1Data.league.fanTeamRules.styles.forEach((style) {
+          widget.selectedPlayers.forEach((player) {
+            if (player.playingStyleId == style.id) {
+              players.add(player);
+            }
+          });
+        });
+        break;
+      case "points":
+        players = widget.selectedPlayers;
+        players.sort((a, b) {
+          return (b.seriesScore - a.seriesScore).toInt();
+        });
+        break;
+      default:
+    }
+    return players;
   }
 
   _getPlayerStyle(Player player) {
@@ -102,26 +129,30 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                 ),
               ),
             ),
-            padding: EdgeInsets.symmetric(vertical: 16.0),
             child: Column(
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        "Choose your Captain and Vice Captain",
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                      ),
-                    ),
-                  ],
-                ),
                 Padding(
                   padding: EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "Choose your Captain and Vice Captain",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -193,6 +224,65 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                     ],
                   ),
                 ),
+                Divider(
+                  height: 1.0,
+                  color: Colors.grey.shade400,
+                ),
+                Container(
+                  height: 48.0,
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: Row(
+                    children: <Widget>[
+                      Text("Sort By"),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                        child: InkWell(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3.0),
+                              border: Border.all(
+                                color: Colors.green,
+                                width: sortBy == "type" ? 2.0 : 0.0,
+                              ),
+                              color: Colors.white,
+                            ),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Player Type"),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              sortBy = "type";
+                              sortedPlayers = getSortedPlayers();
+                            });
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                        child: InkWell(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3.0),
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.green,
+                                width: sortBy == "points" ? 2.0 : 0.0,
+                              ),
+                            ),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Player Score"),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              sortBy = "points";
+                              sortedPlayers = getSortedPlayers();
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),
@@ -201,18 +291,18 @@ class ChooseCaptainState extends State<ChooseCaptain> {
               children: <Widget>[
                 Expanded(
                   child: ListView.builder(
-                    itemCount: widget.selectedPlayers.length,
+                    itemCount: sortedPlayers.length,
                     itemBuilder: (context, index) {
-                      final _player = widget.selectedPlayers[index];
-                      final _prevPlayer = index == 0
-                          ? _player
-                          : widget.selectedPlayers[index - 1];
+                      final _player = sortedPlayers[index];
+                      final _prevPlayer =
+                          index == 0 ? _player : sortedPlayers[index - 1];
 
                       return Padding(
-                        padding:
-                            _prevPlayer.playingStyleId == _player.playingStyleId
-                                ? EdgeInsets.all(0.0)
-                                : EdgeInsets.only(top: 16.0),
+                        padding: _prevPlayer.playingStyleId ==
+                                    _player.playingStyleId ||
+                                sortBy != "type"
+                            ? EdgeInsets.all(0.0)
+                            : EdgeInsets.only(top: 16.0),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -464,7 +554,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                       viceCaptain: _vCaptain == null
                                           ? null
                                           : _vCaptain.id,
-                                      players: widget.selectedPlayers,
+                                      players: sortedPlayers,
                                     ),
                                   ),
                             ),

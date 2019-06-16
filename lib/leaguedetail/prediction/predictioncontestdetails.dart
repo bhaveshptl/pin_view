@@ -280,6 +280,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
               widget.contest, _mapContestSheets);
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -388,7 +390,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
           return Future.value(null);
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   _shareContestDialog(BuildContext context) {
@@ -420,7 +424,8 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
   Future<String> initSocialShareChannel() async {
     String value;
     try {
-      value = await social_share_platform.invokeMethod('initSocialShareChannel');
+      value =
+          await social_share_platform.invokeMethod('initSocialShareChannel');
     } catch (e) {
       print(e);
     }
@@ -489,7 +494,9 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
               uniqueSheets);
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   List<DataColumn> _getDataTableHeader() {

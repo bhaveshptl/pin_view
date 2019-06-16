@@ -116,7 +116,9 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
           }
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   void _onCreateSheet(BuildContext context) async {

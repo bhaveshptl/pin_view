@@ -145,6 +145,8 @@ class LobbyState extends State<Lobby>
       } else {
         return null;
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -163,6 +165,8 @@ class LobbyState extends State<Lobby>
           }).toList();
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -225,11 +229,12 @@ class LobbyState extends State<Lobby>
         });
         break;
       case 4:
-        Navigator.of(context).push(
-          FantasyPageRoute(
-            pageBuilder: (context) => AppDrawer(),
-          ),
-        );
+        Scaffold.of(context).openEndDrawer();
+        // Navigator.of(context).push(
+        //   FantasyPageRoute(
+        //     pageBuilder: (context) => AppDrawer(),
+        //   ),
+        // );
         break;
     }
   }
@@ -445,6 +450,9 @@ class LobbyState extends State<Lobby>
           sportsId: _sportType,
           mapSportTypes: _mapSportTypes,
           onSportChange: _onSportSelectionChaged,
+          changeBottomNavigationIndex: (index) {
+            _onNavigationSelectionChange(context, index);
+          },
         );
       default:
         return Container();
@@ -481,8 +489,12 @@ class LobbyState extends State<Lobby>
       onWillPop: _onWillPop,
       child: ScaffoldPage(
         scaffoldKey: scaffoldKey,
+        endDrawer: AppDrawer(),
         appBar: AppBar(
           elevation: 0.0,
+          actions: <Widget>[
+            Container(),
+          ],
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[

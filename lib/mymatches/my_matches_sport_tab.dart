@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 import 'package:playfantasy/modal/league.dart';
@@ -9,6 +10,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 
 class MyMatchesSportsTab extends StatefulWidget {
   final int sportsType;
+  final Function onJoinContest;
   final Function onLeagueStatusChange;
   final Map<int, List<League>> myLeagues;
   final Map<String, dynamic> myContestIds;
@@ -16,6 +18,7 @@ class MyMatchesSportsTab extends StatefulWidget {
     this.sportsType,
     this.myLeagues,
     this.myContestIds,
+    this.onJoinContest,
     this.onLeagueStatusChange,
   });
 
@@ -45,13 +48,73 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab>
         ? strings.get("NO_COMPLETED_CONTEST")
         : index == LeagueStatus.LIVE
             ? strings.get("NO_RUNNING_CONTEST")
-            : strings.get("NO_UPCOMING_CONTEST");
+            : "You have not joined any contest yet!";
 
-    return Column(
-      children: <Widget>[
-        widget.myLeagues[index].length > 0
-            ? Padding(
-                padding: EdgeInsets.all(16.0),
+    return widget.myLeagues[index].length == 0
+        ? Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        noLeaguesMsg,
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.grey.shade500,
+                                ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Image.asset(
+                  "images/BlankContest.png",
+                  height: 128.0,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        "Go to contest page and find a contest.",
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.grey.shade500,
+                                ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: ColorButton(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    "JOIN A CONTEST",
+                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                  onPressed: () {
+                    widget.onJoinContest();
+                  },
+                ),
+              )
+            ],
+          )
+        : Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -68,29 +131,8 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab>
                     )
                   ],
                 ),
-              )
-            : Container(),
-        widget.myLeagues[index].length == 0
-            ? Padding(
-                padding: EdgeInsets.only(top: 32.0, left: 16.0, right: 16.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        noLeaguesMsg,
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Theme.of(context).errorColor,
-                                ),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  ],
-                ))
-            : Container(),
-        widget.myLeagues[index].length == 0
-            ? Container()
-            : Expanded(
+              ),
+              Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: widget.myLeagues[index].map((League league) {
@@ -121,8 +163,8 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab>
                   ),
                 ),
               ),
-      ],
-    );
+            ],
+          );
   }
 
   @override
@@ -131,11 +173,34 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab>
 
     return Column(
       children: <Widget>[
+        // Container(
+        //   color: Colors.white,
+        //   height: 48.0,
+        //   child: TabBar(
+        //     controller: _statusController,
+        //     isScrollable: false,
+        //     indicator: BoxDecoration(),
+        //     // indicator: BoxDecoration(
+        //     //   color: Theme.of(context).primaryColor,
+        //     //   borderRadius: BorderRadius.all(
+        //     //     Radius.circular(18.0),
+        //     //   ),
+        //     // ),
+        //     labelColor: Theme.of(context).primaryColor,
+        //     unselectedLabelColor: Colors.black,
+        //     labelStyle: Theme.of(context).primaryTextTheme.subhead,
+        //     tabs: status.keys.map<Tab>((page) {
+        //       return Tab(
+        //         text: page,
+        //       );
+        //     }).toList(),
+        //   ),
+        // ),
         Padding(
-          padding: EdgeInsets.only(top: 16.0),
+          padding: EdgeInsets.only(top: 12.0),
           child: Container(
             height: 40.0,
-            width: width * 0.8,
+            width: width * 0.9,
             padding: EdgeInsets.all(2.0),
             decoration: BoxDecoration(
                 color: Colors.white,

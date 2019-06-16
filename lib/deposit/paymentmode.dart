@@ -62,17 +62,17 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
     }
-    
+
     webengagePaymentModeInitEvent();
   }
 
-   webengagePaymentModeInitEvent(){
+  webengagePaymentModeInitEvent() {
     Map<dynamic, dynamic> eventdata = new Map();
     eventdata["eventName"] = "PAYMENTMODE_PAGE_VISITED";
-    Map<String,dynamic> data =Map();
-    data["promoCode"]=widget.promoCode;
-    data["depositAmount"]= widget.amount;
-    data["channelId"]= HttpManager.channelId;
+    Map<String, dynamic> data = Map();
+    data["promoCode"] = widget.promoCode;
+    data["depositAmount"] = widget.amount;
+    data["channelId"] = HttpManager.channelId;
     eventdata["data"] = data;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
@@ -153,6 +153,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -680,6 +682,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             ),
           );
         }
+      }).whenComplete(() {
+        showLoader(false);
       });
     } else {
       initPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);

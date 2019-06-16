@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -93,6 +94,8 @@ class StateDobState extends State<StateDob> {
               .toList();
         });
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(context, false);
     });
   }
 

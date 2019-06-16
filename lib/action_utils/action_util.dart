@@ -123,7 +123,7 @@ class ActionUtil {
     }
   }
 
-  showLoader(context, bool bShow) {
+  showLoader(BuildContext context, bool bShow) {
     AppConfig.of(context).store.dispatch(
           bShow ? LoaderShowAction() : LoaderHideAction(),
         );

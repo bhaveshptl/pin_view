@@ -109,7 +109,9 @@ class RouteLauncher {
           return null;
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(context, false);
+    });
   }
 
   launchBannerRoute({
@@ -173,6 +175,8 @@ class RouteLauncher {
           }
         }
       }
+    }).whenComplete(() {
+      showLoader(context, false);
     });
   }
 
@@ -317,7 +321,9 @@ class RouteLauncher {
           onComplete();
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(_scaffoldKey.currentContext, false);
+    });
   }
 
   launchMyProfile(BuildContext context, {Function onComplete}) async {
@@ -398,7 +404,9 @@ class RouteLauncher {
           return null;
         }
       },
-    );
+    ).whenComplete(() {
+      showLoader(scaffoldKey.currentContext, false);
+    });
   }
 
   showMessage(ScaffoldState currentState, String msg) {
@@ -465,7 +473,7 @@ class RouteLauncher {
           return Future.value(null);
         }
       },
-    );
+    ).whenComplete(() {});
   }
 
   getTeamPlayers({int contestId, int teamId}) async {

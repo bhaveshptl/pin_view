@@ -582,7 +582,7 @@ class SignInPageState extends State<SignInPage> {
         child: Column(
           children: <Widget>[
             Image.network(
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250.jpg"),
+                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
@@ -601,7 +601,7 @@ class SignInPageState extends State<SignInPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 48.0, right: 40.0),
+              padding: EdgeInsets.only(left: 56.0, right: 48.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

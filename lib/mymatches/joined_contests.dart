@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -215,7 +217,15 @@ class JoinedContestsState extends State<JoinedContests>
         _getMyContestMyTeams(_myContests);
         _getMyContestMySheets(_myContests);
       }
-    }).whenComplete(() {});
+    }).whenComplete(() {
+      showLoader(false);
+    });
+  }
+
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
   _getMyContestMyTeams(MyAllContest _mapMyContests) async {
@@ -277,6 +287,8 @@ class JoinedContestsState extends State<JoinedContests>
           _mapContestSheets = _mapContestMySheets;
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 

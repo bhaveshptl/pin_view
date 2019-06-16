@@ -118,6 +118,8 @@ class CreateSheetState extends State<CreateSheet>
           totalFlipBalance = response["total"];
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -143,6 +145,8 @@ class CreateSheetState extends State<CreateSheet>
           }
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 

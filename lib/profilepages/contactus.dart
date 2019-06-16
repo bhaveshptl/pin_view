@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -77,7 +78,9 @@ class ContactUsState extends State<ContactUs> {
           if (response["error"]["reasons"].length > 0) {}
         }
       },
-    );
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
   }
 
   setSubCategoriesListData(index) {
@@ -116,6 +119,8 @@ class ContactUsState extends State<ContactUs> {
       } else {
         _showDialog("Unable to process request. Please try again...!");
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(context, false);
     });
   }
 

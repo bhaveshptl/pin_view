@@ -13,7 +13,13 @@ class MyMatches extends StatefulWidget {
   final int sportsId;
   final Function onSportChange;
   final Map<String, int> mapSportTypes;
-  MyMatches({this.sportsId, this.mapSportTypes, this.onSportChange});
+  final Function changeBottomNavigationIndex;
+  MyMatches({
+    this.sportsId,
+    this.mapSportTypes,
+    this.onSportChange,
+    this.changeBottomNavigationIndex,
+  });
 
   @override
   MyMatchesState createState() => MyMatchesState();
@@ -201,6 +207,9 @@ class MyMatchesState extends State<MyMatches>
                     _leagues.addAll(myLeagues[key]);
                   });
                   _groupLeagues(_leagues);
+                },
+                onJoinContest: () {
+                  widget.changeBottomNavigationIndex(0);
                 },
               );
             }).toList(),

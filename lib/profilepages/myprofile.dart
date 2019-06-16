@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/profile.dart';
@@ -74,7 +75,9 @@ class MyProfileState extends State<MyProfile> {
           if (response["error"]["reasons"].length > 0) {}
         }
       },
-    );
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
   }
 
   setSelectedState() {
@@ -217,6 +220,8 @@ class MyProfileState extends State<MyProfile> {
           _showMessage(response["error"]["erroMessage"]);
         }
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(context, false);
     });
   }
 
@@ -483,6 +488,8 @@ class MyProfileState extends State<MyProfile> {
           _showMessage(response["error"]["erroMessage"]);
         }
       }
+    }).whenComplete(() {
+      ActionUtil().showLoader(context, false);
     });
   }
 

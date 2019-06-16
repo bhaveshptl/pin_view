@@ -134,21 +134,22 @@ class MyTeamsState extends State<MyTeams> {
       mapTeams[player.playingStyleId].add(player);
     });
 
-    sortedStyle = mapTeams.keys.toList();
-    sortedStyle.sort((a, b) {
-      return a - b;
-    });
+    FanTeamRule rules = widget.l1Data.league.fanTeamRules;
 
-    sortedStyle.forEach((styleId) {
+    rules.styles.forEach((PlayingStyle style) {
       styleCount.add(
         Text(
-          Sports.styles[styleId] + " : " + mapTeams[styleId].length.toString(),
+          Sports.styles[style.id] +
+              " : " +
+              mapTeams[style.id].length.toString(),
           style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                 color: Colors.grey.shade600,
               ),
         ),
       );
     });
+
+    sortedStyle.forEach((styleId) {});
 
     return styleCount;
   }

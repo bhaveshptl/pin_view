@@ -69,6 +69,8 @@ class AppDrawerState extends State<AppDrawer> {
           _user = User.fromJson(user);
         });
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -94,7 +96,6 @@ class AppDrawerState extends State<AppDrawer> {
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
       print(res);
-      
     });
     webEngageEventLogout();
   }
@@ -141,7 +142,6 @@ class AppDrawerState extends State<AppDrawer> {
         } else {
           url = BaseUrl().staticPageUrls["SCORING"];
         }
-
         break;
       case "HELP":
         title = "HELP";
@@ -324,6 +324,8 @@ class AppDrawerState extends State<AppDrawer> {
           _showAppUptoDateDialog();
         }
       }
+    }).whenComplete(() {
+      showLoader(false);
     });
   }
 
@@ -342,38 +344,16 @@ class AppDrawerState extends State<AppDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldPage(
-      scaffoldKey: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(
-          "Profile".toUpperCase(),
-        ),
-        actions: <Widget>[
-          !bIsUserVerified
-              ? Container(
-                  padding: EdgeInsets.all(12.0),
-                  child: RaisedButton(
-                    onPressed: () {
-                      _onVerify();
-                    },
-                    padding: EdgeInsets.all(0.0),
-                    color: Colors.white70,
-                    child: Text(
-                      "VERIFY",
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                )
-              : Container(),
-        ],
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(8.0),
+    return Drawer(
+      key: _scaffoldKey,
+      child: ListView(
         children: <Widget>[
-          Card(
-            elevation: 3.0,
+          PreferredSize(
+            preferredSize: Size.fromHeight(0.0),
+            child: Container(),
+          ),
+          Container(
+            color: Colors.grey.shade300,
             child: FlatButton(
               padding: EdgeInsets.all(0.0),
               onPressed: () {
@@ -386,13 +366,9 @@ class AppDrawerState extends State<AppDrawer> {
                     Column(
                       children: <Widget>[
                         CircleAvatar(
-                          maxRadius: 32.0,
+                          maxRadius: 28.0,
                           backgroundColor: Theme.of(context).primaryColor,
-                          child: Icon(
-                            Icons.person,
-                            size: 48.0,
-                            color: Colors.white70,
-                          ),
+                          child: Image.asset("images/person-icon.png"),
                         ),
                       ],
                     ),
@@ -421,19 +397,27 @@ class AppDrawerState extends State<AppDrawer> {
                                       style: Theme.of(context)
                                           .primaryTextTheme
                                           .title
-                                          .copyWith(color: Colors.black54),
+                                          .copyWith(color: Colors.black),
                                     ),
                                   ],
                                 ),
                                 Row(
                                   children: <Widget>[
                                     Text(
-                                      "Tap to view details",
+                                      "Total Balance: " +
+                                          (strings.rupee +
+                                              (_user == null
+                                                  ? "0.0"
+                                                  : (_user.withdrawable +
+                                                          _user
+                                                              .nonWithdrawable +
+                                                          _user.depositBucket)
+                                                      .toStringAsFixed(2))),
                                       style: Theme.of(context)
                                           .primaryTextTheme
                                           .subhead
                                           .copyWith(
-                                            color: Colors.black26,
+                                            color: Colors.black,
                                           ),
                                     ),
                                   ],
@@ -457,208 +441,40 @@ class AppDrawerState extends State<AppDrawer> {
               ),
             ),
           ),
-          Card(
-            elevation: 3.0,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(8.0),
-                  color: Colors.black12.withAlpha(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Total balance",
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .title
-                                .copyWith(
-                                  color: Colors.black87,
-                                ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              "Only winnings balance is withdrawable",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Colors.blue,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        strings.rupee +
-                            (_user == null
-                                ? "0.0"
-                                : (_user.withdrawable +
-                                        _user.nonWithdrawable +
-                                        _user.depositBucket)
-                                    .toStringAsFixed(2)),
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .headline
-                            .copyWith(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                "Deposits",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .copyWith(color: Colors.black54),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  strings.rupee +
-                                      (_user == null
-                                          ? "0.0"
-                                          : _user.depositBucket
-                                              .toStringAsFixed(2)),
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .copyWith(color: Colors.black87),
-                                ),
-                              ),
-                              RaisedButton(
-                                onPressed: () {
-                                  _launchAddCash();
-                                },
-                                color: Colors.teal,
-                                child: Text(
-                                  strings.get("ADD_CASH").toUpperCase(),
-                                  style: TextStyle(color: Colors.white70),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "Withdrawable",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(color: Colors.black54),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text(
-                                strings.rupee +
-                                    (_user == null
-                                        ? "0.0"
-                                        : _user.withdrawable
-                                            .toStringAsFixed(2)),
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .subhead
-                                    .copyWith(color: Colors.black87),
-                              ),
-                            ),
-                            RaisedButton(
-                              onPressed: () {
-                                _launchWithdraw();
-                              },
-                              color: Colors.red,
-                              child: Text(
-                                "WITHDRAW".toUpperCase(),
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "Bonus",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(color: Colors.black54),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text(
-                                strings.rupee +
-                                    (_user == null
-                                        ? "0.0"
-                                        : _user.nonWithdrawable
-                                            .toStringAsFixed(2)),
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .subhead
-                                    .copyWith(color: Colors.black87),
-                              ),
-                            ),
-                            RaisedButton(
-                              onPressed: () {
-                                _showEarnCash();
-                              },
-                              color: Colors.orange,
-                              child: Text(
-                                strings.get("EARN_CASH").toUpperCase(),
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  color: Colors.black12.withAlpha(10),
-                  height: 32.0,
-                  child: FlatButton(
-                    padding: EdgeInsets.all(0.0),
-                    onPressed: () {
-                      _showMyAccount();
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          "View transactions".toUpperCase(),
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
+          ListTile(
+            onTap: () {
+              _onVerify();
+            },
+            leading: Icon(Icons.fingerprint),
+            title: Text("KYC"),
           ),
-          Card(
+          ListTile(
+            onTap: () {
+              _launchWithdraw();
+            },
+            leading: Icon(Icons.print),
+            title: Text("WITHDRAWAL"),
+          ),
+          ListTile(
+            onTap: () {
+              _showMyAccount();
+            },
+            leading: Icon(Icons.card_giftcard),
+            title: Text("BONUS SUMMARY"),
+          ),
+          Divider(
+            color: Colors.grey.shade400,
+            height: 1.0,
+          ),
+          ListTile(
+            leading: Icon(Icons.help_outline),
+            title: Text('How To Play'.toUpperCase()),
+            onTap: () {
+              _launchStaticPage("HELP");
+            },
+          ),
+          Container(
             color: Color.fromRGBO(255, 246, 219, 1),
-            elevation: 3.0,
             child: Stack(
               alignment: Alignment.bottomRight,
               children: <Widget>[
@@ -700,141 +516,61 @@ class AppDrawerState extends State<AppDrawer> {
               ],
             ),
           ),
-          Card(
-            elevation: 3.0,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(8.0),
-                  color: Colors.black12.withAlpha(10),
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        "Help",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                ListTile(
-                  title: Text('How To Play'),
-                  onTap: () {
-                    _launchStaticPage("HELP");
-                  },
-                ),
-                Divider(height: 2.0),
-                ListTile(
-                  title: Text('Scoring System'),
-                  onTap: () {
-                    _launchStaticPage("SCORING");
-                  },
-                ),
-                Divider(height: 2.0),
-                ListTile(
-                  title: Text('Contact Us'),
-                  onTap: () {
-                    _showContactUsPage();
-                  },
-                ),
-              ],
-            ),
+          ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Scoring System'.toUpperCase()),
+            onTap: () {
+              _launchStaticPage("SCORING");
+            },
           ),
-          Card(
-            elevation: 3.0,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.all(8.0),
-                  color: Colors.black12.withAlpha(10),
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        "Others",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                AppConfig.of(context).channelId != '3'
-                    ? Container()
-                    : ListTile(
-                        title: Text('Become A Partner'),
-                        onTap: () {
-                          _showPartnerPage();
-                        },
-                      ),
-                Divider(height: 2.0),
-                isIos
-                    ? Container()
-                    : ListTile(
-                        title: Text('Check For Update'),
-                        onTap: () {
-                          _performUpdateCheck();
-                        },
-                      ),
-                Divider(height: 2.0),
-                // BaseUrl().staticPageUrls["BLOG"] != null
-                //     ? Column(
-                //         children: <Widget>[
-                //           ListTile(
-                //             title: Text('Blog'),
-                //             onTap: () {
-                //               _launchStaticPage("BLOG");
-                //             },
-                //           ),
-                //           Divider(height: 2.0),
-                //         ],
-                //       )
-                //     : Container(),
-                // AppConfig.of(context).channelId == "10"
-                //     ? Container()
-                //     : BaseUrl().staticPageUrls["FORUM"] != null
-                //         ? Column(
-                //             children: <Widget>[
-                //               ListTile(
-                //                 title: Text('Forum'),
-                //                 onTap: () {
-                //                   _launchStaticPage("FORUM");
-                //                 },
-                //               ),
-                //               Divider(height: 2.0),
-                //             ],
-                //           )
-                //         : Container(),
-                ListTile(
-                  title: Text('Terms And Conditions'),
+          ListTile(
+            leading: Icon(Icons.call),
+            title: Text('Contact Us'.toUpperCase()),
+            onTap: () {
+              _showContactUsPage();
+            },
+          ),
+          Divider(
+            color: Colors.grey.shade400,
+            height: 1.0,
+          ),
+          ListTile(
+            leading: Icon(Icons.event_note),
+            title: Text('Terms And Conditions'.toUpperCase()),
+            onTap: () {
+              _launchStaticPage("T&C");
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.lock),
+            title: Text('Privacy Policy'.toUpperCase()),
+            onTap: () {
+              _launchStaticPage("PRIVACY");
+            },
+          ),
+          isIos
+              ? Container()
+              : ListTile(
+                  leading: Icon(Icons.system_update),
+                  title: Text('Check For Update'.toUpperCase()),
                   onTap: () {
-                    _launchStaticPage("T&C");
+                    _performUpdateCheck();
                   },
                 ),
-                Divider(height: 2.0),
-                ListTile(
-                  title: Text('Privacy Policy'),
-                  onTap: () {
-                    _launchStaticPage("PRIVACY");
-                  },
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Log Out'.toUpperCase()),
+            onTap: () async {
+              _doLogout();
+              HttpManager.cookie = null;
+              SharedPrefHelper.internal().removeCookie();
+              Navigator.pop(context);
+              Navigator.of(context).pushReplacement(
+                FantasyPageRoute(
+                  pageBuilder: (context) => SignInPage(),
                 ),
-                Divider(height: 2.0),
-                ListTile(
-                  title: Text('Log Out'),
-                  onTap: () async {
-                    _doLogout();
-                    HttpManager.cookie = null;
-                    SharedPrefHelper.internal().removeCookie();
-                    Navigator.pop(context);
-                    Navigator.of(context).pushReplacement(
-                      FantasyPageRoute(
-                        pageBuilder: (context) => SignInPage(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ],
       ),
