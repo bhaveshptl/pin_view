@@ -75,6 +75,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String BROWSER_LAUNCH_CHANNEL = "com.algorin.pf.browser";
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
     private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
+    private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
 
     MyHelperClass myHeperClass;
     String firebaseToken = "";
@@ -444,6 +445,40 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 }
             }
         });
+
+        new MethodChannel(getFlutterView(), SOCIAL_SHARE_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+            @Override
+            public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                if (methodCall.method.equals("initSocialShareChannel")) {
+                    result.success("Social Share init success");
+                }
+                else if(methodCall.method.equals("shareText")) {
+                    String message = methodCall.arguments();
+                    inviteFriend(message);
+                    result.success("Social Share init success");
+                }
+                else if(methodCall.method.equals("shareViaFacebook")) {
+                    String message = methodCall.arguments();
+                    inviteFriendViaFacebook(message);
+                    result.success("Social Share init success");
+                }else if(methodCall.method.equals("shareViaWhatsApp")) {
+                    String message = methodCall.arguments();
+                    inviteFriendViaWhatsapp(message);
+                    result.success("Social Share init success");
+                }
+                else if(methodCall.method.equals("shareViaGmail")) {
+                    String message = methodCall.arguments();
+                    inviteFriendViaGmail(message);
+                    result.success("Social Share init success");
+                }
+                else  {
+                    result.success("Social Share init success");
+                }
+            }
+        });
+
+
+
     }
 
     /****************Web Engage Stuff***************/
@@ -1046,6 +1081,55 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 return deleted;
     }
 
+
+    private void  inviteFriend(String message){
+        String shareMessage= message;
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+            startActivity(Intent.createChooser(shareIntent, "Share to"));
+        } catch(Exception e) {
+            //e.toString();
+        }
+    }
+
+    private void  inviteFriendViaWhatsapp(String message){
+        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+        whatsappIntent.setType("text/plain");
+        whatsappIntent.setPackage("com.whatsapp");
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT, message);
+        try {
+            startActivity(whatsappIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            inviteFriend(message);
+        }
+    }
+
+    private void  inviteFriendViaFacebook(String message){
+        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+        whatsappIntent.setType("text/plain");
+        whatsappIntent.setPackage("com.facebook.katana");
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT, message);
+        try {
+            startActivity(whatsappIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            inviteFriend(message);
+        }
+    }
+
+    private void inviteFriendViaGmail(String message){
+        String shareMessage= message;
+        try {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.setPackage("com.google.android.gm");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+            startActivity(Intent.createChooser(shareIntent, "Share to"));
+        } catch(Exception e) {
+            inviteFriend(message);
+        }
+    }
 
     private Map<String, Object> getDeviceInfo() {
         Map<String, Object> params = new HashMap<>();

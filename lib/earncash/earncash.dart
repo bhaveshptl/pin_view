@@ -4,7 +4,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/analytics.dart';
@@ -100,22 +99,59 @@ class EarnCashState extends State<EarnCash> {
     );
   }
 
-  _shareNow() {
-    inviteMsg =
-        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
-            strings.rupee +
-            refBAmount.toString() +
-            " in your account - Click " +
-            inviteUrl +
-            " to download the Howzat app and use my code " +
-            refCode +
-            " to register.";
-    if (Platform.isAndroid) {
-      FlutterShareMe().shareToSystem(msg: inviteMsg);
+
+  Future<String> initSocialShareChannel() async {
+    String value;
+    try {
+      value =
+          await social_share_platform.invokeMethod('initSocialShareChannel');
+    } catch (e) {
+      print(e);
     }
-    if (Platform.isIOS) {
-      _shareNowIOS(inviteMsg);
+    return value;
+  }
+
+  Future<String> _shareNowViaWhatsAppApplication(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareViaWhatsApp', msg);
+    } catch (e) {
+      print(e);
+      _shareNowViaSystemApplication(msg);
     }
+    return value;
+  }
+
+  Future<String> _shareNowViaFacebookApplication(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareViaFacebook', msg);
+    } catch (e) {
+      print(e);
+      _shareNowViaSystemApplication(msg);
+    }
+    return value;
+  }
+
+  Future<String> _shareNowViaGmailApplication(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareViaGmail', msg);
+    } catch (e) {
+      print(e);
+      _shareNowViaSystemApplication(msg);
+    }
+    return value;
+  }
+
+  Future<String> _shareNowViaSystemApplication(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareText', msg);
+    } catch (e) {
+      print(e);
+    }
+    return value;
   }
 
   _shareNowWhatsApp() {
@@ -130,45 +166,13 @@ class EarnCashState extends State<EarnCash> {
             " to register.";
 
     if (Platform.isAndroid) {
-      FlutterShareMe().shareToWhatsApp(msg: inviteMsg);
+      _shareNowViaWhatsAppApplication(inviteMsg);
     }
     if (Platform.isIOS) {
-      _shareNowWhatsAppIOS(inviteMsg);
+      _shareNowViaWhatsAppApplication(inviteMsg);
     }
   }
-
-  Future<String> initSocialShareChannel() async {
-    String value;
-    try {
-      value =
-          await social_share_platform.invokeMethod('initSocialShareChannel');
-    } catch (e) {
-      print(e);
-    }
-    return value;
-  }
-
-  Future<String> _shareNowWhatsAppIOS(String msg) async {
-    String value;
-    try {
-      value = await social_share_platform.invokeMethod('shareViaWhatsApp', msg);
-    } catch (e) {
-      print(e);
-      _shareNowIOS(msg);
-    }
-    return value;
-  }
-
-  Future<String> _shareNowIOS(String msg) async {
-    String value;
-    try {
-      value = await social_share_platform.invokeMethod('shareText', msg);
-    } catch (e) {
-      print(e);
-    }
-    return value;
-  }
-
+  
   _shareNowFacebook() {
     inviteMsg =
         "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
@@ -181,10 +185,10 @@ class EarnCashState extends State<EarnCash> {
             " to register.";
 
     if (Platform.isAndroid) {
-      FlutterShareMe().shareToFacebook(msg: inviteMsg);
+      _shareNowViaFacebookApplication(inviteMsg);
     }
     if (Platform.isIOS) {
-      _shareNowIOS(inviteMsg);
+      _shareNowViaFacebookApplication(inviteMsg);
     }
   }
 
@@ -199,10 +203,28 @@ class EarnCashState extends State<EarnCash> {
             refCode +
             " to register.";
     if (Platform.isAndroid) {
-      FlutterShareMe().shareToSystem(msg: inviteMsg);
+      _shareNowViaGmailApplication(inviteMsg);
     }
     if (Platform.isIOS) {
-      _shareNowIOS(inviteMsg);
+      _shareNowViaGmailApplication(inviteMsg);
+    }
+  }
+
+  _shareNow() {
+    inviteMsg =
+        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
+            strings.rupee +
+            refBAmount.toString() +
+            " in your account - Click " +
+            inviteUrl +
+            " to download the Howzat app and use my code " +
+            refCode +
+            " to register.";
+    if (Platform.isAndroid) {
+      _shareNowViaSystemApplication(inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowViaSystemApplication(inviteMsg);
     }
   }
 
