@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
@@ -52,13 +53,15 @@ class SearchContestState extends State<SearchContest> {
             Contest contest = Contest.fromJson(response["contest"]);
             League league = League.fromJson(response["league"]);
             if (league == null) {
-              _scaffoldKey.currentState.showSnackBar(
-                SnackBar(
-                  content: Text(
-                    strings.get("LEAGUE_NOT_FOUND"),
-                  ),
-                ),
-              );
+              ActionUtil()
+                  .showMsgOnTop(strings.get("LEAGUE_NOT_FOUND"), context);
+              // _scaffoldKey.currentState.showSnackBar(
+              //   SnackBar(
+              //     content: Text(
+              //       strings.get("LEAGUE_NOT_FOUND"),
+              //     ),
+              //   ),
+              // );
             } else {
               Navigator.of(context).push(
                 FantasyPageRoute(
@@ -70,13 +73,15 @@ class SearchContestState extends State<SearchContest> {
               );
             }
           } else {
-            _scaffoldKey.currentState.showSnackBar(
-              SnackBar(
-                content: Text(
-                  "Contest not available. Please check contest code.",
-                ),
-              ),
-            );
+            ActionUtil().showMsgOnTop(
+                "Contest not available. Please check contest code.", context);
+            // _scaffoldKey.currentState.showSnackBar(
+            //   SnackBar(
+            //     content: Text(
+            //       "Contest not available. Please check contest code.",
+            //     ),
+            //   ),
+            // );
           }
         },
       );

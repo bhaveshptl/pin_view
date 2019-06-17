@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/modal/prizestructure.dart';
@@ -122,9 +123,10 @@ class CreatePrizeStructureState extends State<CreatePrizeStructure> {
                           Navigator.of(context).pop();
                           widget.onClose(_suggestedPrizes);
                         } else if (error != "") {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(error),
-                          ));
+                          ActionUtil().showMsgOnTop(error, context);
+                          // _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          //   content: Text(error),
+                          // ));
                         }
                       },
                       child: Text(

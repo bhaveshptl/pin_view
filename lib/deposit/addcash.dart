@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -241,13 +242,16 @@ class AddCashState extends State<AddCash> {
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
         if (response["orderId"] == null) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-              ),
-            ),
-          );
+          ActionUtil().showMsgOnTop(
+              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+          //     ),
+          //   ),
+          // );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
@@ -668,44 +672,49 @@ class AddCashState extends State<AddCash> {
         amountController.text != "" ? int.parse(amountController.text) : 0;
     if (amountController.text == "" &&
         !widget.depositData.chooseAmountData.isFirstDeposit) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Please enter amount to apply promo."),
-        ),
-      );
+      ActionUtil().showMsgOnTop("Please enter amount to apply promo.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter amount to apply promo."),
+      //   ),
+      // );
     } else if (customAmountController.text == "" &&
         widget.depositData.chooseAmountData.isFirstDeposit) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Please enter amount to apply promo."),
-        ),
-      );
+      ActionUtil().showMsgOnTop("Please enter amount to apply promo.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter amount to apply promo."),
+      //   ),
+      // );
     } else if (promoController.text == "") {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Please enter promo code to apply."),
-        ),
-      );
+      ActionUtil().showMsgOnTop("Please enter promo code to apply.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter promo code to apply."),
+      //   ),
+      // );
     } else {
       final result = await validatePromo(amount);
       if (result != null) {
         Map<String, dynamic> paymentMode = json.decode(result);
         if (paymentMode["error"] == true) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(paymentMode["msg"]),
-            ),
-          );
+          ActionUtil().showMsgOnTop(paymentMode["msg"], context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(paymentMode["msg"]),
+          //   ),
+          // );
         } else {
           setState(() {
             bonusInfo = paymentMode["details"];
           });
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(paymentMode["message"]),
-              duration: Duration(seconds: 2),
-            ),
-          );
+          ActionUtil().showMsgOnTop(paymentMode["message"], context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(paymentMode["message"]),
+          //     duration: Duration(seconds: 2),
+          //   ),
+          // );
         }
       }
     }
@@ -717,16 +726,24 @@ class AddCashState extends State<AddCash> {
 
     if (amount < widget.depositData.chooseAmountData.minAmount ||
         amount > widget.depositData.chooseAmountData.depositLimit) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Enter amount between Min " +
+      ActionUtil().showMsgOnTop(
+          "Enter amount between Min " +
               strings.rupee +
               widget.depositData.chooseAmountData.minAmount.toString() +
               " and Max " +
               strings.rupee +
-              widget.depositData.chooseAmountData.depositLimit.toString()),
-        ),
-      );
+              widget.depositData.chooseAmountData.depositLimit.toString(),
+          context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Enter amount between Min " +
+      //         strings.rupee +
+      //         widget.depositData.chooseAmountData.minAmount.toString() +
+      //         " and Max " +
+      //         strings.rupee +
+      //         widget.depositData.chooseAmountData.depositLimit.toString()),
+      //   ),
+      // );
     } else if (promoController.text == "") {
       initRepeatDeposit();
     } else {
@@ -734,11 +751,12 @@ class AddCashState extends State<AddCash> {
       if (result != null) {
         Map<String, dynamic> paymentMode = json.decode(result);
         if (paymentMode["error"] == true) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(paymentMode["msg"]),
-            ),
-          );
+          ActionUtil().showMsgOnTop(paymentMode["msg"], context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(paymentMode["msg"]),
+          //   ),
+          // );
         } else {
           initRepeatDeposit();
         }
@@ -1130,32 +1148,44 @@ class AddCashState extends State<AddCash> {
     if ((widget.depositData.chooseAmountData.isFirstDeposit && amount == 0) ||
         (!widget.depositData.chooseAmountData.isFirstDeposit &&
             amountController.text == "")) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Please enter valid amount to deposit."),
-        ),
-      );
+      ActionUtil()
+          .showMsgOnTop("Please enter valid amount to deposit.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter valid amount to deposit."),
+      //   ),
+      // );
     } else {
       if (amountController.text.indexOf(".") != -1) {
-        _scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text("Please enter amount without decimal point"),
-          ),
-        );
+        ActionUtil()
+            .showMsgOnTop("Please enter amount without decimal point", context);
+        // _scaffoldKey.currentState.showSnackBar(
+        //   SnackBar(
+        //     content: Text("Please enter amount without decimal point"),
+        //   ),
+        // );
       } else {
         amount = amount == null ? int.parse(amountController.text) : amount;
         if (amount < widget.depositData.chooseAmountData.minAmount ||
             amount > widget.depositData.chooseAmountData.depositLimit) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text("Enter amount between Min " +
+          ActionUtil().showMsgOnTop(
+              "Enter amount between Min " +
                   strings.rupee +
                   widget.depositData.chooseAmountData.minAmount.toString() +
                   " and Max " +
                   strings.rupee +
-                  widget.depositData.chooseAmountData.depositLimit.toString()),
-            ),
-          );
+                  widget.depositData.chooseAmountData.depositLimit.toString(),
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text("Enter amount between Min " +
+          //         strings.rupee +
+          //         widget.depositData.chooseAmountData.minAmount.toString() +
+          //         " and Max " +
+          //         strings.rupee +
+          //         widget.depositData.chooseAmountData.depositLimit.toString()),
+          //   ),
+          // );
         } else {
           final result = await proceedToPaymentMode(amount);
           if (result != null) {
@@ -1221,11 +1251,12 @@ class AddCashState extends State<AddCash> {
 
   initPayment(Map<String, dynamic> paymentMode, int amount) async {
     if (paymentMode["error"] == true) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(paymentMode["msg"]),
-        ),
-      );
+      ActionUtil().showMsgOnTop(paymentMode["msg"], context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text(paymentMode["msg"]),
+      //   ),
+      // );
     } else {
       flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
@@ -1250,11 +1281,13 @@ class AddCashState extends State<AddCash> {
 
   initRepeatDeposit() {
     if (amountController.text == "") {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Please enter amount to repeat deposit"),
-        ),
-      );
+      ActionUtil()
+          .showMsgOnTop("Please enter amount to repeat deposit", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter amount to repeat deposit"),
+      //   ),
+      // );
     } else {
       int amount = int.parse(amountController.text);
       paySecurely(amount);
@@ -1360,7 +1393,7 @@ class AddCashState extends State<AddCash> {
     );
 
     showLoader(false);
- 
+
     if (result != null) {
       Map<String, dynamic> response = json.decode(result);
       if ((response["authStatus"] as String).toLowerCase() ==
@@ -1370,13 +1403,16 @@ class AddCashState extends State<AddCash> {
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
         if (response["orderId"] == null) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-              ),
-            ),
-          );
+          ActionUtil().showMsgOnTop(
+              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+          //     ),
+          //   ),
+          // );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
@@ -1500,8 +1536,7 @@ class AddCashState extends State<AddCash> {
     try {
       String trackStatus = await webengage_platform.invokeMethod(
           'webEngageTransactionSuccess', trackdata);
-    } catch (e) {
-    }
+    } catch (e) {}
     return trackStatus;
   }
 
@@ -1525,11 +1560,13 @@ class AddCashState extends State<AddCash> {
 
   onCustomAddAmount() {
     if (customAmountController.text.indexOf(".") != -1) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("Please enter amount without decimal point"),
-        ),
-      );
+      ActionUtil()
+          .showMsgOnTop("Please enter amount without decimal point", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("Please enter amount without decimal point"),
+      //   ),
+      // );
     } else {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"

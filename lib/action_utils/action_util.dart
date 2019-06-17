@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
@@ -22,6 +23,8 @@ class ActionUtil {
   ActionUtil._internal();
   static final ActionUtil actionUtil = ActionUtil._internal();
   factory ActionUtil() => actionUtil;
+
+  Flushbar flushbar;
 
   launchJoinContest({
     L1 l1Data,
@@ -117,8 +120,11 @@ class ActionUtil {
           );
         }
       } else if (result != null) {
-        scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
+        Flushbar(
+          message: "$result",
+          duration: Duration(seconds: 3),
+          flushbarPosition: FlushbarPosition.TOP,
+        )..show(scaffoldKey.currentContext);
       }
     }
   }
@@ -255,9 +261,48 @@ class ActionUtil {
 
       if (result != null) {
         final msg = json.decode(result)["message"];
-        scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$msg")));
+        showMsgOnTop(msg, scaffoldKey.currentContext);
+        // scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$msg")));
       }
     }
+  }
+
+  showMsgOnTop(String msg, BuildContext context) {
+    flushbar = Flushbar(
+      messageText: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              msg,
+              style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                    color: Colors.black,
+                  ),
+            ),
+          )
+        ],
+      ),
+      aroundPadding: EdgeInsets.all(8.0),
+      backgroundColor: Colors.white,
+      mainButton: FlatButton(
+        padding: EdgeInsets.all(0.0),
+        child: Icon(Icons.close),
+        onPressed: () {
+          flushbar.dismiss(true);
+        },
+      ),
+      // boxShadows: [
+      //   BoxShadow(
+      //     blurRadius: 6,
+      //     spreadRadius: 1,
+      //     color: Colors.black,
+      //   )
+      // ],
+      // backgroundColor: Color.fromRGBO(251, 228, 121, 1),
+      duration: Duration(seconds: 3),
+      // flushbarStyle: FlushbarStyle.GROUNDED,
+      flushbarPosition: FlushbarPosition.TOP,
+    );
+    flushbar.show(context);
   }
 
   _showAddCashConfirmation(BuildContext context, Contest contest) {

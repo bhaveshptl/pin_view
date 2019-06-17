@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/deposit.dart';
@@ -300,9 +302,10 @@ class RouteLauncher {
                     builder: (BuildContext context) {
                       return StateDob(
                         onSuccess: (String msg) {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(msg),
-                          ));
+                          // _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          //   content: Text(msg),
+                          // ));
+                          ActionUtil().showMsgOnTop(msg, context);
                           launchWithdraw(_scaffoldKey);
                         },
                       );
@@ -410,11 +413,12 @@ class RouteLauncher {
   }
 
   showMessage(ScaffoldState currentState, String msg) {
-    currentState.showSnackBar(
-      SnackBar(
-        content: Text(msg),
-      ),
-    );
+    // currentState.showSnackBar(
+    //   SnackBar(
+    //     content: Text(msg),
+    //   ),
+    // );
+    ActionUtil().showMsgOnTop(msg, currentState.context);
   }
 
   launchAccounts(GlobalKey<ScaffoldState> scaffoldKey,

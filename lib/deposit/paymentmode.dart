@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -79,8 +80,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     /*Web engage Screen Data */
     Map<dynamic, dynamic> screendata = new Map();
     screendata["screenName"] = "PAYMENTMODE";
-    Map<String,dynamic> screenAttributedata =Map();
-    screenAttributedata["depositAmount"]=widget.amount;
+    Map<String, dynamic> screenAttributedata = Map();
+    screenAttributedata["depositAmount"] = widget.amount;
     screendata["data"] = screenAttributedata;
     AnalyticsManager.webengageAddScreenData(screendata);
   }
@@ -144,13 +145,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
         if (response["orderId"] == null) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-              ),
-            ),
-          );
+          ActionUtil().showMsgOnTop(
+              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+          //     ),
+          //   ),
+          // );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
@@ -579,28 +583,32 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   bool validateUserInfo() {
     if ((widget.paymentMode["first_name"] == null &&
         firstNameController.text == "")) {
-      showSnackbar("First name is required to proceed.");
+      ActionUtil().showMsgOnTop("First name is required to proceed.", context);
+      // showSnackbar("First name is required to proceed.");
       return false;
     } else if (widget.paymentMode["mobile"] == null &&
         phoneController.text == "") {
-      showSnackbar("Mobile number is required to proceed.");
+      ActionUtil()
+          .showMsgOnTop("Mobile number is required to proceed.", context);
+      // showSnackbar("Mobile number is required to proceed.");
       return false;
     } else if (widget.paymentMode["email"] == null &&
         emailController.text == "") {
-      showSnackbar("Email id is required to proceed.");
+      ActionUtil().showMsgOnTop("Email id is required to proceed.", context);
+      // showSnackbar("Email id is required to proceed.");
       return false;
     } else {
       return true;
     }
   }
 
-  showSnackbar(String msg) {
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(msg),
-      ),
-    );
-  }
+  // showSnackbar(String msg) {
+  //   _scaffoldKey.currentState.showSnackBar(
+  //     SnackBar(
+  //       content: Text(msg),
+  //     ),
+  //   );
+  // }
 
   onPaySecurely(Map<String, dynamic> paymentModeDetails, String type) async {
     String querParamString = '';
@@ -684,11 +692,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     : "https://d2cbroser6kssl.cloudfront.net/images/icons/howzat_logo.png")
           });
         } else {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text("Opps!! Try again later."),
-            ),
-          );
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text("Opps!! Try again later."),
+          //   ),
+          // );
         }
       }).whenComplete(() {
         showLoader(false);
@@ -725,7 +734,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       } else {
         Navigator.of(context).pop(result);
         branchEventTransactionSuccess(response);
-        webengageEventTransactionSuccess(response); 
+        webengageEventTransactionSuccess(response);
       }
     }
   }

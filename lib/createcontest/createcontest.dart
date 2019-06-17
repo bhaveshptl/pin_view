@@ -326,8 +326,9 @@ class CreateContestState extends State<CreateContest> {
     );
 
     if (result != null) {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState
+      //     .showSnackBar(SnackBar(content: Text("$result")));
       if (curContest != null) {
         if (bWaitingForTeamCreation) {
           bShowJoinContest = true;
@@ -413,13 +414,16 @@ class CreateContestState extends State<CreateContest> {
 
   _onEditPrize() async {
     if (_participantsController.text == "" || _entryFeeController.text == "") {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(
-            "Please enter entry fee and number of participants before edit.",
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(
+          "Please enter entry fee and number of participants before edit.",
+          context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text(
+      //       "Please enter entry fee and number of participants before edit.",
+      //     ),
+      //   ),
+      // );
     } else {
       FocusScope.of(context).requestFocus(FocusNode());
       _scaffoldKey.currentState.showBottomSheet((context) {

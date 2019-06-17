@@ -89,12 +89,13 @@ class MyProfileState extends State<MyProfile> {
   }
 
   _showMessage(String msg) {
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        duration: Duration(seconds: 3),
-      ),
-    );
+    ActionUtil().showMsgOnTop(msg, context);
+    // _scaffoldKey.currentState.showSnackBar(
+    //   SnackBar(
+    //     content: Text(msg),
+    //     duration: Duration(seconds: 3),
+    //   ),
+    // );
   }
 
   _showChangePasswordDialog() async {

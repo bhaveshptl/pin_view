@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/createteam/createteam.dart';
@@ -36,7 +37,8 @@ class TeamPreview extends StatelessWidget {
     );
 
     if (result != null) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
     }
   }
 

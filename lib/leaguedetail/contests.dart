@@ -332,21 +332,23 @@ class ContestsState extends State<Contests> {
 
   squadStatus() {
     if (widget.l1Data.league.rounds[0].matches[0].squad == 0) {
-      widget.scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: <Widget>[
-              Expanded(
-                child:
-                    Text("Squad is not yet announced. Please try again later."),
-              ),
-            ],
-          ),
-          duration: Duration(
-            seconds: 3,
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(
+          "Squad is not yet announced. Please try again later.", context);
+      // widget.scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Row(
+      //       children: <Widget>[
+      //         Expanded(
+      //           child:
+      //               Text("Squad is not yet announced. Please try again later."),
+      //         ),
+      //       ],
+      //     ),
+      //     duration: Duration(
+      //       seconds: 3,
+      //     ),
+      //   ),
+      // );
       return false;
     }
     return true;
@@ -402,7 +404,8 @@ class ContestsState extends State<Contests> {
   }
 
   onStateDobUpdate(String msg) {
-    widget.scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(msg)));
+    ActionUtil().showMsgOnTop(msg, context);
+    // widget.scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override

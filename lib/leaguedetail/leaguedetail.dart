@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -654,30 +655,35 @@ class LeagueDetailState extends State<LeagueDetail>
         ),
       );
     } else {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text(
-            "Questions are not yet set for this prediction. Please try again later!!"),
-      ));
+      ActionUtil().showMsgOnTop(
+          "Questions are not yet set for this prediction. Please try again later!!",
+          context);
+      // _scaffoldKey.currentState.showSnackBar(SnackBar(
+      //   content: Text(
+      //       "Questions are not yet set for this prediction. Please try again later!!"),
+      // ));
     }
   }
 
   squadStatus() {
     if (l1Data.league.rounds[0].matches[0].squad == 0) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: <Widget>[
-              Expanded(
-                child:
-                    Text("Squad is not yet announced. Please try again later."),
-              ),
-            ],
-          ),
-          duration: Duration(
-            seconds: 3,
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(
+          "Squad is not yet announced. Please try again later.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Row(
+      //       children: <Widget>[
+      //         Expanded(
+      //           child:
+      //               Text("Squad is not yet announced. Please try again later."),
+      //         ),
+      //       ],
+      //     ),
+      //     duration: Duration(
+      //       seconds: 3,
+      //     ),
+      //   ),
+      // );
       return false;
     }
     return true;
@@ -839,14 +845,15 @@ class LeagueDetailState extends State<LeagueDetail>
         break;
     }
     if (result != null) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(result),
-          duration: Duration(
-            seconds: 3,
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text(result),
+      //     duration: Duration(
+      //       seconds: 3,
+      //     ),
+      //   ),
+      // );
     }
   }
 
@@ -866,14 +873,18 @@ class LeagueDetailState extends State<LeagueDetail>
         ),
       );
       if (result != null) {
-        _scaffoldKey.currentState
-            .showSnackBar(SnackBar(content: Text("$result")));
+        ActionUtil().showMsgOnTop(result, context);
+        // _scaffoldKey.currentState
+        //     .showSnackBar(SnackBar(content: Text("$result")));
       }
     } else {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text(
-            "Questions are not yet set for this prediction. Please try again later!!"),
-      ));
+      ActionUtil().showMsgOnTop(
+          "Questions are not yet set for this prediction. Please try again later!!",
+          context);
+      // _scaffoldKey.currentState.showSnackBar(SnackBar(
+      //   content: Text(
+      //       "Questions are not yet set for this prediction. Please try again later!!"),
+      // ));
     }
   }
 

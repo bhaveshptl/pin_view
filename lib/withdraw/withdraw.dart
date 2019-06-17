@@ -737,11 +737,13 @@ class WithdrawState extends State<Withdraw>
         });
       } else {
         Map<String, dynamic> response = json.decode(res.body);
-        _scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text(response["error"]["erroMessage"]),
-          ),
-        );
+        // _scaffoldKey.currentState.showSnackBar(
+        //   SnackBar(
+        //     content: Text(response["error"]["erroMessage"]),
+        //   ),
+        // );
+        ActionUtil().showMsgOnTop(
+            response["error"]["erroMessage"], _scaffoldKey.currentContext);
       }
     }).whenComplete(() {
       ActionUtil().showLoader(_scaffoldKey.currentContext, false);
@@ -854,11 +856,13 @@ class WithdrawState extends State<Withdraw>
         } else {
           Map<String, dynamic> response = json.decode(res.body);
           if (response["error"] != null) {
-            _scaffoldKey.currentState.showSnackBar(
-              SnackBar(
-                content: Text(response["error"]["erroMessage"]),
-              ),
-            );
+            // _scaffoldKey.currentState.showSnackBar(
+            //   SnackBar(
+            //     content: Text(response["error"]["erroMessage"]),
+            //   ),
+            // );
+            ActionUtil().showMsgOnTop(
+                response["error"]["erroMessage"], _scaffoldKey.currentContext);
           }
         }
       },

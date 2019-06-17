@@ -7,6 +7,7 @@ import 'package:device_info/device_info.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:package_info/package_info.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
@@ -298,11 +299,12 @@ class SignupState extends State<Signup> {
           } else if (error == null) {
             error = strings.get("INVALID_USERNAME_PASSWORD");
           }
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(error),
-            ),
-          );
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(error),
+          //   ),
+          // );
+          ActionUtil().showMsgOnTop(error, _scaffoldKey.currentContext);
         }
         showLoader(false);
       },
@@ -480,10 +482,12 @@ class SignupState extends State<Signup> {
         onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
-        setState(() {
-          _scaffoldKey.currentState
-              .showSnackBar(SnackBar(content: Text(response['error'])));
-        });
+        // setState(() {
+        //   _scaffoldKey.currentState
+        //       .showSnackBar(SnackBar(content: Text(response['error'])));
+        // });
+        ActionUtil()
+            .showMsgOnTop(response['error'], _scaffoldKey.currentContext);
       }
     });
     showLoader(false);

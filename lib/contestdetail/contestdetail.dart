@@ -487,8 +487,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     );
 
     if (result != null) {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState
+      //     .showSnackBar(SnackBar(content: Text("$result")));
       if (curContest != null) {
         if (bWaitingForTeamCreation) {
           bShowJoinContest = true;
@@ -691,21 +692,23 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
 
   squadStatus() {
     if (_l1Data.league.rounds[0].matches[0].squad == 0) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: <Widget>[
-              Expanded(
-                child:
-                    Text("Squad is not yet announced. Please try again later."),
-              ),
-            ],
-          ),
-          duration: Duration(
-            seconds: 3,
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(
+          "Squad is not yet announced. Please try again later.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Row(
+      //       children: <Widget>[
+      //         Expanded(
+      //           child:
+      //               Text(),
+      //         ),
+      //       ],
+      //     ),
+      //     duration: Duration(
+      //       seconds: 3,
+      //     ),
+      //   ),
+      // );
       return false;
     }
     return true;

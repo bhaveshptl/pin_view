@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/analytics.dart';
@@ -62,8 +63,8 @@ class EarnCashState extends State<EarnCash> {
     /*Web engage Screen Data */
     Map<dynamic, dynamic> screendata = new Map();
     screendata["screenName"] = "EARNCASH";
-    Map<String,dynamic> screenAttributedata =Map();
-    screenAttributedata["refCode"]=refCode;
+    Map<String, dynamic> screenAttributedata = Map();
+    screenAttributedata["refCode"] = refCode;
     screendata["data"] = screenAttributedata;
     AnalyticsManager.webengageAddScreenData(screendata);
   }
@@ -90,15 +91,15 @@ class EarnCashState extends State<EarnCash> {
     Clipboard.setData(
       ClipboardData(text: refCode),
     );
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(
-          strings.get("COPIED"),
-        ),
-      ),
-    );
+    ActionUtil().showMsgOnTop("COPIED", context);
+    // _scaffoldKey.currentState.showSnackBar(
+    //   SnackBar(
+    //     content: Text(
+    //       strings.get("COPIED"),
+    //     ),
+    //   ),
+    // );
   }
-
 
   Future<String> initSocialShareChannel() async {
     String value;
@@ -172,7 +173,7 @@ class EarnCashState extends State<EarnCash> {
       _shareNowViaWhatsAppApplication(inviteMsg);
     }
   }
-  
+
   _shareNowFacebook() {
     inviteMsg =
         "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +

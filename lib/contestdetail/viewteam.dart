@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -99,21 +100,23 @@ class _ViewTeamState extends State<ViewTeam> {
 
   squadStatus() {
     if (widget.l1Data.league.rounds[0].matches[0].squad == 0) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Row(
-            children: <Widget>[
-              Expanded(
-                child:
-                    Text("Squad is not yet announced. Please try again later."),
-              ),
-            ],
-          ),
-          duration: Duration(
-            seconds: 3,
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(
+          "Squad is not yet announced. Please try again later.", context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Row(
+      //       children: <Widget>[
+      //         Expanded(
+      //           child:
+      //               Text("Squad is not yet announced. Please try again later."),
+      //         ),
+      //       ],
+      //     ),
+      //     duration: Duration(
+      //       seconds: 3,
+      //     ),
+      //   ),
+      // );
       return false;
     }
     return true;
@@ -132,8 +135,9 @@ class _ViewTeamState extends State<ViewTeam> {
     );
 
     if (result != null) {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState
+      //     .showSnackBar(SnackBar(content: Text("$result")));
     }
   }
 
@@ -153,8 +157,9 @@ class _ViewTeamState extends State<ViewTeam> {
       ),
     );
     if (result != null) {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState
+      //     .showSnackBar(SnackBar(content: Text("$result")));
     }
   }
 
@@ -322,7 +327,7 @@ class _ViewTeamState extends State<ViewTeam> {
                                                                   _sportsType
                                                                       .toString() +
                                                                   "-black"
-                                                                  ".png")
+                                                                      ".png")
                                                               .toLowerCase()
                                                               .replaceAll(
                                                                   " ", "-"),

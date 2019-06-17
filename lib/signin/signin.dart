@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -284,10 +285,12 @@ class SignInPageState extends State<SignInPage> {
         onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
-        setState(() {
-          _scaffoldKey.currentState
-              .showSnackBar(SnackBar(content: Text(response['error'])));
-        });
+        // setState(() {
+        //   _scaffoldKey.currentState
+        //       .showSnackBar(SnackBar(content: Text(response['error'])));
+        // });
+        ActionUtil()
+            .showMsgOnTop(response['error'], _scaffoldKey.currentContext);
       }
       showLoader(false);
     }).whenComplete(() {
@@ -435,10 +438,12 @@ class SignInPageState extends State<SignInPage> {
         onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
-        setState(() {
-          _scaffoldKey.currentState
-              .showSnackBar(SnackBar(content: Text(response['error'])));
-        });
+        // setState(() {
+        //   _scaffoldKey.currentState
+        //       .showSnackBar(SnackBar(content: Text(response['error'])));
+        // });
+        ActionUtil()
+            .showMsgOnTop(response['error'], _scaffoldKey.currentContext);
       }
       showLoader(false);
     });
@@ -460,8 +465,10 @@ class SignInPageState extends State<SignInPage> {
     );
 
     if (result != null && result == true) {
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text(strings.get("PASSWORD_CHANGED"))));
+      ActionUtil().showMsgOnTop(
+          strings.get("PASSWORD_CHANGED"), _scaffoldKey.currentContext);
+      // _scaffoldKey.currentState.showSnackBar(
+      //     SnackBar(content: Text(strings.get("PASSWORD_CHANGED"))));
     }
   }
 

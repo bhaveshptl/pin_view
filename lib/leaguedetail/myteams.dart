@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -68,8 +69,9 @@ class MyTeamsState extends State<MyTeams> {
     );
 
     if (result != null) {
-      _scaffoldKey.currentState
-          .showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState
+      //     .showSnackBar(SnackBar(content: Text("$result")));
     }
   }
 
@@ -86,7 +88,8 @@ class MyTeamsState extends State<MyTeams> {
     );
 
     if (result != null) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
     }
   }
 
@@ -106,11 +109,12 @@ class MyTeamsState extends State<MyTeams> {
       ),
     );
     if (result != null) {
-      _scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text("$result"),
-        ),
-      );
+      ActionUtil().showMsgOnTop(result, context);
+      // _scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text("$result"),
+      //   ),
+      // );
     }
   }
 

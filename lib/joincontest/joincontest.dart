@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -285,7 +286,8 @@ class JoinContestState extends State<JoinContest> {
     );
 
     if (result != null) {
-      scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$result")));
+      ActionUtil().showMsgOnTop(result, context);
+      // scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$result")));
     }
   }
 

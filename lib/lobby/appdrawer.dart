@@ -344,6 +344,8 @@ class AppDrawerState extends State<AppDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    double verticalPadding =
+        MediaQuery.of(context).size.height > 800 ? 4.0 : 2.0;
     return Drawer(
       key: _scaffoldKey,
       child: ListView(
@@ -441,15 +443,49 @@ class AppDrawerState extends State<AppDrawer> {
               ),
             ),
           ),
-          ListTile(
-            onTap: () {
-              _onVerify();
-            },
-            leading: Image.asset(
-              "images/KYC.png",
-              height: 24.0,
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              onTap: () {
+                _showMyAccount();
+              },
+              leading: Image.asset(
+                "images/account_summary.png",
+                width: 24.0,
+                color: Colors.grey.shade700,
+              ),
+              title: Text("ACCOUNT SUMMARY"),
             ),
-            title: Text("KYC"),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              onTap: () {
+                _launchWithdraw();
+              },
+              leading: Image.asset(
+                "images/withdrawIcon.png",
+                width: 24.0,
+              ),
+              title: Text("WITHDRAWAL"),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              onTap: () {
+                _onVerify();
+              },
+              leading: Image.asset(
+                "images/KYC.png",
+                width: 24.0,
+              ),
+              title: Text("KYC"),
+            ),
+          ),
+          Divider(
+            color: Colors.grey.shade400,
+            height: 1.0,
           ),
           Container(
             color: Color.fromRGBO(255, 246, 219, 1),
@@ -460,21 +496,22 @@ class AppDrawerState extends State<AppDrawer> {
                   children: <Widget>[
                     ListTile(
                       leading: Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Image.asset("images/junglee.png"),
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Image.asset(
+                          "images/junglee.png",
+                          width: 24.0,
+                        ),
                       ),
                       title: Text(
                         'Junglee Rummy',
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .headline
-                            .copyWith(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
                       ),
                       subtitle: Text(
-                        "India's Most Trusted Rummy Site",
+                        "Play Rummy, Win Cash",
                         style:
                             Theme.of(context).primaryTextTheme.body1.copyWith(
                                   color: Colors.black,
@@ -494,111 +531,114 @@ class AppDrawerState extends State<AppDrawer> {
               ],
             ),
           ),
-          ListTile(
-            onTap: () {
-              _launchWithdraw();
-            },
-            leading: Icon(Icons.print),
-            title: Text("WITHDRAWAL"),
+          Divider(
+            color: Colors.grey.shade400,
+            height: 1.0,
           ),
-          ListTile(
-            onTap: () {
-              _showMyAccount();
-            },
-            leading: Image.asset(
-              "images/Bonus-gift.png",
-              height: 24.0,
-              color: Colors.grey.shade700,
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/HowtoPlay.png",
+                width: 24.0,
+              ),
+              title: Text('How To Play'.toUpperCase()),
+              onTap: () {
+                _launchStaticPage("HELP");
+              },
             ),
-            title: Text("BONUS SUMMARY"),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/Scoring.png",
+                width: 24.0,
+              ),
+              title: Text('Scoring System'.toUpperCase()),
+              onTap: () {
+                _launchStaticPage("SCORING");
+              },
+            ),
           ),
           Divider(
             color: Colors.grey.shade400,
             height: 1.0,
           ),
-          ListTile(
-            leading: Image.asset(
-              "images/HowtoPlay.png",
-              height: 24.0,
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/Contact.png",
+                width: 24.0,
+              ),
+              title: Text('Contact Us'.toUpperCase()),
+              onTap: () {
+                _showContactUsPage();
+              },
             ),
-            title: Text('How To Play'.toUpperCase()),
-            onTap: () {
-              _launchStaticPage("HELP");
-            },
-          ),
-          ListTile(
-            leading: Image.asset(
-              "images/Scoring.png",
-              height: 24.0,
-            ),
-            title: Text('Scoring System'.toUpperCase()),
-            onTap: () {
-              _launchStaticPage("SCORING");
-            },
-          ),
-          ListTile(
-            leading: Image.asset(
-              "images/Contact.png",
-              height: 24.0,
-            ),
-            title: Text('Contact Us'.toUpperCase()),
-            onTap: () {
-              _showContactUsPage();
-            },
-          ),
-          Divider(
-            color: Colors.grey.shade400,
-            height: 1.0,
-          ),
-          ListTile(
-            leading: Image.asset(
-              "images/TermsandCondition.png",
-              height: 24.0,
-            ),
-            title: Text('Terms And Conditions'.toUpperCase()),
-            onTap: () {
-              _launchStaticPage("T&C");
-            },
-          ),
-          ListTile(
-            leading: Image.asset(
-              "images/privacy.png",
-              height: 24.0,
-            ),
-            title: Text('Privacy Policy'.toUpperCase()),
-            onTap: () {
-              _launchStaticPage("PRIVACY");
-            },
           ),
           isIos
               ? Container()
-              : ListTile(
-                  leading: Image.asset(
-                    "images/Update.png",
-                    height: 24.0,
+              : Padding(
+                  padding: EdgeInsets.symmetric(vertical: verticalPadding),
+                  child: ListTile(
+                    leading: Image.asset(
+                      "images/Update.png",
+                      width: 24.0,
+                    ),
+                    title: Text('Check For Update'.toUpperCase()),
+                    onTap: () {
+                      _performUpdateCheck();
+                    },
                   ),
-                  title: Text('Check For Update'.toUpperCase()),
-                  onTap: () {
-                    _performUpdateCheck();
-                  },
                 ),
-          ListTile(
-            leading: Image.asset(
-              "images/Logout.png",
-              height: 24.0,
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/TermsandCondition.png",
+                width: 24.0,
+              ),
+              title: Text('Terms And Conditions'.toUpperCase()),
+              onTap: () {
+                _launchStaticPage("T&C");
+              },
             ),
-            title: Text('Log Out'.toUpperCase()),
-            onTap: () async {
-              _doLogout();
-              HttpManager.cookie = null;
-              SharedPrefHelper.internal().removeCookie();
-              Navigator.pop(context);
-              Navigator.of(context).pushReplacement(
-                FantasyPageRoute(
-                  pageBuilder: (context) => SignInPage(),
-                ),
-              );
-            },
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/privacy.png",
+                width: 24.0,
+              ),
+              title: Text('Privacy Policy'.toUpperCase()),
+              onTap: () {
+                _launchStaticPage("PRIVACY");
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/Logout.png",
+                width: 24.0,
+              ),
+              title: Text('Log Out'.toUpperCase()),
+              onTap: () async {
+                _doLogout();
+                HttpManager.cookie = null;
+                SharedPrefHelper.internal().removeCookie();
+                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  FantasyPageRoute(
+                    pageBuilder: (context) => SignInPage(),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),

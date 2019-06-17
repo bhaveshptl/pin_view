@@ -499,14 +499,15 @@ class JoinedContestsState extends State<JoinedContests>
         );
     }
     if (result != null) {
-      scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: Text(result),
-          duration: Duration(
-            seconds: 3,
-          ),
-        ),
-      );
+      ActionUtil().showMsgOnTop(result, context);
+      // scaffoldKey.currentState.showSnackBar(
+      //   SnackBar(
+      //     content: Text(result),
+      //     duration: Duration(
+      //       seconds: 3,
+      //     ),
+      //   ),
+      // );
     }
   }
 

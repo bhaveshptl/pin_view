@@ -39,9 +39,10 @@ class PartnerState extends State<Partner> {
   }
 
   _showMessage(String message) {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text(message),
-    ));
+    ActionUtil().showMsgOnTop(message, context);
+    // _scaffoldKey.currentState.showSnackBar(SnackBar(
+    //   content: Text(message),
+    // ));
   }
 
   bool isNumeric(String s) {

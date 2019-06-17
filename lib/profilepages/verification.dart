@@ -281,11 +281,13 @@ class VerificationState extends State<Verification> {
         _getVerificationStatus();
       } else {
         Map<String, dynamic> response = json.decode(res.body);
-        scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text(response["error"]["erroMessage"]),
-          ),
-        );
+        ActionUtil().showMsgOnTop(
+            response["error"]["erroMessage"], scaffoldKey.currentContext);
+        // scaffoldKey.currentState.showSnackBar(
+        //   SnackBar(
+        //     content: Text(response["error"]["erroMessage"]),
+        //   ),
+        // );
       }
     }).whenComplete(() {
       ActionUtil().showLoader(scaffoldKey.currentContext, false);
@@ -367,11 +369,13 @@ class VerificationState extends State<Verification> {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["err"] != null && response["err"]) {
-              scaffoldKey.currentState.showSnackBar(
-                SnackBar(
-                  content: Text(response["msg"]),
-                ),
-              );
+              // scaffoldKey.currentState.showSnackBar(
+              //   SnackBar(
+              //     content: Text(response["msg"]),
+              //   ),
+              // );
+              ActionUtil()
+                  .showMsgOnTop(response["msg"], scaffoldKey.currentContext);
             }
             setState(() {
               _panVerificationStatus = response["pan_verification"];
