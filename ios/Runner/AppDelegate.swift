@@ -467,6 +467,14 @@ import Firebase
                     SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
                     result("Social Share");
                 }
+                if(call.method == "shareViaFacebook"){
+                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                    result("Social Share");
+                }
+                if(call.method == "shareViaGmail"){
+                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                    result("Social Share");
+                }
                 else{
                     result(FlutterMethodNotImplemented)
                 }

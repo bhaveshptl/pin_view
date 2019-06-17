@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
@@ -404,14 +403,14 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
         " - $contestVisibility LEAGUE \nHey! I created a Contest for our folks to play. Use this contest code *$contestCode* and join us. \n $contestShareUrl";
 
     if (Platform.isAndroid) {
-      FlutterShareMe().shareToSystem(msg: inviteMsg);
+      _shareNowViaSystemApplication(inviteMsg);
     }
     if (Platform.isIOS) {
-      _shareNowIOS(inviteMsg);
+      _shareNowViaSystemApplication(inviteMsg);
     }
   }
 
-  Future<String> _shareNowIOS(String msg) async {
+  Future<String> _shareNowViaSystemApplication(String msg) async {
     String value;
     try {
       value = await social_share_platform.invokeMethod('shareText', msg);

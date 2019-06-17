@@ -75,6 +75,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     data["channelId"] = HttpManager.channelId;
     eventdata["data"] = data;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
+
+    /*Web engage Screen Data */
+    Map<dynamic, dynamic> screendata = new Map();
+    screendata["screenName"] = "PAYMENTMODE";
+    Map<String,dynamic> screenAttributedata =Map();
+    screenAttributedata["depositAmount"]=widget.amount;
+    screendata["data"] = screenAttributedata;
+    AnalyticsManager.webengageAddScreenData(screendata);
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
@@ -716,6 +724,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         webengageEventTransactionFailed(response);
       } else {
         Navigator.of(context).pop(result);
+        branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response); 
       }
     }
   }

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -139,6 +139,7 @@ class LobbyState extends State<Lobby>
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> user = json.decode(res.body)["user"];
+        setWebEngageKeys(user);
         SharedPrefHelper.internal().saveToSharedPref(
             ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
         return User.fromJson(user);
@@ -149,6 +150,37 @@ class LobbyState extends State<Lobby>
       showLoader(false);
     });
   }
+
+  setWebEngageKeys(Map<String,dynamic> data){
+    if(data["email_id"] != null){
+      Map<dynamic, dynamic> setEmailBody = new Map();
+      setEmailBody["trackingType"] = "setEmail";
+      setEmailBody["value"] = AnalyticsManager.dosha256Encoding(data["email_id"]);
+      AnalyticsManager.webengageTrackUser(setEmailBody);
+    }
+
+    if(data["mobile"] != null){
+      Map<dynamic, dynamic> setEmailBody = new Map();
+      setEmailBody["trackingType"] = "setPhoneNumber";
+      setEmailBody["value"] = AnalyticsManager.dosha256Encoding("+91"+data["mobile"].toString());
+      AnalyticsManager.webengageTrackUser(setEmailBody);
+    }
+
+    if(data["first_name"] != null){
+      Map<dynamic, dynamic> setEmailBody = new Map();
+      setEmailBody["trackingType"] = "setFirstName";
+      setEmailBody["value"] = data["first_name"];
+      AnalyticsManager.webengageTrackUser(setEmailBody);
+    }
+
+    if(data["setLastName"] != null){
+      Map<dynamic, dynamic> setEmailBody = new Map();
+      setEmailBody["trackingType"] = "setLastName";
+      setEmailBody["value"] = data["last_name"];
+      AnalyticsManager.webengageTrackUser(setEmailBody);
+    }
+  }
+
 
   _getBanners() async {
     http.Request req = http.Request(

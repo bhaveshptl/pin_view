@@ -252,11 +252,11 @@ class SignupState extends State<Signup> {
           }
         });
       }
-    } else if (PrivateAttribution.getPrivateAttributionName == "oppo") {
+    } else if (PrivateAttribution.getPrivateAttributionName() == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if (PrivateAttribution.getPrivateAttributionName == "xiaomi") {
+    } else if (PrivateAttribution.getPrivateAttributionName() == "xiaomi") {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
@@ -433,11 +433,11 @@ class SignupState extends State<Signup> {
           }
         });
       }
-    } else if (PrivateAttribution.getPrivateAttributionName == "oppo") {
+    } else if (PrivateAttribution.getPrivateAttributionName() == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";
       _payload["context"]["utm_medium"] = "Oppo Store";
       _payload["context"]["utm_campaign"] = "Oppo World Cup";
-    } else if (PrivateAttribution.getPrivateAttributionName == "xiaomi") {
+    } else if (PrivateAttribution.getPrivateAttributionName() == "xiaomi") {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";

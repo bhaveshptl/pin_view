@@ -1360,7 +1360,7 @@ class AddCashState extends State<AddCash> {
     );
 
     showLoader(false);
-
+ 
     if (result != null) {
       Map<String, dynamic> response = json.decode(result);
       if ((response["authStatus"] as String).toLowerCase() ==
@@ -1384,6 +1384,7 @@ class AddCashState extends State<AddCash> {
         }
       } else {
         branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(result);
       }
     }
@@ -1499,7 +1500,8 @@ class AddCashState extends State<AddCash> {
     try {
       String trackStatus = await webengage_platform.invokeMethod(
           'webEngageTransactionSuccess', trackdata);
-    } catch (e) {}
+    } catch (e) {
+    }
     return trackStatus;
   }
 

@@ -73,27 +73,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Boolean isAppOnForeground = isAppOnForeground(this, "com.howzat.howzatfantasy");
         if (!isAppOnForeground) {
-            sendNotification(remoteMessage);
+            if(webengagedata.containsKey("source") && "webengage".equals(webengagedata.get("source"))) {
+                //WebEngage.get().receive(webengagedata);
+            }else{
+                try{
+                    Map<String, String> pushData = remoteMessage.getData();
+                    if (pushData.containsKey("title")&&pushData.containsKey("body")&&pushData.containsKey("image")&&pushData.containsKey("picture")){
+                        sendNotification(remoteMessage);
+                    }
+                }catch(Exception e){
+                }
+            }
         }
         else{
-            try{
-                Boolean  show_fg_local=true;
-                Map<String, String> receivedMap = remoteMessage.getData();
-                String show_fg = receivedMap.get("show_fg");
-                if(show_fg.equals("false")){
-                    show_fg_local=false;
-                }
-                else if(show_fg.equals("false")||show_fg.equals(null)){
-                    show_fg_local=true;
-                }
-                System.out.println(show_fg_local);
-                if(show_fg_local){
-                   // sendNotification(remoteMessage);
-                }
-            }
-            catch(Exception e){
-               // sendNotification(remoteMessage);
-            }
+
         }
 
     }
