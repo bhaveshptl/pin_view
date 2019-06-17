@@ -5,8 +5,10 @@ class ColorButton extends StatelessWidget {
   final Widget child;
   final Function onPressed;
   final Color color;
+  final ShapeBorder shape;
   final Color disabledColor;
   final double elevation;
+  final BorderSide borderSide;
   final BorderRadius borderRadius;
   final EdgeInsetsGeometry padding;
 
@@ -18,6 +20,8 @@ class ColorButton extends StatelessWidget {
     this.elevation,
     this.borderRadius,
     this.padding,
+    this.shape,
+    this.borderSide,
   });
 
   @override
@@ -27,9 +31,10 @@ class ColorButton extends StatelessWidget {
       onPressed: onPressed,
       color: color ?? Color.fromRGBO(70, 165, 12, 1),
       disabledColor: Colors.black26,
-      shape: RoundedRectangleBorder(
-        borderRadius: borderRadius ?? BorderRadius.circular(4.0),
-      ),
+      shape: shape ??
+          RoundedRectangleBorder(
+            borderRadius: borderRadius ?? BorderRadius.circular(4.0),
+          ),
       padding: padding,
       elevation: elevation,
     );

@@ -120,11 +120,7 @@ class ActionUtil {
           );
         }
       } else if (result != null) {
-        Flushbar(
-          message: "$result",
-          duration: Duration(seconds: 3),
-          flushbarPosition: FlushbarPosition.TOP,
-        )..show(scaffoldKey.currentContext);
+        showMsgOnTop(result, scaffoldKey.currentContext);
       }
     }
   }
@@ -278,28 +274,21 @@ class ActionUtil {
                     color: Colors.black,
                   ),
             ),
-          )
+          ),
+          InkWell(
+            child: Icon(
+              Icons.close,
+              color: Colors.grey.shade600,
+            ),
+            onTap: () {
+              flushbar.dismiss(true);
+            },
+          ),
         ],
       ),
       aroundPadding: EdgeInsets.all(8.0),
       backgroundColor: Colors.white,
-      mainButton: FlatButton(
-        padding: EdgeInsets.all(0.0),
-        child: Icon(Icons.close),
-        onPressed: () {
-          flushbar.dismiss(true);
-        },
-      ),
-      // boxShadows: [
-      //   BoxShadow(
-      //     blurRadius: 6,
-      //     spreadRadius: 1,
-      //     color: Colors.black,
-      //   )
-      // ],
-      // backgroundColor: Color.fromRGBO(251, 228, 121, 1),
       duration: Duration(seconds: 3),
-      // flushbarStyle: FlushbarStyle.GROUNDED,
       flushbarPosition: FlushbarPosition.TOP,
     );
     flushbar.show(context);

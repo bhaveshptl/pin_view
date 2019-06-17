@@ -514,7 +514,7 @@ class AppDrawerState extends State<AppDrawer> {
                         "Play Rummy, Win Cash",
                         style:
                             Theme.of(context).primaryTextTheme.body1.copyWith(
-                                  color: Colors.black,
+                                  color: Colors.grey.shade600,
                                 ),
                       ),
                       onTap: () {

@@ -151,36 +151,37 @@ class LobbyState extends State<Lobby>
     });
   }
 
-  setWebEngageKeys(Map<String,dynamic> data){
-    if(data["email_id"] != null){
+  setWebEngageKeys(Map<String, dynamic> data) {
+    if (data["email_id"] != null) {
       Map<dynamic, dynamic> setEmailBody = new Map();
       setEmailBody["trackingType"] = "setEmail";
-      setEmailBody["value"] = AnalyticsManager.dosha256Encoding(data["email_id"]);
+      setEmailBody["value"] =
+          AnalyticsManager.dosha256Encoding(data["email_id"]);
       AnalyticsManager.webengageTrackUser(setEmailBody);
     }
 
-    if(data["mobile"] != null){
+    if (data["mobile"] != null) {
       Map<dynamic, dynamic> setEmailBody = new Map();
       setEmailBody["trackingType"] = "setPhoneNumber";
-      setEmailBody["value"] = AnalyticsManager.dosha256Encoding("+91"+data["mobile"].toString());
+      setEmailBody["value"] =
+          AnalyticsManager.dosha256Encoding("+91" + data["mobile"].toString());
       AnalyticsManager.webengageTrackUser(setEmailBody);
     }
 
-    if(data["first_name"] != null){
+    if (data["first_name"] != null) {
       Map<dynamic, dynamic> setEmailBody = new Map();
       setEmailBody["trackingType"] = "setFirstName";
       setEmailBody["value"] = data["first_name"];
       AnalyticsManager.webengageTrackUser(setEmailBody);
     }
 
-    if(data["setLastName"] != null){
+    if (data["setLastName"] != null) {
       Map<dynamic, dynamic> setEmailBody = new Map();
       setEmailBody["trackingType"] = "setLastName";
       setEmailBody["value"] = data["last_name"];
       AnalyticsManager.webengageTrackUser(setEmailBody);
     }
   }
-
 
   _getBanners() async {
     http.Request req = http.Request(
@@ -538,9 +539,15 @@ class LobbyState extends State<Lobby>
               ColorButton(
                 padding: EdgeInsets.only(
                     left: 8.0, right: 6.0, top: 6.0, bottom: 6.0),
-                borderRadius: BorderRadius.circular(24.0),
-                color: Colors.white12,
-                elevation: 0.0,
+                color: Color.fromRGBO(125, 13, 13, 1),
+                elevation: 6.0,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Color.fromRGBO(70, 165, 12, 1),
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
                 child: Row(
                   children: <Widget>[
                     Image.asset(
