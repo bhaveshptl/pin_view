@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -124,12 +123,6 @@ class AddCashState extends State<AddCash> {
       });
     });
 
-    if (widget.depositData.chooseAmountData.isFirstDeposit) {
-      promoController.text =
-          widget.depositData.chooseAmountData.bonusArray[0]["code"];
-      bShowPromoInput = true;
-    }
-
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
@@ -242,16 +235,13 @@ class AddCashState extends State<AddCash> {
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
         if (response["orderId"] == null) {
-          ActionUtil().showMsgOnTop(
-              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-              context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-          //     ),
-          //   ),
-          // );
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              ),
+            ),
+          );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
@@ -533,188 +523,87 @@ class AddCashState extends State<AddCash> {
       },
     );
 
-    tiles.add(Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: SimpleTextBox(
-              style: TextStyle(
-                fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
-                color: Colors.grey.shade900,
-              ),
-              labelText: "Enter amount",
-              labelStyle: Theme.of(context).primaryTextTheme.headline.copyWith(
-                    color: Colors.grey.shade500,
-                  ),
-              focusedBorderColor: Colors.green,
-              suffixIcon:
-                  customAmountController.text != "" && customAmountBonus > 0
-                      ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Icon(
-                                gift_1,
-                                size: 20.0,
-                                color: Colors.green,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                strings.rupee +
-                                    customAmountBonus.toStringAsFixed(0) +
-                                    " Bonus",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .title
-                                    .copyWith(
-                                      color: Colors.green,
-                                    ),
-                              ),
-                            )
-                          ],
-                        )
-                      : null,
-              focusNode: _customAmountFocusNode,
-              controller: customAmountController,
-              keyboardType: TextInputType.number,
-              contentPadding: EdgeInsets.all(12.0),
-            ),
+    tiles.add(
+      Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: SimpleTextBox(
+          style: TextStyle(
+            fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
+            color: Colors.grey.shade900,
           ),
-          Row(
-            children: <Widget>[
-              Text(
-                "Minimum deposit limit is ${strings.rupee}${widget.depositData.chooseAmountData.minAmount.toString()}",
-                style: TextStyle(
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 4.0),
-            child: Row(
-              children: <Widget>[
-                Text("Have a promocode?"),
-                Padding(
-                  padding: EdgeInsets.only(left: 8.0),
-                  child: InkWell(
-                    customBorder: Border(
-                        bottom: BorderSide(
-                      color: Colors.black,
-                      width: 1.0,
-                    )),
-                    child: Padding(
-                      padding: EdgeInsets.all(4.0),
-                      child: Text(
-                        "Apply Now",
-                        style:
-                            Theme.of(context).primaryTextTheme.button.copyWith(
-                                  color: Colors.black87,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.black,
-                                ),
+          focusedBorderColor: Colors.green,
+          suffixIcon: customAmountController.text != "" && customAmountBonus > 0
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Icon(
+                        gift_1,
+                        size: 20.0,
+                        color: Colors.green,
                       ),
                     ),
-                    onTap: () {
-                      setState(() {
-                        bShowPromoInput = !bShowPromoInput;
-                      });
-                    },
-                  ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: Text(
+                        strings.rupee +
+                            customAmountBonus.toStringAsFixed(0) +
+                            " Bonus",
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.green,
+                                ),
+                      ),
+                    )
+                  ],
                 )
-              ],
-            ),
-          ),
-          bShowPromoInput
-              ? Padding(
-                  padding: EdgeInsets.only(bottom: 8.0, top: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextFormField(
-                          textCapitalization: TextCapitalization.characters,
-                          controller: promoController,
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                            labelText: "Promocode",
-                            contentPadding: EdgeInsets.all(8.0),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black38,
-                              ),
-                            ),
-                            suffixIcon: FlatButton(
-                              child: Text("Apply".toUpperCase()),
-                              onPressed: () {
-                                onApplyPromo();
-                              },
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              : Container(),
-        ],
+              : null,
+          focusNode: _customAmountFocusNode,
+          controller: customAmountController,
+          keyboardType: TextInputType.number,
+          contentPadding: EdgeInsets.all(12.0),
+        ),
       ),
-    ));
+    );
     return tiles;
   }
 
   onApplyPromo() async {
     int amount =
         amountController.text != "" ? int.parse(amountController.text) : 0;
-    if (amountController.text == "" &&
-        !widget.depositData.chooseAmountData.isFirstDeposit) {
-      ActionUtil().showMsgOnTop("Please enter amount to apply promo.", context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter amount to apply promo."),
-      //   ),
-      // );
-    } else if (customAmountController.text == "" &&
-        widget.depositData.chooseAmountData.isFirstDeposit) {
-      ActionUtil().showMsgOnTop("Please enter amount to apply promo.", context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter amount to apply promo."),
-      //   ),
-      // );
+    if (amountController.text == "") {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter amount to apply promo."),
+        ),
+      );
     } else if (promoController.text == "") {
-      ActionUtil().showMsgOnTop("Please enter promo code to apply.", context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter promo code to apply."),
-      //   ),
-      // );
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter promo code to apply."),
+        ),
+      );
     } else {
       final result = await validatePromo(amount);
       if (result != null) {
         Map<String, dynamic> paymentMode = json.decode(result);
         if (paymentMode["error"] == true) {
-          ActionUtil().showMsgOnTop(paymentMode["msg"], context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(paymentMode["msg"]),
-          //   ),
-          // );
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(paymentMode["msg"]),
+            ),
+          );
         } else {
           setState(() {
             bonusInfo = paymentMode["details"];
           });
-          ActionUtil().showMsgOnTop(paymentMode["message"], context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(paymentMode["message"]),
-          //     duration: Duration(seconds: 2),
-          //   ),
-          // );
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(paymentMode["message"]),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
       }
     }
@@ -726,24 +615,16 @@ class AddCashState extends State<AddCash> {
 
     if (amount < widget.depositData.chooseAmountData.minAmount ||
         amount > widget.depositData.chooseAmountData.depositLimit) {
-      ActionUtil().showMsgOnTop(
-          "Enter amount between Min " +
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Enter amount between Min " +
               strings.rupee +
               widget.depositData.chooseAmountData.minAmount.toString() +
               " and Max " +
               strings.rupee +
-              widget.depositData.chooseAmountData.depositLimit.toString(),
-          context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Enter amount between Min " +
-      //         strings.rupee +
-      //         widget.depositData.chooseAmountData.minAmount.toString() +
-      //         " and Max " +
-      //         strings.rupee +
-      //         widget.depositData.chooseAmountData.depositLimit.toString()),
-      //   ),
-      // );
+              widget.depositData.chooseAmountData.depositLimit.toString()),
+        ),
+      );
     } else if (promoController.text == "") {
       initRepeatDeposit();
     } else {
@@ -751,12 +632,11 @@ class AddCashState extends State<AddCash> {
       if (result != null) {
         Map<String, dynamic> paymentMode = json.decode(result);
         if (paymentMode["error"] == true) {
-          ActionUtil().showMsgOnTop(paymentMode["msg"], context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(paymentMode["msg"]),
-          //   ),
-          // );
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(paymentMode["msg"]),
+            ),
+          );
         } else {
           initRepeatDeposit();
         }
@@ -1148,44 +1028,32 @@ class AddCashState extends State<AddCash> {
     if ((widget.depositData.chooseAmountData.isFirstDeposit && amount == 0) ||
         (!widget.depositData.chooseAmountData.isFirstDeposit &&
             amountController.text == "")) {
-      ActionUtil()
-          .showMsgOnTop("Please enter valid amount to deposit.", context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter valid amount to deposit."),
-      //   ),
-      // );
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter valid amount to deposit."),
+        ),
+      );
     } else {
       if (amountController.text.indexOf(".") != -1) {
-        ActionUtil()
-            .showMsgOnTop("Please enter amount without decimal point", context);
-        // _scaffoldKey.currentState.showSnackBar(
-        //   SnackBar(
-        //     content: Text("Please enter amount without decimal point"),
-        //   ),
-        // );
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            content: Text("Please enter amount without decimal point"),
+          ),
+        );
       } else {
         amount = amount == null ? int.parse(amountController.text) : amount;
         if (amount < widget.depositData.chooseAmountData.minAmount ||
             amount > widget.depositData.chooseAmountData.depositLimit) {
-          ActionUtil().showMsgOnTop(
-              "Enter amount between Min " +
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text("Enter amount between Min " +
                   strings.rupee +
                   widget.depositData.chooseAmountData.minAmount.toString() +
                   " and Max " +
                   strings.rupee +
-                  widget.depositData.chooseAmountData.depositLimit.toString(),
-              context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text("Enter amount between Min " +
-          //         strings.rupee +
-          //         widget.depositData.chooseAmountData.minAmount.toString() +
-          //         " and Max " +
-          //         strings.rupee +
-          //         widget.depositData.chooseAmountData.depositLimit.toString()),
-          //   ),
-          // );
+                  widget.depositData.chooseAmountData.depositLimit.toString()),
+            ),
+          );
         } else {
           final result = await proceedToPaymentMode(amount);
           if (result != null) {
@@ -1251,12 +1119,11 @@ class AddCashState extends State<AddCash> {
 
   initPayment(Map<String, dynamic> paymentMode, int amount) async {
     if (paymentMode["error"] == true) {
-      ActionUtil().showMsgOnTop(paymentMode["msg"], context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text(paymentMode["msg"]),
-      //   ),
-      // );
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text(paymentMode["msg"]),
+        ),
+      );
     } else {
       flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
@@ -1281,13 +1148,11 @@ class AddCashState extends State<AddCash> {
 
   initRepeatDeposit() {
     if (amountController.text == "") {
-      ActionUtil()
-          .showMsgOnTop("Please enter amount to repeat deposit", context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter amount to repeat deposit"),
-      //   ),
-      // );
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter amount to repeat deposit"),
+        ),
+      );
     } else {
       int amount = int.parse(amountController.text);
       paySecurely(amount);
@@ -1403,16 +1268,13 @@ class AddCashState extends State<AddCash> {
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
         if (response["orderId"] == null) {
-          ActionUtil().showMsgOnTop(
-              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-              context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-          //     ),
-          //   ),
-          // );
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              ),
+            ),
+          );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
@@ -1420,7 +1282,6 @@ class AddCashState extends State<AddCash> {
         }
       } else {
         branchEventTransactionSuccess(response);
-        webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(result);
       }
     }
@@ -1560,13 +1421,11 @@ class AddCashState extends State<AddCash> {
 
   onCustomAddAmount() {
     if (customAmountController.text.indexOf(".") != -1) {
-      ActionUtil()
-          .showMsgOnTop("Please enter amount without decimal point", context);
-      // _scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Text("Please enter amount without decimal point"),
-      //   ),
-      // );
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter amount without decimal point"),
+        ),
+      );
     } else {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
@@ -1604,80 +1463,118 @@ class AddCashState extends State<AddCash> {
             : null,
         child: Column(
           children: <Widget>[
+            // Container(
+            //   color: Colors.black26,
+            //   padding: EdgeInsets.symmetric(vertical: 8.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: <Widget>[
+            //       Text(
+            //         "Account balance",
+            //         style: TextStyle(
+            //           color: Colors.black87,
+            //           fontSize:
+            //               Theme.of(context).primaryTextTheme.subhead.fontSize,
+            //           fontWeight: FontWeight.bold,
+            //         ),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.only(left: 4.0),
+            //         child: Text(
+            //           strings.rupee +
+            //               (widget.depositData == null
+            //                   ? "0.0"
+            //                   : (widget.depositData.chooseAmountData.balance
+            //                               .deposited +
+            //                           widget.depositData.chooseAmountData
+            //                               .balance.nonWithdrawable +
+            //                           widget.depositData.chooseAmountData
+            //                               .balance.withdrawable)
+            //                       .toStringAsFixed(2)),
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
             Expanded(
               child: SingleChildScrollView(
                 child: createChooseAmountUI(),
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        height: 72.0,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 3.0,
-              spreadRadius: 1.0,
-              color: Colors.black12,
-            ),
-          ],
-        ),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Image.asset(
-                    "images/payment-footer-strip.png",
-                    height: 28.0,
+            Container(
+              height: 72.0,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 3.0,
+                    spreadRadius: 1.0,
+                    color: Colors.black12,
                   ),
                 ],
               ),
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    "We do not accept deposits from the states of Assam, Odisha and Telangana",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
-                          color: Colors.grey.shade500,
-                        ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.grey.shade500,
-                                fontSize: 10.0,
-                              ),
-                      children: [
-                        TextSpan(
-                          text: "Bonus credit is subject to ",
-                        ),
-                        TextSpan(
-                          recognizer: termsGesture,
-                          text: "Terms and Conditions*",
-                          style: TextStyle(
-                            color: Colors.blue,
-                          ),
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset(
+                          "images/payment-footer-strip.png",
+                          height: 28.0,
                         ),
                       ],
                     ),
                   ),
-                )
-              ],
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "We do not accept deposits from the states of Assam, Odisha and Telangana",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                color: Colors.grey.shade500,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .caption
+                                .copyWith(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 10.0,
+                                ),
+                            children: [
+                              TextSpan(
+                                text: "Bonus credit is subject to ",
+                              ),
+                              TextSpan(
+                                recognizer: termsGesture,
+                                text: "Terms and Conditions*",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),

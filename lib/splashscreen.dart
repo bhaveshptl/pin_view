@@ -89,31 +89,31 @@ class SplashScreenState extends State<SplashScreen>
       );
     }
 
-    // if (result) {
-    //   final wsCookie = json.decode(await setWSCookie());
-    //   if (wsCookie != null && wsCookie != "") {
-    //     final result =
-    //         await SharedPrefHelper().saveWSCookieToStorage(wsCookie["cookie"]);
-    //     print(result);
-    //   }
+    if (result) {
+      final wsCookie = json.decode(await setWSCookie());
+      if (wsCookie != null && wsCookie != "") {
+        final result =
+            await SharedPrefHelper().saveWSCookieToStorage(wsCookie["cookie"]);
+        print(result);
+      }
 
-    //   setLoadingPercentage(99.0);
-    //   SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
-    //   Navigator.of(context).pushReplacement(
-    //     FantasyPageRoute(
-    //       pageBuilder: (context) => Lobby(),
-    //     ),
-    //   );
-    // } else {
-    //   setLoadingPercentage(99.0);
-    //   final result =
-    //       await SharedPrefHelper().getFromSharedPref(ApiUtil.REGISTERED_USER);
-    //   Navigator.of(context).pushReplacement(
-    //     FantasyPageRoute(
-    //       pageBuilder: (context) => result == null ? Signup() : SignInPage(),
-    //     ),
-    //   );
-    // }
+      setLoadingPercentage(99.0);
+      SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => Lobby(),
+        ),
+      );
+    } else {
+      setLoadingPercentage(99.0);
+      final result =
+          await SharedPrefHelper().getFromSharedPref(ApiUtil.REGISTERED_USER);
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => result == null ? Signup() : SignInPage(),
+        ),
+      );
+    }
   }
 
   setWSCookie() async {
