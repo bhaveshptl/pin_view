@@ -221,7 +221,7 @@ class JoinContestState extends State<JoinContest> {
     Map<String, dynamic> webengageTeamData = new Map();
     webengageTeamData["TeamId"]=_teamToJoin.id;
     webengageTeamData["MatchId"]=widget.league.matchId;
-    webengageTeamData["ContestId"]=widget.league.matchId;
+    webengageTeamData["ContestId"]=widget.contest.id;
     webengageTeamData["LeagueId"]=widget.l1Data.league.id;
     webengageTeamData["SeriesId"]=widget.league.series.id;
     webengageTeamData["MatchDate"]=widget.l1Data.league.rounds[0].matches[0].startTime;
