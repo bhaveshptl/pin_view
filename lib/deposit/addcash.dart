@@ -123,6 +123,12 @@ class AddCashState extends State<AddCash> {
       });
     });
 
+    if (widget.depositData.chooseAmountData.isFirstDeposit) {
+      promoController.text =
+          widget.depositData.chooseAmountData.bonusArray[0]["code"];
+      bShowPromoInput = true;
+    }
+
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
@@ -523,56 +529,152 @@ class AddCashState extends State<AddCash> {
       },
     );
 
-    tiles.add(
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: SimpleTextBox(
-          style: TextStyle(
-            fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
-            color: Colors.grey.shade900,
+    tiles.add(Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: SimpleTextBox(
+              style: TextStyle(
+                fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
+                color: Colors.grey.shade900,
+              ),
+              labelText: "Enter amount",
+              labelStyle: Theme.of(context).primaryTextTheme.headline.copyWith(
+                    color: Colors.grey.shade500,
+                  ),
+              focusedBorderColor: Colors.green,
+              suffixIcon:
+                  customAmountController.text != "" && customAmountBonus > 0
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                gift_1,
+                                size: 20.0,
+                                color: Colors.green,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                strings.rupee +
+                                    customAmountBonus.toStringAsFixed(0) +
+                                    " Bonus",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.green,
+                                    ),
+                              ),
+                            )
+                          ],
+                        )
+                      : null,
+              focusNode: _customAmountFocusNode,
+              controller: customAmountController,
+              keyboardType: TextInputType.number,
+              contentPadding: EdgeInsets.all(12.0),
+            ),
           ),
-          focusedBorderColor: Colors.green,
-          suffixIcon: customAmountController.text != "" && customAmountBonus > 0
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: Icon(
-                        gift_1,
-                        size: 20.0,
-                        color: Colors.green,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 8.0),
+          Row(
+            children: <Widget>[
+              Text(
+                "Minimum deposit limit is ${strings.rupee}${widget.depositData.chooseAmountData.minAmount.toString()}",
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              children: <Widget>[
+                Text("Have a promocode?"),
+                Padding(
+                  padding: EdgeInsets.only(left: 8.0),
+                  child: InkWell(
+                    customBorder: Border(
+                        bottom: BorderSide(
+                      color: Colors.black,
+                      width: 1.0,
+                    )),
+                    child: Padding(
+                      padding: EdgeInsets.all(4.0),
                       child: Text(
-                        strings.rupee +
-                            customAmountBonus.toStringAsFixed(0) +
-                            " Bonus",
+                        "Apply Now",
                         style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.green,
+                            Theme.of(context).primaryTextTheme.button.copyWith(
+                                  color: Colors.black87,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: Colors.black,
                                 ),
                       ),
-                    )
-                  ],
+                    ),
+                    onTap: () {
+                      setState(() {
+                        bShowPromoInput = !bShowPromoInput;
+                      });
+                    },
+                  ),
                 )
-              : null,
-          focusNode: _customAmountFocusNode,
-          controller: customAmountController,
-          keyboardType: TextInputType.number,
-          contentPadding: EdgeInsets.all(12.0),
-        ),
+              ],
+            ),
+          ),
+          bShowPromoInput
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 8.0, top: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextFormField(
+                          textCapitalization: TextCapitalization.characters,
+                          controller: promoController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: "Promocode",
+                            contentPadding: EdgeInsets.all(8.0),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                            suffixIcon: FlatButton(
+                              child: Text("Apply".toUpperCase()),
+                              onPressed: () {
+                                onApplyPromo();
+                              },
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Container(),
+        ],
       ),
-    );
+    ));
     return tiles;
   }
 
   onApplyPromo() async {
     int amount =
         amountController.text != "" ? int.parse(amountController.text) : 0;
-    if (amountController.text == "") {
+    if (amountController.text == "" &&
+        !widget.depositData.chooseAmountData.isFirstDeposit) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Please enter amount to apply promo."),
+        ),
+      );
+    } else if (customAmountController.text == "" &&
+        widget.depositData.chooseAmountData.isFirstDeposit) {
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text("Please enter amount to apply promo."),
@@ -1463,118 +1565,80 @@ class AddCashState extends State<AddCash> {
             : null,
         child: Column(
           children: <Widget>[
-            // Container(
-            //   color: Colors.black26,
-            //   padding: EdgeInsets.symmetric(vertical: 8.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: <Widget>[
-            //       Text(
-            //         "Account balance",
-            //         style: TextStyle(
-            //           color: Colors.black87,
-            //           fontSize:
-            //               Theme.of(context).primaryTextTheme.subhead.fontSize,
-            //           fontWeight: FontWeight.bold,
-            //         ),
-            //       ),
-            //       Padding(
-            //         padding: EdgeInsets.only(left: 4.0),
-            //         child: Text(
-            //           strings.rupee +
-            //               (widget.depositData == null
-            //                   ? "0.0"
-            //                   : (widget.depositData.chooseAmountData.balance
-            //                               .deposited +
-            //                           widget.depositData.chooseAmountData
-            //                               .balance.nonWithdrawable +
-            //                           widget.depositData.chooseAmountData
-            //                               .balance.withdrawable)
-            //                       .toStringAsFixed(2)),
-            //         ),
-            //       )
-            //     ],
-            //   ),
-            // ),
             Expanded(
               child: SingleChildScrollView(
                 child: createChooseAmountUI(),
               ),
             ),
-            Container(
-              height: 72.0,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 3.0,
-                    spreadRadius: 1.0,
-                    color: Colors.black12,
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 72.0,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 3.0,
+              spreadRadius: 1.0,
+              color: Colors.black12,
+            ),
+          ],
+        ),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    "images/payment-footer-strip.png",
+                    height: 28.0,
                   ),
                 ],
               ),
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          "images/payment-footer-strip.png",
-                          height: 28.0,
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    "We do not accept deposits from the states of Assam, Odisha and Telangana",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style:
+                          Theme.of(context).primaryTextTheme.caption.copyWith(
+                                color: Colors.grey.shade500,
+                                fontSize: 10.0,
+                              ),
+                      children: [
+                        TextSpan(
+                          text: "Bonus credit is subject to ",
+                        ),
+                        TextSpan(
+                          recognizer: termsGesture,
+                          text: "Terms and Conditions*",
+                          style: TextStyle(
+                            color: Colors.blue,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          "We do not accept deposits from the states of Assam, Odisha and Telangana",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .caption
-                              .copyWith(
-                                color: Colors.grey.shade500,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .copyWith(
-                                  color: Colors.grey.shade500,
-                                  fontSize: 10.0,
-                                ),
-                            children: [
-                              TextSpan(
-                                text: "Bonus credit is subject to ",
-                              ),
-                              TextSpan(
-                                recognizer: termsGesture,
-                                text: "Terms and Conditions*",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                )
+              ],
             ),
           ],
         ),

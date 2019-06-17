@@ -445,33 +445,11 @@ class AppDrawerState extends State<AppDrawer> {
             onTap: () {
               _onVerify();
             },
-            leading: Icon(Icons.fingerprint),
+            leading: Image.asset(
+              "images/KYC.png",
+              height: 24.0,
+            ),
             title: Text("KYC"),
-          ),
-          ListTile(
-            onTap: () {
-              _launchWithdraw();
-            },
-            leading: Icon(Icons.print),
-            title: Text("WITHDRAWAL"),
-          ),
-          ListTile(
-            onTap: () {
-              _showMyAccount();
-            },
-            leading: Icon(Icons.card_giftcard),
-            title: Text("BONUS SUMMARY"),
-          ),
-          Divider(
-            color: Colors.grey.shade400,
-            height: 1.0,
-          ),
-          ListTile(
-            leading: Icon(Icons.help_outline),
-            title: Text('How To Play'.toUpperCase()),
-            onTap: () {
-              _launchStaticPage("HELP");
-            },
           ),
           Container(
             color: Color.fromRGBO(255, 246, 219, 1),
@@ -517,14 +495,52 @@ class AppDrawerState extends State<AppDrawer> {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.list),
+            onTap: () {
+              _launchWithdraw();
+            },
+            leading: Icon(Icons.print),
+            title: Text("WITHDRAWAL"),
+          ),
+          ListTile(
+            onTap: () {
+              _showMyAccount();
+            },
+            leading: Image.asset(
+              "images/Bonus-gift.png",
+              height: 24.0,
+              color: Colors.grey.shade700,
+            ),
+            title: Text("BONUS SUMMARY"),
+          ),
+          Divider(
+            color: Colors.grey.shade400,
+            height: 1.0,
+          ),
+          ListTile(
+            leading: Image.asset(
+              "images/HowtoPlay.png",
+              height: 24.0,
+            ),
+            title: Text('How To Play'.toUpperCase()),
+            onTap: () {
+              _launchStaticPage("HELP");
+            },
+          ),
+          ListTile(
+            leading: Image.asset(
+              "images/Scoring.png",
+              height: 24.0,
+            ),
             title: Text('Scoring System'.toUpperCase()),
             onTap: () {
               _launchStaticPage("SCORING");
             },
           ),
           ListTile(
-            leading: Icon(Icons.call),
+            leading: Image.asset(
+              "images/Contact.png",
+              height: 24.0,
+            ),
             title: Text('Contact Us'.toUpperCase()),
             onTap: () {
               _showContactUsPage();
@@ -535,14 +551,20 @@ class AppDrawerState extends State<AppDrawer> {
             height: 1.0,
           ),
           ListTile(
-            leading: Icon(Icons.event_note),
+            leading: Image.asset(
+              "images/TermsandCondition.png",
+              height: 24.0,
+            ),
             title: Text('Terms And Conditions'.toUpperCase()),
             onTap: () {
               _launchStaticPage("T&C");
             },
           ),
           ListTile(
-            leading: Icon(Icons.lock),
+            leading: Image.asset(
+              "images/privacy.png",
+              height: 24.0,
+            ),
             title: Text('Privacy Policy'.toUpperCase()),
             onTap: () {
               _launchStaticPage("PRIVACY");
@@ -551,14 +573,20 @@ class AppDrawerState extends State<AppDrawer> {
           isIos
               ? Container()
               : ListTile(
-                  leading: Icon(Icons.system_update),
+                  leading: Image.asset(
+                    "images/Update.png",
+                    height: 24.0,
+                  ),
                   title: Text('Check For Update'.toUpperCase()),
                   onTap: () {
                     _performUpdateCheck();
                   },
                 ),
           ListTile(
-            leading: Icon(Icons.exit_to_app),
+            leading: Image.asset(
+              "images/Logout.png",
+              height: 24.0,
+            ),
             title: Text('Log Out'.toUpperCase()),
             onTap: () async {
               _doLogout();

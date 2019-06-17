@@ -325,6 +325,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 .title
                                 .copyWith(
                                   color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
                           ),
                         ),
@@ -671,6 +672,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       .title
                                       .copyWith(
                                         color: Colors.white,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                 ),
                               ),

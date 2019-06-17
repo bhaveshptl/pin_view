@@ -325,6 +325,16 @@ class SignupState extends State<Signup> {
     return int.parse(s, onError: (e) => null) != null;
   }
 
+  bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value))
+      return false;
+    else
+      return true;
+  }
+
   _doGoogleLogin(BuildContext context) async {
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
@@ -693,6 +703,12 @@ class SignupState extends State<Signup> {
                                           if (value.isEmpty) {
                                             return strings
                                                 .get("EMAIL_OR_MOBILE_ERROR");
+                                          } else if (isNumeric(value) &&
+                                              !isMobileNumber(value)) {
+                                            return "Please enter valid Mobile";
+                                          } else if (!isNumeric(value) &&
+                                              !validateEmail(value)) {
+                                            return "Please enter valid Email";
                                           }
                                         },
                                         keyboardType:
