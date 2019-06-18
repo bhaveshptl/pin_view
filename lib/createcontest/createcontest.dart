@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/commonwidgets/underline_textbox.dart';
-
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -45,7 +46,7 @@ class CreateContestState extends State<CreateContest> {
   int _numberOfParticipants;
   bool _bIsMultyEntry = false;
   bool _bAllowMultiEntryChange = false;
-
+  bool isIos = false;
   bool bShowJoinContest = false;
   bool bWaitingForTeamCreation = false;
 
@@ -67,6 +68,9 @@ class CreateContestState extends State<CreateContest> {
   @override
   initState() {
     super.initState();
+    if (Platform.isIOS) {
+      isIos = true;
+    }
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
 
@@ -530,7 +534,10 @@ class CreateContestState extends State<CreateContest> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: UnderlineTextBox(
-                                keyboardType: TextInputType.number,
+                                keyboardType: isIos? TextInputType.text:TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                       WhitelistingTextInputFormatter.digitsOnly
+                                                  ],
                                 labelText: "Entry Fee (1 - 10,000)",
                                 contentPadding:
                                     EdgeInsets.symmetric(vertical: 4.0),
@@ -553,7 +560,10 @@ class CreateContestState extends State<CreateContest> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: UnderlineTextBox(
-                                keyboardType: TextInputType.number,
+                                keyboardType:isIos? TextInputType.text:TextInputType.number,
+                                inputFormatters: <TextInputFormatter>[
+                                       WhitelistingTextInputFormatter.digitsOnly
+                                                  ],
                                 labelText: "Number of Entries (2-100)",
                                 contentPadding:
                                     EdgeInsets.symmetric(vertical: 4.0),
@@ -914,7 +924,7 @@ class CreateContestState extends State<CreateContest> {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).primaryTextTheme.title.copyWith(
                           color: Colors.white,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                         ),
                   ),
                 ),
