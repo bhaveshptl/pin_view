@@ -441,6 +441,7 @@ class AddCashState extends State<AddCash> {
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: ExactAssetImage("images/Ribbon.png"),
+                            alignment: Alignment.centerLeft
                           ),
                         ),
                         margin: EdgeInsets.only(left: 10.0, right: 32.0),
