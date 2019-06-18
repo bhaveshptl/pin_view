@@ -1503,7 +1503,7 @@ class AddCashState extends State<AddCash> {
               ),
             ),
             Container(
-              height: 72.0,
+              height: isIos?92.0:72.0,
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [

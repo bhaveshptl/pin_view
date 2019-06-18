@@ -588,8 +588,8 @@ class SignInPageState extends State<SignInPage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png"),
+            Image.network(!isIos?
+                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png":"https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_firstdeposit_new1_lobby_v2.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(

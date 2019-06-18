@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
-
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/commonwidgets/epoc.dart';
@@ -42,6 +42,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
   String sortBy = "type";
   List<Player> sortedPlayers;
   double teamLogoHeight = 40.0;
+  bool isIos = false;
 
   @override
   void initState() {
@@ -49,6 +50,9 @@ class ChooseCaptainState extends State<ChooseCaptain> {
     _captain = widget.captain;
     _vCaptain = widget.viceCaptain;
     sortedPlayers = getSortedPlayers();
+    if (Platform.isIOS) {
+      isIos = true;
+    }
   }
 
   void _showErrorMessage(String _message) {
@@ -509,6 +513,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
           ),
           Container(
             height: 72.0,
+            padding:isIos?EdgeInsets.only(bottom: 8.0):null,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [

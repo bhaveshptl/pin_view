@@ -360,7 +360,7 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                             .title
                             .copyWith(
                                 color: Colors.white,
-                                fontWeight: FontWeight.w800),
+                                fontWeight: FontWeight.w600),
                       ),
                     ),
                   )

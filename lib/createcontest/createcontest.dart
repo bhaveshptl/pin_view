@@ -916,6 +916,7 @@ class CreateContestState extends State<CreateContest> {
           children: <Widget>[
             Container(
               height: 48.0,
+              padding:isIos?EdgeInsets.only(bottom: 7.0):null,
               child: ColorButton(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),

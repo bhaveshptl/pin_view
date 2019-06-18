@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
-
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -52,10 +52,14 @@ class JoinContestState extends State<JoinContest> {
   List<dynamic> contestMyTeams = [];
   GlobalKey<ScaffoldState> scaffoldKey;
   StreamSubscription _streamSubscription;
+  bool isIos = false;
 
   @override
   void initState() {
     super.initState();
+    if (Platform.isIOS) {
+      isIos = true;
+    }
     if (widget.contest != null) {
       getMyContestTeams();
     } else {
@@ -627,6 +631,7 @@ class JoinContestState extends State<JoinContest> {
             ),
       bottomNavigationBar: Container(
         height: 72.0,
+        padding:isIos?EdgeInsets.only(bottom: 7.5):null,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -653,7 +658,7 @@ class JoinContestState extends State<JoinContest> {
                     "Create Team".toUpperCase(),
                     style: Theme.of(context).primaryTextTheme.title.copyWith(
                           color: Colors.white,
-                          fontWeight: FontWeight.w800,
+                          fontWeight:isIos?FontWeight.w600:FontWeight.w800,
                         ),
                   ),
                 ),
@@ -677,7 +682,7 @@ class JoinContestState extends State<JoinContest> {
                     "Join now".toUpperCase(),
                     style: Theme.of(context).primaryTextTheme.title.copyWith(
                           color: Colors.white,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: isIos?FontWeight.w600:FontWeight.w800,
                         ),
                   ),
                 ),
