@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 class LobbyBottomNavigation extends StatelessWidget {
   final int activeIndex;
   final Function onNavigationSelectionChange;
+  final bool isIos;
+  
 
-  LobbyBottomNavigation(this.onNavigationSelectionChange, {this.activeIndex});
-
+  LobbyBottomNavigation(this.isIos,this.onNavigationSelectionChange, {this.activeIndex});
+ 
   void onTabTapped(BuildContext context, int index) {
     onNavigationSelectionChange(context, index);
   }
@@ -23,6 +25,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w600,
+            fontSize: isIos?12:null
           ),
           maxLines: 2,
         ),
@@ -41,6 +44,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w600,
+            fontSize: isIos?12:null
           ),
           maxLines: 2,
         ),
@@ -60,6 +64,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w600,
+            fontSize: isIos?12:null
           ),
           maxLines: 2,
         ),
@@ -79,6 +84,7 @@ class LobbyBottomNavigation extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w600,
+            fontSize: isIos?12:null
           ),
           maxLines: 2,
         ),
@@ -118,7 +124,7 @@ class LobbyBottomNavigation extends StatelessWidget {
             ),
       ),
       child: Container(
-        height: 64.0,
+        height:isIos?null:64.0,
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
