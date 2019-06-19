@@ -55,17 +55,10 @@ class InitPayState extends State<InitPay> {
       });
     }
 
-    if (isIos) {
-      await flutterWebviewPlugin
-          .evalJavascript("document.cookie='" + cookie + "'");
-      Map<String, String> cookiesMap = await flutterWebviewPlugin.getCookies();
-      if (cookiesMap["pids"].length > 0) {
-        setState(() {
-          isWebviewLoaded = true;
-        });
-      }
-    } else {
-      flutterWebviewPlugin.evalJavascript("document.cookie='" + cookie + "'");
+    await flutterWebviewPlugin
+        .evalJavascript("document.cookie='" + cookie + "'");
+    Map<String, String> cookiesMap = await flutterWebviewPlugin.getCookies();
+    if (cookiesMap["pids"].length > 0) {
       setState(() {
         isWebviewLoaded = true;
       });

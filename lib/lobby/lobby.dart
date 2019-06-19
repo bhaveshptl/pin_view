@@ -531,10 +531,21 @@ class LobbyState extends State<Lobby>
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              SvgPicture.asset(
-                "images/logo_white.svg",
-                color: Colors.white,
-                width: 32.0,
+              Row(
+                children: <Widget>[
+                  SvgPicture.asset(
+                    "images/logo_white.svg",
+                    color: Colors.white,
+                    width: 32.0,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 8.0),
+                    child: Image.asset(
+                      "images/logo_name_white.png",
+                      height: 20.0,
+                    ),
+                  ),
+                ],
               ),
               ColorButton(
                 padding: EdgeInsets.only(

@@ -1501,80 +1501,75 @@ class AddCashState extends State<AddCash> {
                 child: createChooseAmountUI(),
               ),
             ),
-            Container(
-              height: 72.0,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 3.0,
-                    spreadRadius: 1.0,
-                    color: Colors.black12,
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        height: 72.0,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 3.0,
+              spreadRadius: 1.0,
+              color: Colors.black12,
+            ),
+          ],
+        ),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    "images/payment-footer-strip.png",
+                    height: 28.0,
                   ),
                 ],
               ),
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          "images/payment-footer-strip.png",
-                          height: 28.0,
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    "We do not accept deposits from the states of Assam, Odisha and Telangana",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style:
+                          Theme.of(context).primaryTextTheme.caption.copyWith(
+                                color: Colors.grey.shade500,
+                                fontSize: 10.0,
+                              ),
+                      children: [
+                        TextSpan(
+                          text: "Bonus credit is subject to ",
+                        ),
+                        TextSpan(
+                          recognizer: termsGesture,
+                          text: "Terms and Conditions*",
+                          style: TextStyle(
+                            color: Colors.blue,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          "We do not accept deposits from the states of Assam, Odisha and Telangana",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .primaryTextTheme
-                              .caption
-                              .copyWith(
-                                color: Colors.grey.shade500,
-                              ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .copyWith(
-                                  color: Colors.grey.shade500,
-                                  fontSize: 10.0,
-                                ),
-                            children: [
-                              TextSpan(
-                                text: "Bonus credit is subject to ",
-                              ),
-                              TextSpan(
-                                recognizer: termsGesture,
-                                text: "Terms and Conditions*",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+                )
+              ],
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
@@ -10,6 +11,8 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/profilepages/changepassword.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
+
+const double _kPickerSheetHeight = 216.0;
 
 class MyProfile extends StatefulWidget {
   @override
@@ -406,20 +409,61 @@ class MyProfileState extends State<MyProfile> {
   }
 
   Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
+    showCupertinoModalPopup<void>(
       context: context,
-      initialDate: _date,
-      firstDate: DateTime(1947),
-      lastDate: DateTime(currentYear),
+      builder: (BuildContext context) {
+        return _buildBottomPicker(
+          CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            initialDateTime: _date,
+            onDateTimeChanged: (DateTime newDateTime) {
+              setState(() {
+                _date = newDateTime;
+                bIsDatePicked = true;
+                bIsInfoUpdated = true;
+              });
+            },
+          ),
+        );
+      },
     );
 
-    if (picked != null) {
-      setState(() {
-        _date = picked;
-        bIsDatePicked = true;
-        bIsInfoUpdated = true;
-      });
-    }
+    // final DateTime picked = await showDatePicker(
+    //   context: context,
+    //   initialDate: _date,
+    //   firstDate: DateTime(1947),
+    //   lastDate: DateTime(currentYear),
+    // );
+
+    // if (picked != null) {
+    //   setState(() {
+    //     _date = picked;
+    //     bIsDatePicked = true;
+    //     bIsInfoUpdated = true;
+    //   });
+    // }
+  }
+
+  Widget _buildBottomPicker(Widget picker) {
+    return Container(
+      height: _kPickerSheetHeight,
+      padding: const EdgeInsets.only(top: 6.0),
+      color: CupertinoColors.white,
+      child: DefaultTextStyle(
+        style: const TextStyle(
+          color: CupertinoColors.black,
+          fontSize: 22.0,
+        ),
+        child: GestureDetector(
+          // Blocks taps from propagating to the modal sheet and popping.
+          onTap: () {},
+          child: SafeArea(
+            top: false,
+            child: picker,
+          ),
+        ),
+      ),
+    );
   }
 
   getDate() {

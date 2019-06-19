@@ -651,7 +651,7 @@ class JoinContestState extends State<JoinContest> {
                   color: Colors.orange,
                   child: Text(
                     "Create Team".toUpperCase(),
-                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
                         ),
@@ -675,7 +675,7 @@ class JoinContestState extends State<JoinContest> {
                         },
                   child: Text(
                     "Join now".toUpperCase(),
-                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
                         ),

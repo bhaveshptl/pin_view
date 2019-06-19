@@ -477,8 +477,7 @@ class ContestDetailsCard extends StatelessWidget {
                                       children: <Widget>[
                                         Expanded(
                                           child: Text(
-                                            (contest.size - contest.joined)
-                                                    .toString() +
+                                            contest.joined.toString() +
                                                 " seats",
                                             textAlign: TextAlign.center,
                                             style: Theme.of(context)

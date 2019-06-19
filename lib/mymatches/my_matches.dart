@@ -58,6 +58,7 @@ class MyMatchesState extends State<MyMatches>
   _listenSportChange() {
     _sportsController =
         TabController(vsync: this, length: widget.mapSportTypes.keys.length);
+    _sportsController.index = _sportType - 1;
     _sportsController.addListener(() {
       showLoader(true);
       if (!_sportsController.indexIsChanging) {
