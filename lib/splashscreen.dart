@@ -310,8 +310,8 @@ class SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: AppConfig.of(context).channelId == "10" ||
-              AppConfig.of(context).channelId == "13"
+      body: AppConfig.of(context).channelId == "10" 
+              
           ? Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -330,10 +330,11 @@ class SplashScreenState extends State<SplashScreen>
           : Stack(
               children: <Widget>[
                 Container(
-                  decoration: (AppConfig.of(context).channelId == "10" ||
-                          AppConfig.of(context).channelId == "13"
-                      ? BoxDecoration(color: Theme.of(context).primaryColor)
-                      : null),
+                  decoration: (AppConfig.of(context).channelId == "10"
+                    ? BoxDecoration(color: Theme.of(context).primaryColor)
+                    : (AppConfig.of(context).channelId == "13"
+                        ? BoxDecoration(color: Theme.of(context).primaryColor)
+                        : null)),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,

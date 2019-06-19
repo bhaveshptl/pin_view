@@ -57,17 +57,21 @@ class LobbyState extends State<Lobby>
   Map<String, int> _mapSportTypes;
   bool bUpdateAppConfirmationShown = false;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
+  bool isIos = false;
+  
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
     symbol: strings.rupee,
     decimalDigits: 2,
   );
-
+  
   @override
   initState() {
     super.initState();
+    if (Platform.isIOS) {
+      isIos = true;
+    }
     _mapSportTypes = {
       "CRICKET": 1,
       "FOOTBALL": 2,
@@ -611,8 +615,9 @@ class LobbyState extends State<Lobby>
         ),
         body: getActivePage(),
         bottomNavigationBar: LobbyBottomNavigation(
+          isIos,
           _onNavigationSelectionChange,
-          activeIndex: _activeIndex,
+          activeIndex: _activeIndex
         ),
       ),
     );

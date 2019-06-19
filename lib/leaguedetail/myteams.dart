@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
-
+import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -21,6 +21,7 @@ class MyTeams extends StatefulWidget {
   final L1 l1Data;
   final League league;
   final List<MyTeam> myTeams;
+  
 
   MyTeams({this.league, this.l1Data, this.myTeams});
 
@@ -33,10 +34,13 @@ class MyTeamsState extends State<MyTeams> {
   final double teamLogoHeight = 40.0;
   StreamSubscription _streamSubscription;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  bool isIos = false;
   @override
   void initState() {
     super.initState();
+    if (Platform.isIOS) {
+      isIos = true;
+    }
     _myTeams = widget.myTeams;
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
@@ -539,6 +543,7 @@ class MyTeamsState extends State<MyTeams> {
                   padding: EdgeInsets.symmetric(vertical: 8.0),
                   child: Container(
                     height: 56.0,
+                    padding:isIos?EdgeInsets.only(bottom: 7.0):null,
                     width: MediaQuery.of(context).size.width / 2,
                     child: ColorButton(
                       color: Colors.orange,
@@ -549,7 +554,7 @@ class MyTeamsState extends State<MyTeams> {
                             .headline
                             .copyWith(
                               color: Colors.white,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                             ),
                       ),
                       onPressed: () {

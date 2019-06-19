@@ -517,7 +517,7 @@ class ContestDetailsCard extends StatelessWidget {
                                               .headline
                                               .copyWith(
                                                 color: Colors.white,
-                                                fontWeight: FontWeight.w800,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                         ),
                                       ),

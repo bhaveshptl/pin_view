@@ -111,7 +111,7 @@ class TeamPreview extends StatelessWidget {
                                 .body2
                                 .copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                 ),
                           ),
                         )
@@ -130,7 +130,7 @@ class TeamPreview extends StatelessWidget {
                                 .body2
                                 .copyWith(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                 ),
                           ),
                         )
@@ -152,7 +152,7 @@ class TeamPreview extends StatelessWidget {
                             ? Colors.black
                             : Colors.white,
                         fontSize: 10.0,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w600,
                       ),
                 ),
               ),
