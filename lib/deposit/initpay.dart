@@ -58,7 +58,11 @@ class InitPayState extends State<InitPay> {
     await flutterWebviewPlugin
         .evalJavascript("document.cookie='" + cookie + "'");
     Map<String, String> cookiesMap = await flutterWebviewPlugin.getCookies();
-    if (cookiesMap["pids"].length > 0) {
+    Map<String, String> mapCookies = {};
+    cookiesMap.keys.forEach((key) {
+      mapCookies[key.trim()] = cookiesMap[key];
+    });
+    if (mapCookies["pids"].length > 0) {
       setState(() {
         isWebviewLoaded = true;
       });
