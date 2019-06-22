@@ -289,7 +289,7 @@ class DownloadAPKState extends State<DownloadAPK> {
                                             strings.get("CANCEL").toUpperCase(),
                                             style: Theme.of(context)
                                                 .primaryTextTheme
-                                                .subhead
+                                                .body2
                                                 .copyWith(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.w800,
@@ -315,7 +315,7 @@ class DownloadAPKState extends State<DownloadAPK> {
                                           : "Update now".toUpperCase(),
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .subhead
+                                          .body2
                                           .copyWith(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w800,

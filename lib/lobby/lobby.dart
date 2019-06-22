@@ -58,14 +58,14 @@ class LobbyState extends State<Lobby>
   bool bUpdateAppConfirmationShown = false;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool isIos = false;
-  
+
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
     symbol: strings.rupee,
     decimalDigits: 2,
   );
-  
+
   @override
   initState() {
     super.initState();
@@ -367,6 +367,7 @@ class LobbyState extends State<Lobby>
             Column(
               children: <Widget>[
                 Container(
+                  // padding: EdgeInsets.all(8.0),
                   width: MediaQuery.of(context).size.width,
                   child: _carousel.length > 0
                       ? CarouselSlider(
@@ -615,10 +616,8 @@ class LobbyState extends State<Lobby>
         ),
         body: getActivePage(),
         bottomNavigationBar: LobbyBottomNavigation(
-          isIos,
-          _onNavigationSelectionChange,
-          activeIndex: _activeIndex
-        ),
+            isIos, _onNavigationSelectionChange,
+            activeIndex: _activeIndex),
       ),
     );
   }

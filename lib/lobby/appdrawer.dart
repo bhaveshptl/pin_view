@@ -451,10 +451,15 @@ class AppDrawerState extends State<AppDrawer> {
               },
               leading: Image.asset(
                 "images/account_summary.png",
-                width: 24.0,
+                width: 30.0,
                 color: Colors.grey.shade700,
               ),
-              title: Text("ACCOUNT SUMMARY"),
+              title: Text(
+                "Account Summary",
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
             ),
           ),
           Padding(
@@ -465,9 +470,14 @@ class AppDrawerState extends State<AppDrawer> {
               },
               leading: Image.asset(
                 "images/withdrawIcon.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text("WITHDRAWAL"),
+              title: Text(
+                "Withdrawal",
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
             ),
           ),
           Padding(
@@ -478,9 +488,14 @@ class AppDrawerState extends State<AppDrawer> {
               },
               leading: Image.asset(
                 "images/KYC.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text("KYC"),
+              title: Text(
+                "KYC",
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
             ),
           ),
           Divider(
@@ -499,7 +514,7 @@ class AppDrawerState extends State<AppDrawer> {
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: Image.asset(
                           "images/junglee.png",
-                          width: 24.0,
+                          width: 30.0,
                         ),
                       ),
                       title: Text(
@@ -507,7 +522,7 @@ class AppDrawerState extends State<AppDrawer> {
                         style:
                             Theme.of(context).primaryTextTheme.title.copyWith(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                 ),
                       ),
                       subtitle: Text(
@@ -518,15 +533,15 @@ class AppDrawerState extends State<AppDrawer> {
                                 ),
                       ),
                       onTap: () {
-                        browserLaunchChannel.invokeMethod(
-                            "launchInBrowser", "https://ei3k.app.link/howzat");
+                        browserLaunchChannel.invokeMethod("launchInBrowser",
+                            "https://ei3k.app.link/howzat?ad=howzat-crosssell-SideMenu&utm_source=howzat&utm_medium=Banners&utm_campaign=howzat-crosssell-SideMenu");
                       },
                     ),
                   ],
                 ),
                 Image.asset(
                   "images/new.png",
-                  height: 64.0,
+                  height: 56.0,
                 ),
               ],
             ),
@@ -540,9 +555,14 @@ class AppDrawerState extends State<AppDrawer> {
             child: ListTile(
               leading: Image.asset(
                 "images/HowtoPlay.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text('How To Play'.toUpperCase()),
+              title: Text(
+                'How to Play',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
               onTap: () {
                 _launchStaticPage("HELP");
               },
@@ -553,9 +573,14 @@ class AppDrawerState extends State<AppDrawer> {
             child: ListTile(
               leading: Image.asset(
                 "images/Scoring.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text('Scoring System'.toUpperCase()),
+              title: Text(
+                'Scoring System',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
               onTap: () {
                 _launchStaticPage("SCORING");
               },
@@ -570,9 +595,14 @@ class AppDrawerState extends State<AppDrawer> {
             child: ListTile(
               leading: Image.asset(
                 "images/Contact.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text('Contact Us'.toUpperCase()),
+              title: Text(
+                'Contact Us',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
               onTap: () {
                 _showContactUsPage();
               },
@@ -585,9 +615,14 @@ class AppDrawerState extends State<AppDrawer> {
                   child: ListTile(
                     leading: Image.asset(
                       "images/Update.png",
-                      width: 24.0,
+                      width: 30.0,
                     ),
-                    title: Text('Check For Update'.toUpperCase()),
+                    title: Text(
+                      'Check For Updates',
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Colors.black,
+                          ),
+                    ),
                     onTap: () {
                       _performUpdateCheck();
                     },
@@ -598,9 +633,14 @@ class AppDrawerState extends State<AppDrawer> {
             child: ListTile(
               leading: Image.asset(
                 "images/TermsandCondition.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text('Terms And Conditions'.toUpperCase()),
+              title: Text(
+                'Terms And Condition',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
               onTap: () {
                 _launchStaticPage("T&C");
               },
@@ -611,9 +651,14 @@ class AppDrawerState extends State<AppDrawer> {
             child: ListTile(
               leading: Image.asset(
                 "images/privacy.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text('Privacy Policy'.toUpperCase()),
+              title: Text(
+                'Privacy Policy',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
               onTap: () {
                 _launchStaticPage("PRIVACY");
               },
@@ -624,9 +669,14 @@ class AppDrawerState extends State<AppDrawer> {
             child: ListTile(
               leading: Image.asset(
                 "images/Logout.png",
-                width: 24.0,
+                width: 30.0,
               ),
-              title: Text('Log Out'.toUpperCase()),
+              title: Text(
+                'Logout',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
               onTap: () async {
                 _doLogout();
                 HttpManager.cookie = null;

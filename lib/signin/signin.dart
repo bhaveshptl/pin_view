@@ -588,8 +588,9 @@ class SignInPageState extends State<SignInPage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(!isIos?
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png":"https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_firstdeposit_new1_lobby_v2.jpg"),
+            Image.network(!isIos
+                ? "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250_login.jpg"
+                : "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_firstdeposit_new1_lobby_v2.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
@@ -608,7 +609,7 @@ class SignInPageState extends State<SignInPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 56.0, right: 48.0),
+              padding: EdgeInsets.only(left: 56.0, right: 56.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -627,7 +628,7 @@ class SignInPageState extends State<SignInPage> {
                                       padding: EdgeInsets.only(bottom: 16.0),
                                       child: SimpleTextBox(
                                         onSaved: (val) => _authName = val,
-                                        labelText: "Email or mobile",
+                                        labelText: "Email or mobile*",
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings
@@ -639,43 +640,40 @@ class SignInPageState extends State<SignInPage> {
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    " *",
-                                    style: TextStyle(color: Colors.red),
-                                  ),
                                 ],
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
-                                    child: SimpleTextBox(
-                                      onSaved: (val) => _password = val,
-                                      labelText: "Password",
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _obscureText = !_obscureText;
-                                          });
-                                        },
-                                        padding: EdgeInsets.all(0.0),
-                                        icon: Icon(
-                                          _obscureText
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
+                                    child: Stack(
+                                      alignment: Alignment.topRight,
+                                      overflow: Overflow.visible,
+                                      children: <Widget>[
+                                        SimpleTextBox(
+                                          onSaved: (val) => _password = val,
+                                          labelText: "Password*",
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return strings
+                                                  .get("PASSWORD_ERROR");
+                                            }
+                                          },
+                                          obscureText: _obscureText,
                                         ),
-                                      ),
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return strings.get("PASSWORD_ERROR");
-                                        }
-                                      },
-                                      obscureText: _obscureText,
+                                        Positioned(
+                                          top: -2.0,
+                                          child: IconButton(
+                                            icon: Icon(Icons.visibility),
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscureText = !_obscureText;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  Text(
-                                    " *",
-                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ],
                               ),
@@ -685,31 +683,28 @@ class SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(right: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        InkWell(
-                          onTap: () {
-                            _showForgotPassword();
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(4.0, 4.0, 0.0, 4.0),
-                            child: Text(
-                              strings.get("FORGOT_PASSWORD"),
-                              style: TextStyle(
-                                color: Colors.black54,
-                                decoration: TextDecoration.underline,
-                              ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      InkWell(
+                        onTap: () {
+                          _showForgotPassword();
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(4.0, 4.0, 0.0, 4.0),
+                          child: Text(
+                            strings.get("FORGOT_PASSWORD"),
+                            style: TextStyle(
+                              color: Colors.black54,
+                              decoration: TextDecoration.underline,
                             ),
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0, right: 8.0),
+                    padding: EdgeInsets.only(top: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -730,7 +725,7 @@ class SignInPageState extends State<SignInPage> {
                                       .title
                                       .copyWith(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.normal,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                 ),
                               ),
@@ -741,7 +736,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0, right: 8.0),
+                    padding: EdgeInsets.only(top: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -787,7 +782,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
+                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -807,7 +802,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
+                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(

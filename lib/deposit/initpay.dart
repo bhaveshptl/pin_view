@@ -8,8 +8,9 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class InitPay extends StatefulWidget {
   final String url;
+  final bool waitForCookieset;
   final Function onTransactionComplete;
-  InitPay({this.url, this.onTransactionComplete});
+  InitPay({this.url, this.onTransactionComplete, this.waitForCookieset});
 
   @override
   InitPayState createState() => InitPayState();
@@ -55,17 +56,21 @@ class InitPayState extends State<InitPay> {
       });
     }
 
-    await flutterWebviewPlugin
-        .evalJavascript("document.cookie='" + cookie + "'");
-    Map<String, String> cookiesMap = await flutterWebviewPlugin.getCookies();
-    Map<String, String> mapCookies = {};
-    cookiesMap.keys.forEach((key) {
-      mapCookies[key.trim()] = cookiesMap[key];
-    });
-    if (mapCookies["pids"].length > 0) {
-      setState(() {
-        isWebviewLoaded = true;
+    if (widget.waitForCookieset) {
+      Map<String, String> cookiesMap = await flutterWebviewPlugin.getCookies();
+      await flutterWebviewPlugin
+          .evalJavascript("document.cookie='" + cookie + "'");
+      Map<String, String> mapCookies = {};
+      cookiesMap.keys.forEach((key) {
+        mapCookies[key.trim().replaceAll("\"", "")] = cookiesMap[key];
       });
+      if (mapCookies["pids"].length > 0) {
+        setState(() {
+          isWebviewLoaded = true;
+        });
+      }
+    } else {
+      isWebviewLoaded = true;
     }
   }
 

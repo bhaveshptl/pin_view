@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -363,6 +364,80 @@ class JoinedContestsState extends State<JoinedContests>
     return tabs;
   }
 
+  getMyContestTeams(Contest contest) async {
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode([contest.id]);
+    return await HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+          if (response[contest.id.toString()] != null) {
+            List<dynamic> contestMyTeams =
+                (response[contest.id.toString()] as List);
+            return getUniqueTeams(contestMyTeams);
+          } else {
+            return _myTeams;
+          }
+        } else {
+          return _myTeams;
+        }
+      },
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
+  }
+
+  getUniqueTeams(List<dynamic> contestMyTeams) {
+    List<MyTeam> myUniqueTeams = [];
+    for (MyTeam team in _myTeams) {
+      bool bIsTeamUsed = false;
+      for (dynamic contestTeam in contestMyTeams) {
+        if (team.id == contestTeam["id"]) {
+          bIsTeamUsed = true;
+          break;
+        }
+      }
+      if (!bIsTeamUsed) {
+        myUniqueTeams.add(team);
+      }
+    }
+    return myUniqueTeams;
+  }
+
+  _onJoinContest(Contest contest) async {
+    List<dynamic> teams = await getMyContestTeams(contest);
+    if (teams != null && teams.length > 0) {
+      ActionUtil().launchJoinContest(
+        l1Data: _l1Data,
+        contest: contest,
+        myTeams: _myTeams,
+        league: widget.league,
+        scaffoldKey: scaffoldKey,
+      );
+    } else {
+      var result = await Navigator.of(context).push(
+        FantasyPageRoute(
+          pageBuilder: (context) => CreateTeam(
+                league: widget.league,
+                l1Data: _l1Data,
+                mode: TeamCreationMode.CREATE_TEAM,
+              ),
+        ),
+      );
+
+      if (result != null) {
+        ActionUtil().launchJoinContest(
+          l1Data: _l1Data,
+          contest: contest,
+          myTeams: _myTeams,
+          league: widget.league,
+          scaffoldKey: scaffoldKey,
+        );
+      }
+    }
+  }
+
   getTabBody() {
     List<Widget> tabsBody = [];
     if (_myContests == null) {
@@ -391,13 +466,7 @@ class JoinedContestsState extends State<JoinedContests>
                   l1Data: _l1Data,
                   league: widget.league,
                   onJoin: (Contest curContest) {
-                    ActionUtil().launchJoinContest(
-                      l1Data: _l1Data,
-                      myTeams: _myTeams,
-                      contest: curContest,
-                      league: widget.league,
-                      scaffoldKey: scaffoldKey,
-                    );
+                    _onJoinContest(curContest);
                   },
                   contest: contest,
                   onClick: _onContestClick,

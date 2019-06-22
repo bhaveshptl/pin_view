@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -39,6 +40,7 @@ class AddCashState extends State<AddCash> {
   double customAmountBonus = 0.0;
   Map<String, dynamic> bonusInfo;
   bool bRepeatTransaction = true;
+  bool bWaitForCookieset = true;
   bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
@@ -260,7 +262,8 @@ class AddCashState extends State<AddCash> {
   setDepositInfo() async {
     // depositData = widget.depositData;
     amountController.text =
-        widget.depositData.chooseAmountData.lastPaymentArray == null
+        widget.depositData.chooseAmountData.lastPaymentArray == null ||
+                widget.depositData.chooseAmountData.lastPaymentArray.length == 0
             ? ""
             : (widget.depositData.chooseAmountData.lastPaymentArray[0]
                     ["amount"])
@@ -345,6 +348,12 @@ class AddCashState extends State<AddCash> {
   getAmountTiles() {
     List<Widget> tiles = [];
     int i = 0;
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 0,
+    );
+
     widget.depositData.chooseAmountData.amountTiles.forEach(
       (amount) {
         int curTileIndex = i;
@@ -461,7 +470,8 @@ class AddCashState extends State<AddCash> {
                                             widget.depositData.chooseAmountData
                                                 .bonusArray[0]["max"]
                                     ? (strings.rupee +
-                                        getFirstDepositBonusAmount(amount) +
+                                        getFirstDepositBonusAmount(amount)
+                                            .toStringAsFixed(0) +
                                         " Bonus")
                                     : "No Bonus"),
                                 style: isIos
@@ -524,46 +534,69 @@ class AddCashState extends State<AddCash> {
     );
 
     tiles.add(
-      Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: SimpleTextBox(
-          style: TextStyle(
-            fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
-            color: Colors.grey.shade900,
+      Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: SimpleTextBox(
+              style: TextStyle(
+                fontSize: Theme.of(context).primaryTextTheme.display1.fontSize,
+                color: Colors.grey.shade900,
+              ),
+              labelText: "Enter Amount",
+              labelStyle: TextStyle(
+                fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
+              ),
+              focusedBorderColor: Colors.green,
+              suffixIcon:
+                  customAmountController.text != "" && customAmountBonus > 0
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                gift_1,
+                                size: 20.0,
+                                color: Colors.green,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                strings.rupee +
+                                    customAmountBonus.toStringAsFixed(0) +
+                                    " Bonus",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.green,
+                                    ),
+                              ),
+                            )
+                          ],
+                        )
+                      : null,
+              focusNode: _customAmountFocusNode,
+              controller: customAmountController,
+              keyboardType: TextInputType.number,
+              contentPadding: EdgeInsets.all(12.0),
+            ),
           ),
-          focusedBorderColor: Colors.green,
-          suffixIcon: customAmountController.text != "" && customAmountBonus > 0
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: Icon(
-                        gift_1,
-                        size: 20.0,
-                        color: Colors.green,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 8.0),
-                      child: Text(
-                        strings.rupee +
-                            customAmountBonus.toStringAsFixed(0) +
-                            " Bonus",
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.green,
-                                ),
-                      ),
-                    )
-                  ],
-                )
-              : null,
-          focusNode: _customAmountFocusNode,
-          controller: customAmountController,
-          keyboardType: TextInputType.number,
-          contentPadding: EdgeInsets.all(12.0),
-        ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "(Minimum Deposit Amount: ${formatCurrency.format(widget.depositData.chooseAmountData.minAmount)})",
+                  ),
+                ),
+              )
+            ],
+          )
+        ],
       ),
     );
     return tiles;
@@ -645,13 +678,17 @@ class AddCashState extends State<AddCash> {
   }
 
   getBonusAmount() {
-    double bonusAmount = amount * bonusInfo["percentage"] / 100;
-    if (amount < bonusInfo["minimum"]) {
-      bonusAmount = 0;
-    } else if (bonusAmount > bonusInfo["maximum"]) {
-      bonusAmount = (bonusInfo["maximum"]).toDouble();
+    if (bonusInfo != null) {
+      double bonusAmount = amount * bonusInfo["percentage"] / 100;
+      if (amount < bonusInfo["minimum"]) {
+        bonusAmount = 0;
+      } else if (bonusAmount > bonusInfo["maximum"]) {
+        bonusAmount = (bonusInfo["maximum"]).toDouble();
+      }
+      return bonusAmount;
+    } else {
+      return 0.0;
     }
-    return bonusAmount;
   }
 
   getFirstDepositBonusAmount(int amount) {
@@ -665,7 +702,7 @@ class AddCashState extends State<AddCash> {
     } else if (bonusAmount > maxAmount) {
       bonusAmount = maxAmount.toDouble();
     }
-    return bonusAmount.toStringAsFixed(0);
+    return bonusAmount;
   }
 
   getRepeatDepositUI() {
@@ -1126,11 +1163,15 @@ class AddCashState extends State<AddCash> {
       );
     } else {
       flutterWebviewPlugin.close();
+      bonusInfo = paymentMode["promoInfo"];
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => ChoosePaymentMode(
                 amount: amount,
                 paymentMode: paymentMode,
+                bonusAmount: widget.depositData.chooseAmountData.isFirstDeposit
+                    ? getFirstDepositBonusAmount(amount)
+                    : getBonusAmount(),
                 promoCode: widget.depositData.chooseAmountData.isFirstDeposit
                     ? widget.depositData.chooseAmountData.bonusArray[0]["code"]
                     : promoController.text,
@@ -1253,11 +1294,13 @@ class AddCashState extends State<AddCash> {
       FantasyPageRoute(
         pageBuilder: (context) => InitPay(
               url: url,
+              waitForCookieset: bWaitForCookieset,
             ),
       ),
     );
 
     showLoader(false);
+    bWaitForCookieset = false;
 
     if (result != null) {
       Map<String, dynamic> response = json.decode(result);
@@ -1507,14 +1550,13 @@ class AddCashState extends State<AddCash> {
       bottomNavigationBar: Container(
         height: 72.0,
         decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 3.0,
-              spreadRadius: 1.0,
-              color: Colors.black12,
+          color: Color.fromRGBO(242, 242, 242, 1),
+          border: Border.fromBorderSide(
+            BorderSide(
+              color: Colors.grey.shade300,
+              width: 1.0,
             ),
-          ],
+          ),
         ),
         child: Column(
           children: <Widget>[

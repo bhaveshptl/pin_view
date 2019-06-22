@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/createteam/createteam.dart';
 
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -334,21 +335,6 @@ class ContestsState extends State<Contests> {
     if (widget.l1Data.league.rounds[0].matches[0].squad == 0) {
       ActionUtil().showMsgOnTop(
           "Squad is not yet announced. Please try again later.", context);
-      // widget.scaffoldKey.currentState.showSnackBar(
-      //   SnackBar(
-      //     content: Row(
-      //       children: <Widget>[
-      //         Expanded(
-      //           child:
-      //               Text("Squad is not yet announced. Please try again later."),
-      //         ),
-      //       ],
-      //     ),
-      //     duration: Duration(
-      //       seconds: 3,
-      //     ),
-      //   ),
-      // );
       return false;
     }
     return true;
@@ -356,15 +342,80 @@ class ContestsState extends State<Contests> {
 
   onJoinContest(Contest contest) async {
     if (squadStatus()) {
-      bShowJoinContest = false;
-      ActionUtil().launchJoinContest(
-        l1Data: _l1Data,
-        contest: contest,
-        myTeams: _myTeams,
-        league: widget.league,
-        scaffoldKey: widget.scaffoldKey,
-      );
+      List<dynamic> teams = await getMyContestTeams(contest);
+      if (teams != null && teams.length > 0) {
+        bShowJoinContest = false;
+        ActionUtil().launchJoinContest(
+          l1Data: _l1Data,
+          contest: contest,
+          myTeams: _myTeams,
+          league: widget.league,
+          scaffoldKey: widget.scaffoldKey,
+        );
+      } else {
+        var result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateTeam(
+                  league: widget.league,
+                  l1Data: widget.l1Data,
+                  mode: TeamCreationMode.CREATE_TEAM,
+                ),
+          ),
+        );
+
+        if (result != null) {
+          bShowJoinContest = false;
+          ActionUtil().launchJoinContest(
+            l1Data: _l1Data,
+            contest: contest,
+            myTeams: _myTeams,
+            league: widget.league,
+            scaffoldKey: widget.scaffoldKey,
+          );
+        }
+      }
     }
+  }
+
+  getMyContestTeams(Contest contest) async {
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode([contest.id]);
+    return await HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+          if (response[contest.id.toString()] != null) {
+            List<dynamic> contestMyTeams =
+                (response[contest.id.toString()] as List);
+            return getUniqueTeams(contestMyTeams);
+          } else {
+            return widget.myTeams;
+          }
+        } else {
+          return widget.myTeams;
+        }
+      },
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
+  }
+
+  getUniqueTeams(List<dynamic> contestMyTeams) {
+    List<MyTeam> myUniqueTeams = [];
+    for (MyTeam team in _myTeams) {
+      bool bIsTeamUsed = false;
+      for (dynamic contestTeam in contestMyTeams) {
+        if (team.id == contestTeam["id"]) {
+          bIsTeamUsed = true;
+          break;
+        }
+      }
+      if (!bIsTeamUsed) {
+        myUniqueTeams.add(team);
+      }
+    }
+    return myUniqueTeams;
   }
 
   void _showPrizeStructure(Contest contest) async {

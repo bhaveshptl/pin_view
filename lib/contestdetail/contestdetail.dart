@@ -435,16 +435,81 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     }
   }
 
+  getMyContestTeams(Contest contest) async {
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode([contest.id]);
+    return await HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+          if (response[contest.id.toString()] != null) {
+            List<dynamic> contestMyTeams =
+                (response[contest.id.toString()] as List);
+            return getUniqueTeams(contestMyTeams);
+          } else {
+            return widget.myTeams;
+          }
+        } else {
+          return widget.myTeams;
+        }
+      },
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
+  }
+
+  getUniqueTeams(List<dynamic> contestMyTeams) {
+    List<MyTeam> myUniqueTeams = [];
+    for (MyTeam team in _myTeams) {
+      bool bIsTeamUsed = false;
+      for (dynamic contestTeam in contestMyTeams) {
+        if (team.id == contestTeam["id"]) {
+          bIsTeamUsed = true;
+          break;
+        }
+      }
+      if (!bIsTeamUsed) {
+        myUniqueTeams.add(team);
+      }
+    }
+    return myUniqueTeams;
+  }
+
   _onJoinContest(Contest contest) async {
     if (squadStatus()) {
-      bShowJoinContest = false;
-      ActionUtil().launchJoinContest(
-        l1Data: _l1Data,
-        contest: contest,
-        myTeams: _myTeams,
-        league: widget.league,
-        scaffoldKey: _scaffoldKey,
-      );
+      List<dynamic> teams = await getMyContestTeams(contest);
+      if (teams != null && teams.length > 0) {
+        bShowJoinContest = false;
+        ActionUtil().launchJoinContest(
+          l1Data: _l1Data,
+          contest: contest,
+          myTeams: _myTeams,
+          league: widget.league,
+          scaffoldKey: _scaffoldKey,
+        );
+      } else {
+        var result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateTeam(
+                  league: widget.league,
+                  l1Data: widget.l1Data,
+                  mode: TeamCreationMode.CREATE_TEAM,
+                ),
+          ),
+        );
+
+        if (result != null) {
+          bShowJoinContest = false;
+          ActionUtil().launchJoinContest(
+            l1Data: _l1Data,
+            contest: contest,
+            myTeams: _myTeams,
+            league: widget.league,
+            scaffoldKey: _scaffoldKey,
+          );
+        }
+      }
     }
   }
 

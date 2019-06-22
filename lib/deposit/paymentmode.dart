@@ -1,11 +1,15 @@
+import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
-import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/deposit/initpay.dart';
@@ -22,9 +26,16 @@ class ChoosePaymentMode extends StatefulWidget {
   final int amount;
   final String url;
   final String promoCode;
+  final double bonusAmount;
   final Map<String, dynamic> paymentMode;
 
-  ChoosePaymentMode({this.amount, this.promoCode, this.url, this.paymentMode});
+  ChoosePaymentMode({
+    this.amount,
+    this.bonusAmount,
+    this.promoCode,
+    this.url,
+    this.paymentMode,
+  });
 
   @override
   ChoosePaymentModeState createState() => ChoosePaymentModeState();
@@ -33,6 +44,7 @@ class ChoosePaymentMode extends StatefulWidget {
 class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   String cookie;
   int _selectedItemIndex = -1;
+  bool bWaitForCookieset = true;
   bool lastPaymentExpanded = false;
   final flutterWebviewPlugin = FlutterWebviewPlugin();
   static const razorpay_platform =
@@ -48,6 +60,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   TextEditingController lastNameController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
 
+  TapGestureRecognizer termsGesture = TapGestureRecognizer();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -63,6 +76,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
     }
+
+    termsGesture.onTap = () {
+      _launchStaticPage("T&C");
+    };
 
     webengagePaymentModeInitEvent();
   }
@@ -84,6 +101,31 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     screenAttributedata["depositAmount"] = widget.amount;
     screendata["data"] = screenAttributedata;
     AnalyticsManager.webengageAddScreenData(screendata);
+  }
+
+  _launchStaticPage(String name) {
+    String url = "";
+    String title = "";
+    switch (name.toUpperCase()) {
+      case "T&C":
+        title = "TERMS AND CONDITIONS";
+        url = BaseUrl().staticPageUrls["TERMS"];
+        break;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              clearCache: true,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
@@ -581,7 +623,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   bool validateUserInfo() {
-    if ((widget.paymentMode["first_name"] == null &&
+    if (widget.paymentMode["isFirstDeposit"]) {
+      return true;
+    } else if ((widget.paymentMode["first_name"] == null &&
         firstNameController.text == "")) {
       ActionUtil().showMsgOnTop("First name is required to proceed.", context);
       // showSnackbar("First name is required to proceed.");
@@ -635,16 +679,20 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "nameOnTheCard": paymentModeDetails["nameOnTheCard"],
       "saveCardDetails": paymentModeDetails["saveCardDetails"],
       "email": widget.paymentMode["email"] == null
-          ? emailController.text
+          ? emailController.text == ""
+              ? "howzat@user.com"
+              : emailController.text == ""
           : widget.paymentMode["email"],
       "phone": widget.paymentMode["mobile"] == null
-          ? phoneController.text
+          ? phoneController.text == "" ? "9876543210" : phoneController.text
           : widget.paymentMode["mobile"],
       "last_name": widget.paymentMode["last_name"] == null
-          ? lastNameController.text
+          ? lastNameController.text == "" ? "User" : lastNameController.text
           : widget.paymentMode["last_name"],
       "first_name": widget.paymentMode["first_name"] == null
-          ? firstNameController.text
+          ? firstNameController.text == ""
+              ? "Howzat"
+              : firstNameController.text == ""
           : widget.paymentMode["first_name"],
       "updateEmail": widget.paymentMode["email"] == null,
       "updateMobile": widget.paymentMode["mobile"] == null,
@@ -719,11 +767,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       FantasyPageRoute(
         pageBuilder: (context) => InitPay(
               url: url,
+              waitForCookieset: bWaitForCookieset,
             ),
       ),
     );
 
     showLoader(false);
+    bWaitForCookieset = false;
     if (result != null) {
       Map<String, dynamic> response = json.decode(result);
       if ((response["authStatus"] as String).toLowerCase() ==
@@ -881,6 +931,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             null
         ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
         : {};
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 0,
+    );
+
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
@@ -894,10 +950,172 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 padding: EdgeInsets.all(8.0),
                 child: Column(
                   children: <Widget>[
-                    widget.paymentMode["first_name"] == null ||
-                            widget.paymentMode["last_name"] == null ||
-                            widget.paymentMode["email"] == null ||
-                            widget.paymentMode["mobile"] == null
+                    Card(
+                      child: Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: (widget.promoCode != null &&
+                                    widget.promoCode.length > 0) &&
+                                widget.bonusAmount > 0
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Text("Deposit amount"),
+                                        ],
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4.0),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text(
+                                              formatCurrency
+                                                  .format(widget.amount),
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .display1
+                                                  .copyWith(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Column(
+                                            children: <Widget>[
+                                              Row(
+                                                children: <Widget>[
+                                                  Text("Bonus Code Applied"),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 4.0),
+                                                child: DottedBorder(
+                                                  gap: 2,
+                                                  strokeWidth: 1,
+                                                  color: Colors.green,
+                                                  child: Container(
+                                                    // padding:
+                                                    //     EdgeInsets.symmetric(
+                                                    //   horizontal: 4.0,
+                                                    // ),
+                                                    child: Text(
+                                                      widget.promoCode,
+                                                      style: Theme.of(context)
+                                                          .primaryTextTheme
+                                                          .subtitle
+                                                          .copyWith(
+                                                            color: Colors.green,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Column(
+                                            children: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Text("Total Bonus"),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 4.0),
+                                                child: DottedBorder(
+                                                  gap: 2,
+                                                  strokeWidth: 1,
+                                                  color: Colors.green,
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      horizontal: 20.0,
+                                                    ),
+                                                    child: Text(
+                                                      formatCurrency.format(
+                                                          widget.bonusAmount),
+                                                      style: Theme.of(context)
+                                                          .primaryTextTheme
+                                                          .subtitle
+                                                          .copyWith(
+                                                            color: Colors.green,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text("Deposit amount"),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 4.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text(
+                                          formatCurrency.format(widget.amount),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .display1
+                                              .copyWith(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                      ),
+                    ),
+                    (!widget.paymentMode["isFirstDeposit"]) &&
+                            (widget.paymentMode["first_name"] == null ||
+                                widget.paymentMode["last_name"] == null ||
+                                widget.paymentMode["email"] == null ||
+                                widget.paymentMode["mobile"] == null)
                         ? Card(
                             elevation: 3.0,
                             child: Padding(
@@ -1124,45 +1342,80 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              child: Image.asset("images/pci.png"),
-                              height: 48.0,
-                            ),
-                            Container(
-                              child: Image.asset("images/paytm.png"),
-                              height: 48.0,
-                            ),
-                            Container(
-                              child: Image.asset("images/visa.png"),
-                              height: 48.0,
-                            ),
-                            Container(
-                              child: Image.asset("images/master.png"),
-                              height: 48.0,
-                            ),
-                            Container(
-                              child: Image.asset("images/amex.png"),
-                              height: 48.0,
-                            ),
-                            Container(
-                              child: Image.asset("images/cashfree.png"),
-                              height: 48.0,
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),
             )
           : Container(),
+      bottomNavigationBar: Container(
+        height: 72.0,
+        decoration: BoxDecoration(
+          color: Color.fromRGBO(242, 242, 242, 1),
+          border: Border.fromBorderSide(
+            BorderSide(
+              color: Colors.grey.shade300,
+              width: 1.0,
+            ),
+          ),
+        ),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    "images/payment-footer-strip.png",
+                    height: 28.0,
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    "We do not accept deposits from the states of Assam, Odisha and Telangana",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).primaryTextTheme.caption.copyWith(
+                          color: Colors.grey.shade500,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style:
+                          Theme.of(context).primaryTextTheme.caption.copyWith(
+                                color: Colors.grey.shade500,
+                                fontSize: 10.0,
+                              ),
+                      children: [
+                        TextSpan(
+                          text: "Bonus credit is subject to ",
+                        ),
+                        TextSpan(
+                          recognizer: termsGesture,
+                          text: "Terms and Conditions*",
+                          style: TextStyle(
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

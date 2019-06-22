@@ -70,7 +70,7 @@ class LeagueDetailState extends State<LeagueDetail>
   Map<int, List<MySheet>> _mapContestSheets = {};
   Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  
+
   TabController tabController;
   int activeTabIndex = 0;
 
@@ -1014,7 +1014,7 @@ class LeagueDetailState extends State<LeagueDetail>
                 ),
           Container(
             height: 72.0,
-            padding:isIos?EdgeInsets.only(bottom: 7.5):null,
+            padding: isIos ? EdgeInsets.only(bottom: 7.5) : null,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -1223,7 +1223,7 @@ class LeagueDetailState extends State<LeagueDetail>
                       )
                     : Container(
                         height: 48.0,
-                        padding:isIos?EdgeInsets.only(bottom: 7.0):null,
+                        padding: isIos ? EdgeInsets.only(bottom: 7.0) : null,
                         width: MediaQuery.of(context).size.width / 2,
                         child: ColorButton(
                           color: Colors.orange,

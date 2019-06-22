@@ -662,8 +662,9 @@ class SignupState extends State<Signup> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(!isIos?
-                "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250_login.jpg":"https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_referral_raf_250_login.jpg"),
+            Image.network(!isIos
+                ? "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png"
+                : "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_referral_raf_250_login.jpg"),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
@@ -682,7 +683,7 @@ class SignupState extends State<Signup> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 56.0, right: 48.0),
+              padding: EdgeInsets.only(left: 56.0, right: 56.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -702,7 +703,8 @@ class SignupState extends State<Signup> {
                                       child: SimpleTextBox(
                                         onSaved: (val) => _authName = val,
                                         labelText:
-                                            strings.get("EMAIL_OR_MOBILE"),
+                                            strings.get("EMAIL_OR_MOBILE") +
+                                                "*",
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings
@@ -720,10 +722,6 @@ class SignupState extends State<Signup> {
                                       ),
                                     ),
                                   ),
-                                  Text(
-                                    " *",
-                                    style: TextStyle(color: Colors.red),
-                                  ),
                                 ],
                               ),
                               Row(
@@ -732,35 +730,36 @@ class SignupState extends State<Signup> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
-                                      child: SimpleTextBox(
-                                        onSaved: (val) => _password = val,
-                                        labelText: strings.get("PASSWORD"),
-                                        suffixIcon: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _obscureText = !_obscureText;
-                                            });
-                                          },
-                                          padding: EdgeInsets.all(0.0),
-                                          icon: Icon(
-                                            _obscureText
-                                                ? Icons.visibility
-                                                : Icons.visibility_off,
+                                      child: Stack(
+                                        alignment: Alignment.topRight,
+                                        overflow: Overflow.visible,
+                                        children: <Widget>[
+                                          SimpleTextBox(
+                                            onSaved: (val) => _password = val,
+                                            labelText:
+                                                strings.get("PASSWORD") + "*",
+                                            validator: (value) {
+                                              if (value.isEmpty) {
+                                                return strings
+                                                    .get("PASSWORD_ERROR");
+                                              }
+                                            },
+                                            obscureText: _obscureText,
                                           ),
-                                        ),
-                                        validator: (value) {
-                                          if (value.isEmpty) {
-                                            return strings
-                                                .get("PASSWORD_ERROR");
-                                          }
-                                        },
-                                        obscureText: _obscureText,
+                                          Positioned(
+                                            top: -2.0,
+                                            child: IconButton(
+                                              icon: Icon(Icons.visibility),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _obscureText = !_obscureText;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                    " *",
-                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ],
                               ),
@@ -768,8 +767,7 @@ class SignupState extends State<Signup> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Padding(
-                                      padding: EdgeInsets.only(
-                                          bottom: 16.0, right: 8.0),
+                                      padding: EdgeInsets.only(bottom: 16.0),
                                       child: SimpleTextBox(
                                         controller: _referralCodeController,
                                         labelText: strings.get("REFERRAL_CODE"),
@@ -783,7 +781,6 @@ class SignupState extends State<Signup> {
                                   Expanded(
                                     child: Container(
                                       height: 48.0,
-                                      padding: EdgeInsets.only(right: 8.0),
                                       child: ColorButton(
                                         onPressed: () {
                                           if (formKey.currentState.validate()) {
@@ -799,7 +796,7 @@ class SignupState extends State<Signup> {
                                                 .title
                                                 .copyWith(
                                                   color: Colors.white,
-                                                  fontWeight: FontWeight.normal,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                           ),
                                         ),
@@ -855,8 +852,7 @@ class SignupState extends State<Signup> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(
-                                    top: 8.0, bottom: 8.0, right: 8.0),
+                                padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
@@ -876,7 +872,7 @@ class SignupState extends State<Signup> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 8.0, right: 8.0),
+                                padding: EdgeInsets.only(top: 8.0),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(

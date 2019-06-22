@@ -21,7 +21,7 @@ disableDeviceRotation() {
 ///
 void main() async {
   String channelId = "10";
-  const apiBaseUrl = "https://www.howzat.com";
+  const apiBaseUrl = "https://stage.howzat.com";
   String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
 
   disableDeviceRotation();
@@ -37,8 +37,8 @@ void main() async {
     appName: 'Howzat',
     channelId: channelId,
     showBackground: false,
-    disableBranchIOAttribution:false,
-    privateAttributionName:"",
+    disableBranchIOAttribution: false,
+    privateAttributionName: "",
     apiBaseUrl: apiBaseUrl,
     carouselSlideTime: Duration(seconds: 10),
     child: StoreProvider(
