@@ -503,7 +503,7 @@ class SignupState extends State<Signup> {
 
     Map<dynamic, dynamic> usernameData = new Map();
     usernameData["trackType"] = "login_name";
-    usernameData["value"] = loginData["login_name:"];
+    usernameData["value"] = loginData["login_name"];
     AnalyticsManager.webengageCustomAttributeTrackUser(usernameData);
   }
 

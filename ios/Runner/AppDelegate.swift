@@ -131,7 +131,6 @@ import Firebase
     
     
     private func initBranchSession(branchResultData branchData:[String: AnyObject]?)->[String:String]{
-        print("<<<<<<<<<<<Branch>>>>>>>>>>>>");
         var object = [String : String]();
         var refCodeFromBranchTrail0:String = "";
         var refCodeFromBranchTrail1:String = "";
@@ -143,7 +142,6 @@ import Firebase
         let sessionParams = Branch.getInstance().getLatestReferringParams();
         
         if branchData != nil {
-            print(branchData!);
             if(branchData!["+clicked_branch_link"] != nil){
                 if(branchData!["+clicked_branch_link"]! as? Int == 1){
                     installReferring_link0=branchData!["~referring_link"]! as? String ?? "";
@@ -158,7 +156,6 @@ import Firebase
         }
         
         if installParams != nil {
-            print(installParams!);
             if(installParams!["+clicked_branch_link"] != nil){
                 if(installParams!["+clicked_branch_link"]! as? Int == 1){
                     installReferring_link1=installParams!["~referring_link"]! as? String ?? "";
@@ -173,7 +170,6 @@ import Firebase
         }
         
         if sessionParams != nil {
-            print(sessionParams!);
             if(sessionParams!["+clicked_branch_link"] != nil){
                 if(sessionParams!["+clicked_branch_link"]! as? Int == 1){
                     installReferring_link2=sessionParams!["~referring_link"]! as? String ?? "";
@@ -268,46 +264,75 @@ import Firebase
                 [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
                 
                 if(call.method=="webEngageEventSigniup"){
-                    let  channelResult:String=""
+                    let argue = call.arguments as? [String : Any];
+                     var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.webEngageEventSigniup(signupData:argue!);
+                    }
                     result(channelResult);
                 }
                 if(call.method=="webEngageEventLogin"){
-                    let  channelResult:String=""
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.webEngageEventLogin(loginData:argue!);
+                    }
                     result(channelResult);
                 }
                 if(call.method=="webEngageTransactionFailed"){
-                    let  channelResult:String=""
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.webEngageTransactionFailed(data:argue!);
+                    }
                     result(channelResult);
                 }
                 if(call.method=="webEngageTransactionSuccess"){
-                    let  channelResult:String=""
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.webEngageTransactionSuccess(data:argue!);
+                    }
                     result(channelResult);
                 }
                 if(call.method == "webengageTrackUser"){
-                    let argue = call.arguments as? NSDictionary;
-                    let  channelResult:String="";
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
                     if(argue != nil){
-                        let trackType = argue!["trackType"] as? String;
-                        let value = argue!["value"] as? String;
-                        if(trackType != nil ){
-                            if(value != nil){
-                             self?.webengageTrackUser(trackType:trackType!,value:value!);
-                            }
+                        if(argue != nil ){
+                     channelResult = self!.webengageTrackUser(data:argue!);
                         }
                     }
                     result(channelResult)
                 }
                 else if (call.method == "webengageCustomAttributeTrackUser"){
-                    let  channelResult:String=""
-                    result(channelResult)
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.webengageCustomAttributeTrackUser(data:argue!);
+                    }
+                    result(channelResult);
                 }
                 else if (call.method == "webengageTrackEvent"){
-                    let  channelResult:String=""
-                    result(channelResult)
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.webengageTrackEvent(data:argue!);
+                    }
+                    result(channelResult);
                 }
                 else if(call.method == "trackEventsWithAttributes"){
-                    let  channelResult:String=""
-                    result(channelResult)
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.trackEventsWithAttributes(data:argue!);
+                    }
+                    result(channelResult);
+                }
+                else if(call.method == "webengageAddScreenData"){
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    result(channelResult);
                 }
                 else{
                     result(FlutterMethodNotImplemented)
@@ -379,8 +404,6 @@ import Firebase
                         event.customData[key] = value;
                     }
                     event.logEvent();
-                    print("<<<<<<<<<<<<<<<<B>>>>>>>>>>>>>");
-                    print(event);
                     result(channelResult)
                 }
                 else if(call.method == "branchEventTransactionSuccess"){
@@ -502,7 +525,6 @@ import Firebase
                 "color": "#d32518"
             ]
         ]
-        print(options);
         razorpay.open(options)
     }
     
@@ -511,9 +533,6 @@ import Firebase
     
     public func onPaymentError(_ code: Int32, description str: String,andData response: [AnyHashable : Any]?){
         /* Function Usecase : Call on Razorpay Payment Failed*/
-        print("<<<<<<<<<<< Payment Failed >>>>>>>>>>>>>>>>>>>>>>>>>>>");
-        // RAZORPAY_IO_CHANNEL.invokeMethod("onRazorPayPaymentFail", arguments: str);
-        print(str);
         razorpay_result(FlutterError(code: "0",
                                      message: str,
                                      details: nil))
@@ -523,8 +542,6 @@ import Firebase
     public func onPaymentSuccess(_ payment_id: String,andData response: [AnyHashable : Any]?){
         print("<<<<<<<<<<< Payment Success >>>>>>>>>>>>>>>>>>>>>>>>>>>");
         /* Function Usecase : Call on Razorpay Payment success*/
-        print(payment_id);
-        print(response!);
         var dict : Dictionary = Dictionary<AnyHashable,Any>();
         if(response != nil){
             dict=response!;
@@ -536,13 +553,19 @@ import Firebase
         response["signature"] = razorpay_signature;
         response["orderId"] = razorpay_order_id;
         response["status"] = "paid";
-        print(response);
         razorpay_result(response);
-        
     }
     
-    private func  webengageTrackUser(trackType:String,value:String)-> String{
+    private func  webengageTrackUser(data:[String:Any])-> String{
         /* Function Usecase : to track Web Engage User */
+        var  trackType = "";
+        var  value = "";
+        if(data["trackingType"] != nil){
+            trackType = data["trackingType"] as! String;
+        }
+        if(data["value"] != nil){
+           value = data["value"] as! String;
+        }
         switch trackType{
         case "login":
             weUser.login(value);
@@ -551,13 +574,13 @@ import Firebase
             weUser.logout();
             return "Logout To Tracking event done";
         case "setEmail":
-            weUser.setEmail(value);
+            weUser.setHashedEmail(value);
             return "Email track   added";
         case "setBirthDate":
             weUser.setBirthDateString(value);
             return "Birth Day track added";
         case "setPhoneNumber":
-            weUser.setPhone(value);
+            weUser.setHashedPhone(value);
             return "Phone Number track added";
         case "setFirstName":
             weUser.setFirstName(value);
@@ -582,32 +605,132 @@ import Firebase
         }
     }
     
-    private func  webengageCustomAttributeTrackUser(trackType:String,value:String) -> String{
+    private func  webengageCustomAttributeTrackUser(data:[String:Any]) -> String{
         /* Function Usecase : to track Web Engage User with custom attributes */
+        var  trackType = "";
+        var  value = "";
+        if(data["trackType"] != nil){
+            trackType = data["trackType"] as! String;
+        }
+        if(data["value"] != nil){
+            value = data["value"] as! String;
+        }
         weUser.setAttribute(trackType, withStringValue:value);
         return "User " + trackType + "tracking added";
     }
     
-    private func webengageTrackEvent(eventName:String,priority:Bool)-> String{
+    private func webengageTrackEvent(data:[String:Any])-> String{
         /* Function Usecase : Track webengage Event without any Attributes*/
+        var  eventName = "";
+        if(data["eventName"] != nil){
+            eventName = data["eventName"] as! String;
+        }
         weAnalytics.trackEvent(withName:eventName)
         return "Event "+eventName+"" + "added";
     }
     
     
-    private func trackEventsWithAttributes(eventName:String,priority:Bool)-> String{
+    private func trackEventsWithAttributes(data:[String:Any])-> String{
         /* Function Usecase : Track webengage Event with  Attributes*/
-        let orderPlacedAttributes : [String:Any] = [
-            "Amount": 808.48,
-            "Product 1 SKU Code": "UHUH799",
-        ]
-        weAnalytics.trackEvent(withName: eventName, andValue: orderPlacedAttributes)
+        var eventName = "";
+        if(data["eventName"] != nil){
+            eventName = data["eventName"] as! String;
+        }
+        var addedAttributes:[String:Any] = [:];
+        if(data["data"] != nil){
+            addedAttributes = data["data"] as! [String:Any];
+        }
+        weAnalytics.trackEvent(withName: eventName, andValue:addedAttributes)
         return "Event "+eventName+"" + "added";
     }
     
+    private func webEngageEventSigniup(signupData:[String:Any])->String {
+        var email = "";
+        var phone = "";
+        var addedAttributes:[String:Any] = [:];
+        if(signupData["email"] != nil){
+            email = signupData["email"] as! String;
+        }
+        if(signupData["phone"] != nil){
+            phone = signupData["phone"] as! String;
+        }
+        if(signupData["data"] != nil){
+            addedAttributes = signupData["data"] as! [String:Any];
+        }
+        weAnalytics.trackEvent(withName: "COMPLETE_REGISTRATION", andValue:addedAttributes);
+        if(email.count>3){
+             weUser.setHashedEmail(email);
+        }
+        if(phone.count>3){
+            weUser.setHashedPhone(phone);
+        }
+        return "Web Engage Signup Event added";
+    }
     
+    private func webEngageEventLogin(loginData:[String:Any])->String{
+        var email = "";
+        var phone = "";
+        var first_name = "";
+        var last_name = "";
+        var addedAttributes:[String:Any] = [:];
+        if(loginData["email"] != nil){
+            email = loginData["email"] as! String;
+        }
+        if(loginData["phone"] != nil){
+            phone = loginData["phone"] as! String;
+        }
+        if(loginData["data"] != nil){
+            addedAttributes = loginData["data"] as! [String:Any];
+        }
+        if(loginData["first_name"] != nil){
+            first_name = loginData["first_name"] as! String;
+        }
+        if(loginData["last_name"] != nil){
+           last_name = loginData["last_name"]! as! String ;
+        }
+        weAnalytics.trackEvent(withName: "COMPLETE_LOGIN", andValue:addedAttributes);
+        if(email.count>3){
+            weUser.setHashedEmail(email);
+        }
+        if(phone.count>3){
+            weUser.setHashedPhone(phone);
+        }
+        if(loginData["first_name"] != nil){
+             weUser.setFirstName(first_name);
+        }
+        if(loginData["last_name"] != nil){
+             weUser.setLastName(last_name);
+        }
+         return "Web engage Login  Event added";
+    }
     
+    private func webEngageTransactionFailed(data:[String:Any])-> String{
+        var isfirstDepositor:Bool = false;
+        var eventName = "FIRST_DEPOSIT_FAILED";
+        var addedAttributes:[String:Any] = [:];
+        if(data["firstDepositor"] != nil){
+            isfirstDepositor = data["firstDepositor"] as? Bool ?? false;
+            if(!isfirstDepositor){
+                eventName = "REPEAT_DEPOSIT_FAILED";
+            }
+        }
+        if(data["data"] != nil){
+            addedAttributes = data["data"] as! [String:Any];
+        }
+        weAnalytics.trackEvent(withName: eventName, andValue:addedAttributes);
+        return "Web engage Transaction Failed  Event added";
+    }
     
+    private func webEngageTransactionSuccess(data:[String:Any])-> String{
+        var isfirstDepositor:Bool = false;
+        var eventName = "DEPOSIT_SUCCESS";
+        var addedAttributes:[String:Any] = [:];
+        if(data["data"] != nil){
+            addedAttributes = data["data"] as! [String:Any];
+        }
+        weAnalytics.trackEvent(withName: eventName, andValue:addedAttributes);
+        return "Web engage Transaction Success  Event added";
+    }
     
     private func branchLifecycleEventSigniup(registrationID:String,transactionID:String,description:String,data: NSDictionary){
         let event = BranchEvent.standardEvent(.completeRegistration)
@@ -616,8 +739,6 @@ import Firebase
         event.customData["registrationID"] = registrationID;
         let obj = data as NSDictionary
         for (key, value) in obj {
-            print(key);
-            print(value);
             event.customData[key] = value;
         }
         event.logEvent();
@@ -650,15 +771,13 @@ import Firebase
         if let messageID = userInfo[gcmMessageIDKey] {
             print("Message ID: \(messageID)")
         }
-        print(userInfo)
     }
     
     override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                               fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if let messageID = userInfo[gcmMessageIDKey] {
-            print("Message ID: \(messageID)")
+          
         }
-        print(userInfo)
         completionHandler(UIBackgroundFetchResult.newData);
         Branch.getInstance().handlePushNotification(userInfo)
     }
@@ -714,7 +833,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         if let messageID = userInfo[gcmMessageIDKey] {
             print("Message ID: \(messageID)")
         }
-        print(userInfo)
         completionHandler()
     }
 }
@@ -722,15 +840,14 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
 
 extension AppDelegate : MessagingDelegate {
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-        print("Firebase registration token: \(fcmToken)")
         let dataDict:[String: String] = ["token": fcmToken]
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
         Messaging.messaging().subscribe(toTopic: "news") { error in
-            print("Subscribed to news topic")
+           
         }
         
         Messaging.messaging().subscribe(toTopic: "ios_news") { error in
-            print("Subscribed to ios_news topic")
+           
         }
         
     }
