@@ -51,16 +51,12 @@
             <!-- Branch App Links (optional) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
                     android:host="www.howzat.com"
-                    android:scheme="https" />
-                <data
-                    android:host="stg.howzat.com"
-                    android:scheme="https" />
+                    android:scheme="https"
+                    android:pathPrefix="/"/>
             </intent-filter>
 
         </activity>
