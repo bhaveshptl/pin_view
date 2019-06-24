@@ -448,10 +448,10 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                 (response[contest.id.toString()] as List);
             return getUniqueTeams(contestMyTeams);
           } else {
-            return widget.myTeams;
+            return _myTeams;
           }
         } else {
-          return widget.myTeams;
+          return _myTeams;
         }
       },
     ).whenComplete(() {
@@ -492,8 +492,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateTeam(
+                  l1Data: _l1Data,
                   league: widget.league,
-                  l1Data: widget.l1Data,
                   mode: TeamCreationMode.CREATE_TEAM,
                 ),
           ),
