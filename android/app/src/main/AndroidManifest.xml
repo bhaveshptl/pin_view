@@ -56,10 +56,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="example.app.link"
+                    android:host="www.howzat.com"
                     android:scheme="https" />
                 <data
-                    android:host="example-alternate.app.link"
+                    android:host="stg.howzat.com"
                     android:scheme="https" />
             </intent-filter>
 
