@@ -444,7 +444,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             }
                         }
                     });
-                } else {
+                } else if ( methodCall.method.equals("onUserInfoRefreshed")) {
+                    Map<String, Object> arguments = methodCall.arguments();
+                    onUserInfoRefreshed(arguments);
+                }
+                else{
                     result.notImplemented();
                 }
             }
@@ -482,6 +486,85 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         });
 
 
+
+    }
+
+
+    private String onUserInfoRefreshed(Map<String, Object> arguments){
+       
+        if(arguments.get("first_name") != null && ((String) arguments.get("first_name")).length()>0){
+            weUser.setFirstName((String)arguments.get("first_name"));
+        }
+        if(arguments.get("lastName") != null && ((String) arguments.get("lastName")).length()>0){
+            weUser.setLastName((String)arguments.get("lastName"));
+        }
+        if(arguments.get("login_name") != null && ((String) arguments.get("login_name")).length()>0){
+            weUser.setAttribute("userName", (String)arguments.get("login_name"));
+        }
+        if(arguments.get("channelId") != null && ((String) arguments.get("channelId")).length()>0){
+            weUser.setAttribute("channelId", (String)arguments.get("channelId"));
+        }
+        if(arguments.get("withdrawable") != null && (arguments.get("withdrawable")).toString().length()>0){
+            weUser.setAttribute("withdrawable", new Double(arguments.get("withdrawable").toString()));
+        }
+        if(arguments.get("depositBucket") != null && (arguments.get("depositBucket")).toString().length()>0){
+            weUser.setAttribute("depositBucket",  new Double(arguments.get("depositBucket").toString()));
+        }
+        if(arguments.get("nonWithdrawable") != null && (arguments.get("nonWithdrawable")).toString().length()>0){
+            weUser.setAttribute("nonWithdrawable",  new Double(arguments.get("nonWithdrawable").toString()));
+        }
+        if(arguments.get("nonPlayableBucket") != null && (arguments.get("nonPlayableBucket")).toString().length()>0){
+            weUser.setAttribute("nonPlayableBucket",  new Double(arguments.get("nonPlayableBucket").toString()));
+        }
+        if(arguments.get("pan_verification") != null && ((String) arguments.get("pan_verification")).length()>0){
+
+            if(arguments.get("pan_verification").toString().equals("DOC_NOT_SUBMITTED")){
+                weUser.setAttribute("idProofStatus", 0);
+            }
+            else if(arguments.get("pan_verification").toString().equals("DOC_SUBMITTED")){
+                weUser.setAttribute("idProofStatus", 1);
+            }
+            else if(arguments.get("pan_verification").toString().equals("UNDER_REVIEW")){
+                weUser.setAttribute("idProofStatus", 2);
+            }
+            else if(arguments.get("pan_verification").toString().equals("DOC_REJECTED")){
+                weUser.setAttribute("idProofStatus", 3);
+
+            }else if(arguments.get("pan_verification").toString().equals("VERIFIED")){
+                weUser.setAttribute("idProofStatus", 4);
+            }
+        }
+        if(arguments.get("mobile_verification") != null){
+            weUser.setAttribute("mobileVerified", (boolean)arguments.get("mobile_verification"));
+        }
+        if(arguments.get("address_verification") != null && ((String) arguments.get("address_verification")).length()>0){
+            if(arguments.get("address_verification").toString().equals("DOC_NOT_SUBMITTED")){
+                weUser.setAttribute("addressProofStatus", 0);
+            }
+            else if(arguments.get("address_verification").toString().equals("DOC_SUBMITTED")){
+                weUser.setAttribute("addressProofStatus", 1);
+            }
+            else if(arguments.get("address_verification").toString().equals("UNDER_REVIEW")){
+                weUser.setAttribute("addressProofStatus", 2);
+            }
+            else if(arguments.get("address_verification").toString().equals("DOC_REJECTED")){
+                weUser.setAttribute("addressProofStatus", 3);
+            }else if(arguments.get("address_verification").toString().equals("VERIFIED")){
+                weUser.setAttribute("addressProofStatus", 4);
+            }
+        }
+        if(arguments.get("email_verification") != null){
+            weUser.setAttribute("emailVerified", (boolean)arguments.get("email_verification"));
+        }
+
+        if(arguments.get("dob") != null&& ((String) arguments.get("dob")).length()>0){
+            weUser.setBirthDate((String)arguments.get("dob"));
+        }
+        if(arguments.get("state") != null&& ((String) arguments.get("state")).length()>0){
+            weUser.setAttribute("State", (String) arguments.get("state"));
+        }
+        weUser.setAttribute("balance", new Double(arguments.get("user_balance_webengage").toString()));
+        return "Refreshed user Date is used";
 
     }
 

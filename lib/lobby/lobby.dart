@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class LobbyState extends State<Lobby>
   bool bUpdateAppConfirmationShown = false;
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool isIos = false;
-
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
@@ -155,37 +156,58 @@ class LobbyState extends State<Lobby>
     });
   }
 
-  setWebEngageKeys(Map<String, dynamic> data) {
-    if (data["email_id"] != null) {
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackingType"] = "setEmail";
-      setEmailBody["value"] =
-          AnalyticsManager.dosha256Encoding(data["email_id"]);
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
 
-    if (data["mobile"] != null) {
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackingType"] = "setPhoneNumber";
-      setEmailBody["value"] =
-          AnalyticsManager.dosha256Encoding("+91" + data["mobile"].toString());
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-
-    if (data["first_name"] != null) {
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackingType"] = "setFirstName";
-      setEmailBody["value"] = data["first_name"];
-      AnalyticsManager.webengageTrackUser(setEmailBody);
-    }
-
-    if (data["setLastName"] != null) {
-      Map<dynamic, dynamic> setEmailBody = new Map();
-      setEmailBody["trackingType"] = "setLastName";
-      setEmailBody["value"] = data["last_name"];
-      AnalyticsManager.webengageTrackUser(setEmailBody);
+  setWebEngageKeys(Map<dynamic, dynamic> data)  async{
+    Map<dynamic, dynamic> userInfo = new Map();
+    userInfo["first_name"]=data["first_name"] != null ? data["first_name"] :"";
+    userInfo["lastName"]=data["lastName"] != null ? data["lastName"] :"";
+    userInfo["login_name"]=data["login_name"] != null ? data["login_name"] :"";
+    userInfo["channelId"]=data["channelId"] != null ? data["channelId"] :"";
+    userInfo["withdrawable"]=data["withdrawable"] != null ? data["withdrawable"] :"";
+    userInfo["depositBucket"]=data["depositBucket"] != null ? data["depositBucket"] :"";
+    userInfo["nonWithdrawable"]=data["nonWithdrawable"] != null ? data["nonWithdrawable"] :"";
+    userInfo["nonPlayableBucket"]=data["nonPlayableBucket"] != null ? data["nonPlayableBucket"] :"";
+    userInfo["accountStatus"]="";
+    userInfo["user_balance_webengage"]=data["depositBucket"]+data["withdrawable"];
+    Map<dynamic, dynamic> verificationStatus= data["verificationStatus"];
+    userInfo["pan_verification"]=verificationStatus["pan_verification"];
+    userInfo["mobile_verification"]=verificationStatus["mobile_verification"];
+    userInfo["address_verification"]=verificationStatus["address_verification"];
+    userInfo["email_verification"]=verificationStatus["email_verification"];
+    Map<String, dynamic> profileData=await _getProfileData();
+    userInfo["pincode"]=profileData["pincode"] != null ? profileData["pincode"] :"";
+    userInfo["dob"]=profileData["dob"] != null ? profileData["dob"] :"";
+    userInfo["state"]=profileData["state"] != null ? profileData["state"] :"";
+    try {
+      final value = await utils_platform
+          .invokeMethod('onUserInfoRefreshed',userInfo);
+    } catch (e) {
+      
     }
   }
+
+  _getProfileData() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_USER_PROFILE,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+           return response;
+        } else if (res.statusCode == 401) {
+           return null;
+        }
+      },
+    ).whenComplete(() {
+     
+    });
+  }
+
+  
 
   _getBanners() async {
     http.Request req = http.Request(
