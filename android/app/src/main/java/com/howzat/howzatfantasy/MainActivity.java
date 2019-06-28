@@ -111,11 +111,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private void initWebEngage() {
-
-        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866").setDebugMode(true) // only
-                                                                                                                        // in
-                                                                                                                        // development
-                                                                                                                        // mode
+        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866")
+                .setDebugMode(true)
+                .setPushSmallIcon(R.drawable.notification_icon_small)
+                .setPushAccentColor(Color.parseColor("#d32518"))
                 .build();
         this.getApplication()
                 .registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
@@ -1040,12 +1039,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         firebaseToken = token;
                     }
                 });
-
-        // WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
-        // .setPushSmallIcon(R.drawable.notification_icon_small)
-        // .setPushLargeIcon(R.drawable.notification_icon_small)
-        // .setPushAccentColor(Color.parseColor("#ff0000"))
-        // .build();
     }
 
     private String getFireBaseToken() {
