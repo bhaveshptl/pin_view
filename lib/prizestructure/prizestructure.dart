@@ -35,6 +35,73 @@ class PrizeStructureState extends State<PrizeStructure> {
     List<Widget> _prizeRows = [];
     if (widget.prizeStructure.length == 0) {
       _prizeRows.add(Container());
+    } else if (widget.contest.multiplier) {
+      int i = 0;
+      int prevIndex = 0;
+      List<Map<String, dynamic>> updatePrizeStructure = [];
+      for (dynamic _prize in widget.prizeStructure) {
+        if (prevIndex != i) {
+          if ((widget.prizeStructure[i]["amount"] !=
+                  widget.prizeStructure[prevIndex]["amount"]) ||
+              i == widget.prizeStructure.length - 1) {
+            updatePrizeStructure.add({
+              "rank": (prevIndex + 1).toString() + "-" + (i + 1).toString(),
+              "amount": widget.prizeStructure[prevIndex]["amount"]
+            });
+            prevIndex = i;
+          }
+        }
+        i++;
+      }
+      for (Map<String, dynamic> _prize in updatePrizeStructure) {
+        _prizeRows.add(
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey.shade200,
+                ),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 16.0, right: 16.0, top: 12.0, bottom: 12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    "RANK: " + _prize["rank"],
+                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          color: Colors.grey.shade800,
+                        ),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      widget.contest.prizeType == 1
+                          ? Image.asset(
+                              strings.chips,
+                              width: 16.0,
+                              height: 12.0,
+                              fit: BoxFit.contain,
+                            )
+                          : Container(),
+                      Text(
+                        formatCurrency.format(
+                          double.parse(_prize["amount"].toString()),
+                        ),
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.grey.shade600,
+                                ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      }
     } else {
       for (dynamic _prize in widget.prizeStructure) {
         _prizeRows.add(
@@ -172,30 +239,55 @@ class PrizeStructureState extends State<PrizeStructure> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            widget.contest.prizeType == 1
-                                ? Image.asset(
-                                    strings.chips,
-                                    width: 16.0,
-                                    height: 12.0,
-                                    fit: BoxFit.contain,
-                                  )
-                                : Container(),
-                            Text(
-                              formatCurrency.format(widget
-                                  .contest.prizeDetails[0]["totalPrizeAmount"]),
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .title
-                                  .copyWith(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w700,
+                        widget.contest.multiplier
+                            ? Row(
+                                children: <Widget>[
+                                  Text(
+                                    widget.contest.topPrecent.toString() +
+                                        "% win ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
-                            ),
-                          ],
-                        ),
+                                  Text(
+                                    formatCurrency.format(
+                                      widget.contest.entryFee *
+                                          widget.contest.winningsMultiplier,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: <Widget>[
+                                  widget.contest.prizeType == 1
+                                      ? Image.asset(
+                                          strings.chips,
+                                          width: 16.0,
+                                          height: 12.0,
+                                          fit: BoxFit.contain,
+                                        )
+                                      : Container(),
+                                  Text(
+                                    formatCurrency.format(widget.contest
+                                        .prizeDetails[0]["totalPrizeAmount"]),
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                ],
+                              ),
                         Text(
                           widget.contest.prizeDetails[0]["noOfPrizes"]
                               .toString(),

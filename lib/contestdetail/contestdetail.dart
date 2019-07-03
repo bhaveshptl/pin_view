@@ -780,7 +780,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   }
 
   void _showPrizeStructure(BuildContext context) async {
-    List<dynamic> prizeStructure = await _getPrizeStructure(widget.contest);
+    List<dynamic> prizeStructure =
+        await routeLauncher.getPrizeStructure(widget.contest);
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -792,24 +793,24 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     );
   }
 
-  _getPrizeStructure(Contest contest) async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(BaseUrl().apiUrl +
-          ApiUtil.GET_PRIZESTRUCTURE +
-          contest.id.toString() +
-          "/prizestructure"),
-    );
-    return HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          return json.decode(res.body);
-        }
-      },
-    ).whenComplete(() {
-      showLoader(false);
-    });
-  }
+  // _getPrizeStructure(Contest contest) async {
+  //   http.Request req = http.Request(
+  //     "GET",
+  //     Uri.parse(BaseUrl().apiUrl +
+  //         ApiUtil.GET_PRIZESTRUCTURE +
+  //         contest.id.toString() +
+  //         "/prizestructure"),
+  //   );
+  //   return HttpManager(http.Client()).sendRequest(req).then(
+  //     (http.Response res) {
+  //       if (res.statusCode >= 200 && res.statusCode <= 299) {
+  //         return json.decode(res.body);
+  //       }
+  //     },
+  //   ).whenComplete(() {
+  //     showLoader(false);
+  //   });
+  // }
 
   @override
   void dispose() {

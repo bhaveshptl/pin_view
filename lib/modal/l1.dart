@@ -1,6 +1,6 @@
 class L1 {
   final LeagueDetails league;
-  final List<Contest> contests;
+  List<Contest> contests;
   L1({this.league, this.contests});
 
   factory L1.fromJson(Map<String, dynamic> json) {
@@ -323,6 +323,9 @@ class Contest {
   bool recommended;
   bool deleted;
   bool hideBonusInfo;
+  bool multiplier;
+  int winningsMultiplier;
+  int topPrecent;
   Contest({
     this.id,
     this.name,
@@ -353,6 +356,9 @@ class Contest {
     this.recommended,
     this.deleted,
     this.hideBonusInfo,
+    this.topPrecent,
+    this.winningsMultiplier,
+    this.multiplier = false,
   });
 
   copyFrom(Contest contest) {
@@ -385,6 +391,9 @@ class Contest {
     this.recommended = contest.recommended;
     this.deleted = contest.deleted;
     this.hideBonusInfo = contest.hideBonusInfo;
+    this.winningsMultiplier = contest.winningsMultiplier;
+    this.topPrecent = contest.topPrecent;
+    this.multiplier = contest.multiplier;
   }
 
   factory Contest.fromJson(Map<String, dynamic> json) {
@@ -425,6 +434,9 @@ class Contest {
       recommended: json["recommended"],
       deleted: json["deleted"],
       hideBonusInfo: json["hideBonusInfo"],
+      multiplier: json["multiplier"] == null ? false : json["multiplier"],
+      topPrecent: json["topPrecent"],
+      winningsMultiplier: json["winningsMultiplier"],
     );
   }
 

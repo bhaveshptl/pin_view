@@ -29,10 +29,12 @@ import 'package:playfantasy/leaguedetail/prediction/predictioncontestcard.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
 
 class JoinedContests extends StatefulWidget {
+  final L1 l1Data;
   final League league;
   final int sportsType;
+  final List<MyTeam> myTeams;
 
-  JoinedContests({this.league, this.sportsType});
+  JoinedContests({this.league, this.sportsType, this.myTeams, this.l1Data});
 
   @override
   JoinedContestsState createState() => JoinedContestsState();
@@ -62,6 +64,8 @@ class JoinedContestsState extends State<JoinedContests>
     scaffoldKey = GlobalKey<ScaffoldState>();
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
+    _l1Data = widget.l1Data;
+    _myTeams = widget.myTeams;
     initTabController();
     super.initState();
   }

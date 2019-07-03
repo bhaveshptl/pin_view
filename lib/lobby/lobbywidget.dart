@@ -85,35 +85,30 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
           if (widget.onLeagues != null) {
             widget.onLeagues(_allLeagues);
           }
-
-          setState(() {
-            _seperateLeaguesByRunningStatus(_allLeagues);
-          });
         } else if (data["data"]["bDataModified"] == true &&
             (data["data"]["lstRemoved"] as List).length > 0) {
           List<League> _removedLeagues = (data["data"]["lstRemoved"] as List)
               .map((i) => League.fromJson(i))
               .toList();
-          setState(() {
-            for (League _league in _removedLeagues) {
-              if (_league.status == LeagueStatus.UPCOMING) {
-                int index = getLeagueIndex(upcomingLeagues, _league);
-                if (index != -1) {
-                  upcomingLeagues.removeAt(index);
-                }
-              } else if (_league.status == LeagueStatus.LIVE) {
-                int index = getLeagueIndex(liveLeagues, _league);
-                if (index != -1) {
-                  liveLeagues.removeAt(index);
-                }
-              } else if (_league.status == LeagueStatus.COMPLETED) {
-                int index = getLeagueIndex(completedLeagues, _league);
-                if (index != -1) {
-                  completedLeagues.removeAt(index);
-                }
+
+          for (League _league in _removedLeagues) {
+            if (_league.status == LeagueStatus.UPCOMING) {
+              int index = getLeagueIndex(upcomingLeagues, _league);
+              if (index != -1) {
+                upcomingLeagues.removeAt(index);
+              }
+            } else if (_league.status == LeagueStatus.LIVE) {
+              int index = getLeagueIndex(liveLeagues, _league);
+              if (index != -1) {
+                liveLeagues.removeAt(index);
+              }
+            } else if (_league.status == LeagueStatus.COMPLETED) {
+              int index = getLeagueIndex(completedLeagues, _league);
+              if (index != -1) {
+                completedLeagues.removeAt(index);
               }
             }
-          });
+          }
         } else if (data["data"]["bDataModified"] == true &&
             (data["data"]["lstModified"] as List).length > 0) {
           List<League> _modifiedLeagues = (data["data"]["lstModified"] as List)
@@ -132,11 +127,11 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
               _allLeagues[index] = _league;
             }
           }
-          _seperateLeaguesByRunningStatus(_allLeagues);
           if (widget.onLeagues != null) {
             widget.onLeagues(_allLeagues);
           }
         }
+        _seperateLeaguesByRunningStatus(_allLeagues);
       }
     }
   }

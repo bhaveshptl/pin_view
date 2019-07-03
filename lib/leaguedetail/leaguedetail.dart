@@ -70,6 +70,7 @@ class LeagueDetailState extends State<LeagueDetail>
   Map<int, List<MySheet>> _mapContestSheets = {};
   Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Map<String, dynamic> myContestIds = {};
 
   TabController tabController;
   int activeTabIndex = 0;
@@ -115,6 +116,7 @@ class LeagueDetailState extends State<LeagueDetail>
         _myTeams = (data["data"]["myteams"] as List)
             .map((i) => MyTeam.fromJson(i))
             .toList();
+        myContestIds = data["data"]["mycontestid"];
         joinedContestCount = (data["data"]["mycontestid"]
                     [widget.league.leagueId.toString()] ==
                 null)
@@ -221,8 +223,17 @@ class LeagueDetailState extends State<LeagueDetail>
   _updateJoinCount(Map<String, dynamic> _data) {
     for (Contest _contest in l1Data.contests) {
       if (_contest.id == _data["cId"]) {
+        if (myContestIds[_data["lId"].toString()] == null) {
+          myContestIds[_data["lId"].toString()] = [];
+        }
+        if ((myContestIds[_data["lId"].toString()]).indexOf(_data["cId"]) ==
+            -1) {
+          (myContestIds[_data["lId"].toString()]).add(_data["cId"]);
+        }
         setState(() {
           _contest.joined = _data["iJC"];
+          joinedContestCount =
+              myContestIds[widget.league.leagueId.toString()].length;
         });
       }
     }
@@ -259,24 +270,23 @@ class LeagueDetailState extends State<LeagueDetail>
       });
     }
     if (_data["lstRemoved"] != null && _data["lstRemoved"].length > 0) {
-      List<int> _removedContestIndexes = [];
+      List<Contest> updatedContests = [];
       List<Contest> _lstRemovedContests = (_data["lstRemoved"] as List)
           .map((i) => Contest.fromJson(i))
           .toList();
-      for (Contest _removedContest in _lstRemovedContests) {
-        int index = 0;
-        for (Contest _contest in l1Data.contests) {
+      for (Contest _contest in l1Data.contests) {
+        bool bFound = false;
+        for (Contest _removedContest in _lstRemovedContests) {
           if (_removedContest.id == _contest.id) {
-            _removedContestIndexes.add(index);
+            bFound = true;
           }
-          index++;
+        }
+        if (!bFound) {
+          updatedContests.add(_contest);
         }
       }
-      setState(() {
-        for (int i = _removedContestIndexes.length - 1; i >= 0; i--) {
-          l1Data.contests.removeAt(_removedContestIndexes[i]);
-        }
-      });
+      print("Contest removed!!");
+      l1Data.contests = updatedContests;
     }
     if (_data["lstModified"] != null && _data["lstModified"].length >= 1) {
       List<dynamic> _modifiedContests = _data["lstModified"];
@@ -820,6 +830,8 @@ class LeagueDetailState extends State<LeagueDetail>
         Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (BuildContext context) => JoinedContests(
+                  l1Data: l1Data,
+                  myTeams: _myTeams,
                   league: widget.league,
                   sportsType: widget.sportType,
                 ),

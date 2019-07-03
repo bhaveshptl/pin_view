@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/createteam/createteam.dart';
 
 import 'package:playfantasy/modal/l1.dart';
@@ -157,162 +158,159 @@ class ContestsState extends State<Contests> {
           _l1Data.contests.add(_contest);
         }
       }
-      setState(() {
-        setContestsByCategory(_l1Data.contests);
-      });
+      // setState(() {
+      //   setContestsByCategory(_l1Data.contests);
+      // });
     }
     if (_data["lstRemoved"] != null && _data["lstRemoved"].length > 0) {
-      List<int> _removedContestIndexes = [];
       List<Contest> _lstRemovedContests = (_data["lstRemoved"] as List)
           .map((i) => Contest.fromJson(i))
           .toList();
-      for (Contest _removedContest in _lstRemovedContests) {
-        int index = 0;
-        for (Contest _contest in _l1Data.contests) {
+      List<Contest> updatedContests = [];
+      for (Contest _contest in _l1Data.contests) {
+        bool bFound = false;
+        for (Contest _removedContest in _lstRemovedContests) {
           if (_removedContest.id == _contest.id) {
-            _removedContestIndexes.add(index);
+            bFound = true;
           }
-          index++;
+        }
+        if (!bFound) {
+          updatedContests.add(_contest);
         }
       }
-      for (int i = _removedContestIndexes.length - 1; i >= 0; i--) {
-        if (_l1Data.contests.length > _removedContestIndexes[i]) {
-          _l1Data.contests.removeAt(_removedContestIndexes[i]);
-        }
-      }
-      setState(() {
-        setContestsByCategory(_l1Data.contests);
-      });
+      _l1Data.contests = updatedContests;
     }
+
     if (_data["lstModified"] != null && _data["lstModified"].length >= 1) {
       List<dynamic> _modifiedContests = _data["lstModified"];
       for (Map<String, dynamic> _changedContest in _modifiedContests) {
         for (Contest _contest in _l1Data.contests) {
           if (_contest.id == _changedContest["id"]) {
-            setState(() {
-              if (_changedContest["name"] != null &&
-                  _contest.name != _changedContest["name"]) {
-                _contest.name = _changedContest["name"];
+            if (_changedContest["name"] != null &&
+                _contest.name != _changedContest["name"]) {
+              _contest.name = _changedContest["name"];
+            }
+            if (_changedContest["templateId"] != null &&
+                _contest.templateId != _changedContest["templateId"]) {
+              _contest.templateId = _changedContest["templateId"];
+            }
+            if (_changedContest["size"] != null &&
+                _contest.size != _changedContest["size"]) {
+              _contest.size = _changedContest["size"];
+            }
+            if (_changedContest["prizeType"] != null &&
+                _contest.prizeType != _changedContest["prizeType"]) {
+              _contest.prizeType = _changedContest["prizeType"];
+            }
+            if (_changedContest["entryFee"] != null &&
+                _contest.entryFee != _changedContest["entryFee"]) {
+              _contest.entryFee = _changedContest["entryFee"];
+            }
+            if (_changedContest["minUsers"] != null &&
+                _contest.minUsers != _changedContest["minUsers"]) {
+              _contest.minUsers = _changedContest["minUsers"];
+            }
+            if (_changedContest["serviceFee"] != null &&
+                _contest.serviceFee != _changedContest["serviceFee"]) {
+              _contest.serviceFee = _changedContest["serviceFee"];
+            }
+            if (_changedContest["teamsAllowed"] != null &&
+                _contest.teamsAllowed != _changedContest["teamsAllowed"]) {
+              _contest.teamsAllowed = _changedContest["teamsAllowed"];
+            }
+            if (_changedContest["leagueId"] != null &&
+                _contest.leagueId != _changedContest["leagueId"]) {
+              _contest.leagueId = _changedContest["leagueId"];
+            }
+            if (_changedContest["releaseTime"] != null &&
+                _contest.releaseTime != _changedContest["releaseTime"]) {
+              _contest.releaseTime = _changedContest["releaseTime"];
+            }
+            if (_changedContest["regStartTime"] != null &&
+                _contest.regStartTime != _changedContest["regStartTime"]) {
+              _contest.regStartTime = _changedContest["regStartTime"];
+            }
+            if (_changedContest["startTime"] != null &&
+                _contest.startTime != _changedContest["startTime"]) {
+              _contest.startTime = _changedContest["startTime"];
+            }
+            if (_changedContest["endTime"] != null &&
+                _contest.endTime != _changedContest["endTime"]) {
+              _contest.endTime = _changedContest["endTime"];
+            }
+            if (_changedContest["status"] != null &&
+                _contest.status != _changedContest["status"]) {
+              _contest.status = _changedContest["status"];
+            }
+            if (_changedContest["visibilityId"] != null &&
+                _contest.visibilityId != _changedContest["visibilityId"]) {
+              _contest.visibilityId = _changedContest["visibilityId"];
+            }
+            if (_changedContest["visibilityInfo"] != null &&
+                _contest.visibilityInfo != _changedContest["visibilityInfo"]) {
+              _contest.visibilityInfo = _changedContest["visibilityInfo"];
+            }
+            if (_changedContest["contestJoinCode"] != null &&
+                _contest.contestJoinCode !=
+                    _changedContest["contestJoinCode"]) {
+              _contest.contestJoinCode = _changedContest["contestJoinCode"];
+            }
+            if (_changedContest["joined"] != null &&
+                _contest.joined != _changedContest["joined"]) {
+              _contest.joined = _changedContest["joined"];
+            }
+            if (_changedContest["bonusAllowed"] != null &&
+                _contest.bonusAllowed != _changedContest["bonusAllowed"]) {
+              _contest.bonusAllowed = _changedContest["bonusAllowed"];
+            }
+            if (_changedContest["guaranteed"] != null &&
+                _contest.guaranteed != _changedContest["guaranteed"]) {
+              _contest.guaranteed = _changedContest["guaranteed"];
+            }
+            if (_changedContest["recommended"] != null &&
+                _contest.recommended != _changedContest["recommended"]) {
+              _contest.recommended = _changedContest["recommended"];
+            }
+            if (_changedContest["deleted"] != null &&
+                _contest.deleted != _changedContest["deleted"]) {
+              _contest.deleted = _changedContest["deleted"];
+            }
+            if (_changedContest["brand"] != null &&
+                _changedContest["brand"]["info"] != null &&
+                _contest.brand["info"] != _changedContest["brand"]["info"]) {
+              _contest.brand["info"] = _changedContest["brand"]["info"];
+            }
+            if ((_changedContest["lstAdded"] as List).length > 0) {
+              for (dynamic _prize in _changedContest["lstAdded"]) {
+                _contest.prizeDetails.add(_prize);
               }
-              if (_changedContest["templateId"] != null &&
-                  _contest.templateId != _changedContest["templateId"]) {
-                _contest.templateId = _changedContest["templateId"];
-              }
-              if (_changedContest["size"] != null &&
-                  _contest.size != _changedContest["size"]) {
-                _contest.size = _changedContest["size"];
-              }
-              if (_changedContest["prizeType"] != null &&
-                  _contest.prizeType != _changedContest["prizeType"]) {
-                _contest.prizeType = _changedContest["prizeType"];
-              }
-              if (_changedContest["entryFee"] != null &&
-                  _contest.entryFee != _changedContest["entryFee"]) {
-                _contest.entryFee = _changedContest["entryFee"];
-              }
-              if (_changedContest["minUsers"] != null &&
-                  _contest.minUsers != _changedContest["minUsers"]) {
-                _contest.minUsers = _changedContest["minUsers"];
-              }
-              if (_changedContest["serviceFee"] != null &&
-                  _contest.serviceFee != _changedContest["serviceFee"]) {
-                _contest.serviceFee = _changedContest["serviceFee"];
-              }
-              if (_changedContest["teamsAllowed"] != null &&
-                  _contest.teamsAllowed != _changedContest["teamsAllowed"]) {
-                _contest.teamsAllowed = _changedContest["teamsAllowed"];
-              }
-              if (_changedContest["leagueId"] != null &&
-                  _contest.leagueId != _changedContest["leagueId"]) {
-                _contest.leagueId = _changedContest["leagueId"];
-              }
-              if (_changedContest["releaseTime"] != null &&
-                  _contest.releaseTime != _changedContest["releaseTime"]) {
-                _contest.releaseTime = _changedContest["releaseTime"];
-              }
-              if (_changedContest["regStartTime"] != null &&
-                  _contest.regStartTime != _changedContest["regStartTime"]) {
-                _contest.regStartTime = _changedContest["regStartTime"];
-              }
-              if (_changedContest["startTime"] != null &&
-                  _contest.startTime != _changedContest["startTime"]) {
-                _contest.startTime = _changedContest["startTime"];
-              }
-              if (_changedContest["endTime"] != null &&
-                  _contest.endTime != _changedContest["endTime"]) {
-                _contest.endTime = _changedContest["endTime"];
-              }
-              if (_changedContest["status"] != null &&
-                  _contest.status != _changedContest["status"]) {
-                _contest.status = _changedContest["status"];
-              }
-              if (_changedContest["visibilityId"] != null &&
-                  _contest.visibilityId != _changedContest["visibilityId"]) {
-                _contest.visibilityId = _changedContest["visibilityId"];
-              }
-              if (_changedContest["visibilityInfo"] != null &&
-                  _contest.visibilityInfo !=
-                      _changedContest["visibilityInfo"]) {
-                _contest.visibilityInfo = _changedContest["visibilityInfo"];
-              }
-              if (_changedContest["contestJoinCode"] != null &&
-                  _contest.contestJoinCode !=
-                      _changedContest["contestJoinCode"]) {
-                _contest.contestJoinCode = _changedContest["contestJoinCode"];
-              }
-              if (_changedContest["joined"] != null &&
-                  _contest.joined != _changedContest["joined"]) {
-                _contest.joined = _changedContest["joined"];
-              }
-              if (_changedContest["bonusAllowed"] != null &&
-                  _contest.bonusAllowed != _changedContest["bonusAllowed"]) {
-                _contest.bonusAllowed = _changedContest["bonusAllowed"];
-              }
-              if (_changedContest["guaranteed"] != null &&
-                  _contest.guaranteed != _changedContest["guaranteed"]) {
-                _contest.guaranteed = _changedContest["guaranteed"];
-              }
-              if (_changedContest["recommended"] != null &&
-                  _contest.recommended != _changedContest["recommended"]) {
-                _contest.recommended = _changedContest["recommended"];
-              }
-              if (_changedContest["deleted"] != null &&
-                  _contest.deleted != _changedContest["deleted"]) {
-                _contest.deleted = _changedContest["deleted"];
-              }
-              if (_changedContest["brand"] != null &&
-                  _changedContest["brand"]["info"] != null &&
-                  _contest.brand["info"] != _changedContest["brand"]["info"]) {
-                _contest.brand["info"] = _changedContest["brand"]["info"];
-              }
-              if ((_changedContest["lstAdded"] as List).length > 0) {
-                for (dynamic _prize in _changedContest["lstAdded"]) {
-                  _contest.prizeDetails.add(_prize);
-                }
-              }
-              if ((_changedContest["lstModified"] as List).length > 0) {
-                for (dynamic _modifiedPrize in _changedContest["lstModified"]) {
-                  for (dynamic _prize in _contest.prizeDetails) {
-                    if (_prize["id"] == _modifiedPrize["id"]) {
-                      if (_modifiedPrize["label"] != null) {
-                        _prize["label"] = _modifiedPrize["label"];
-                      }
-                      if (_modifiedPrize["noOfPrizes"] != null) {
-                        _prize["noOfPrizes"] = _modifiedPrize["noOfPrizes"];
-                      }
-                      if (_modifiedPrize["totalPrizeAmount"] != null) {
-                        _prize["totalPrizeAmount"] =
-                            _modifiedPrize["totalPrizeAmount"];
-                      }
+            }
+            if ((_changedContest["lstModified"] as List).length > 0) {
+              for (dynamic _modifiedPrize in _changedContest["lstModified"]) {
+                for (dynamic _prize in _contest.prizeDetails) {
+                  if (_prize["id"] == _modifiedPrize["id"]) {
+                    if (_modifiedPrize["label"] != null) {
+                      _prize["label"] = _modifiedPrize["label"];
+                    }
+                    if (_modifiedPrize["noOfPrizes"] != null) {
+                      _prize["noOfPrizes"] = _modifiedPrize["noOfPrizes"];
+                    }
+                    if (_modifiedPrize["totalPrizeAmount"] != null) {
+                      _prize["totalPrizeAmount"] =
+                          _modifiedPrize["totalPrizeAmount"];
                     }
                   }
                 }
               }
-            });
+            }
           }
         }
       }
     }
+
+    setState(() {
+      setContestsByCategory(_l1Data.contests);
+    });
   }
 
   _onContestClick(Contest contest, League league) {
@@ -420,7 +418,8 @@ class ContestsState extends State<Contests> {
 
   void _showPrizeStructure(Contest contest) async {
     widget.showLoader(true);
-    List<dynamic> prizeStructure = await _getPrizeStructure(contest);
+    List<dynamic> prizeStructure =
+        await routeLauncher.getPrizeStructure(contest);
     widget.showLoader(false);
     if (prizeStructure != null) {
       showModalBottomSheet(
@@ -435,24 +434,24 @@ class ContestsState extends State<Contests> {
     }
   }
 
-  _getPrizeStructure(Contest contest) async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(BaseUrl().apiUrl +
-          ApiUtil.GET_PRIZESTRUCTURE +
-          contest.id.toString() +
-          "/prizestructure"),
-    );
-    return HttpManager(http.Client()).sendRequest(req).then(
-      (http.Response res) {
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          return json.decode(res.body);
-        } else {
-          return Future.value(null);
-        }
-      },
-    );
-  }
+  // _getPrizeStructure(Contest contest) async {
+  //   http.Request req = http.Request(
+  //     "GET",
+  //     Uri.parse(BaseUrl().apiUrl +
+  //         ApiUtil.GET_PRIZESTRUCTURE +
+  //         contest.id.toString() +
+  //         "/prizestructure"),
+  //   );
+  //   return HttpManager(http.Client()).sendRequest(req).then(
+  //     (http.Response res) {
+  //       if (res.statusCode >= 200 && res.statusCode <= 299) {
+  //         return json.decode(res.body);
+  //       } else {
+  //         return Future.value(null);
+  //       }
+  //     },
+  //   );
+  // }
 
   onStateDobUpdate(String msg) {
     ActionUtil().showMsgOnTop(msg, context);

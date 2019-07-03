@@ -680,7 +680,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "saveCardDetails": paymentModeDetails["saveCardDetails"],
       "email": widget.paymentMode["email"] == null
           ? emailController.text == ""
-              ? "howzat@user.com"
+              ? "${widget.paymentMode["mobile"]}@howzat.com"
               : emailController.text == ""
           : widget.paymentMode["email"],
       "phone": widget.paymentMode["mobile"] == null
@@ -701,6 +701,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "isFirstDeposit": widget.paymentMode["isFirstDeposit"],
       "native": true,
     };
+    if (payload["first_name"] == "Howzat" ||
+        payload["last_name"] == "User" ||
+        payload["phone"] == "9876543210" ||
+        payload["email"] == "${widget.paymentMode["mobile"]}@howzat.com") {
+      payload["updateEmail"] = false;
+      payload["updateMobile"] = false;
+      payload["updateName"] = false;
+    }
     webEngagePaymentInitEvent(paymentModeDetails);
     int index = 0;
     payload.forEach((key, value) {
