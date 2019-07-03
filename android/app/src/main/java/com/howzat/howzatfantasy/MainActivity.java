@@ -111,11 +111,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private void initWebEngage() {
-
-        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866").setDebugMode(true) // only
-                                                                                                                        // in
-                                                                                                                        // development
-                                                                                                                        // mode
+        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866")
+                .setDebugMode(true)
+                .setPushSmallIcon(R.drawable.notification_icon_small)
+                .setPushAccentColor(Color.parseColor("#d32518"))
                 .build();
         this.getApplication()
                 .registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
@@ -505,19 +504,22 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             weUser.setAttribute("channelId", (String)arguments.get("channelId"));
         }
         if(arguments.get("withdrawable") != null && (arguments.get("withdrawable")).toString().length()>0){
-            weUser.setAttribute("withdrawable", new Double(arguments.get("withdrawable").toString()));
+            double withdrawable =new Double(arguments.get("withdrawable").toString());
+            weUser.setAttribute("withdrawable",Math.round(withdrawable * 100.0) / 100.0 );
         }
         if(arguments.get("depositBucket") != null && (arguments.get("depositBucket")).toString().length()>0){
-            weUser.setAttribute("depositBucket",  new Double(arguments.get("depositBucket").toString()));
+            double depositBucket = new Double(arguments.get("depositBucket").toString());
+            weUser.setAttribute("depositBucket",  Math.round(depositBucket * 100.0) / 100.0 );
         }
         if(arguments.get("nonWithdrawable") != null && (arguments.get("nonWithdrawable")).toString().length()>0){
-            weUser.setAttribute("nonWithdrawable",  new Double(arguments.get("nonWithdrawable").toString()));
+            double nonWithdrawable = new Double(arguments.get("nonWithdrawable").toString());
+            weUser.setAttribute("nonWithdrawable", Math.round(nonWithdrawable * 100.0) / 100.0  );
         }
         if(arguments.get("nonPlayableBucket") != null && (arguments.get("nonPlayableBucket")).toString().length()>0){
-            weUser.setAttribute("nonPlayableBucket",  new Double(arguments.get("nonPlayableBucket").toString()));
+            double nonPlayableBucket= new Double(arguments.get("nonPlayableBucket").toString());
+            weUser.setAttribute("nonPlayableBucket", Math.round(nonPlayableBucket * 100.0) / 100.0);
         }
         if(arguments.get("pan_verification") != null && ((String) arguments.get("pan_verification")).length()>0){
-
             if(arguments.get("pan_verification").toString().equals("DOC_NOT_SUBMITTED")){
                 weUser.setAttribute("idProofStatus", 0);
             }
@@ -556,14 +558,17 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(arguments.get("email_verification") != null){
             weUser.setAttribute("emailVerified", (boolean)arguments.get("email_verification"));
         }
-
         if(arguments.get("dob") != null&& ((String) arguments.get("dob")).length()>0){
             weUser.setBirthDate((String)arguments.get("dob"));
         }
         if(arguments.get("state") != null&& ((String) arguments.get("state")).length()>0){
             weUser.setAttribute("State", (String) arguments.get("state"));
         }
-        weUser.setAttribute("balance", new Double(arguments.get("user_balance_webengage").toString()));
+        if(arguments.get("user_balance_webengage") != null){
+            double user_balance_webengage = new Double(arguments.get("user_balance_webengage").toString());
+            weUser.setAttribute("balance",Math.round(user_balance_webengage * 100.0) / 100.0 );
+        }
+        
         return "Refreshed user Date is used";
 
     }
@@ -1037,12 +1042,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         firebaseToken = token;
                     }
                 });
-
-        // WebEngageConfig webEngageConfig = new WebEngageConfig.Builder()
-        // .setPushSmallIcon(R.drawable.notification_icon_small)
-        // .setPushLargeIcon(R.drawable.notification_icon_small)
-        // .setPushAccentColor(Color.parseColor("#ff0000"))
-        // .build();
     }
 
     private String getFireBaseToken() {

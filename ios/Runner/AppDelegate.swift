@@ -24,6 +24,7 @@ import Firebase
     private var WEBENGAGE_CHANNEL:FlutterMethodChannel!;
     private var SOCIAL_SHARE_CHANNEL:FlutterMethodChannel!;
     private var BROWSER_LAUNCH_CHANNEL:FlutterMethodChannel!;
+    private var UTILS_CHANNEL:FlutterMethodChannel!;
     private var razorpay_result: FlutterResult!
     private var device_info_result: FlutterResult!
     private var bBranchLodead:Bool = false;
@@ -46,6 +47,8 @@ import Firebase
         WEBENGAGE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.webengage",binaryMessenger: controller)
         SOCIAL_SHARE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.socialshare",binaryMessenger: controller)
         BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller)
+        
+        UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller)
         /* Init Services*/
         initPushNotifications(application);
         initFlutterChannels();
@@ -503,6 +506,21 @@ import Firebase
                 }
             })
         })
+        
+        UTILS_CHANNEL.setMethodCallHandler({
+            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
+            self.UTILS_CHANNEL.setMethodCallHandler({
+                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
+                if(call.method == "onUserInfoRefreshed"){
+                    let argue = call.arguments as? [String : Any];
+                    var  channelResult:String="";
+                    if(argue != nil){
+                        channelResult = self!.onUserInfoRefreshed(data:argue!);
+                    }
+                    result(channelResult);
+                }
+            })
+        })
     }
     
     
@@ -554,6 +572,117 @@ import Firebase
         response["orderId"] = razorpay_order_id;
         response["status"] = "paid";
         razorpay_result(response);
+    }
+    
+    private func onUserInfoRefreshed(data:[String:Any])-> String{
+        if(data["first_name"] != nil){
+            let value:String = data["first_name"] as! String;
+            weUser.setFirstName(value);
+        }
+        if(data["lastName"] != nil){
+            let value:String = data["lastName"] as! String;
+            weUser.setLastName(value);
+        }
+        if(data["login_name"] != nil){
+            let value:String = data["login_name"] as! String;
+            weUser.setAttribute("userName", withStringValue:value);
+            
+        }
+        if(data["channelId"] != nil){
+            let value:String = data["channelId"] as! String;
+            weUser.setAttribute("channelId", withStringValue:value);
+            
+        }
+        if(data["withdrawable"] != nil){
+            var valueinD:Double = data["withdrawable"] as! Double;
+            valueinD = Double(round(100*valueinD)/100);
+            var valueinS:String = String(format: "%.0f", valueinD);
+            let value = valueinD;
+            weUser.setAttribute("withdrawable", withStringValue:String(value));
+        }
+        if(data["depositBucket"] != nil){
+            var valueinD:Double = data["depositBucket"] as! Double;
+            valueinD = Double(round(100*valueinD)/100);
+            var valueinS:String = String(format: "%.0f", valueinD);
+            let value = valueinD;
+            weUser.setAttribute("depositBucket", withStringValue:String(value));
+        }
+        if(data["nonWithdrawable"] != nil){
+            var valueinD:Double = data["nonWithdrawable"] as! Double;
+            valueinD = Double(round(100*valueinD)/100);
+            var valueinS:String = String(format: "%.0f", valueinD);
+            let value = valueinD;
+            weUser.setAttribute("nonWithdrawable", withStringValue:String(value));
+        }
+        if(data["nonPlayableBucket"] != nil){
+            var valueinD:Double = data["nonPlayableBucket"] as! Double;
+            valueinD = Double(round(100*valueinD)/100);
+            var valueinS:String = String(format: "%.0f", valueinD);
+            let value = valueinD;
+            weUser.setAttribute("nonPlayableBucket", withStringValue:String(value));
+        }
+        if(data["pan_verification"] != nil){
+            let value:String = data["pan_verification"] as! String;
+            if(value=="DOC_NOT_SUBMITTED"){
+                weUser.setAttribute("idProofStatus", withValue:0);
+            }else if(value=="DOC_SUBMITTED"){
+                 weUser.setAttribute("idProofStatus", withValue:1);
+            }else if(value=="UNDER_REVIEW"){
+                 weUser.setAttribute("idProofStatus", withValue:2);
+            }else if(value=="DOC_REJECTED"){
+                 weUser.setAttribute("idProofStatus", withValue:3);
+            }else if(value=="VERIFIED") {
+                 weUser.setAttribute("idProofStatus", withValue:4);
+            }
+            
+        }
+        if(data["mobile_verification"] != nil){
+            let value:Bool = data["mobile_verification"] as! Bool;
+            if(value){
+                weUser.setAttribute("mobileVerified", withValue:true);
+            }else{
+                weUser.setAttribute("mobileVerified", withValue:false);
+            }
+        }
+        if(data["address_verification"] != nil){
+            let value:String = data["address_verification"] as! String;
+            if(value=="DOC_NOT_SUBMITTED"){
+                weUser.setAttribute("addressProofStatus", withValue:0);
+            }else if(value=="DOC_SUBMITTED"){
+                weUser.setAttribute("addressProofStatus", withValue:1);
+            }else if(value=="UNDER_REVIEW"){
+                weUser.setAttribute("addressProofStatus", withValue:2);
+            }else if(value=="DOC_REJECTED"){
+                weUser.setAttribute("addressProofStatus", withValue:3);
+            }else if(value=="VERIFIED") {
+                weUser.setAttribute("addressProofStatus", withValue:4);
+            }
+        }
+        if(data["email_verification"] != nil){
+            let value:Bool = data["email_verification"] as! Bool;
+            if(value){
+                 weUser.setAttribute("emailVerified", withValue:true);
+            }else{
+                 weUser.setAttribute("emailVerified", withValue:false);
+            }
+           
+        }
+        if(data["dob"] != nil){
+            let value:String = data["dob"] as! String;
+            weUser.setBirthDateString(value);
+        }
+        if(data["state"] != nil){
+            let value:String = data["state"] as! String;
+            weUser.setAttribute("State", withStringValue:value);
+        }
+        if(data["user_balance_webengage"] != nil){
+            var valueinD:Double = data["user_balance_webengage"] as! Double;
+            valueinD = Double(round(100*valueinD)/100);
+            var valueinS:String = String(format: "%.0f", valueinD);
+            let value = valueinD;
+            weUser.setAttribute("balance", withStringValue:String(value));
+        }
+        return "Data is used";
     }
     
     private func  webengageTrackUser(data:[String:Any])-> String{
