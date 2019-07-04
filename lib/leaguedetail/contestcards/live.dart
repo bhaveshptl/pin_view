@@ -65,28 +65,52 @@ class LiveContest extends StatelessWidget {
                           "Prize Pool",
                           style: TextStyle(color: Colors.black38),
                         ),
-                        Row(
-                          children: <Widget>[
-                            contest.prizeType == 1
-                                ? Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 2.0),
-                                    child: Image.asset(
-                                      strings.chips,
-                                      width: 10.0,
-                                      height: 10.0,
-                                      fit: BoxFit.contain,
+                        contest.multiplier
+                            ? Row(
+                                children: <Widget>[
+                                  Text(
+                                    contest.topPrecent.toString() + "% win ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w700,
                                     ),
-                                  )
-                                : Container(),
-                            Text(
-                              formatCurrency.format(
-                                  contest.prizeDetails[0]["totalPrizeAmount"]),
-                              textAlign: TextAlign.center,
-                              style: bodyStyle,
-                            ),
-                          ],
-                        ),
+                                  ),
+                                  Text(
+                                    formatCurrency.format(
+                                      contest.entryFee *
+                                          contest.winningsMultiplier,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: <Widget>[
+                                  contest.prizeType == 1
+                                      ? Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 2.0),
+                                          child: Image.asset(
+                                            strings.chips,
+                                            width: 10.0,
+                                            height: 10.0,
+                                            fit: BoxFit.contain,
+                                          ),
+                                        )
+                                      : Container(),
+                                  Text(
+                                    formatCurrency.format(contest
+                                        .prizeDetails[0]["totalPrizeAmount"]),
+                                    textAlign: TextAlign.center,
+                                    style: bodyStyle,
+                                  ),
+                                ],
+                              ),
                       ],
                     ),
                   ),

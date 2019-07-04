@@ -156,34 +156,41 @@ class LobbyState extends State<Lobby>
     });
   }
 
-
-  setWebEngageKeys(Map<dynamic, dynamic> data)  async{
+  setWebEngageKeys(Map<dynamic, dynamic> data) async {
     Map<dynamic, dynamic> userInfo = new Map();
-    userInfo["first_name"]=data["first_name"] != null ? data["first_name"] :"";
-    userInfo["lastName"]=data["lastName"] != null ? data["lastName"] :"";
-    userInfo["login_name"]=data["login_name"] != null ? data["login_name"] :"";
-    userInfo["channelId"]=data["channelId"] != null ? data["channelId"] :"";
-    userInfo["withdrawable"]=data["withdrawable"] != null ? data["withdrawable"] :"";
-    userInfo["depositBucket"]=data["depositBucket"] != null ? data["depositBucket"] :"";
-    userInfo["nonWithdrawable"]=data["nonWithdrawable"] != null ? data["nonWithdrawable"] :"";
-    userInfo["nonPlayableBucket"]=data["nonPlayableBucket"] != null ? data["nonPlayableBucket"] :"";
-    userInfo["accountStatus"]="";
-    userInfo["user_balance_webengage"]=data["depositBucket"]+data["withdrawable"];
-    Map<dynamic, dynamic> verificationStatus= data["verificationStatus"];
-    userInfo["pan_verification"]=verificationStatus["pan_verification"];
-    userInfo["mobile_verification"]=verificationStatus["mobile_verification"];
-    userInfo["address_verification"]=verificationStatus["address_verification"];
-    userInfo["email_verification"]=verificationStatus["email_verification"];
-    Map<String, dynamic> profileData=await _getProfileData();
-    userInfo["pincode"]=profileData["pincode"] != null ? profileData["pincode"] :"";
-    userInfo["dob"]=profileData["dob"] != null ? profileData["dob"] :"";
-    userInfo["state"]=profileData["state"] != null ? profileData["state"] :"";
+    userInfo["first_name"] =
+        data["first_name"] != null ? data["first_name"] : "";
+    userInfo["lastName"] = data["lastName"] != null ? data["lastName"] : "";
+    userInfo["login_name"] =
+        data["login_name"] != null ? data["login_name"] : "";
+    userInfo["channelId"] = data["channelId"] != null ? data["channelId"] : "";
+    userInfo["withdrawable"] =
+        data["withdrawable"] != null ? data["withdrawable"] : "";
+    userInfo["depositBucket"] =
+        data["depositBucket"] != null ? data["depositBucket"] : "";
+    userInfo["nonWithdrawable"] =
+        data["nonWithdrawable"] != null ? data["nonWithdrawable"] : "";
+    userInfo["nonPlayableBucket"] =
+        data["nonPlayableBucket"] != null ? data["nonPlayableBucket"] : "";
+    userInfo["accountStatus"] = "";
+    userInfo["user_balance_webengage"] =
+        data["depositBucket"] + data["withdrawable"];
+    Map<dynamic, dynamic> verificationStatus = data["verificationStatus"];
+    userInfo["pan_verification"] = verificationStatus["pan_verification"];
+    userInfo["mobile_verification"] = verificationStatus["mobile_verification"];
+    userInfo["address_verification"] =
+        verificationStatus["address_verification"];
+    userInfo["email_verification"] = verificationStatus["email_verification"];
+    Map<String, dynamic> profileData = await _getProfileData();
+    userInfo["pincode"] =
+        profileData["pincode"] != null ? profileData["pincode"] : "";
+    userInfo["dob"] = profileData["dob"] != null ? profileData["dob"] : "";
+    userInfo["state"] =
+        profileData["state"] != null ? profileData["state"] : "";
     try {
-      final value = await utils_platform
-          .invokeMethod('onUserInfoRefreshed',userInfo);
-    } catch (e) {
-      
-    }
+      final value =
+          await utils_platform.invokeMethod('onUserInfoRefreshed', userInfo);
+    } catch (e) {}
   }
 
   _getProfileData() async {
@@ -197,17 +204,13 @@ class LobbyState extends State<Lobby>
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
-           return response;
+          return response;
         } else if (res.statusCode == 401) {
-           return null;
+          return {};
         }
       },
-    ).whenComplete(() {
-     
-    });
+    ).whenComplete(() {});
   }
-
-  
 
   _getBanners() async {
     http.Request req = http.Request(

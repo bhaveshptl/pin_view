@@ -59,31 +59,55 @@ class UpcomingHowzatContest extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      contest.prizeType == 1
-                          ? Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 2.0),
-                              child: Image.asset(
-                                strings.chips,
-                                width: 10.0,
-                                height: 10.0,
-                                fit: BoxFit.contain,
+                  contest.multiplier
+                      ? Row(
+                          children: <Widget>[
+                            Text(
+                              contest.topPrecent.toString() + "% win ",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.w700,
                               ),
-                            )
-                          : Container(),
-                      Text(
-                        formatCurrency.format(
-                            contest.prizeDetails[0]["totalPrizeAmount"]),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.w700,
+                            ),
+                            Text(
+                              formatCurrency.format(
+                                contest.entryFee * contest.winningsMultiplier,
+                              ),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 30.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: <Widget>[
+                            contest.prizeType == 1
+                                ? Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.0),
+                                    child: Image.asset(
+                                      strings.chips,
+                                      width: 10.0,
+                                      height: 10.0,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  )
+                                : Container(),
+                            Text(
+                              formatCurrency.format(
+                                  contest.prizeDetails[0]["totalPrizeAmount"]),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 30.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                   ColorButton(
                     onPressed: (bIsContestFull || onJoin == null)
                         ? null
