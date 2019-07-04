@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
-import 'package:permission/permission.dart';
+// import 'package:permission/permission.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:android_intent/android_intent.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+// import 'package:android_intent/android_intent.dart';
+// import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 
@@ -31,7 +31,7 @@ class DownloadAPKState extends State<DownloadAPK> {
   int downloadProgress = 0;
   bool downloadStarted = false;
   bool bIsAPKInstallationAvailable = false;
-  PermissionStatus permissionStatus = PermissionStatus.allow;
+  // PermissionStatus permissionStatus = PermissionStatus.allow;
 
   @override
   void initState() {
@@ -44,24 +44,24 @@ class DownloadAPKState extends State<DownloadAPK> {
   }
 
   checkForPermission() async {
-    List<Permissions> permissions =
-        await Permission.getPermissionStatus([PermissionName.WriteStorage]);
-    setState(() {
-      permissionStatus = permissions[0].permissionStatus;
-    });
-    if (permissions[0].permissionStatus != PermissionStatus.allow) {
-      askForPermission();
-    }
+    // List<Permissions> permissions =
+    //     await Permission.getPermissionStatus([PermissionName.WriteStorage]);
+    // setState(() {
+    //   permissionStatus = permissions[0].permissionStatus;
+    // });
+    // if (permissions[0].permissionStatus != PermissionStatus.allow) {
+    //   askForPermission();
+    // }
   }
 
   askForPermission() async {
-    final result =
-        await Permission.requestSinglePermission(PermissionName.WriteStorage);
-    if (result != null) {
-      setState(() {
-        permissionStatus = result;
-      });
-    }
+    // final result =
+    //     await Permission.requestSinglePermission(PermissionName.WriteStorage);
+    // if (result != null) {
+    //   setState(() {
+    //     permissionStatus = result;
+    //   });
+    // }
   }
 
   startDownload() async {
@@ -71,52 +71,53 @@ class DownloadAPKState extends State<DownloadAPK> {
     Directory appDocDir = await getExternalStorageDirectory();
     String appDocPath = appDocDir.path;
 
-    taskId = await FlutterDownloader.enqueue(
-      url: widget.url,
-      savedDir: appDocPath,
-      showNotification: true,
-      fileName: AppConfig.of(context).appName + ".apk",
-    );
+    // taskId = await FlutterDownloader.enqueue(
+    //   url: widget.url,
+    //   savedDir: appDocPath,
+    //   showNotification: true,
+    //   fileName: AppConfig.of(context).appName + ".apk",
+    // );
 
-    FlutterDownloader.registerCallback(
-        (String id, DownloadTaskStatus status, int progress) {
-      if (id == taskId) {
-        setState(() {
-          downloadProgress = progress;
-        });
-        if (status == DownloadTaskStatus.complete) {
-          setState(() {
-            bIsAPKInstallationAvailable = true;
-          });
-        }
-      }
-    });
+    // FlutterDownloader.registerCallback(
+    //     (String id, DownloadTaskStatus status, int progress) {
+    //   if (id == taskId) {
+    //     setState(() {
+    //       downloadProgress = progress;
+    //     });
+    //     if (status == DownloadTaskStatus.complete) {
+    //       setState(() {
+    //         bIsAPKInstallationAvailable = true;
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   installAPK() async {
     if (taskId != null) {
-      FlutterDownloader.open(taskId: taskId);
+      // FlutterDownloader.open(taskId: taskId);
     } else {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       Directory appDocDir = await getExternalStorageDirectory();
       String fileUrl =
           appDocDir.path + "/" + AppConfig.of(context).appName + ".apk";
-      AndroidIntent(
-              action: "action_view",
-              fileUrl: fileUrl,
-              package: packageInfo.packageName,
-              mimeType: "application/vnd.android.package-archive")
-          .openFile();
+      // AndroidIntent(
+      //         action: "action_view",
+      //         fileUrl: fileUrl,
+      //         package: packageInfo.packageName,
+      //         mimeType: "application/vnd.android.package-archive")
+      //     .openFile();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    bool bteur = true;
     return WillPopScope(
       onWillPop: widget.isForceUpdate
           ? () => Future.value(false)
           : () => Future.value(true),
-      child: permissionStatus == PermissionStatus.allow
+      child: bteur // permissionStatus == PermissionStatus.allow
           ? SimpleDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6.0),

@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -46,7 +46,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   int _selectedItemIndex = -1;
   bool bWaitForCookieset = true;
   bool lastPaymentExpanded = false;
-  final flutterWebviewPlugin = FlutterWebviewPlugin();
+  // final flutterWebviewPlugin = FlutterWebviewPlugin();
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const branch_io_platform =
@@ -67,10 +67,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   void initState() {
     super.initState();
     setPaymentModeList();
-    flutterWebviewPlugin.launch(
-      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-      hidden: true,
-    );
+    // flutterWebviewPlugin.launch(
+    //   BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+    //   hidden: true,
+    // );
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
@@ -112,20 +112,20 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         url = BaseUrl().staticPageUrls["TERMS"];
         break;
     }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WebviewScaffold(
-              url: url,
-              clearCache: true,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => WebviewScaffold(
+    //           url: url,
+    //           clearCache: true,
+    //           appBar: AppBar(
+    //             title: Text(
+    //               title.toUpperCase(),
+    //             ),
+    //           ),
+    //         ),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
@@ -928,7 +928,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   @override
   void dispose() {
-    flutterWebviewPlugin.close();
+    // flutterWebviewPlugin.close();
     super.dispose();
   }
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/user.dart';
@@ -164,20 +164,20 @@ class AppDrawerState extends State<AppDrawer> {
         url = BaseUrl().staticPageUrls["PRIVACY"];
         break;
     }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WebviewScaffold(
-              url: isIos ? Uri.encodeFull(url) : url,
-              clearCache: true,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => WebviewScaffold(
+    //           url: isIos ? Uri.encodeFull(url) : url,
+    //           clearCache: true,
+    //           appBar: AppBar(
+    //             title: Text(
+    //               title.toUpperCase(),
+    //             ),
+    //           ),
+    //         ),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
   }
 
   _showEarnCash() async {

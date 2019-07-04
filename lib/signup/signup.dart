@@ -22,7 +22,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -592,20 +592,20 @@ class SignupState extends State<Signup> {
     String title = "";
     title = "TERMS AND CONDITIONS";
     url = BaseUrl().staticPageUrls["TERMS"];
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WebviewScaffold(
-              url: isIos ? Uri.encodeFull(url) : url,
-              clearCache: true,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => WebviewScaffold(
+    //           url: isIos ? Uri.encodeFull(url) : url,
+    //           clearCache: true,
+    //           appBar: AppBar(
+    //             title: Text(
+    //               title.toUpperCase(),
+    //             ),
+    //           ),
+    //         ),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
   }
 
   _launchSignIn() {

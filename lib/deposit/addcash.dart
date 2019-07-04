@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
@@ -43,7 +43,7 @@ class AddCashState extends State<AddCash> {
   bool bWaitForCookieset = true;
   bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
-  FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
+  // FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int selectedTileindex = 0;
@@ -151,10 +151,10 @@ class AddCashState extends State<AddCash> {
   }
 
   initWebview() {
-    flutterWebviewPlugin.launch(
-      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-      hidden: true,
-    );
+    // flutterWebviewPlugin.launch(
+    //   BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+    //   hidden: true,
+    // );
   }
 
   _launchStaticPage(String name) {
@@ -166,20 +166,20 @@ class AddCashState extends State<AddCash> {
         url = BaseUrl().staticPageUrls["TERMS"];
         break;
     }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WebviewScaffold(
-              url: url,
-              clearCache: true,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => WebviewScaffold(
+    //           url: url,
+    //           clearCache: true,
+    //           appBar: AppBar(
+    //             title: Text(
+    //               title.toUpperCase(),
+    //             ),
+    //           ),
+    //         ),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
@@ -1162,7 +1162,7 @@ class AddCashState extends State<AddCash> {
         ),
       );
     } else {
-      flutterWebviewPlugin.close();
+      // flutterWebviewPlugin.close();
       bonusInfo = paymentMode["promoInfo"];
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
@@ -1480,9 +1480,9 @@ class AddCashState extends State<AddCash> {
 
   @override
   void dispose() {
-    if (flutterWebviewPlugin != null) {
-      flutterWebviewPlugin.close();
-    }
+    // if (flutterWebviewPlugin != null) {
+    //   flutterWebviewPlugin.close();
+    // }
     super.dispose();
   }
 

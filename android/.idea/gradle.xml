@@ -3,28 +3,22 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <compositeConfiguration>
-          <compositeBuild compositeDefinitionSource="SCRIPT" />
-        </compositeConfiguration>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/git/flutter_downloader-7c238c3c9c0292b1727a7a80cf7ba4f9b2ad00b6/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/git/permission-cf1033c0723bf580238b14c9720ef3e41d771a4f/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/git/plugins-8888ae61d8611bc6beb0ff2f1a2cb59fca1ceb46/packages/android_intent/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/device_info-0.3.0/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/firebase_analytics-1.0.6/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/firebase_core-0.2.5+1/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/firebase_messaging-2.1.0/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/flutter_facebook_login-1.1.1/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/flutter_webview_plugin-0.2.1+2/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/google_sign_in-3.2.4/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/image_picker-0.4.10/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/package_info-0.3.2/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/path_provider-0.4.1/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/share-0.5.3/android" />
-            <option value="$USER_HOME$/flutter/sdk/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.4.3/android" />
+            <option value="C:/src/flutter/.pub-cache/git/flutter_downloader-7c238c3c9c0292b1727a7a80cf7ba4f9b2ad00b6/android" />
+            <option value="C:/src/flutter/.pub-cache/git/permission-cf1033c0723bf580238b14c9720ef3e41d771a4f/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.3.0/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_analytics-1.1.0/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core-0.2.5+1/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_facebook_login-1.1.1/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/google_sign_in-3.2.4/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker-0.4.12+1/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/package_info-0.3.2+1/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-0.4.1/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.4.3/android" />
+            <option value="C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/webview_flutter-0.3.9+1/android" />
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
           </set>

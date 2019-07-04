@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
@@ -181,20 +181,20 @@ class ContactUsState extends State<ContactUs> {
         url = BaseUrl().staticPageUrls["FAQ"];
         break;
     }
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => WebviewScaffold(
-              url: url,
-              clearCache: true,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => WebviewScaffold(
+    //           url: url,
+    //           clearCache: true,
+    //           appBar: AppBar(
+    //             title: Text(
+    //               title.toUpperCase(),
+    //             ),
+    //           ),
+    //         ),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
   }
 
   @override

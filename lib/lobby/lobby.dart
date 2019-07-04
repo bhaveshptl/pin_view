@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/user.dart';
@@ -346,20 +346,20 @@ class LobbyState extends State<Lobby>
   }
 
   launchHelp() {
-    Navigator.of(context).push(
-      FantasyPageRoute(
-        pageBuilder: (context) => WebviewScaffold(
-              url: "https://www.playfantasy.com/assets/help.html?cache=" +
-                  DateTime.now().millisecondsSinceEpoch.toString(),
-              appBar: AppBar(
-                title: Text(
-                  "HELP".toUpperCase(),
-                ),
-              ),
-            ),
-        fullscreenDialog: true,
-      ),
-    );
+    // Navigator.of(context).push(
+    //   FantasyPageRoute(
+    //     pageBuilder: (context) => WebviewScaffold(
+    //           url: "https://www.playfantasy.com/assets/help.html?cache=" +
+    //               DateTime.now().millisecondsSinceEpoch.toString(),
+    //           appBar: AppBar(
+    //             title: Text(
+    //               "HELP".toUpperCase(),
+    //             ),
+    //           ),
+    //         ),
+    //     fullscreenDialog: true,
+    //   ),
+    // );
   }
 
   Widget getActivePage() {
