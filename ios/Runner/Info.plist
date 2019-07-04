@@ -68,6 +68,8 @@
 	<string>Howzat uses  location to know your Indian State </string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Howzat uses  location to know your Indian State </string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Howzat uses  location to know your Indian State </string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need microphone access for uploading videos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
