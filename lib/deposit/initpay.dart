@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -31,7 +32,7 @@ class InitPayState extends State<InitPay> {
 
   setWebview() async {
     cookieManager = CookieManager();
-    cookieManager.setCookie("https://www.howzat.com", HttpManager.cookie);
+    cookieManager.setCookie(BaseUrl().apiUrl, HttpManager.cookie);
   }
 
   @override

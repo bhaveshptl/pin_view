@@ -16,7 +16,7 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-// import 'package:permission/permission.dart';
+import 'package:permission/permission.dart';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
@@ -47,7 +47,7 @@ class SplashScreenState extends State<SplashScreen>
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const utils_platform = const MethodChannel('com.algorin.pf.utils');
-  // PermissionStatus permissionStatus = PermissionStatus.allow;
+  PermissionStatus permissionStatus = PermissionStatus.allow;
   bool isIos = false;
   bool disableBranchIOAttribution = false;
 
@@ -231,27 +231,27 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   askForPermission() async {
-    // final result =
-    //     await Permission.requestSinglePermission(PermissionName.WriteStorage);
-    // if (result != null) {
-    //   setState(() {
-    //     permissionStatus = result;
-    //   });
-    // }
-    // return result;
+    final result =
+        await Permission.requestSinglePermission(PermissionName.WriteStorage);
+    if (result != null) {
+      setState(() {
+        permissionStatus = result;
+      });
+    }
+    return result;
   }
 
   checkForPermission() async {
-    // List<Permissions> permissions =
-    //     await Permission.getPermissionStatus([PermissionName.WriteStorage]);
-    // setState(() {
-    //   permissionStatus = permissions[0].permissionStatus;
-    // });
+    List<Permissions> permissions =
+        await Permission.getPermissionsStatus([PermissionName.WriteStorage]);
+    setState(() {
+      permissionStatus = permissions[0].permissionStatus;
+    });
 
-    // if (permissions[0].permissionStatus != PermissionStatus.allow) {
-    //   final result = await askForPermission();
-    //   if (result == PermissionStatus.allow) {}
-    // }
+    if (permissions[0].permissionStatus != PermissionStatus.allow) {
+      final result = await askForPermission();
+      if (result == PermissionStatus.allow) {}
+    }
   }
 
   getInitData() async {

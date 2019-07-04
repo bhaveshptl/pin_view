@@ -30,8 +30,7 @@ dependencies:
   shared_preferences: 0.4.3
   web_socket_channel: ^1.0.9
   cached_network_image: ^0.5.0
-  flutter_facebook_login: 2.0.1
-  # flutter_webview_plugin: ^0.2.1+2
+  flutter_facebook_login: 2.0.1  
   firebase_analytics: 2.0.2
   firebase_core: 0.3.3
   webview_flutter: 
@@ -39,9 +38,7 @@ dependencies:
       url: git://github.com/bhaveshptl/plugins.git
       path: packages/webview_flutter
   crypto: ^2.0.6
-  # flutter_downloader:
-  #   git: 
-  #     url: git://github.com/bhaveshptl/flutter_downloader.git
+  flutter_downloader: 1.1.7    
   android_intent: 
     git:
       url: git://github.com/bhaveshptl/plugins.git

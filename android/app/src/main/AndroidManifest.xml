@@ -134,7 +134,7 @@
             </intent-filter>
         </activity>
 
-        <!-- <provider
+        <provider
             android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
             android:authorities="${applicationId}.flutter_downloader.provider"
             android:exported="false"
@@ -157,7 +157,7 @@
             <meta-data
                 android:name="vn.hunghd.flutterdownloader.MAX_CONCURRENT_TASKS"
                 android:value="5" />
-        </provider> -->
+        </provider>
     </application>
 
 </manifest>
