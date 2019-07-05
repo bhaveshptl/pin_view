@@ -57,6 +57,7 @@ class SplashScreenState extends State<SplashScreen>
     super.initState();
     if (Platform.isIOS) {
       isIos = true;
+      showLocationFetchPopUp();
     }
     initServices();
     if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
@@ -140,6 +141,42 @@ class SplashScreenState extends State<SplashScreen>
       await _initBranchIoPlugin();
     }
   }
+
+  Future<String> showLocationFetchPopUp() async {
+    Map<dynamic, dynamic> value;
+    try {
+      value = await utils_platform.invokeMethod('enableLocationServices');
+
+      showLocationFetchPopUp();
+      
+    } catch (e) {
+      print(e);
+
+    }
+    return "";
+  }
+  
+
+  showLocationPermissionWarning() async {
+    return showDialog(
+      context: context,
+      builder: (context) => WillPopScope(
+            onWillPop: () {},
+            child: AlertDialog(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    "Please go to settings and give app required permissions and restart app to move forward.",
+                  ),
+                ],
+              ),
+            ),
+          ),
+      barrierDismissible: false,
+    );
+  }
+
 
   _initBranchIoPlugin() async {
     Map<dynamic, dynamic> value = new Map();
