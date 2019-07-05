@@ -65,11 +65,11 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Howzat requires access to the camera to upload Identity document  </string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Howzat uses  location to know your Indian State </string>
+	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Howzat uses  location to know your Indian State </string>
+	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Howzat uses  location to know your Indian State </string>
+	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need microphone access for uploading videos</string>
 	<key>NSPhotoLibraryUsageDescription</key>

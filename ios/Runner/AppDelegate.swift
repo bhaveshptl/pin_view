@@ -57,7 +57,7 @@ import CoreLocation
         initFlutterChannels();
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
-
+        enableLocationServices();
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -522,15 +522,30 @@ import CoreLocation
                     }
                     result(channelResult);
                 }
-                
-                if(call.method == "enableLocationServices"){
+                if(call.method == "getLocationLongLat"){
                     self?.location_permission_result=result;
-                    self?.enableLocationServices();
+                    self?.getLocationLongLat();
                 }
             })
         })
     }
     
+    func getLocationLongLat(){
+        locationManager.delegate = self
+        var currentLocation: CLLocation!
+        var response = [String : String]()
+        response["bAccessGiven"] = "false";
+        if( CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+            CLLocationManager.authorizationStatus() ==  .authorizedAlways){
+            currentLocation = locationManager.location;
+            response["bAccessGiven"] = "true";
+            response["longitude"] = String(currentLocation.coordinate.longitude);
+            response["latitude"] = String(currentLocation.coordinate.latitude);
+        }else{
+           response["bAccessGiven"] = "false"; 
+        }
+        location_permission_result(response);
+    }
     func enableLocationServices() {
         locationManager.delegate = self
         switch CLLocationManager.authorizationStatus() {
@@ -538,7 +553,6 @@ import CoreLocation
             locationManager.requestAlwaysAuthorization()
             break
         case .restricted, .denied:
-            //self.showLocationAcessDeniedAlert();
             break
         case .authorizedWhenInUse:
             self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -549,42 +563,7 @@ import CoreLocation
             self.locationManager.startUpdatingLocation()
             break
         }
-        
-        var currentLocation: CLLocation!
-        var response = [String : String]()
-        if( CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
-            CLLocationManager.authorizationStatus() ==  .authorizedAlways){
-            currentLocation = locationManager.location
-            print("^^^^^^^^^^^^^^^Location^^^^^^^^^^^^");
-            print(currentLocation.coordinate.longitude);
-            print(currentLocation.coordinate.latitude);
-        }
-        response["bAccessGiven"] = "true";
-        response["longitude"] = "";
-        response["latitude"] = "";
-        response["isAlways"] = "paid";
-        location_permission_result(response);
     }
-    
-    func showLocationAcessDeniedAlert() {
-        let alertController = UIAlertController(title: "Sad Face Emoji!",
-                                                message: "The calendar permission was not authorized. Please enable it in Settings to continue.",
-                                                preferredStyle: .alert)
-        
-        let settingsAction = UIAlertAction(title: "Settings", style: .default) { (alertAction) in
-            
-            // THIS IS WHERE THE MAGIC HAPPENS!!!!
-            if let appSettings = NSURL(string: UIApplicationOpenSettingsURLString) {
-                //UIApplication.sharedApplication().openURL(appSettings)
-            }
-        }
-        alertController.addAction(settingsAction)
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        //presentViewController(alertController, animated: true, completion: nil)
-    }
-    
     
     internal func showPaymentForm(name: String, email:String, phone:String, amount:String,orderId:String, method:String,image:String){
         /* Function Usecase : Open  Razorpay Payment Window*/

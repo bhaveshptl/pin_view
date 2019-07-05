@@ -23,6 +23,7 @@ import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:location_permissions/location_permissions.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -43,12 +44,15 @@ class SignupState extends State<Signup> {
   Map<dynamic, dynamic> androidDeviceInfoMap;
   String _installReferringLink = "";
   String chosenloginTypeByUser = "";
+  String location_longitude="";
+  String location_latitude = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   bool disableBranchIOAttribution = false;
   final formKey = new GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
@@ -71,6 +75,8 @@ class SignupState extends State<Signup> {
       AnalyticsManager.deleteInternalStorageFile(
           PrivateAttribution.getApkNameToDelete());
     }
+
+    setLongLatValues();
   }
 
   initServices() async {
@@ -189,13 +195,141 @@ class SignupState extends State<Signup> {
     return value;
   }
 
+ 
+  Future<String> setLongLatValues() async {
+    PermissionStatus permission =
+          await LocationPermissions().requestPermissions();
+    Map<dynamic, dynamic> value;
+    PermissionStatus permissionStatus =
+        await LocationPermissions().checkPermissionStatus();
+    if (permissionStatus.toString() == PermissionStatus.granted.toString()) {
+      try {
+        value = await utils_platform.invokeMethod('getLocationLongLat');
+        print("^^^^^^^^^Inside the Geo location********");
+        print(value);
+        if(value["bAccessGiven"] != null){
+        if(value["bAccessGiven"]=="true"){
+          location_longitude=value["longitude"];
+          location_latitude=value["latitude"];
+        }
+      } 
+      } catch (e) {
+         print("^^^^^^^^^Inside the Geo location error ********");
+        print(e);
+        value = null;
+      }
+    } else if (permissionStatus.toString() ==
+        PermissionStatus.denied.toString()) {
+      await showLocationPermissionInformationPopup();
+      
+    } else {
+      PermissionStatus permission =
+          await LocationPermissions().requestPermissions();
+    }
+    return "";
+  }
+
+  showLocationPermissionInformationPopup() async {
+    return showDialog(
+      context: context,
+      builder: (context) => WillPopScope(
+            onWillPop: () {},
+            child: AlertDialog(
+              contentPadding: EdgeInsets.all(0.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    height: 80.0,
+                    color: Theme.of(context).primaryColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SvgPicture.asset(
+                          "images/logo_white.svg",
+                          color: Colors.white,
+                          width: 40.0,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.0),
+                          child: Image.asset(
+                            "images/logo_name_white.png",
+                            height: 20.0,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: RichText(
+                            textAlign: TextAlign.justify,
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: Colors.black87,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text:
+                                      "Howzat needs access to your location.Please allow access to your location settings and restart app to move forward.",
+                                ),
+                                
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(right: 8.0),
+                  child: FlatButton(
+                    child: Text("Settings"),
+                    onPressed: () {
+                      openSettingForGrantingPermissions();
+                                          
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+      barrierDismissible: false,
+    );
+  }
+
+  Future<bool> openSettingForGrantingPermissions() async {
+    bool isOpened = await LocationPermissions().openAppSettings();
+    PermissionStatus permissionStatus =
+        await LocationPermissions().checkPermissionStatus();
+    if (permissionStatus.toString() == PermissionStatus.granted.toString()){
+         print("We are inside granted permission");
+         Navigator.of(context).pop();
+          
+       }else{
+          print("We are outside granted permission");
+          
+       } 
+    
+  }
+
   _showReferralInput() {
     setState(() {
       _bShowReferralInput = !_bShowReferralInput;
     });
   }
 
-  _doSignUp() async {
+  _doSignUp() async { 
     showLoader(true);
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -203,6 +337,7 @@ class SignupState extends State<Signup> {
     String model = "";
     String manufacturer = "";
     String serial = "";
+    
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       model = androidInfo.model;
@@ -226,7 +361,6 @@ class SignupState extends State<Signup> {
       _payload["email"] = _authName;
       chosenloginTypeByUser = "FORM_EMAIL";
     }
-
     _payload["password"] = _password;
     _payload["context"] = {
       "refCode": _referralCodeController.text,
@@ -236,7 +370,9 @@ class SignupState extends State<Signup> {
       "manufacturer": manufacturer,
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
-      "app_version_flutter": app_version_flutter
+      "app_version_flutter": app_version_flutter,
+      "location_longitude":location_longitude,
+      "location_latitude":location_latitude
     };
 
     bool disableBranchIOAttribution =
@@ -418,7 +554,9 @@ class SignupState extends State<Signup> {
       "manufacturer": manufacturer,
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
-      "app_version_flutter": app_version_flutter
+      "app_version_flutter": app_version_flutter,
+      "location_longitude":location_longitude,
+      "location_latitude":location_latitude
     };
 
     bool disableBranchIOAttribution =
