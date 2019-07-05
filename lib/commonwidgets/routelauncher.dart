@@ -144,7 +144,7 @@ class RouteLauncher {
       case "RUMMY":
         onComplete();
         browserLaunchChannel.invokeMethod(
-            "launchInBrowser", "https://ei3k.app.link/howzat");
+            "launchInBrowser", "https://m.jungleerummy.com/client/lobby");
         break;
       default:
     }

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -181,20 +182,18 @@ class ContactUsState extends State<ContactUs> {
         url = BaseUrl().staticPageUrls["FAQ"];
         break;
     }
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => WebviewScaffold(
-    //           url: url,
-    //           clearCache: true,
-    //           appBar: AppBar(
-    //             title: Text(
-    //               title.toUpperCase(),
-    //             ),
-    //           ),
-    //         ),
-    //     fullscreenDialog: true,
-    //   ),
-    // );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+      ),
+    );
   }
 
   @override

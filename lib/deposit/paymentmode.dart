@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -112,20 +113,18 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         url = BaseUrl().staticPageUrls["TERMS"];
         break;
     }
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => WebviewScaffold(
-    //           url: url,
-    //           clearCache: true,
-    //           appBar: AppBar(
-    //             title: Text(
-    //               title.toUpperCase(),
-    //             ),
-    //           ),
-    //         ),
-    //     fullscreenDialog: true,
-    //   ),
-    // );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+      ),
+    );
   }
 
   Future<String> _openRazorpayNative(Map<String, dynamic> payload) async {
@@ -745,7 +744,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 ? "https://d2cbroser6kssl.cloudfront.net/images/logo.png"
                 : (AppConfig.of(context).channelId == '9'
                     ? "https://d2cbroser6kssl.cloudfront.net/images/icons/smart11_logo.png"
-                    : "https://d2cbroser6kssl.cloudfront.net/images/icons/howzat_logo.png")
+                    : "https://d2cbroser6kssl.cloudfront.net/images/howzat/logo/howzat-logo-red-bg-v1.png")
           });
         } else {
           ActionUtil().showMsgOnTop("Opps!! Try again later.", context);

@@ -61,7 +61,8 @@ void main() async {
     appName: 'PlayFantasy',
     channelId: channelId,
     showBackground: true,
-    disableBranchIOAttribution:false,
+    privateAttributionName: "",
+    disableBranchIOAttribution: false,
     apiBaseUrl: apiBaseUrl,
     carouselSlideTime: Duration(seconds: 5),
     child: StoreProvider(

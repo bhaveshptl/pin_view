@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 // import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -39,20 +40,18 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
         url = BaseUrl().staticPageUrls["TERMS"];
         break;
     }
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => WebviewScaffold(
-    //           url: url,
-    //           clearCache: true,
-    //           appBar: AppBar(
-    //             title: Text(
-    //               title.toUpperCase(),
-    //             ),
-    //           ),
-    //         ),
-    //     fullscreenDialog: true,
-    //   ),
-    // );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: url,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+      ),
+    );
   }
 
   @override

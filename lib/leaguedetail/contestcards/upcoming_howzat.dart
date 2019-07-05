@@ -63,7 +63,23 @@ class UpcomingHowzatContest extends StatelessWidget {
                       ? Row(
                           children: <Widget>[
                             Text(
-                              contest.topPrecent.toString() + "% win ",
+                              contest.topPrecent.toString(),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              "%",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              " win ",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 24.0,

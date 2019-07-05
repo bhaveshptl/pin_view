@@ -11,6 +11,7 @@ import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
@@ -592,20 +593,18 @@ class SignupState extends State<Signup> {
     String title = "";
     title = "TERMS AND CONDITIONS";
     url = BaseUrl().staticPageUrls["TERMS"];
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => WebviewScaffold(
-    //           url: isIos ? Uri.encodeFull(url) : url,
-    //           clearCache: true,
-    //           appBar: AppBar(
-    //             title: Text(
-    //               title.toUpperCase(),
-    //             ),
-    //           ),
-    //         ),
-    //     fullscreenDialog: true,
-    //   ),
-    // );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+              url: isIos ? Uri.encodeFull(url) : url,
+              appBar: AppBar(
+                title: Text(
+                  title.toUpperCase(),
+                ),
+              ),
+            ),
+      ),
+    );
   }
 
   _launchSignIn() {

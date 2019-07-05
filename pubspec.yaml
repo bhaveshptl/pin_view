@@ -7,7 +7,7 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 2.45+4
+version: 3.46+4
 
 environment:
   sdk: '>=2.0.0-dev.68.0 <3.0.0'
@@ -33,12 +33,14 @@ dependencies:
   flutter_facebook_login: 2.0.1  
   firebase_analytics: 2.0.2
   firebase_core: 0.3.3
+  crypto: ^2.0.6
+  flutter_downloader:
+    git:
+      url: https://github.com/bhaveshptl/flutter_downloader.git      
   webview_flutter: 
     git:
       url: git://github.com/bhaveshptl/plugins.git
       path: packages/webview_flutter
-  crypto: ^2.0.6
-  flutter_downloader: 1.1.7    
   android_intent: 
     git:
       url: git://github.com/bhaveshptl/plugins.git

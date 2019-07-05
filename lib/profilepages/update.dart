@@ -56,10 +56,10 @@ class DownloadAPKState extends State<DownloadAPK> {
 
   askForPermission() async {
     final result =
-        await Permission.requestSinglePermission(PermissionName.WriteStorage);
+        await Permission.requestPermissions([PermissionName.WriteStorage]);
     if (result != null) {
       setState(() {
-        permissionStatus = result;
+        permissionStatus = result[0].permissionStatus;
       });
     }
   }
@@ -75,6 +75,7 @@ class DownloadAPKState extends State<DownloadAPK> {
       url: widget.url,
       savedDir: appDocPath,
       showNotification: true,
+      mimeType: "application/vnd.android.package-archive",
       fileName: AppConfig.of(context).appName + ".apk",
     );
 
@@ -286,6 +287,7 @@ class DownloadAPKState extends State<DownloadAPK> {
                                         height: 56.0,
                                         padding: EdgeInsets.all(4.0),
                                         child: ColorButton(
+                                          color: Colors.grey.shade600,
                                           child: Text(
                                             strings.get("CANCEL").toUpperCase(),
                                             style: Theme.of(context)
@@ -309,7 +311,6 @@ class DownloadAPKState extends State<DownloadAPK> {
                                   padding: EdgeInsets.all(4.0),
                                   child: ColorButton(
                                     elevation: 0.0,
-                                    color: Colors.orange.shade500,
                                     child: Text(
                                       bIsAPKInstallationAvailable
                                           ? "Install".toUpperCase()
