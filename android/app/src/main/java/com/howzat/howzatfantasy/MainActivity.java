@@ -2,15 +2,11 @@ package com.howzat.howzatfantasy;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,8 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +28,6 @@ import io.branch.referral.util.BRANCH_STANDARD_EVENT;
 import io.branch.referral.util.BranchContentSchema;
 import io.branch.referral.util.BranchEvent;
 import io.branch.referral.util.ContentMetadata;
-import io.branch.referral.util.CurrencyType;
-import io.branch.referral.util.ProductCategory;
 import io.flutter.app.FlutterActivity;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -48,7 +40,7 @@ import com.razorpay.PaymentResultWithDataListener;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
@@ -66,8 +58,6 @@ import java.util.function.Function;
 import com.webengage.sdk.android.WebEngageConfig;
 import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
 import com.webengage.sdk.android.WebEngage;
-import com.webengage.sdk.android.WebEngageConfig;
-import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
 
 import com.webengage.sdk.android.Analytics;
 import com.webengage.sdk.android.User;

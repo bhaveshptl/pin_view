@@ -7,11 +7,12 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -46,7 +47,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   int _selectedItemIndex = -1;
   bool bWaitForCookieset = true;
   bool lastPaymentExpanded = false;
-  final flutterWebviewPlugin = FlutterWebviewPlugin();
+  // final flutterWebviewPlugin = FlutterWebviewPlugin();
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const branch_io_platform =
@@ -67,10 +68,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   void initState() {
     super.initState();
     setPaymentModeList();
-    flutterWebviewPlugin.launch(
-      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-      hidden: true,
-    );
+    // flutterWebviewPlugin.launch(
+    //   BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+    //   hidden: true,
+    // );
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
@@ -116,14 +117,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
               url: url,
-              clearCache: true,
               appBar: AppBar(
                 title: Text(
                   title.toUpperCase(),
                 ),
               ),
             ),
-        fullscreenDialog: true,
       ),
     );
   }
@@ -745,7 +744,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 ? "https://d2cbroser6kssl.cloudfront.net/images/logo.png"
                 : (AppConfig.of(context).channelId == '9'
                     ? "https://d2cbroser6kssl.cloudfront.net/images/icons/smart11_logo.png"
-                    : "https://d2cbroser6kssl.cloudfront.net/images/icons/howzat_logo.png")
+                    : "https://d2cbroser6kssl.cloudfront.net/images/howzat/logo/howzat-logo-red-bg-v1.png")
           });
         } else {
           ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
@@ -928,7 +927,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   @override
   void dispose() {
-    flutterWebviewPlugin.close();
+    // flutterWebviewPlugin.close();
     super.dispose();
   }
 

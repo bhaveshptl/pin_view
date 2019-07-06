@@ -69,10 +69,26 @@ class LiveContest extends StatelessWidget {
                             ? Row(
                                 children: <Widget>[
                                   Text(
-                                    contest.topPrecent.toString() + "% win ",
+                                    contest.topPrecent.toString(),
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize: 14.0,
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    "%",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 10.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    " win ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16.0,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),

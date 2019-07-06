@@ -4,13 +4,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
@@ -43,7 +44,7 @@ class AddCashState extends State<AddCash> {
   bool bWaitForCookieset = true;
   bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
-  FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
+  // FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   int selectedTileindex = 0;
@@ -151,10 +152,10 @@ class AddCashState extends State<AddCash> {
   }
 
   initWebview() {
-    flutterWebviewPlugin.launch(
-      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-      hidden: true,
-    );
+    // flutterWebviewPlugin.launch(
+    //   BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+    //   hidden: true,
+    // );
   }
 
   _launchStaticPage(String name) {
@@ -170,14 +171,12 @@ class AddCashState extends State<AddCash> {
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
               url: url,
-              clearCache: true,
               appBar: AppBar(
                 title: Text(
                   title.toUpperCase(),
                 ),
               ),
             ),
-        fullscreenDialog: true,
       ),
     );
   }
@@ -1162,7 +1161,7 @@ class AddCashState extends State<AddCash> {
         ),
       );
     } else {
-      flutterWebviewPlugin.close();
+      // flutterWebviewPlugin.close();
       bonusInfo = paymentMode["promoInfo"];
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
@@ -1278,7 +1277,7 @@ class AddCashState extends State<AddCash> {
               ? "https://d2cbroser6kssl.cloudfront.net/images/logo.png"
               : (AppConfig.of(context).channelId == '9'
                   ? "https://d2cbroser6kssl.cloudfront.net/images/icons/smart11_logo.png"
-                  : "https://d2cbroser6kssl.cloudfront.net/images/icons/howzat_logo.png")
+                  : "https://d2cbroser6kssl.cloudfront.net/images/howzat/logo/howzat-logo-red-bg-v1.png")
         });
       }).whenComplete(() {
         showLoader(false);
@@ -1480,9 +1479,9 @@ class AddCashState extends State<AddCash> {
 
   @override
   void dispose() {
-    if (flutterWebviewPlugin != null) {
-      flutterWebviewPlugin.close();
-    }
+    // if (flutterWebviewPlugin != null) {
+    //   flutterWebviewPlugin.close();
+    // }
     super.dispose();
   }
 

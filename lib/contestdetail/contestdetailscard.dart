@@ -65,32 +65,71 @@ class ContestDetailsCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Row(
-                      children: <Widget>[
-                        contest.prizeType == 1
-                            ? Image.asset(
-                                strings.chips,
-                                width: 12.0,
-                                height: 12.0,
-                                fit: BoxFit.contain,
-                              )
-                            : Container(),
-                        Text(
-                          contest.prizeDetails != null
-                              ? formatCurrency.format(
-                                  contest.prizeDetails[0]["totalPrizeAmount"])
-                              : 0.toString(),
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .headline
-                                .fontSize,
-                            fontWeight: FontWeight.w700,
+                    contest.multiplier
+                        ? Row(
+                            children: <Widget>[
+                              Text(
+                                contest.topPrecent.toString(),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                "%",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                " win ",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                formatCurrency.format(
+                                  contest.entryFee * contest.winningsMultiplier,
+                                ),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: <Widget>[
+                              contest.prizeType == 1
+                                  ? Image.asset(
+                                      strings.chips,
+                                      width: 12.0,
+                                      height: 12.0,
+                                      fit: BoxFit.contain,
+                                    )
+                                  : Container(),
+                              Text(
+                                contest.prizeDetails != null
+                                    ? formatCurrency.format(contest
+                                        .prizeDetails[0]["totalPrizeAmount"])
+                                    : 0.toString(),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .headline
+                                      .fontSize,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ],
                 ),
                 InkWell(

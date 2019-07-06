@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -168,14 +169,12 @@ class AppDrawerState extends State<AppDrawer> {
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
               url: isIos ? Uri.encodeFull(url) : url,
-              clearCache: true,
               appBar: AppBar(
                 title: Text(
                   title.toUpperCase(),
                 ),
               ),
             ),
-        fullscreenDialog: true,
       ),
     );
   }
@@ -534,7 +533,7 @@ class AppDrawerState extends State<AppDrawer> {
                       ),
                       onTap: () {
                         browserLaunchChannel.invokeMethod("launchInBrowser",
-                            "https://ei3k.app.link/howzat?ad=howzat-crosssell-SideMenu&utm_source=howzat&utm_medium=Banners&utm_campaign=howzat-crosssell-SideMenu");
+                            "https://m.jungleerummy.com/client/lobby?ad=howzat-crosssell-SideMenu&utm_source=howzat&utm_medium=Banners&utm_campaign=howzat-crosssell-SideMenu");
                       },
                     ),
                   ],

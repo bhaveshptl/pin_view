@@ -243,11 +243,26 @@ class PrizeStructureState extends State<PrizeStructure> {
                             ? Row(
                                 children: <Widget>[
                                   Text(
-                                    widget.contest.topPrecent.toString() +
-                                        "% win ",
+                                    widget.contest.topPrecent.toString(),
                                     style: TextStyle(
                                       color: Colors.black,
-                                      fontSize: 18.0,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    "%",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    " win ",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20.0,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),

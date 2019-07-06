@@ -34,7 +34,7 @@ if (channelId == null) {
 }
 
 def buildType = localProperties.getProperty('flutter.buildType')
-if(buildType == null){
+if (buildType == null) {
     buildType = 'stg'
 }
 
@@ -59,7 +59,7 @@ task copyImages(type: Copy) {
             into "../../images"
         }
 
-    } else if (channelId == '13'){
+    } else if (channelId == '13') {
         copy {
             from "../../resources/images-howzat"
             into "../../images"
@@ -87,7 +87,7 @@ task copyRes(type: Copy) {
             from "../../resources/res-howzat"
             into "../../android/app/src/main/res"
         }
-    } else if (channelId == '13'){
+    } else if (channelId == '13') {
         copy {
             from "../../resources/res-howzat"
             into "../../android/app/src/main/res"
@@ -98,12 +98,12 @@ task copyRes(type: Copy) {
 
 task copyFlutterInitialization(type: Copy) {
     println 'Deleting main.dart!!!!'
-    delete "../../lib/main.dart"  
+    delete "../../lib/main.dart"
     println 'Copying updated resources!!!!'
     if (channelId == '3' && buildType == 'stg') {
         copy {
             from "../../resources/main_3.dart"
-            into "../../lib"            
+            into "../../lib"
             rename { String fileName ->
                 fileName.replace('_3', '')
             }
@@ -111,7 +111,7 @@ task copyFlutterInitialization(type: Copy) {
     } else if (channelId == '9' && buildType == 'stg') {
         copy {
             from "../../resources/main_9.dart"
-            into "../../lib"            
+            into "../../lib"
             rename { String fileName ->
                 fileName.replace('_9', '')
             }
@@ -119,12 +119,12 @@ task copyFlutterInitialization(type: Copy) {
     } else if (channelId == '10' && buildType == 'stg') {
         copy {
             from "../../resources/main_10.dart"
-            into "../../lib"            
+            into "../../lib"
             rename { String fileName ->
                 fileName.replace('_10', '')
             }
         }
-    } else if (channelId == '13' && buildType == 'stg'){
+    } else if (channelId == '13' && buildType == 'stg') {
         copy {
             from "../../resources/main_10.dart"
             into "../../lib"
@@ -132,11 +132,10 @@ task copyFlutterInitialization(type: Copy) {
                 fileName.replace('_10', '')
             }
         }
-    }
-    else if (channelId == '3' && buildType == 'prod') {
+    } else if (channelId == '3' && buildType == 'prod') {
         copy {
             from "../../resources/main_3_prod.dart"
-            into "../../lib"            
+            into "../../lib"
             rename { String fileName ->
                 fileName.replace('_3_prod', '')
             }
@@ -144,7 +143,7 @@ task copyFlutterInitialization(type: Copy) {
     } else if (channelId == '9' && buildType == 'prod') {
         copy {
             from "../../resources/main_9_prod.dart"
-            into "../../lib"            
+            into "../../lib"
             rename { String fileName ->
                 fileName.replace('_9_prod', '')
             }
@@ -152,12 +151,12 @@ task copyFlutterInitialization(type: Copy) {
     } else if (channelId == '10' && buildType == 'prod') {
         copy {
             from "../../resources/main_10_prod.dart"
-            into "../../lib"            
+            into "../../lib"
             rename { String fileName ->
                 fileName.replace('_10_prod', '')
             }
         }
-    } else if (channelId == '10' && buildType == 'prod'){
+    } else if (channelId == '10' && buildType == 'prod') {
         copy {
             from "../../resources/main_10_prod.dart"
             into "../../lib"
@@ -173,11 +172,13 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 repositories {
-    mavenCentral()
+    maven {
+        url "https://maven.google.com"
+    }
 }
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     lintOptions {
         disable 'InvalidPackage'
@@ -185,12 +186,12 @@ android {
 
     defaultConfig {
         applicationId "com.howzat.howzatfantasy"
-        minSdkVersion 19
+        minSdkVersion 20
         targetSdkVersion 26
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -220,8 +221,8 @@ flutter {
 dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'io.branch.sdk.android:library:3.+'
     implementation 'com.razorpay:checkout:1.4.9'
     implementation 'com.google.firebase:firebase-messaging:17.4.0'
@@ -231,5 +232,5 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
-
+com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
 

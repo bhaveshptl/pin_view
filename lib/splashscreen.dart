@@ -243,7 +243,7 @@ class SplashScreenState extends State<SplashScreen>
 
   checkForPermission() async {
     List<Permissions> permissions =
-        await Permission.getPermissionStatus([PermissionName.WriteStorage]);
+        await Permission.getPermissionsStatus([PermissionName.WriteStorage]);
     setState(() {
       permissionStatus = permissions[0].permissionStatus;
     });
@@ -310,8 +310,7 @@ class SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: AppConfig.of(context).channelId == "10" 
-              
+      body: AppConfig.of(context).channelId == "10"
           ? Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -331,10 +330,10 @@ class SplashScreenState extends State<SplashScreen>
               children: <Widget>[
                 Container(
                   decoration: (AppConfig.of(context).channelId == "10"
-                    ? BoxDecoration(color: Theme.of(context).primaryColor)
-                    : (AppConfig.of(context).channelId == "13"
-                        ? BoxDecoration(color: Theme.of(context).primaryColor)
-                        : null)),
+                      ? BoxDecoration(color: Theme.of(context).primaryColor)
+                      : (AppConfig.of(context).channelId == "13"
+                          ? BoxDecoration(color: Theme.of(context).primaryColor)
+                          : null)),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,

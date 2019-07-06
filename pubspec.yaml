@@ -7,7 +7,7 @@ description: A new Flutter project.
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 2.45+4
+version: 3.46+4
 
 environment:
   sdk: '>=2.0.0-dev.68.0 <3.0.0'
@@ -20,25 +20,28 @@ dependencies:
   flushbar: 1.5.3
   device_info: ^0.3.0
   flutter_svg: ^0.8.2
-  package_info: ^0.3.2
+  package_info: 0.3.2+1
   dotted_border: ^0.1.1
-  image_picker: ^0.4.10
+  image_picker: 0.5.4
   flutter_redux: ^0.5.3
-  google_sign_in: ^3.2.4
+  google_sign_in: 4.0.1
   carousel_slider: ^1.0.1  
   animated_text_kit: ^1.2.0
-  shared_preferences: ^0.4.2
+  shared_preferences: 0.4.3
   web_socket_channel: ^1.0.9
   cached_network_image: ^0.5.0
-  flutter_facebook_login: ^1.1.1
-  flutter_webview_plugin: ^0.2.1+2
-  firebase_analytics: ^1.0.6
-  firebase_core: ^0.2.5+1
+  flutter_facebook_login: 2.0.1  
+  firebase_analytics: 2.0.2
+  firebase_core: 0.3.3
   crypto: ^2.0.6
   flutter_downloader:
-    git: 
-      url: git://github.com/bhaveshptl/flutter_downloader.git
-  android_intent:
+    git:
+      url: https://github.com/bhaveshptl/flutter_downloader.git      
+  webview_flutter: 
+    git:
+      url: git://github.com/bhaveshptl/plugins.git
+      path: packages/webview_flutter
+  android_intent: 
     git:
       url: git://github.com/bhaveshptl/plugins.git
       path: packages/android_intent
