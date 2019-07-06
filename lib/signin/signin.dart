@@ -604,12 +604,9 @@ class SignInPageState extends State<SignInPage> {
     }
   }
 
-  onLoginAuthenticate(Map<String, dynamic> loginData) {
-    print("<<<<<<<<<Login Data>>>>>>>>>");
-    print(loginData);
-    webEngageUserLogin(loginData["user_id"].toString(), loginData);
-    trackAndSetBranchUserIdentity(loginData["user_id"].toString());
-   
+  onLoginAuthenticate(Map<String, dynamic> loginData) async {
+    await webEngageUserLogin(loginData["user_id"].toString(), loginData);
+    await trackAndSetBranchUserIdentity(loginData["user_id"].toString());
   }
 
   Future<String> webEngageUserLogin(

@@ -631,18 +631,10 @@ class SignupState extends State<Signup> {
     showLoader(false);
   }
 
-  onLoginAuthenticate(Map<String, dynamic> loginData) {
-    print("<<<<<<<<Signupdata Data>>>>>>>");
-    print(loginData);
-
-    branchLifecycleEventSigniup(loginData);
-    trackAndSetBranchUserIdentity(loginData["user_id"].toString());
-    webEngageUserLogin(loginData["user_id"].toString(), loginData);
-
-    Map<dynamic, dynamic> usernameData = new Map();
-    usernameData["trackType"] = "login_name";
-    usernameData["value"] = loginData["login_name"];
-    AnalyticsManager.webengageCustomAttributeTrackUser(usernameData);
+  onLoginAuthenticate(Map<String, dynamic> loginData) async {
+    await webEngageUserLogin(loginData["user_id"].toString(), loginData);
+    await trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+    await branchLifecycleEventSigniup(loginData);
   }
 
   Future<String> webEngageUserLogin(
@@ -653,15 +645,10 @@ class SignupState extends State<Signup> {
     data["value"] = userId;
     try {
       result =
-          await webengage_platform.invokeMethod('webengageTrackUser', data);
+          await webengage_platform.invokeMethod('webengageTrackUser', data);   
       webEngageEventSigniup(loginData);
-
-      print("Web engage>>>>>>>>>>>>>>>");
-      print(result);
     } catch (e) {
-      print("Web engage>>>>>>>>>>>>>>>");
-
-      print(e);
+      
     }
     return "";
   }
@@ -687,13 +674,7 @@ class SignupState extends State<Signup> {
     try {
       String trackValue = await webengage_platform.invokeMethod(
           'webEngageEventSigniup', signupdata);
-      print("Web engage>>>>>>>>>>>>>>>");
-
-      print(trackValue);
     } catch (e) {
-      print("Web engage>>>>>>>>>>>>>>>");
-
-      print(e);
     }
     return trackValue;
   }
