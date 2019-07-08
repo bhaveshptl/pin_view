@@ -547,4 +547,23 @@ class RouteLauncher {
       },
     );
   }
+
+  getPromoCodes(bool bIsFirstDeposit) {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_PROMOCODES + bIsFirstDeposit.toString(),
+      ),
+    );
+
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        return json.decode(res.body);
+      } else {
+        return null;
+      }
+    });
+  }
 }

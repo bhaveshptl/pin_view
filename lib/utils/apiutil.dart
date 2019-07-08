@@ -94,7 +94,7 @@ class ApiUtil {
   static const CHANGE_TEAM_NAME = "/api/ups/user/updateUserName";
   static const GET_ACCOUNT_DETAILS = "/api/account/overview";
   static const PARTNER_REQUEST = "/api/ups/partner-request";
-  static const DEPOSIT_INFO = "/api/v2/payment/player/deposit/v2";
+  static const DEPOSIT_INFO = "/api/v2/payment/player/deposit/v3";
   static const PAYMENT_MODE = "/api/v2/payment/player/deposit/proceed/v2";
   static const VALIDATE_PROMO = "/api/v2/payment/player/deposit/validate/promo";
   static const INIT_PAYMENT = "/api/payment/player/deposit/init-pay?";
@@ -128,44 +128,44 @@ class ApiUtil {
 
   static const QUIZ_USER_BALANCE = "/api/v2/lobby/quiz-userbalance";
   static const GET_BANNERS = "/api/v2/lobby/banners";
+
+  static const GET_PROMOCODES = "/api/v2/payment/promocodes/";
 }
 
-class PrivateAttribution{
-  
-  static bool disableBranchIOAttribution =false;
+class PrivateAttribution {
+  static bool disableBranchIOAttribution = false;
   static String attributionNumber = "1";
-  static String currentVersion ="2_44";
-  static bool getdisableBranchIOAttribution(){
-       return disableBranchIOAttribution;
-  }
-  static String getPrivateAttributionName(){
-       var attributionName = attributionNumber; 
-     switch(attributionName) { 
-      case "1": 
-      return "oppo"; 
-      case "2":  
-      return "xiaomi";
-      default: 
-      return ""; 
-   } 
+  static String currentVersion = "2_44";
+  static bool getdisableBranchIOAttribution() {
+    return disableBranchIOAttribution;
   }
 
-  static String getApkNameToDelete(){
+  static String getPrivateAttributionName() {
+    var attributionName = attributionNumber;
+    switch (attributionName) {
+      case "1":
+        return "oppo";
+      case "2":
+        return "xiaomi";
+      default:
+        return "";
+    }
+  }
+
+  static String getApkNameToDelete() {
     String apkNameToDelete = "";
     var attributionName = attributionNumber;
-    switch(attributionName) { 
-      case "1": 
-      apkNameToDelete="howzat_oppo_"+currentVersion+".apk";
-      break;
-      case "2": 
-      apkNameToDelete="howzat_xiaomi_"+currentVersion+".apk"; 
-      break;
-      default: 
-      apkNameToDelete="howzat.apk";
-      break;
-   }
-   return apkNameToDelete;
+    switch (attributionName) {
+      case "1":
+        apkNameToDelete = "howzat_oppo_" + currentVersion + ".apk";
+        break;
+      case "2":
+        apkNameToDelete = "howzat_xiaomi_" + currentVersion + ".apk";
+        break;
+      default:
+        apkNameToDelete = "howzat.apk";
+        break;
+    }
+    return apkNameToDelete;
   }
-
-
 }
