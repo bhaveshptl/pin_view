@@ -111,7 +111,9 @@ class MyAccountState extends State<MyAccount> {
                   ],
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: accountDetails.unreleasedBonus >= 0
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
                       "Bonus",
@@ -132,6 +134,35 @@ class MyAccountState extends State<MyAccount> {
                     ),
                   ],
                 ),
+                accountDetails.unreleasedBonus >= 0
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text(
+                            "Locked Bonus",
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .body1
+                                  .fontSize,
+                            ),
+                          ),
+                          Text(
+                            strings.rupee +
+                                " " +
+                                accountDetails.unreleasedBonus
+                                    .toStringAsFixed(2),
+                            style: TextStyle(
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .title
+                                  .fontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Container(),
               ],
             ),
           ),

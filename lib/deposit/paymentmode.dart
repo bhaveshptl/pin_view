@@ -7,12 +7,12 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dotted_border/dotted_border.dart';
-// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
-import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
+// import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -47,7 +47,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   int _selectedItemIndex = -1;
   bool bWaitForCookieset = true;
   bool lastPaymentExpanded = false;
-  // final flutterWebviewPlugin = FlutterWebviewPlugin();
+  final flutterWebviewPlugin = FlutterWebviewPlugin();
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const branch_io_platform =
@@ -68,10 +68,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   void initState() {
     super.initState();
     setPaymentModeList();
-    // flutterWebviewPlugin.launch(
-    //   BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-    //   hidden: true,
-    // );
+    flutterWebviewPlugin.launch(
+      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+      hidden: true,
+    );
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
@@ -927,7 +927,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   @override
   void dispose() {
-    // flutterWebviewPlugin.close();
+    flutterWebviewPlugin.close();
     super.dispose();
   }
 
@@ -975,7 +975,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                     children: <Widget>[
                                       Row(
                                         children: <Widget>[
-                                          Text("Deposit amount"),
+                                          Text("Deposit Amount"),
                                         ],
                                       ),
                                       Padding(
@@ -1007,7 +1007,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                             children: <Widget>[
                                               Row(
                                                 children: <Widget>[
-                                                  Text("Bonus Code Applied"),
+                                                  Text("Bonus Code"),
                                                 ],
                                               ),
                                               Padding(
@@ -1051,7 +1051,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: <Widget>[
-                                                  Text("Total Bonus"),
+                                                  Text("Total Benifits"),
                                                 ],
                                               ),
                                               Padding(

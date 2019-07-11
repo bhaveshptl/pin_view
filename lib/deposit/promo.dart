@@ -17,6 +17,22 @@ class PromoInput extends StatefulWidget {
 class _PromoStateInput extends State<PromoInput> {
   dynamic selectedPromo;
   double bonusAmount = 0.0;
+  bool bShowBonusDistribution = true;
+
+  Map<int, String> mapMonths = {
+    1: "Jan",
+    2: "Feb",
+    3: "Mar",
+    4: "Apr",
+    5: "May",
+    6: "Jun",
+    7: "Jul",
+    8: "Aug",
+    9: "Sep",
+    10: "Oct",
+    11: "Nov",
+    12: "Dec"
+  };
 
   @override
   void initState() {
@@ -49,135 +65,219 @@ class _PromoStateInput extends State<PromoInput> {
   }
 
   Widget getBonusDistribution() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8.0,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade300,
-                      ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.0,
                     ),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text("Min deposit"),
-                      ),
-                      Expanded(
-                        child: Text(strings.rupee +
-                            selectedPromo["minimum"].toString()),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8.0,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text("Bonus Amount"),
-                      ),
-                      Expanded(
-                        child: Text(
-                            selectedPromo["playablePercentage"].toString() +
-                                "%"),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8.0,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text("Locked Bonus"),
-                      ),
-                      Expanded(
-                        child: Text(
-                            selectedPromo["nonPlayablePercentage"].toString() +
-                                "%"),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8.0,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade300,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text("Instant Cash"),
-                      ),
-                      Expanded(
-                        child: Text(
-                            selectedPromo["instantCashPercentage"].toString() +
-                                "%"),
-                      ),
-                    ],
-                  ),
-                ),
-                bonusAmount == 0
-                    ? Container()
-                    : Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.0,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade300,
                         ),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "Each time you play for ${strings.rupee}${getTotalWagerAmount()} you get ${strings.rupee}${getWagerReleaseAmount()} to playable bonus from locked bonus",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .copyWith(
-                                      color: Colors.black,
-                                    ),
+                      ),
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            "Min deposit",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body1
+                                .copyWith(
+                                  color: Colors.black,
+                                ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            strings.rupee + selectedPromo["minimum"].toString(),
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body1
+                                .copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  selectedPromo["playablePercentage"] == 0
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey.shade300,
                               ),
                             ),
-                          ],
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Bonus Amount",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                      ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      selectedPromo["playablePercentage"]
+                                              .toString() +
+                                          "%",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body1
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      )
-              ],
+                  selectedPromo["nonPlayablePercentage"] == 0
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Locked Bonus",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                      ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      selectedPromo["nonPlayablePercentage"]
+                                              .toString() +
+                                          "%",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body1
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                  selectedPromo["instantCashPercentage"] == 0
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Instant Cash",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                      ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  selectedPromo["instantCashPercentage"]
+                                          .toString() +
+                                      "%",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                  bonusAmount == 0
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Each time you play for ${strings.rupee}${getTotalWagerAmount()} you get ${strings.rupee}${getWagerReleaseAmount()} to playable bonus from locked bonus",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Colors.black,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                ],
+              ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 
@@ -193,6 +293,11 @@ class _PromoStateInput extends State<PromoInput> {
         selectedPromo = null;
       });
     }
+  }
+
+  getPromoExpiry(promoCode) {
+    DateTime _date = DateTime.fromMillisecondsSinceEpoch(promoCode["endDate"]);
+    return _date.day.toString() + mapMonths[_date.month];
   }
 
   @override
@@ -214,7 +319,7 @@ class _PromoStateInput extends State<PromoInput> {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        "Apply Pormocode",
+                        "Apply Promocode",
                         style:
                             Theme.of(context).primaryTextTheme.title.copyWith(
                                   color: Colors.black,
@@ -247,6 +352,8 @@ class _PromoStateInput extends State<PromoInput> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: widget.promoCodes.map((promoCode) {
+              bool bPromoSelected = selectedPromo == null ||
+                  selectedPromo["promoCode"] != promoCode["promoCode"];
               return Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: InkWell(
@@ -254,7 +361,9 @@ class _PromoStateInput extends State<PromoInput> {
                     onSelectPromo(promoCode);
                   },
                   child: DottedBorder(
-                    color: Colors.green,
+                    padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 8.0),
+                    color:
+                        !bPromoSelected ? Colors.green : Colors.grey.shade300,
                     child: Column(
                       children: <Widget>[
                         Row(
@@ -265,7 +374,7 @@ class _PromoStateInput extends State<PromoInput> {
                               children: <Widget>[
                                 Container(
                                   height: 40.0,
-                                  width: 40.0,
+                                  width: 32.0,
                                   child: FlatButton(
                                     onPressed: () {
                                       onSelectPromo(promoCode);
@@ -278,19 +387,17 @@ class _PromoStateInput extends State<PromoInput> {
                                           color: (selectedPromo == null ||
                                                   selectedPromo["promoCode"] !=
                                                       promoCode["promoCode"])
-                                              ? Colors.black
+                                              ? Colors.grey.shade300
                                               : Color.fromRGBO(70, 165, 12, 1),
                                           width: 1.0,
                                         ),
                                       ),
                                       padding: EdgeInsets.all(2.0),
-                                      child: (selectedPromo == null ||
-                                              selectedPromo["promoCode"] !=
-                                                  promoCode["promoCode"])
+                                      child: bPromoSelected
                                           ? CircleAvatar(
                                               radius: 6.0,
                                               backgroundColor:
-                                                  Colors.transparent,
+                                                  Colors.grey.shade300,
                                             )
                                           : CircleAvatar(
                                               radius: 6.0,
@@ -304,18 +411,58 @@ class _PromoStateInput extends State<PromoInput> {
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  promoCode["promoCode"],
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      promoCode["promoCode"],
+                                      style: TextStyle(
+                                        color: bPromoSelected
+                                            ? Colors.black
+                                            : Color.fromRGBO(70, 165, 12, 1),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 4.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            "Valid till ${getPromoExpiry(promoCode)}",
+                                            style: TextStyle(
+                                              color: bPromoSelected
+                                                  ? Colors.black
+                                                  : Color.fromRGBO(
+                                                      70, 165, 12, 1),
+                                              fontSize: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .caption
+                                                  .fontSize,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 )
                               ],
                             ),
-                            Icon(
-                              Icons.expand_more,
-                              color: Colors.green,
-                            ),
+                            bShowBonusDistribution
+                                ? Icon(
+                                    bPromoSelected
+                                        ? Icons.expand_more
+                                        : Icons.expand_less,
+                                    color: !bPromoSelected
+                                        ? Colors.green
+                                        : Colors.black,
+                                  )
+                                : Container(),
                           ],
                         ),
-                        selectedPromo != null &&
+                        bShowBonusDistribution &&
+                                selectedPromo != null &&
                                 selectedPromo["promoCode"] ==
                                     promoCode["promoCode"]
                             ? getBonusDistribution()

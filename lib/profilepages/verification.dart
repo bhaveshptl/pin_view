@@ -999,13 +999,13 @@ class VerificationState extends State<Verification> {
 
 class DocVerificationMessages {
   static String DOC_SUBMITTED =
-      "- Address documents have been uploaded successfully. The status will be updated within 2 working days.";
+      "- Address documents have been uploaded successfully. The status will be updated within 4-5 working days.";
   static String VERIFIED = "- You can now make cash withdrawal requests.";
 }
 
 class PanVerificationMessages {
   static String UNDER_REVIEW =
-      "- PAN verification is in progress. The status will be updated within 2 working days.";
+      "- PAN verification is in progress. The status will be updated within 4-5 working days.";
   static String DOC_REJECTED =
       "- Your PAN verification request has been rejected. Please contact customer support for more details.";
   static String VERIFIED = "- Your PAN has been verified successfully.";
@@ -1013,7 +1013,7 @@ class PanVerificationMessages {
 
 class AddressVerificationMessages {
   static String UNDER_REVIEW =
-      "- Address verification is in progress.  The status will be updated within 2 working days.";
+      "- Address verification is in progress.  The status will be updated within 4-5 working days.";
   static String DOC_REJECTED =
       "- Your address verification request has been rejected. Please contact customer support for more details.";
   static String VERIFIED = "- Your address has been verified successfully.";

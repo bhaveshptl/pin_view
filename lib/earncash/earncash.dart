@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/earncash/bonus_distribution.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/analytics.dart';
@@ -54,11 +56,12 @@ class EarnCashState extends State<EarnCash> {
   }
 
   setReferralDetails() async {
-    refCode = widget.data["refCode"];
-    refAAmount = widget.data["amountUserA"];
-    refBAmount = widget.data["amountUserB"];
-    inviteUrl = (widget.data["refLink"] as String).replaceAll("%3d", "=");
-    inviteSteps = widget.data["inviteSteps"];
+    refCode = widget.data["refDetails"]["refCode"];
+    refAAmount = widget.data["refDetails"]["amountUserA"];
+    refBAmount = widget.data["refDetails"]["amountUserB"];
+    inviteUrl =
+        (widget.data["refDetails"]["refLink"] as String).replaceAll("%3d", "=");
+    inviteSteps = widget.data["refDetails"]["inviteSteps"];
 
     /*Web engage Screen Data */
     Map<dynamic, dynamic> screendata = new Map();
@@ -293,19 +296,62 @@ class EarnCashState extends State<EarnCash> {
               child: Row(
                 children: <Widget>[
                   Expanded(
-                    child: Text(
-                      ("For every friends that plays, you both will earn " +
-                          strings.rupee +
-                          refAAmount.toString()),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).primaryTextTheme.body2.copyWith(
-                            color: Colors.black,
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                "For every friends that plays, you both will earn ",
                           ),
+                          TextSpan(
+                            text: strings.rupee + refAAmount.toString(),
+                          ),
+                        ],
+                        style:
+                            Theme.of(context).primaryTextTheme.body2.copyWith(
+                                  color: Colors.black,
+                                ),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
               ),
             ),
+            widget.data["bonusDistribution"] == null ||
+                    widget.data["bonusDistribution"]["referral"] == null ||
+                    widget.data["bonusDistribution"]["referred"] == null
+                ? Container()
+                : InkWell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              "Click here for more info",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    onTap: () async {
+                      final result = await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return BonusDistribution(
+                            amount: refAAmount,
+                            bonusDistribution: widget.data["bonusDistribution"],
+                          );
+                        },
+                      );
+                    },
+                  ),
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Row(

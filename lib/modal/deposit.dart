@@ -1,20 +1,23 @@
 class Deposit {
   String bannerImage;
   bool bAllowRepeatDeposit;
-  ChooseAmountData chooseAmountData;
+  bool bshowBonusDistribution;
   Map<String, dynamic> refreshData;
+  ChooseAmountData chooseAmountData;
 
   Deposit({
     this.bannerImage,
     this.refreshData,
     this.chooseAmountData,
     this.bAllowRepeatDeposit,
+    this.bshowBonusDistribution,
   });
 
   factory Deposit.fromJson(Map<String, dynamic> json) {
     return Deposit(
       bannerImage: json["bannerImage"],
       refreshData: json["refreshData"],
+      bshowBonusDistribution: true, // json["showBonusDistribution"],
       chooseAmountData: ChooseAmountData.fromJson(json["chooseAmountData"]),
       bAllowRepeatDeposit:
           json["repeatAllowed"] == null ? false : json["repeatAllowed"],

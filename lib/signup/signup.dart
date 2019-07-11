@@ -11,7 +11,7 @@ import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
-import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
+// import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
@@ -23,7 +23,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
-// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 class Signup extends StatefulWidget {
   @override
@@ -367,7 +367,7 @@ class SignupState extends State<Signup> {
   _doFacebookLogin(BuildContext context) async {
     showLoader(true);
     var facebookLogin = new FacebookLogin();
-    facebookLogin.loginBehavior = FacebookLoginBehavior.nativeOnly;
+    facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
     var result = await facebookLogin
         .logInWithReadPermissions(['email', 'public_profile']);
 

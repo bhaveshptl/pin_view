@@ -564,6 +564,8 @@ class RouteLauncher {
       } else {
         return null;
       }
+    }).whenComplete(() {
+      return null;
     });
   }
 }
