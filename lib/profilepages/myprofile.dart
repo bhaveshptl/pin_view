@@ -213,14 +213,14 @@ class MyProfileState extends State<MyProfile> {
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        _showMessage("Team name changed successfully.");
         _userProfile.isUserNameChangeAllowed = false;
         _userProfile.teamName = _teamNameController.text;
-        Navigator.of(context).pop();
+        Navigator.pop(context);
+        _showMessage("Team name changed successfully.");
       } else if (res.statusCode >= 400 && res.statusCode <= 499) {
         Map<String, dynamic> response = json.decode(res.body);
         if (response["error"] != null) {
-          Navigator.of(context).pop();
+          Navigator.pop(context);
           _showMessage(response["error"]["erroMessage"]);
         }
       }

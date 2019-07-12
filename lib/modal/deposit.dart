@@ -17,7 +17,7 @@ class Deposit {
     return Deposit(
       bannerImage: json["bannerImage"],
       refreshData: json["refreshData"],
-      bshowBonusDistribution: true, // json["showBonusDistribution"],
+      bshowBonusDistribution: json["showBonusDistribution"],
       chooseAmountData: ChooseAmountData.fromJson(json["chooseAmountData"]),
       bAllowRepeatDeposit:
           json["repeatAllowed"] == null ? false : json["repeatAllowed"],
