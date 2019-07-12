@@ -12,5 +12,8 @@ class Sports {
     6: "DEF",
     7: "MID",
     8: "FRWD",
+    9: "RD",
+    10: "AR",
+    11: "DEF",
   };
 }

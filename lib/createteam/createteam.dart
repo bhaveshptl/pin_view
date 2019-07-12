@@ -61,7 +61,7 @@ class CreateTeamState extends State<CreateTeam>
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
   Map<int, List<Player>> _selectedPlayersByStyleId = {};
-  
+
   int teamAPlayerCount = 0;
   int teamBPlayerCount = 0;
 
@@ -1181,7 +1181,7 @@ class CreateTeamState extends State<CreateTeam>
           ),
           Container(
             height: 72.0,
-            padding:isIos?EdgeInsets.only(bottom: 8.0):null,
+            padding: isIos ? EdgeInsets.only(bottom: 8.0) : null,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [

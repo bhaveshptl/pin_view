@@ -76,6 +76,7 @@ class LobbyState extends State<Lobby>
     _mapSportTypes = {
       "CRICKET": 1,
       "FOOTBALL": 2,
+      "KABADDI": 3,
     };
     _controller = TabController(vsync: this, length: _mapSportTypes.length);
     _getBanners();
