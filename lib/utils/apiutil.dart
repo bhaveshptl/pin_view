@@ -136,8 +136,8 @@ class ApiUtil {
 
 class PrivateAttribution {
   static bool disableBranchIOAttribution = false;
-  static String attributionNumber = "1";
-  static String currentVersion = "2_44";
+  static String attributionNumber = "2";
+  static String currentVersion = "3_46";
   static bool getdisableBranchIOAttribution() {
     return disableBranchIOAttribution;
   }
