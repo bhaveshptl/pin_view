@@ -18,6 +18,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
 import android.util.Log;
 
 import com.howzat.howzatfantasy.MainActivity;
@@ -48,6 +50,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
+      
 
         Map<String, String> webengagedata = remoteMessage.getData();
         if(webengagedata != null) {
@@ -71,7 +74,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
 
-        Boolean isAppOnForeground = isAppOnForeground(this, "com.howzat.howzatfantasy");
+        Boolean isAppOnForeground = false;
         if (!isAppOnForeground) {
             if(webengagedata.containsKey("source") && "webengage".equals(webengagedata.get("source"))) {
                 //WebEngage.get().receive(webengagedata);
@@ -99,12 +102,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void scheduleJob() {
-        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
-        Job myJob = dispatcher.newJobBuilder()
-                .setService(MyJobService.class)
-                .setTag("my-job-tag")
-                .build();
-        dispatcher.schedule(myJob);
+//        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+//        Job myJob = dispatcher.newJobBuilder()
+//                .setService(MyJobService.class)
+//                .setTag("my-job-tag")
+//                .build();
+//        dispatcher.schedule(myJob);
 
     }
 
@@ -131,21 +134,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             //Bitmap pictureBigBitmap = BitmapFactory.decodeResource(getResources(), ic_launcher_round);
 
-            Intent intent = new Intent(this, MainActivity.class);
+          Intent intent = new Intent(MainActivity.applicationContext, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+            PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.applicationContext, 0 /* Request code */, intent,
                     PendingIntent.FLAG_ONE_SHOT);
             String channelId = "fcm_default_channel";
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(MainActivity.applicationContext);
+
+           NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MainActivity.applicationContext, channelId);
             NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
             bigPictureStyle.bigPicture(pictureUrlBitmap);
             bigPictureStyle.setBigContentTitle(body);
-
-            int smallimage=this.getResources().getIdentifier("push_logo", "drawable", "com.howzat.howzatfantasy");
             notificationBuilder
                     .setSmallIcon(R.drawable.notification_icon_small)
                     .setContentTitle(title)
@@ -163,7 +165,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 NotificationChannel channel = new NotificationChannel(channelId,
                         "PlayFantasy",
                         NotificationManager.IMPORTANCE_DEFAULT);
-                notificationManager.createNotificationChannel(channel);
+
             }
 
             notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
