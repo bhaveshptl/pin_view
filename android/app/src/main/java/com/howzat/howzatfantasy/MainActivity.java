@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
-
+import android.content.Context;
 import com.howzat.howzatfantasy.services.DeviceInfo;
 import com.howzat.howzatfantasy.services.MyHelperClass;
 
@@ -71,6 +71,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
     private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
     private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
+    public static Context applicationContext;
 
     MyHelperClass myHeperClass;
     String firebaseToken = "";
@@ -86,11 +87,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        applicationContext=getApplicationContext();
         initPushNotifications();
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
         initFlutterChannels();
         initWebEngage();
+
     }
 
     @Override
