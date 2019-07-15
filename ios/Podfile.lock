@@ -12,10 +12,12 @@ PODS:
   - Branch/Core (0.27.0)
   - device_info (0.0.1):
     - Flutter
-  - FBSDKCoreKit (4.44.1):
+  - FBSDKCoreKit (4.39.1):
     - Bolts (~> 1.9)
-  - FBSDKLoginKit (4.44.1):
+  - FBSDKLoginKit (4.39.1):
     - FBSDKCoreKit
+  - Firebase/Analytics (6.0.0):
+    - Firebase/Core
   - Firebase/Core (6.0.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (= 6.0.0)
@@ -25,6 +27,7 @@ PODS:
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 4.0.0)
   - firebase_analytics (0.0.1):
+    - Firebase/Analytics (~> 6.0)
     - Firebase/Core
     - Flutter
   - firebase_core (0.0.1):
@@ -60,7 +63,8 @@ PODS:
   - flutter_downloader (0.0.1):
     - Flutter
   - flutter_facebook_login (0.0.1):
-    - FBSDKLoginKit (~> 4.29)
+    - FBSDKCoreKit (= 4.39.1)
+    - FBSDKLoginKit (= 4.39.1)
     - Flutter
   - flutter_webview_plugin (0.0.1):
     - Flutter
@@ -124,6 +128,8 @@ PODS:
   - WebEngage (4.6.0):
     - WebEngage/Xcode10 (= 4.6.0)
   - WebEngage/Xcode10 (4.6.0)
+  - webview_flutter (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - android_intent (from `.symlinks/plugins/android_intent/ios`)
@@ -145,6 +151,7 @@ DEPENDENCIES:
   - razorpay-pod (= 1.1.2)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - WebEngage
+  - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -197,17 +204,19 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
+  webview_flutter:
+    :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
   android_intent: 73316069cd1f6aac919df1c6e640cad190fd5e8b
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: e4f2a9c361ebdc960c823d16014c187bf19b508c
   device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
-  FBSDKCoreKit: a823ae35bdb60ebb8d7a7e51abe7c5d87d2bfced
-  FBSDKLoginKit: 54ae59987f2a8703021557c90a9aebb9e5c2bef6
+  FBSDKCoreKit: f442aa96179cc9b382bb4abeb7e340a47cca8f91
+  FBSDKLoginKit: c3079d9a4db27c492287b1eed7a4272b28cf8a59
   Firebase: fa80b9d987ca014a1ba9357496ef2a0178b28b12
-  firebase_analytics: 7fa219488f2a781ca776bf72ecc66b6ac4511272
-  firebase_core: ce5006bb48508ee4e71e0f429a3f519bb8ee2961
+  firebase_analytics: b0d7c086f5a50042153fd0441dafef51bde36cd0
+  firebase_core: 44f31f51532812598f0f9f4af0caa705b9edfc19
   FirebaseAnalytics: 1743c5f4de3687d0745709dfdc4b1dea1484f44c
   FirebaseAnalyticsInterop: efbe45c8385ec626e29f9525e5ebd38520dfb6c1
   FirebaseCore: e38f025287b413255a53acc1945d048a112047f7
@@ -215,7 +224,7 @@ SPEC CHECKSUMS:
   FirebaseMessaging: c796d50864dc822a3c06c9c1c1444b37732b795b
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   flutter_downloader: 058b9c41564a90500f67f3e432e3524613a7fd83
-  flutter_facebook_login: 8570fe85a9b988b19503530a85bfce2b3b847145
+  flutter_facebook_login: be61e24a4b7d621515353c6b4583d1981bdaa3d6
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   google_sign_in: 27e70a98b529f0b076d4b19f231b81da28b1750b
   GoogleAppMeasurement: 7f028ea162b72c8f326daec74afc95d94f7a47d6
@@ -223,7 +232,7 @@ SPEC CHECKSUMS:
   GoogleToolboxForMac: b3553629623a3b1bff17f555e736cd5a6d95ad55
   GoogleUtilities: 84df567c76ca84f67b7bb40e769fdd4acc746a10
   GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
-  image_picker: a211f28b95a560433c00f5cd3773f4710a20404d
+  image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
@@ -232,6 +241,7 @@ SPEC CHECKSUMS:
   razorpay-pod: bd7b4bfedd59002e7c30d96dd71fe31e740f2bcf
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
   WebEngage: 122738dc25a70f81fb811f8449ad26495cf13f4b
+  webview_flutter: 1aa7604e6cdb451a9b7ed2c37d5454c0b440246b
 
 PODFILE CHECKSUM: a3cdbe57900acfdcc1ec1f0e37b7ba00abfc31de
 
