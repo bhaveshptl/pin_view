@@ -126,11 +126,11 @@ class _ViewTeamState extends State<ViewTeam> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: widget.l1Data,
-              selectedTeam: getTeam(),
-              mode: TeamCreationMode.EDIT_TEAM,
-            ),
+          league: widget.league,
+          l1Data: widget.l1Data,
+          selectedTeam: getTeam(),
+          mode: TeamCreationMode.EDIT_TEAM,
+        ),
       ),
     );
 
@@ -145,15 +145,15 @@ class _ViewTeamState extends State<ViewTeam> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: widget.l1Data,
-              selectedTeam: MyTeam.fromJson(
-                json.decode(
-                  json.encode(getTeam()),
-                ),
-              ),
-              mode: TeamCreationMode.CLONE_TEAM,
+          league: widget.league,
+          l1Data: widget.l1Data,
+          selectedTeam: MyTeam.fromJson(
+            json.decode(
+              json.encode(getTeam()),
             ),
+          ),
+          mode: TeamCreationMode.CLONE_TEAM,
+        ),
       ),
     );
     if (result != null) {
@@ -259,16 +259,18 @@ class _ViewTeamState extends State<ViewTeam> {
                                   backgroundColor: Colors.black12,
                                   child: CachedNetworkImage(
                                     imageUrl: _player.jerseyUrl,
-                                    placeholder: Container(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.0,
+                                    placeholder: (context, string) {
+                                      return Container(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                          ),
                                         ),
-                                      ),
-                                      width: TEAM_LOGO_HEIGHT,
-                                      height: TEAM_LOGO_HEIGHT,
-                                    ),
+                                        width: TEAM_LOGO_HEIGHT,
+                                        height: TEAM_LOGO_HEIGHT,
+                                      );
+                                    },
                                     height: TEAM_LOGO_HEIGHT,
                                   ),
                                 ),

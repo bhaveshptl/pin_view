@@ -95,7 +95,7 @@ class ApiUtil {
   static const GET_ACCOUNT_DETAILS = "/api/account/overview";
   static const PARTNER_REQUEST = "/api/ups/partner-request";
   static const DEPOSIT_INFO = "/api/v2/payment/player/deposit/v3";
-  static const PAYMENT_MODE = "/api/v2/payment/player/deposit/proceed/v2";
+  static const PAYMENT_MODE = "/api/v2/payment/player/deposit/proceed/v3";
   static const VALIDATE_PROMO = "/api/v2/payment/player/deposit/validate/promo";
   static const VALIDATE_PROMO_V2 =
       "/api/v2/payment/player/deposit/validate/promo/v2";

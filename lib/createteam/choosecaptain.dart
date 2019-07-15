@@ -332,13 +332,15 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                                       backgroundColor: Colors.black12,
                                       child: CachedNetworkImage(
                                         imageUrl: _player.jerseyUrl,
-                                        placeholder: Container(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                          ),
-                                          width: teamLogoHeight,
-                                          height: teamLogoHeight,
-                                        ),
+                                        placeholder: (context, string) {
+                                          return Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                            ),
+                                            width: teamLogoHeight,
+                                            height: teamLogoHeight,
+                                          );
+                                        },
                                         height: teamLogoHeight,
                                       ),
                                     ),
@@ -513,7 +515,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
           ),
           Container(
             height: 72.0,
-            padding:isIos?EdgeInsets.only(bottom: 8.0):null,
+            padding: isIos ? EdgeInsets.only(bottom: 8.0) : null,
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -548,20 +550,18 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                             FantasyPageRoute(
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
-                                    league: widget.league,
-                                    l1Data: widget.l1Data,
-                                    allowEditTeam: false,
-                                    fanTeamRules:
-                                        widget.l1Data.league.fanTeamRules,
-                                    myTeam: MyTeam(
-                                      captain:
-                                          _captain == null ? null : _captain.id,
-                                      viceCaptain: _vCaptain == null
-                                          ? null
-                                          : _vCaptain.id,
-                                      players: sortedPlayers,
-                                    ),
-                                  ),
+                                league: widget.league,
+                                l1Data: widget.l1Data,
+                                allowEditTeam: false,
+                                fanTeamRules: widget.l1Data.league.fanTeamRules,
+                                myTeam: MyTeam(
+                                  captain:
+                                      _captain == null ? null : _captain.id,
+                                  viceCaptain:
+                                      _vCaptain == null ? null : _vCaptain.id,
+                                  players: sortedPlayers,
+                                ),
+                              ),
                             ),
                           );
                         },

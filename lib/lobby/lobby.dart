@@ -7,9 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
-// import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -26,7 +25,6 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
-import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
@@ -73,11 +71,7 @@ class LobbyState extends State<Lobby>
     if (Platform.isIOS) {
       isIos = true;
     }
-    _mapSportTypes = {
-      "CRICKET": 1,
-      "FOOTBALL": 2,
-      "KABADDI": 3,
-    };
+    _mapSportTypes = sports.mapSports;
     _controller = TabController(vsync: this, length: _mapSportTypes.length);
     _getBanners();
     _getSportsType();

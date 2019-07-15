@@ -28,11 +28,11 @@ class TeamPreview extends StatelessWidget {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: league,
-              l1Data: l1Data,
-              selectedTeam: myTeam,
-              mode: TeamCreationMode.EDIT_TEAM,
-            ),
+          league: league,
+          l1Data: l1Data,
+          selectedTeam: myTeam,
+          mode: TeamCreationMode.EDIT_TEAM,
+        ),
       ),
     );
 
@@ -190,6 +190,98 @@ class TeamPreview extends StatelessWidget {
     }
   }
 
+  getSportsPlayersUI(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: league.status == LeagueStatus.UPCOMING ? 32.0 : 0.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          getPlayingStyleLabel(playingStyle.label),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white54,
+                                fontWeight: FontWeight.w700,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: getPlayersForStyle(playingStyle, context),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  getKabaddiPlayersUI(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: league.status == LeagueStatus.UPCOMING ? 32.0 : 0.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          getPlayingStyleLabel(playingStyle.label),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subhead
+                              .copyWith(
+                                color: Colors.white54,
+                                fontWeight: FontWeight.w700,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: getPlayersForStyle(playingStyle, context),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     bool bIsSmallDevice = MediaQuery.of(context).size.height < 720;
@@ -201,7 +293,10 @@ class TeamPreview extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("images/ground-image.png"),
+                image: AssetImage(
+                    this.l1Data.league.rounds[0].matches[0].sportType == 3
+                        ? "images/kabaddi-ground-image.png"
+                        : "images/ground-image.png"),
                 fit: BoxFit.fill,
               ),
             ),
@@ -209,146 +304,126 @@ class TeamPreview extends StatelessWidget {
         ),
         ScaffoldPage(
           backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            elevation: 0.0,
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.transparent,
-            title:
-                Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
-            actions: <Widget>[
-              allowEditTeam && league.status == LeagueStatus.UPCOMING
-                  ? IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        _onEditTeam(context);
-                      },
-                    )
-                  : Container(),
-              IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          ),
           body: Column(
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.only(
-                    bottom:
-                        bIsSmallDevice ? 4.0 : (bIsMediumDevice ? 8.0 : 12.0),
-                    top: bIsSmallDevice ? 0.0 : (bIsMediumDevice ? 6.0 : 8.0)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SvgPicture.asset(
-                      "images/logo_white.svg",
-                      color: Colors.white30,
-                      width: 32.0,
-                      height: bIsSmallDevice ? 24.0 : 56.0,
-                    ),
-                    // Image.asset(
-                    //   "images/logo_white.png",
-                    //   color: Colors.white30,
-                    //   height: bIsSmallDevice ? 24.0 : 56.0,
-                    // ),
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Image.asset(
-                        "images/logo_name_white.png",
+              Expanded(
+                flex: 232,
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: EdgeInsets.only(
+                      bottom:
+                          bIsSmallDevice ? 4.0 : (bIsMediumDevice ? 8.0 : 12.0),
+                      top:
+                          bIsSmallDevice ? 0.0 : (bIsMediumDevice ? 6.0 : 8.0)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      SvgPicture.asset(
+                        "images/logo_white.svg",
                         color: Colors.white30,
-                        height: bIsSmallDevice ? 18.0 : 30.0,
+                        width: 32.0,
+                        height: bIsSmallDevice ? 24.0 : 56.0,
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Image.asset(
+                          "images/logo_name_white.png",
+                          color: Colors.white30,
+                          height: bIsSmallDevice ? 18.0 : 30.0,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: league.status == LeagueStatus.UPCOMING ? 32.0 : 0.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:
-                        fanTeamRules.styles.map((PlayingStyle playingStyle) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10.0),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: Text(
-                                    getPlayingStyleLabel(playingStyle.label),
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .copyWith(
-                                          color: Colors.white54,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                    textAlign: TextAlign.center,
+                flex: 1688,
+                child: Column(
+                  children: <Widget>[
+                    this.l1Data.league.rounds[0].matches[0].sportType == 3
+                        ? getKabaddiPlayersUI(context)
+                        : getSportsPlayersUI(context),
+                    league.status == LeagueStatus.COMPLETED
+                        ? Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(
+                                  height: bIsMediumDevice
+                                      ? 56.0
+                                      : bIsSmallDevice ? 48.0 : 64.0,
+                                  color: Colors.grey.shade700,
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        myTeam.score.toString(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .headline
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                      ),
+                                      Text(
+                                        "Total Points".toUpperCase(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.grey.shade400,
+                                            ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children:
-                                    getPlayersForStyle(playingStyle, context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                              )
+                            ],
+                          )
+                        : Container(),
+                  ],
                 ),
               ),
-              league.status == LeagueStatus.COMPLETED
-                  ? Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            height: bIsMediumDevice
-                                ? 56.0
-                                : bIsSmallDevice ? 48.0 : 64.0,
-                            color: Colors.grey.shade700,
-                            padding: EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  myTeam.score.toString(),
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .headline
-                                      .copyWith(
-                                        color: Colors.white,
-                                      ),
-                                ),
-                                Text(
-                                  "Total Points".toUpperCase(),
-                                  style: Theme.of(context)
-                                      .primaryTextTheme
-                                      .title
-                                      .copyWith(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                ),
-                              ],
-                            ),
+            ],
+          ),
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints.tight(
+            Size.fromHeight(72.0 + kToolbarHeight),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
+              Row(
+                children: <Widget>[
+                  allowEditTeam && league.status == LeagueStatus.UPCOMING
+                      ? FlatButton(
+                          // icon: Icon(Icons.edit),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
                           ),
+                          onPressed: () {
+                            _onEditTeam(context);
+                          },
                         )
-                      ],
-                    )
-                  : Container(),
+                      : Container(),
+                  FlatButton(
+                    // icon: Icon(Icons.close),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              )
             ],
           ),
         ),

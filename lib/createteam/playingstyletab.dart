@@ -229,14 +229,16 @@ class PlayingStyleTab extends StatelessWidget {
                                 backgroundColor: Colors.black12,
                                 child: CachedNetworkImage(
                                   imageUrl: _player.jerseyUrl,
-                                  placeholder: Container(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                    ),
-                                    width: teamLogoHeight,
-                                    height: teamLogoHeight,
-                                  ),
+                                  placeholder: (context, string) {
+                                    return Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                      ),
+                                      width: teamLogoHeight,
+                                      height: teamLogoHeight,
+                                    );
+                                  },
                                   height: teamLogoHeight,
                                 ),
                               ),

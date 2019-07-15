@@ -17,9 +17,9 @@ dependencies:
     sdk: flutter  
   http: ^0.12.0
   intl: ^0.15.8
-  flushbar: 1.5.3
+  flushbar: 1.7.1
   device_info: ^0.3.0
-  flutter_svg: ^0.8.2
+  flutter_svg: 0.13.1
   package_info: 0.3.2+1
   dotted_border: ^0.1.1
   image_picker: 0.5.4
@@ -29,7 +29,7 @@ dependencies:
   animated_text_kit: ^1.2.0
   shared_preferences: 0.4.3
   web_socket_channel: ^1.0.9
-  cached_network_image: ^0.5.0
+  cached_network_image: 1.1.0
   flutter_facebook_login: 2.0.1  
   firebase_analytics: 3.0.3
   firebase_core: 0.4.0+6

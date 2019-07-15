@@ -499,15 +499,15 @@ class CreateTeamState extends State<CreateTeam>
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ChooseCaptain(
-              captain: _captain,
-              l1Data: widget.l1Data,
-              league: widget.league,
-              viceCaptain: _vCaptain,
-              onSave: _onSaveCaptains,
-              fanTeamRules: _fanTeamRules,
-              mapSportLabel: Sports.styles,
-              selectedPlayers: _selectedPlayers,
-            ),
+          captain: _captain,
+          l1Data: widget.l1Data,
+          league: widget.league,
+          viceCaptain: _vCaptain,
+          onSave: _onSaveCaptains,
+          fanTeamRules: _fanTeamRules,
+          mapSportLabel: sports.playingStyles,
+          selectedPlayers: _selectedPlayers,
+        ),
       ),
     );
   }
@@ -524,7 +524,7 @@ class CreateTeamState extends State<CreateTeam>
     for (PlayingStyle style in _playingStyles) {
       tabs.add(
         Tab(
-          text: Sports.styles[style.id] +
+          text: sports.playingStyles[style.id] +
               "(" +
               (_selectedPlayersByStyleId[style.id] == null
                   ? 0.toString()
@@ -562,7 +562,7 @@ class CreateTeamState extends State<CreateTeam>
           league: widget.league,
           l1Data: widget.l1Data,
           allPlayers: allPlayers,
-          mapSportLabel: Sports.styles,
+          mapSportLabel: sports.playingStyles,
           onPlayerSelect: _selectPlayer,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
         ),
@@ -944,14 +944,17 @@ class CreateTeamState extends State<CreateTeam>
                                                 ? widget.league.teamA.logoUrl
                                                 : "",
                                             fit: BoxFit.fitHeight,
-                                            placeholder: Container(
-                                              padding: EdgeInsets.all(12.0),
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2.0,
-                                              ),
-                                              width: TEAM_LOGO_HEIGHT,
-                                              height: TEAM_LOGO_HEIGHT,
-                                            ),
+                                            placeholder: (context, string) {
+                                              return Container(
+                                                padding: EdgeInsets.all(12.0),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2.0,
+                                                ),
+                                                width: TEAM_LOGO_HEIGHT,
+                                                height: TEAM_LOGO_HEIGHT,
+                                              );
+                                            },
                                             height: TEAM_LOGO_HEIGHT,
                                             width: TEAM_LOGO_HEIGHT,
                                           ),
@@ -1047,14 +1050,17 @@ class CreateTeamState extends State<CreateTeam>
                                                 ? widget.league.teamB.logoUrl
                                                 : "",
                                             fit: BoxFit.fitHeight,
-                                            placeholder: Container(
-                                              padding: EdgeInsets.all(12.0),
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2.0,
-                                              ),
-                                              width: TEAM_LOGO_HEIGHT,
-                                              height: TEAM_LOGO_HEIGHT,
-                                            ),
+                                            placeholder: (context, string) {
+                                              return Container(
+                                                padding: EdgeInsets.all(12.0),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2.0,
+                                                ),
+                                                width: TEAM_LOGO_HEIGHT,
+                                                height: TEAM_LOGO_HEIGHT,
+                                              );
+                                            },
                                             height: TEAM_LOGO_HEIGHT,
                                             width: TEAM_LOGO_HEIGHT,
                                           ),
@@ -1217,14 +1223,14 @@ class CreateTeamState extends State<CreateTeam>
                             FantasyPageRoute(
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
-                                    league: widget.league,
-                                    l1Data: widget.l1Data,
-                                    allowEditTeam: false,
-                                    fanTeamRules: _fanTeamRules,
-                                    myTeam: MyTeam(
-                                      players: _selectedPlayers,
-                                    ),
-                                  ),
+                                league: widget.league,
+                                l1Data: widget.l1Data,
+                                allowEditTeam: false,
+                                fanTeamRules: _fanTeamRules,
+                                myTeam: MyTeam(
+                                  players: _selectedPlayers,
+                                ),
+                              ),
                             ),
                           );
                         },

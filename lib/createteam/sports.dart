@@ -1,9 +1,17 @@
+Sports sports = Sports();
+
 class Sports {
   Sports._internal();
   static final Sports sport = Sports._internal();
   factory Sports() => sport;
 
-  static Map<int, String> styles = {
+  Map<String, int> mapSports = {
+    "CRICKET": 1,
+    "FOOTBALL": 2,
+    "KABADDI": 3,
+  };
+
+  Map<int, String> playingStyles = {
     1: "WK",
     2: "BAT",
     3: "BOWL",

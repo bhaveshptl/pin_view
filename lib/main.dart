@@ -21,8 +21,8 @@ disableDeviceRotation() {
 ///
 void main() async {
   String channelId = "10";
-  const apiBaseUrl = "https://beta.howzat.com";
-  String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
+  const apiBaseUrl = "https://stage.howzat.com";
+  String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
 
   disableDeviceRotation();
 

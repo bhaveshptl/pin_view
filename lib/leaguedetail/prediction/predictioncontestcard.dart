@@ -68,14 +68,16 @@ class PredictionContestCard extends StatelessWidget {
                           CachedNetworkImage(
                             imageUrl: contest.brand["brandLogoUrl"],
                             width: 32.0,
-                            placeholder: Container(
-                              padding: EdgeInsets.all(4.0),
-                              width: 32.0,
-                              height: 32.0,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.0,
-                              ),
-                            ),
+                            placeholder: (context, string) {
+                              return Container(
+                                padding: EdgeInsets.all(4.0),
+                                width: 32.0,
+                                height: 32.0,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

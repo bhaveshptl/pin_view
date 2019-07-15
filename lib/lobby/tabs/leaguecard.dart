@@ -95,14 +95,16 @@ class LeagueCard extends StatelessWidget {
                                             ? _league.teamA.logoUrl
                                             : "",
                                         fit: BoxFit.fitHeight,
-                                        placeholder: Container(
-                                          padding: EdgeInsets.all(12.0),
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                          ),
-                                          width: TEAM_LOGO_HEIGHT,
-                                          height: TEAM_LOGO_HEIGHT,
-                                        ),
+                                        placeholder: (context, string) {
+                                          return Container(
+                                            padding: EdgeInsets.all(12.0),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                            ),
+                                            width: TEAM_LOGO_HEIGHT,
+                                            height: TEAM_LOGO_HEIGHT,
+                                          );
+                                        },
                                         height: TEAM_LOGO_HEIGHT,
                                         width: TEAM_LOGO_HEIGHT,
                                       ),
@@ -209,14 +211,16 @@ class LeagueCard extends StatelessWidget {
                                             ? _league.teamB.logoUrl
                                             : "",
                                         fit: BoxFit.fitHeight,
-                                        placeholder: Container(
-                                          padding: EdgeInsets.all(4.0),
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                          ),
-                                          width: TEAM_LOGO_HEIGHT,
-                                          height: TEAM_LOGO_HEIGHT,
-                                        ),
+                                        placeholder: (context, string) {
+                                          return Container(
+                                            padding: EdgeInsets.all(4.0),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                            ),
+                                            width: TEAM_LOGO_HEIGHT,
+                                            height: TEAM_LOGO_HEIGHT,
+                                          );
+                                        },
                                         height: TEAM_LOGO_HEIGHT,
                                         width: TEAM_LOGO_HEIGHT,
                                       ),

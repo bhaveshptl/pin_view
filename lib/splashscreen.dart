@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/profilepages/update.dart';
 import 'package:playfantasy/signup/signup.dart';
@@ -285,10 +286,32 @@ class SplashScreenState extends State<SplashScreen>
     BaseUrl().setWebSocketUrl(initData["websocketUrl"]);
     BaseUrl().setContestShareUrl(initData["contestShareUrl"]);
     BaseUrl().setStaticPageUrl(initData["staticPageUrls"]);
+    sports.mapSports = getMapSports(initData);
+    sports.playingStyles = getMapPlayingStyle(initData);
 
     SharedPrefHelper()
         .saveToSharedPref(ApiUtil.KEY_INIT_DATA, json.encode(initData));
     HttpManager.channelId = widget.channelId;
+  }
+
+  getMapSports(Map<String, dynamic> initData) {
+    Map<String, int> mapSports = {};
+    (initData["sports"] as Map<String, dynamic>).keys.forEach((key) {
+      mapSports[key] = initData["sports"][key];
+    });
+
+    return mapSports;
+  }
+
+  getMapPlayingStyle(Map<String, dynamic> initData) {
+    Map<int, String> mapSports = {};
+    (initData["playingStyleLabels"] as Map<String, dynamic>)
+        .keys
+        .forEach((key) {
+      mapSports[int.parse(key)] = initData["playingStyleLabels"][key];
+    });
+
+    return mapSports;
   }
 
   _showUpdatingAppDialog(String url,

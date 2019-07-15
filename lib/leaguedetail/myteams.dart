@@ -21,7 +21,6 @@ class MyTeams extends StatefulWidget {
   final L1 l1Data;
   final League league;
   final List<MyTeam> myTeams;
-  
 
   MyTeams({this.league, this.l1Data, this.myTeams});
 
@@ -66,9 +65,9 @@ class MyTeamsState extends State<MyTeams> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: widget.l1Data,
-            ),
+          league: widget.league,
+          l1Data: widget.l1Data,
+        ),
       ),
     );
 
@@ -83,11 +82,11 @@ class MyTeamsState extends State<MyTeams> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: widget.l1Data,
-              selectedTeam: team,
-              mode: TeamCreationMode.EDIT_TEAM,
-            ),
+          league: widget.league,
+          l1Data: widget.l1Data,
+          selectedTeam: team,
+          mode: TeamCreationMode.EDIT_TEAM,
+        ),
       ),
     );
 
@@ -101,15 +100,15 @@ class MyTeamsState extends State<MyTeams> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: widget.l1Data,
-              selectedTeam: MyTeam.fromJson(
-                json.decode(
-                  json.encode(team),
-                ),
-              ),
-              mode: TeamCreationMode.CLONE_TEAM,
+          league: widget.league,
+          l1Data: widget.l1Data,
+          selectedTeam: MyTeam.fromJson(
+            json.decode(
+              json.encode(team),
             ),
+          ),
+          mode: TeamCreationMode.CLONE_TEAM,
+        ),
       ),
     );
     if (result != null) {
@@ -147,7 +146,7 @@ class MyTeamsState extends State<MyTeams> {
     rules.styles.forEach((PlayingStyle style) {
       styleCount.add(
         Text(
-          Sports.styles[style.id] +
+          sports.playingStyles[style.id] +
               " : " +
               mapTeams[style.id].length.toString(),
           style: Theme.of(context).primaryTextTheme.subhead.copyWith(
@@ -215,13 +214,12 @@ class MyTeamsState extends State<MyTeams> {
                         Navigator.of(context).push(
                           FantasyPageRoute(
                             pageBuilder: (BuildContext context) => TeamPreview(
-                                  myTeam: team,
-                                  allowEditTeam: true,
-                                  league: widget.league,
-                                  l1Data: widget.l1Data,
-                                  fanTeamRules:
-                                      widget.l1Data.league.fanTeamRules,
-                                ),
+                              myTeam: team,
+                              allowEditTeam: true,
+                              league: widget.league,
+                              l1Data: widget.l1Data,
+                              fanTeamRules: widget.l1Data.league.fanTeamRules,
+                            ),
                           ),
                         );
                       },
@@ -355,16 +353,21 @@ class MyTeamsState extends State<MyTeams> {
                                                     child: CachedNetworkImage(
                                                       imageUrl:
                                                           captain.jerseyUrl,
-                                                      placeholder: Container(
-                                                        padding:
-                                                            EdgeInsets.all(8.0),
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                          strokeWidth: 2.0,
-                                                        ),
-                                                        width: teamLogoHeight,
-                                                        height: teamLogoHeight,
-                                                      ),
+                                                      placeholder:
+                                                          (context, string) {
+                                                        return Container(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  8.0),
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            strokeWidth: 2.0,
+                                                          ),
+                                                          width: teamLogoHeight,
+                                                          height:
+                                                              teamLogoHeight,
+                                                        );
+                                                      },
                                                       height: teamLogoHeight,
                                                     ),
                                                   ),
@@ -434,15 +437,19 @@ class MyTeamsState extends State<MyTeams> {
                                                       child: CachedNetworkImage(
                                                         imageUrl:
                                                             vCaptain.jerseyUrl,
-                                                        placeholder: Container(
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            strokeWidth: 2.0,
-                                                          ),
-                                                          width: teamLogoHeight,
-                                                          height:
-                                                              teamLogoHeight,
-                                                        ),
+                                                        placeholder:
+                                                            (context, string) {
+                                                          return Container(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                              strokeWidth: 2.0,
+                                                            ),
+                                                            width:
+                                                                teamLogoHeight,
+                                                            height:
+                                                                teamLogoHeight,
+                                                          );
+                                                        },
                                                         height: teamLogoHeight,
                                                       ),
                                                     ),
@@ -543,7 +550,7 @@ class MyTeamsState extends State<MyTeams> {
                   padding: EdgeInsets.symmetric(vertical: 8.0),
                   child: Container(
                     height: 56.0,
-                    padding:isIos?EdgeInsets.only(bottom: 7.0):null,
+                    padding: isIos ? EdgeInsets.only(bottom: 7.0) : null,
                     width: MediaQuery.of(context).size.width / 2,
                     child: ColorButton(
                       color: Colors.orange,
