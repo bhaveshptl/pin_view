@@ -37,7 +37,34 @@ class _PromoStateInput extends State<PromoInput> {
   @override
   void initState() {
     super.initState();
-    selectedPromo = widget.selectedPromo;
+    if (widget.selectedPromo == null && widget.amount > 0) {
+      var promoCodeToSelect;
+      double selectedPromoBonus = 0;
+      widget.promoCodes.forEach((promo) {
+        double bonusAmount = getBonusAmountForPromo(promo);
+        if (bonusAmount > 0 && bonusAmount > selectedPromoBonus) {
+          promoCodeToSelect = promo;
+          selectedPromoBonus = bonusAmount;
+        }
+      });
+      selectedPromo = promoCodeToSelect;
+    } else {
+      selectedPromo = widget.selectedPromo;
+    }
+    if (selectedPromo != null) {
+      setBonusAmount();
+    }
+  }
+
+  getBonusAmountForPromo(promoCode) {
+    double customAmountBonus = widget.amount * promoCode["percentage"] / 100;
+
+    if (promoCode == null || widget.amount < promoCode["minimum"]) {
+      customAmountBonus = 0.0;
+    } else if (customAmountBonus > promoCode["maximum"]) {
+      customAmountBonus = (promoCode["maximum"]).toDouble();
+    }
+    return customAmountBonus;
   }
 
   setBonusAmount() {
@@ -65,6 +92,8 @@ class _PromoStateInput extends State<PromoInput> {
   }
 
   Widget getBonusDistribution() {
+    int totalWagerAmount = getTotalWagerAmount();
+    int wagerReleaseAmount = getWagerReleaseAmount();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
@@ -74,6 +103,52 @@ class _PromoStateInput extends State<PromoInput> {
               padding: EdgeInsets.symmetric(horizontal: 8.0),
               child: Column(
                 children: <Widget>[
+                  selectedPromo["percentage"] == 0
+                      ? Container()
+                      : Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.0,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey.shade300,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Total Benefits",
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                      ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      selectedPromo["percentage"].toString() +
+                                          "%",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body1
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                   Container(
                     padding: EdgeInsets.symmetric(
                       vertical: 8.0,
@@ -101,6 +176,45 @@ class _PromoStateInput extends State<PromoInput> {
                         Expanded(
                           child: Text(
                             strings.rupee + selectedPromo["minimum"].toString(),
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body1
+                                .copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.0,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            "Max Benefits",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .body1
+                                .copyWith(
+                                  color: Colors.black,
+                                ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            strings.rupee + selectedPromo["maximum"].toString(),
                             style: Theme.of(context)
                                 .primaryTextTheme
                                 .body1
@@ -250,7 +364,8 @@ class _PromoStateInput extends State<PromoInput> {
                             ],
                           ),
                         ),
-                  bonusAmount == 0
+                  bonusAmount == 0 ||
+                          !(totalWagerAmount > 0 && wagerReleaseAmount > 0)
                       ? Container()
                       : Container(
                           padding: EdgeInsets.symmetric(
@@ -260,7 +375,7 @@ class _PromoStateInput extends State<PromoInput> {
                             children: <Widget>[
                               Expanded(
                                 child: Text(
-                                  "Each time you play for ${strings.rupee}${getTotalWagerAmount()} you get ${strings.rupee}${getWagerReleaseAmount()} to playable bonus from locked bonus",
+                                  "Each time you play for ${strings.rupee}${totalWagerAmount.toString()} you get ${strings.rupee}${wagerReleaseAmount.toString()} to playable bonus from locked bonus",
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .caption

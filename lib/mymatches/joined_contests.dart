@@ -41,7 +41,7 @@ class JoinedContests extends StatefulWidget {
 }
 
 class JoinedContestsState extends State<JoinedContests>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   L1 _l1Data;
   List<MyTeam> _myTeams;
   List<MySheet> _mySheets;
@@ -317,14 +317,13 @@ class JoinedContestsState extends State<JoinedContests>
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ContestDetail(
-              contest: contest,
-              league: league,
-              l1Data: _l1Data,
-              myTeams: _myTeams,
-              mapContestTeams: _mapContestTeams != null
-                  ? _mapContestTeams[contest.id]
-                  : null,
-            ),
+          contest: contest,
+          league: league,
+          l1Data: _l1Data,
+          myTeams: _myTeams,
+          mapContestTeams:
+              _mapContestTeams != null ? _mapContestTeams[contest.id] : null,
+        ),
       ),
     );
   }
@@ -333,14 +332,13 @@ class JoinedContestsState extends State<JoinedContests>
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => PredictionContestDetail(
-              contest: contest,
-              league: league,
-              predictionData: _predictionData,
-              mySheets: _mySheets,
-              mapContestSheets: _mapContestSheets != null
-                  ? _mapContestSheets[contest.id]
-                  : null,
-            ),
+          contest: contest,
+          league: league,
+          predictionData: _predictionData,
+          mySheets: _mySheets,
+          mapContestSheets:
+              _mapContestSheets != null ? _mapContestSheets[contest.id] : null,
+        ),
       ),
     );
   }
@@ -423,10 +421,10 @@ class JoinedContestsState extends State<JoinedContests>
       var result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => CreateTeam(
-                league: widget.league,
-                l1Data: _l1Data,
-                mode: TeamCreationMode.CREATE_TEAM,
-              ),
+            league: widget.league,
+            l1Data: _l1Data,
+            mode: TeamCreationMode.CREATE_TEAM,
+          ),
         ),
       );
 
@@ -458,7 +456,7 @@ class JoinedContestsState extends State<JoinedContests>
               Contest contest = _myContests.normal[index];
               bool bShowBrandInfo = index > 0
                   ? !(contest.brand["info"] ==
-                      _myContests.normal[index].brand["info"])
+                      _myContests.normal[index - 1].brand["info"])
                   : true;
 
               return Padding(
@@ -542,10 +540,10 @@ class JoinedContestsState extends State<JoinedContests>
         result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateContest(
-                  l1data: _l1Data,
-                  myTeams: _myTeams,
-                  league: widget.league,
-                ),
+              l1data: _l1Data,
+              myTeams: _myTeams,
+              league: widget.league,
+            ),
           ),
         );
         break;
@@ -553,10 +551,10 @@ class JoinedContestsState extends State<JoinedContests>
         result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => MyTeams(
-                  l1Data: _l1Data,
-                  myTeams: _myTeams,
-                  league: widget.league,
-                ),
+              l1Data: _l1Data,
+              myTeams: _myTeams,
+              league: widget.league,
+            ),
           ),
         );
         break;
@@ -564,10 +562,10 @@ class JoinedContestsState extends State<JoinedContests>
         result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => MySheets(
-                  predictionData: _predictionData,
-                  mySheets: _mySheets,
-                  league: widget.league,
-                ),
+              predictionData: _predictionData,
+              mySheets: _mySheets,
+              league: widget.league,
+            ),
           ),
         );
     }

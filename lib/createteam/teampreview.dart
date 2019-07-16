@@ -185,6 +185,12 @@ class TeamPreview extends StatelessWidget {
         return "Bowlers".toUpperCase();
       case "All Rounder":
         return "All Rounders".toUpperCase();
+      case "Raider":
+        return "Raiders".toUpperCase();
+      case "Defender":
+        return "Defenders".toUpperCase();
+      case "All-Rounder":
+        return "All Rounders".toUpperCase();
       default:
         return label.toUpperCase();
     }
@@ -237,16 +243,18 @@ class TeamPreview extends StatelessWidget {
   }
 
   getKabaddiPlayersUI(BuildContext context) {
+    int i = 0;
+    List<int> flexList = [570, 570, 390];
+    List<Color> colors = [Colors.black12, Colors.black26, Colors.black38];
     return Expanded(
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: league.status == LeagueStatus.UPCOMING ? 32.0 : 0.0,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: fanTeamRules.styles.map((PlayingStyle playingStyle) {
+          i++;
+          return Expanded(
+            flex: flexList[i - 1],
+            child: Container(
+              padding: EdgeInsets.only(top: 8.0),
               child: Column(
                 children: <Widget>[
                   Row(
@@ -275,9 +283,9 @@ class TeamPreview extends StatelessWidget {
                   ),
                 ],
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -286,6 +294,8 @@ class TeamPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     bool bIsSmallDevice = MediaQuery.of(context).size.height < 720;
     bool bIsMediumDevice = MediaQuery.of(context).size.height < 1080;
+
+    bool bIsKabaddi = this.l1Data.league.rounds[0].matches[0].sportType == 3;
     return Stack(
       children: <Widget>[
         ConstrainedBox(
@@ -293,10 +303,9 @@ class TeamPreview extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    this.l1Data.league.rounds[0].matches[0].sportType == 3
-                        ? "images/kabaddi-ground-image.png"
-                        : "images/ground-image.png"),
+                image: AssetImage(bIsKabaddi
+                    ? "images/kabaddi-ground-image.png"
+                    : "images/ground-image.png"),
                 fit: BoxFit.fill,
               ),
             ),
@@ -307,7 +316,7 @@ class TeamPreview extends StatelessWidget {
           body: Column(
             children: <Widget>[
               Expanded(
-                flex: 232,
+                flex: !bIsKabaddi ? 320 : 388,
                 child: Container(
                   alignment: Alignment.bottomCenter,
                   padding: EdgeInsets.only(
@@ -337,7 +346,7 @@ class TeamPreview extends StatelessWidget {
                 ),
               ),
               Expanded(
-                flex: 1688,
+                flex: !bIsKabaddi ? 1600 : 1532,
                 child: Column(
                   children: <Widget>[
                     this.l1Data.league.rounds[0].matches[0].sportType == 3
@@ -390,39 +399,35 @@ class TeamPreview extends StatelessWidget {
             ],
           ),
         ),
-        ConstrainedBox(
-          constraints: BoxConstraints.tight(
-            Size.fromHeight(72.0 + kToolbarHeight),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
-              Row(
-                children: <Widget>[
-                  allowEditTeam && league.status == LeagueStatus.UPCOMING
-                      ? FlatButton(
-                          // icon: Icon(Icons.edit),
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            _onEditTeam(context);
-                          },
-                        )
-                      : Container(),
-                  FlatButton(
-                    // icon: Icon(Icons.close),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  )
-                ],
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+            title:
+                Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
+            actions: <Widget>[
+              allowEditTeam && league.status == LeagueStatus.UPCOMING
+                  ? FlatButton(
+                      // icon: Icon(Icons.edit),
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _onEditTeam(context);
+                      },
+                    )
+                  : Container(),
+              FlatButton(
+                // icon: Icon(Icons.close),
+                child: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               )
             ],
           ),
