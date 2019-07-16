@@ -6,7 +6,7 @@ packages:
     description:
       path: "packages/android_intent"
       ref: HEAD
-      resolved-ref: "95cc8cc0d2a68201c4e689b4f3db351907d05ddb"
+      resolved-ref: "949fb4dad9d21a5be2bb211a63d26b1e90bfbd9b"
       url: "git://github.com/bhaveshptl/plugins.git"
     source: git
     version: "0.3.1"
@@ -100,14 +100,14 @@ packages:
       name: firebase_analytics
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.2"
+    version: "3.0.3"
   firebase_core:
     dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.3"
+    version: "0.4.0+6"
   flushbar:
     dependency: "direct main"
     description:
@@ -127,6 +127,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.0+1"
+  flutter_downloader:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: d6775e8fae0130c13990cfac9354d2f3b7db7c03
+      url: "https://github.com/bhaveshptl/flutter_downloader.git"
+    source: git
+    version: "1.1.7"
   flutter_facebook_login:
     dependency: "direct main"
     description:
@@ -153,6 +162,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_webview_plugin:
+    dependency: "direct main"
+    description:
+      name: flutter_webview_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.5"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -249,7 +265,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: d19bb35b10e5def811420060042d16ed4727ab95
+      resolved-ref: f9a4de86dd238c7a9dfbb80e33edecd9d9cabf43
       url: "git://github.com/bhaveshptl/permission.git"
     source: git
     version: "0.1.2"
@@ -375,7 +391,7 @@ packages:
     description:
       path: "packages/webview_flutter"
       ref: HEAD
-      resolved-ref: "2de59c93e1f3dc80f1e7bd483c1d8d874faf59ff"
+      resolved-ref: "949fb4dad9d21a5be2bb211a63d26b1e90bfbd9b"
       url: "git://github.com/bhaveshptl/plugins.git"
     source: git
     version: "0.3.9+2"

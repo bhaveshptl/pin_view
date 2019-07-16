@@ -597,29 +597,29 @@ import Firebase
             var valueinD:Double = data["withdrawable"] as! Double;
             valueinD = Double(round(100*valueinD)/100);
             var valueinS:String = String(format: "%.0f", valueinD);
-            let value = valueinD;
-            weUser.setAttribute("withdrawable", withStringValue:String(value));
+            let value = NSNumber(value: valueinD);
+            weUser.setAttribute("withdrawable",  withValue:value);
         }
         if(data["depositBucket"] != nil){
             var valueinD:Double = data["depositBucket"] as! Double;
             valueinD = Double(round(100*valueinD)/100);
             var valueinS:String = String(format: "%.0f", valueinD);
-            let value = valueinD;
-            weUser.setAttribute("depositBucket", withStringValue:String(value));
+            let value = NSNumber(value: valueinD);
+            weUser.setAttribute("depositBucket",  withValue:value);
         }
         if(data["nonWithdrawable"] != nil){
             var valueinD:Double = data["nonWithdrawable"] as! Double;
             valueinD = Double(round(100*valueinD)/100);
             var valueinS:String = String(format: "%.0f", valueinD);
-            let value = valueinD;
-            weUser.setAttribute("nonWithdrawable", withStringValue:String(value));
+            let value = NSNumber(value: valueinD);
+            weUser.setAttribute("nonWithdrawable",  withValue:value);
         }
         if(data["nonPlayableBucket"] != nil){
             var valueinD:Double = data["nonPlayableBucket"] as! Double;
             valueinD = Double(round(100*valueinD)/100);
             var valueinS:String = String(format: "%.0f", valueinD);
-            let value = valueinD;
-            weUser.setAttribute("nonPlayableBucket", withStringValue:String(value));
+            let value = NSNumber(value: valueinD);
+            weUser.setAttribute("nonPlayableBucket",  withValue:value);
         }
         if(data["pan_verification"] != nil){
             let value:String = data["pan_verification"] as! String;
@@ -679,8 +679,8 @@ import Firebase
             var valueinD:Double = data["user_balance_webengage"] as! Double;
             valueinD = Double(round(100*valueinD)/100);
             var valueinS:String = String(format: "%.0f", valueinD);
-            let value = valueinD;
-            weUser.setAttribute("balance", withStringValue:String(value));
+            let value = NSNumber(value: valueinD);
+            weUser.setAttribute("balance", withValue:value);
         }
         return "Data is used";
     }
