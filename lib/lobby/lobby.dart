@@ -78,7 +78,8 @@ class LobbyState extends State<Lobby>
     _controller.addListener(() {
       if (!_controller.indexIsChanging) {
         setState(() {
-          _sportType = _controller.index + 1;
+          _sportType =
+              _mapSportTypes[_mapSportTypes.keys.toList()[_controller.index]];
         });
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
@@ -317,26 +318,26 @@ class LobbyState extends State<Lobby>
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-            title: Text(strings.get("APP_CLOSE_TITLE")),
-            content: Container(
-              width: MediaQuery.of(context).size.width,
-              child: Text(strings.get("DO_U_W_EXIT")),
+        title: Text(strings.get("APP_CLOSE_TITLE")),
+        content: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Text(strings.get("DO_U_W_EXIT")),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(
+              strings.get("NO").toUpperCase(),
             ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(
-                  strings.get("NO").toUpperCase(),
-                ),
-              ),
-              FlatButton(
-                onPressed: () => exit(0),
-                child: Text(
-                  strings.get("YES").toUpperCase(),
-                ),
-              ),
-            ],
           ),
+          FlatButton(
+            onPressed: () => exit(0),
+            child: Text(
+              strings.get("YES").toUpperCase(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -58,12 +58,12 @@ class MyMatchesState extends State<MyMatches>
   _listenSportChange() {
     _sportsController =
         TabController(vsync: this, length: widget.mapSportTypes.keys.length);
-    _sportsController.index = _sportType - 1;
+    _sportsController.index = getSportTabIndex(_sportType);
     _sportsController.addListener(() {
       showLoader(true);
       if (!_sportsController.indexIsChanging) {
-        print(_sportsController.index + 1);
-        _sportType = _sportsController.index + 1;
+        _sportType = widget.mapSportTypes[
+            widget.mapSportTypes.keys.toList()[_sportsController.index]];
         setState(() {
           _sportType = _sportType;
         });
@@ -72,6 +72,18 @@ class MyMatchesState extends State<MyMatches>
         _getMyMatches(bShowLoader: true);
       }
     });
+  }
+
+  getSportTabIndex(sportType) {
+    int i = 0;
+    int tabIndex = 0;
+    widget.mapSportTypes.keys.forEach((sport) {
+      if (widget.mapSportTypes[sport] == sportType) {
+        tabIndex = i;
+      }
+      i++;
+    });
+    return tabIndex;
   }
 
   int getLeagueIndex(List<League> _leagues, League _league) {

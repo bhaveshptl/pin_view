@@ -354,6 +354,25 @@ class PlayingStyleTab extends StatelessWidget {
     );
   }
 
+  getPlayingStyleLabel(String label) {
+    switch (label) {
+      case "Batsman":
+        return "batsmen".toUpperCase();
+      case "Bowler":
+        return "Bowlers".toUpperCase();
+      case "All Rounder":
+        return "All Rounders".toUpperCase();
+      case "Raider":
+        return "Raiders".toUpperCase();
+      case "Defender":
+        return "Defenders".toUpperCase();
+      case "All-Rounder":
+        return "All Rounders".toUpperCase();
+      default:
+        return label.toUpperCase();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -375,7 +394,7 @@ class PlayingStyleTab extends StatelessWidget {
                                 style.rule[1].toString())
                         : "") +
                     " " +
-                    style.label.toUpperCase(),
+                    getPlayingStyleLabel(style.label),
                 style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
