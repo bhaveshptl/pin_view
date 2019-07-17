@@ -453,7 +453,7 @@ class AddCashState extends State<AddCash> {
                                         .primaryTextTheme
                                         .body1
                                         .copyWith(
-                                          color: (chooseAmount >=
+                                          color: (selectedPromo != null && chooseAmount >=
                                                       selectedPromo[
                                                           "minimum"] &&
                                                   chooseAmount <=
