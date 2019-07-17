@@ -7,9 +7,10 @@ import WebEngage
 import FirebaseInstanceID
 import FirebaseMessaging
 import Firebase
+import CoreLocation
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocolWithData {
+@objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocolWithData,CLLocationManagerDelegate {
     private var controller : FlutterViewController!;
     private var razorpay: Razorpay!
     private var razorpayProdKey:String="rzp_live_jpaEKwXwl8iWX6";
@@ -26,6 +27,7 @@ import Firebase
     private var BROWSER_LAUNCH_CHANNEL:FlutterMethodChannel!;
     private var UTILS_CHANNEL:FlutterMethodChannel!;
     private var razorpay_result: FlutterResult!
+    private var location_permission_result: FlutterResult!
     private var device_info_result: FlutterResult!
     private var bBranchLodead:Bool = false;
     private var app_launchOptions: [UIApplicationLaunchOptionsKey: Any]?;
@@ -33,6 +35,7 @@ import Firebase
     let gcmMessageIDKey = "gcm.message_id"
     var weUser: WEGUser!
     var weAnalytics: WEGAnalytics!
+    let locationManager = CLLocationManager()
     
     
     override func application(
@@ -54,7 +57,7 @@ import Firebase
         initFlutterChannels();
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
-        
+        enableLocationServices();
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -469,8 +472,8 @@ import Firebase
                 }
             })
         })
-        
-        
+
+
         SOCIAL_SHARE_CHANNEL.setMethodCallHandler({
             (call: FlutterMethodCall, result:  FlutterResult) -> Void in
             self.SOCIAL_SHARE_CHANNEL.setMethodCallHandler({
@@ -519,10 +522,48 @@ import Firebase
                     }
                     result(channelResult);
                 }
+                if(call.method == "getLocationLongLat"){
+                    self?.location_permission_result=result;
+                    self?.getLocationLongLat();
+                }
             })
         })
     }
     
+    func getLocationLongLat(){
+        locationManager.delegate = self
+        var currentLocation: CLLocation!
+        var response = [String : String]()
+        response["bAccessGiven"] = "false";
+        if( CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+            CLLocationManager.authorizationStatus() ==  .authorizedAlways){
+            currentLocation = locationManager.location;
+            response["bAccessGiven"] = "true";
+            response["longitude"] = String(currentLocation.coordinate.longitude);
+            response["latitude"] = String(currentLocation.coordinate.latitude);
+        }else{
+           response["bAccessGiven"] = "false"; 
+        }
+        location_permission_result(response);
+    }
+    func enableLocationServices() {
+        locationManager.delegate = self
+        switch CLLocationManager.authorizationStatus() {
+        case .notDetermined:
+            locationManager.requestAlwaysAuthorization()
+            break
+        case .restricted, .denied:
+            break
+        case .authorizedWhenInUse:
+            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            self.locationManager.startUpdatingLocation()
+            break
+        case .authorizedAlways:
+            self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            self.locationManager.startUpdatingLocation()
+            break
+        }
+    }
     
     internal func showPaymentForm(name: String, email:String, phone:String, amount:String,orderId:String, method:String,image:String){
         /* Function Usecase : Open  Razorpay Payment Window*/
