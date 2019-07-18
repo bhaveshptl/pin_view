@@ -295,7 +295,7 @@ class VerificationState extends State<Verification> {
   }
 
   Future getImage(Function callback) async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery,maxWidth: 1200);
 
     if (image != null) {
       callback(image);
@@ -321,15 +321,20 @@ class VerificationState extends State<Verification> {
   }
 
   _onUploadDocuments() async {
+    print("############INto the up-load dicuments###########");
+
     if (_panImage == null || _addressImage == null) {
       setState(() {
         _bShowImageUploadError = true;
       });
     } else {
+      print("Inside cokkie");
       if (cookie == null) {
         Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
         await futureCookie.then((value) {
           cookie = value;
+          print("cokkie#########");
+          print(cookie);
         });
       }
 
@@ -337,20 +342,31 @@ class VerificationState extends State<Verification> {
       var uri = Uri.parse(
           BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
 
+      print("uri");
+      print(uri);
       // get length for http post
       var panLength = await _panImage.length();
+      print("panLength");
+      print(panLength);
       // to byte stream
+
       var panStream =
           http.ByteStream(DelegatingStream.typed(_panImage.openRead()));
-
+      print("panStream");
+      print(panStream);
       // get length for http post
       var addressLength = await _addressImage.length();
+      print("addressLength");
+      print(addressLength);
       // to byte stream
       var addressStream =
           http.ByteStream(DelegatingStream.typed(_addressImage.openRead()));
-
+      print("addressStream");
+      print(addressStream);
       // new multipart request
       var request = http.MultipartRequest("POST", uri);
+      print("request");
+      print(request);
 
       // add multipart form to request
       request.files.add(http.MultipartFile('pan', panStream, panLength,
@@ -366,6 +382,7 @@ class VerificationState extends State<Verification> {
         return http.Response.fromStream(onValue);
       }).then(
         (http.Response res) {
+          print(res.statusCode);
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["err"] != null && response["err"]) {
@@ -382,6 +399,10 @@ class VerificationState extends State<Verification> {
               _addressVerificationStatus = response["address_verification"];
               _setDocVerificationStatus();
             });
+          } else if (res.statusCode == 413) {
+            ActionUtil().showMsgOnTop(
+                "File is too large! Upload file with less than 10MB",
+                scaffoldKey.currentContext);
           }
         },
       );
