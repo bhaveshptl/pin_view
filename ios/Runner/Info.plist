@@ -100,5 +100,10 @@
 	<string>~47b65866</string>
 	<key>branch_key</key>
 	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Howzat would like to access your calender to select your DOB</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Howzat would like to access your contacts for faster google login</string>
+    
 </dict>
 </plist>

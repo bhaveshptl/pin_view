@@ -559,7 +559,10 @@ class AddCashState extends State<AddCash> {
                     ),
               focusNode: _customAmountFocusNode,
               controller: customAmountController,
-              keyboardType: TextInputType.number,
+              keyboardType: isIos? TextInputType.text:TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                                       WhitelistingTextInputFormatter.digitsOnly
+                                                  ],
               contentPadding: EdgeInsets.all(12.0),
             ),
           ),
@@ -1168,7 +1171,10 @@ class AddCashState extends State<AddCash> {
                                   width: 150.0,
                                   child: TextFormField(
                                     controller: amountController,
-                                    keyboardType: TextInputType.number,
+                                    keyboardType: isIos? TextInputType.text:TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                       WhitelistingTextInputFormatter.digitsOnly
+                                                  ],
                                     decoration: InputDecoration(
                                       labelText: strings.get("AMOUNT"),
                                       contentPadding: EdgeInsets.all(8.0),
