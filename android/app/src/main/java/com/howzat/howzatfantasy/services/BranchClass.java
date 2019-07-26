@@ -1,5 +1,11 @@
 package com.howzat.howzatfantasy.services;
 
+import android.graphics.Color;
+
+import com.howzat.howzatfantasy.R;
+import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
+import com.webengage.sdk.android.WebEngageConfig;
+
 import io.branch.referral.Branch;
 import io.flutter.app.FlutterApplication;
 
@@ -12,6 +18,17 @@ public class BranchClass  extends FlutterApplication {
         Branch.enableLogging();
         // Branch object initialization
         Branch.getAutoInstance(this);
+        initWebEngage();
+    }
+
+    private void initWebEngage() {
+        WebEngageConfig config = new WebEngageConfig.Builder()
+                .setWebEngageKey("~47b65866")
+                .setPushSmallIcon(R.drawable.notification_icon_small)
+                .setPushAccentColor(Color.parseColor("#d32518"))
+                .setDebugMode(true)
+                .build();
+        registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, config));
     }
 
 }
