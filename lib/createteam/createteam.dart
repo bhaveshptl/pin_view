@@ -52,6 +52,7 @@ class CreateTeamState extends State<CreateTeam>
   Player _captain;
   Player _vCaptain;
   String _sortedBy;
+  bool bIsAscending = false;
   List<Player> allPlayers;
   Widget floatButtonWidget;
   String _avgCredits = "0";
@@ -562,8 +563,9 @@ class CreateTeamState extends State<CreateTeam>
           league: widget.league,
           l1Data: widget.l1Data,
           allPlayers: allPlayers,
-          mapSportLabel: sports.playingStyles,
+          isAscending: bIsAscending,
           onPlayerSelect: _selectPlayer,
+          mapSportLabel: sports.playingStyles,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
         ),
       );
@@ -574,11 +576,13 @@ class CreateTeamState extends State<CreateTeam>
   onSort(String type) {
     if (_sortedBy == type) {
       setState(() {
+        bIsAscending = !bIsAscending;
         allPlayers = allPlayers.reversed.toList();
       });
     } else {
       switch (type) {
         case "NAME":
+          bIsAscending = true;
           setState(() {
             allPlayers.sort((a, b) {
               return a.name.compareTo(b.name);
@@ -586,6 +590,7 @@ class CreateTeamState extends State<CreateTeam>
           });
           break;
         case "SCORE":
+          bIsAscending = false;
           setState(() {
             allPlayers.sort((a, b) {
               return ((b.seriesScore - a.seriesScore) * 100).toInt();
@@ -593,6 +598,7 @@ class CreateTeamState extends State<CreateTeam>
           });
           break;
         case "CREDITS":
+          bIsAscending = false;
           setState(() {
             allPlayers.sort((a, b) {
               return ((b.credit - a.credit) * 100).toInt();
@@ -1186,7 +1192,7 @@ class CreateTeamState extends State<CreateTeam>
             ),
           ),
           Container(
-            height: 72.0,
+            height: 64.0,
             padding: isIos ? EdgeInsets.only(bottom: 8.0) : null,
             decoration: BoxDecoration(
               color: Colors.white,

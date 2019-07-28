@@ -514,7 +514,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
             ),
           ),
           Container(
-            height: 72.0,
+            height: 64.0,
             padding: isIos ? EdgeInsets.only(bottom: 8.0) : null,
             decoration: BoxDecoration(
               color: Colors.white,

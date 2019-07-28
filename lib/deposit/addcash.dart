@@ -136,6 +136,7 @@ class AddCashState extends State<AddCash> {
     if (widget.depositData != null &&
         widget.depositData.chooseAmountData.isFirstDeposit) {
       amount = widget.depositData.chooseAmountData.amountTiles[0];
+      customAmountController.text = amount.toString();
     }
   }
 
@@ -347,6 +348,7 @@ class AddCashState extends State<AddCash> {
                             )
                           : widget.depositData.chooseAmountData
                               .amountTiles[curTileIndex];
+                      customAmountController.text = selectedAmount.toString();
                       setState(() {
                         selectedTileindex = curTileIndex;
                         amount = selectedAmount;
@@ -453,7 +455,8 @@ class AddCashState extends State<AddCash> {
                                         .primaryTextTheme
                                         .body1
                                         .copyWith(
-                                          color: (selectedPromo != null && chooseAmount >=
+                                          color: (selectedPromo != null &&
+                                                  chooseAmount >=
                                                       selectedPromo[
                                                           "minimum"] &&
                                                   chooseAmount <=
@@ -559,10 +562,10 @@ class AddCashState extends State<AddCash> {
                     ),
               focusNode: _customAmountFocusNode,
               controller: customAmountController,
-              keyboardType: isIos? TextInputType.text:TextInputType.number,
+              keyboardType: isIos ? TextInputType.text : TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                                       WhitelistingTextInputFormatter.digitsOnly
-                                                  ],
+                WhitelistingTextInputFormatter.digitsOnly
+              ],
               contentPadding: EdgeInsets.all(12.0),
             ),
           ),
@@ -1171,10 +1174,12 @@ class AddCashState extends State<AddCash> {
                                   width: 150.0,
                                   child: TextFormField(
                                     controller: amountController,
-                                    keyboardType: isIos? TextInputType.text:TextInputType.number,
+                                    keyboardType: isIos
+                                        ? TextInputType.text
+                                        : TextInputType.number,
                                     inputFormatters: <TextInputFormatter>[
-                                       WhitelistingTextInputFormatter.digitsOnly
-                                                  ],
+                                      WhitelistingTextInputFormatter.digitsOnly
+                                    ],
                                     decoration: InputDecoration(
                                       labelText: strings.get("AMOUNT"),
                                       contentPadding: EdgeInsets.all(8.0),

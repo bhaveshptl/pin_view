@@ -10,6 +10,7 @@ class PlayingStyleTab extends StatelessWidget {
   final League league;
   final Function onSort;
   final String sortedBy;
+  final bool isAscending;
   final PlayingStyle style;
   final List<Player> allPlayers;
   final Function onPlayerSelect;
@@ -25,6 +26,7 @@ class PlayingStyleTab extends StatelessWidget {
     this.onSort,
     this.sortedBy,
     this.allPlayers,
+    this.isAscending,
     this.mapSportLabel,
     this.onPlayerSelect,
     this.selectedPlayers,
@@ -107,6 +109,15 @@ class PlayingStyleTab extends StatelessWidget {
                                         color: Colors.grey.shade600,
                                       ),
                                 ),
+                                sortedBy == "NAME"
+                                    ? Icon(
+                                        isAscending
+                                            ? Icons.arrow_downward
+                                            : Icons.arrow_upward,
+                                        size: 18.0,
+                                        color: Colors.grey.shade600,
+                                      )
+                                    : Container(),
                               ],
                             ),
                           ),
@@ -139,6 +150,15 @@ class PlayingStyleTab extends StatelessWidget {
                                         ),
                                   ),
                                 ),
+                                sortedBy == "SCORE"
+                                    ? Icon(
+                                        isAscending
+                                            ? Icons.arrow_downward
+                                            : Icons.arrow_upward,
+                                        size: 18.0,
+                                        color: Colors.grey.shade600,
+                                      )
+                                    : Container(),
                               ],
                             ),
                           ),
@@ -170,6 +190,15 @@ class PlayingStyleTab extends StatelessWidget {
                                         ),
                                   ),
                                 ),
+                                sortedBy == "CREDITS"
+                                    ? Icon(
+                                        isAscending
+                                            ? Icons.arrow_downward
+                                            : Icons.arrow_upward,
+                                        size: 18.0,
+                                        color: Colors.grey.shade600,
+                                      )
+                                    : Container(),
                               ],
                             ),
                           ),

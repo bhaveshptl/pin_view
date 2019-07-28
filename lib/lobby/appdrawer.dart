@@ -571,6 +571,24 @@ class AppDrawerState extends State<AppDrawer> {
             padding: EdgeInsets.symmetric(vertical: verticalPadding),
             child: ListTile(
               leading: Image.asset(
+                "images/HowtoPlay.png",
+                width: 30.0,
+              ),
+              title: Text(
+                'Blog',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
+              onTap: () {
+                _launchStaticPage("BLOG");
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
                 "images/Scoring.png",
                 width: 30.0,
               ),

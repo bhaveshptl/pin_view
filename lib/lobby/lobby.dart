@@ -361,147 +361,158 @@ class LobbyState extends State<Lobby>
   Widget getActivePage() {
     switch (_activeIndex) {
       case 0:
-        return Column(
-          children: <Widget>[
-            Container(
-              color: Colors.white,
-              child: TabBar(
-                controller: _controller,
-                labelColor: Theme.of(context).primaryColor,
-                unselectedLabelColor: Colors.black,
-                labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                indicator: UnderlineTabIndicator(
-                  borderSide: BorderSide(
-                    width: 4.0,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                tabs: _mapSportTypes.keys.map<Tab>((page) {
-                  return Tab(
-                    text: page,
-                  );
-                }).toList(),
-              ),
-            ),
-            Column(
-              children: <Widget>[
-                Container(
-                  // padding: EdgeInsets.all(8.0),
-                  width: MediaQuery.of(context).size.width,
-                  child: _carousel.length > 0
-                      ? CarouselSlider(
-                          enlargeCenterPage: true,
-                          aspectRatio: 16 / 3.5,
-                          viewportFraction: 1.0,
-                          onPageChanged: (int index) {
-                            setState(() {
-                              _curPageIndex = index;
-                            });
-                          },
-                          enableInfiniteScroll: true,
-                          autoPlayInterval: Duration(seconds: 10),
-                          items: _carousel.map<Widget>((dynamic banner) {
-                            return FlatButton(
-                              padding: EdgeInsets.all(0.0),
-                              onPressed: () {
-                                if (banner["CTA"] != "" &&
-                                    banner["CTA"] != "NA") {
-                                  showLoader(true);
-                                }
-                                routeLauncher.launchBannerRoute(
-                                    banner: banner,
-                                    context: context,
-                                    scaffoldKey: scaffoldKey,
-                                    onComplete: () {
-                                      showLoader(false);
-                                    });
-                              },
-                              child: Image.network(
-                                banner["banner"],
-                                fit: BoxFit.fitWidth,
-                                width: MediaQuery.of(context).size.width,
-                              ),
-                            );
-                          }).toList(),
-                          autoPlay: _carousel.length <= 2 ? false : true,
-                          reverse: false,
-                        )
-                      : Container(),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: _carousel
-                        .asMap()
-                        .map((index, f) => MapEntry(
-                            index,
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 4.0),
-                              child: Container(
-                                width: 8.0,
-                                height: 8.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: index == _curPageIndex
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.black45,
-                                ),
-                              ),
-                            )))
-                        .values
-                        .toList(),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 8.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.0,
+        return NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverPadding(
+                padding: const EdgeInsets.all(8.0),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                    <Widget>[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4.0),
+                        child: _carousel.length > 0
+                            ? CarouselSlider(
+                                enlargeCenterPage: false,
+                                aspectRatio: 16 / 3.5,
+                                viewportFraction: 1.0,
+                                onPageChanged: (int index) {
+                                  setState(() {
+                                    _curPageIndex = index;
+                                  });
+                                },
+                                enableInfiniteScroll: true,
+                                autoPlayInterval: Duration(seconds: 10),
+                                items: _carousel.map<Widget>((dynamic banner) {
+                                  return FlatButton(
+                                    padding: EdgeInsets.all(0.0),
+                                    onPressed: () {
+                                      if (banner["CTA"] != "" &&
+                                          banner["CTA"] != "NA") {
+                                        showLoader(true);
+                                      }
+                                      routeLauncher.launchBannerRoute(
+                                          banner: banner,
+                                          context: context,
+                                          scaffoldKey: scaffoldKey,
+                                          onComplete: () {
+                                            showLoader(false);
+                                          });
+                                    },
+                                    child: Image.network(
+                                      banner["banner"],
+                                      fit: BoxFit.fitWidth,
+                                      width: MediaQuery.of(context).size.width,
+                                    ),
+                                  );
+                                }).toList(),
+                                autoPlay: _carousel.length <= 2 ? false : true,
+                                reverse: false,
+                              )
+                            : Container(),
                       ),
-                      child: Text(
-                        "Upcoming Matches",
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _controller,
-                children: _mapSportTypes.keys.map<Widget>((page) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(
-                        child: LobbyWidget(
-                          sportType: _mapSportTypes[page],
-                          onLeagues: (value) {
-                            _leagues = value;
-                          },
-                          onSportChange: _onSportSelectionChaged,
-                          mapSportTypes: _mapSportTypes,
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: _carousel
+                              .asMap()
+                              .map((index, f) => MapEntry(
+                                  index,
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: Container(
+                                      width: 8.0,
+                                      height: 8.0,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: index == _curPageIndex
+                                            ? Theme.of(context).primaryColor
+                                            : Colors.black45,
+                                      ),
+                                    ),
+                                  )))
+                              .values
+                              .toList(),
                         ),
                       ),
                     ],
-                  );
-                }).toList(),
+                  ),
+                ),
               ),
-            ),
-          ],
+            ];
+          },
+          body: Column(
+            children: <Widget>[
+              Container(
+                color: Colors.white,
+                child: TabBar(
+                  controller: _controller,
+                  labelColor: Theme.of(context).primaryColor,
+                  unselectedLabelColor: Colors.black,
+                  labelStyle: Theme.of(context).primaryTextTheme.title.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                  indicator: UnderlineTabIndicator(
+                    borderSide: BorderSide(
+                      width: 4.0,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  tabs: _mapSportTypes.keys.map<Tab>((page) {
+                    return Tab(
+                      text: page,
+                    );
+                  }).toList(),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                        ),
+                        child: Text(
+                          "Upcoming Matches",
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _controller,
+                  children: _mapSportTypes.keys.map<Widget>((page) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Expanded(
+                          child: LobbyWidget(
+                            sportType: _mapSportTypes[page],
+                            onLeagues: (value) {
+                              _leagues = value;
+                            },
+                            onSportChange: _onSportSelectionChaged,
+                            mapSportTypes: _mapSportTypes,
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
         );
         break;
       case 1:
