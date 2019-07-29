@@ -68,7 +68,7 @@ class MyMatchesState extends State<MyMatches>
           _sportType = _sportType;
         });
         _initializeMyLeagues();
-        widget.onSportChange(_sportType);
+        widget.onSportChange(_sportsController.index);
         _getMyMatches(bShowLoader: true);
       }
     });
