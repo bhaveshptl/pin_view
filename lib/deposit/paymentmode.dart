@@ -1051,7 +1051,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: <Widget>[
-                                                  Text("Total Benifits"),
+                                                  Text("Total Benefits"),
                                                 ],
                                               ),
                                               Padding(

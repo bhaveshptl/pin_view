@@ -88,7 +88,7 @@ class PrizeStructureState extends State<PrizeStructure> {
                       Text(
                         formatCurrency.format(
                           double.parse(_prize["amount"].toString()),
-                        ),
+                        ).replaceAll(".00", ""),
                         style:
                             Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   color: Colors.grey.shade600,
@@ -138,7 +138,7 @@ class PrizeStructureState extends State<PrizeStructure> {
                       Text(
                         formatCurrency.format(
                           double.parse(_prize["amount"].toString()),
-                        ),
+                        ).replaceAll(".00", ""),
                         style:
                             Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   color: Colors.grey.shade600,
@@ -270,7 +270,7 @@ class PrizeStructureState extends State<PrizeStructure> {
                                     formatCurrency.format(
                                       widget.contest.entryFee *
                                           widget.contest.winningsMultiplier,
-                                    ),
+                                    ).replaceAll(".00", ""),
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 24.0,
@@ -291,7 +291,7 @@ class PrizeStructureState extends State<PrizeStructure> {
                                       : Container(),
                                   Text(
                                     formatCurrency.format(widget.contest
-                                        .prizeDetails[0]["totalPrizeAmount"]),
+                                        .prizeDetails[0]["totalPrizeAmount"]).replaceAll(".00", ""),
                                     textAlign: TextAlign.center,
                                     style: Theme.of(context)
                                         .primaryTextTheme
