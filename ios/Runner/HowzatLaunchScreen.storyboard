@@ -27,6 +27,10 @@
                             <constraint firstItem="OyT-4l-y5F" firstAttribute="trailing" secondItem="Bcu-3y-fUS" secondAttribute="trailing" id="2bA-GQ-e8Y"/>
                             <constraint firstItem="OyT-4l-y5F" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="GVo-22-OmH"/>
                             <constraint firstItem="OyT-4l-y5F" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="JmQ-l9-UcK"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="OyT-4l-y5F" secondAttribute="bottom" id="YcG-AW-49T"/>
+                            <constraint firstItem="OyT-4l-y5F" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="dSp-fc-sLz"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="trailing" secondItem="OyT-4l-y5F" secondAttribute="trailing" id="jAj-dc-PLK"/>
+                            <constraint firstItem="OyT-4l-y5F" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="qQQ-9r-RKu"/>
                             <constraint firstItem="OyT-4l-y5F" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="rJ8-lD-TQe"/>
                             <constraint firstItem="OyT-4l-y5F" firstAttribute="bottom" secondItem="Bcu-3y-fUS" secondAttribute="bottom" id="xFM-zT-vv1"/>
                         </constraints>
@@ -35,7 +39,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="44" y="369.26536731634184"/>
+            <point key="canvasLocation" x="43.478260869565219" y="368.47826086956525"/>
         </scene>
     </scenes>
     <resources>
