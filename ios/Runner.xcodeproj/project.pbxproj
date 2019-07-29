@@ -23,6 +23,7 @@
 		BE1F541A229A620D00610497 /* MyDeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1F5419229A620C00610497 /* MyDeviceInfo.swift */; };
 		BE4B930C229A951C00C4959C /* MyHelperClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4B930B229A951C00C4959C /* MyHelperClass.swift */; };
 		BE51DDD022EF3527005DC3DC /* SplashScreenTablet.png in Resources */ = {isa = PBXBuildFile; fileRef = BE51DDCF22EF3527005DC3DC /* SplashScreenTablet.png */; };
+		BE51DDD222EF3895005DC3DC /* IpadLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE51DDD122EF3895005DC3DC /* IpadLaunchScreen.storyboard */; };
 		BEC5553A22EEC84C00F161C3 /* HowzatLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BEC5553922EEC84C00F161C3 /* HowzatLaunchScreen.storyboard */; };
 		BEF8229A229856890091C6FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BEF82299229856890091C6FB /* GoogleService-Info.plist */; };
 		BEF8229C229856980091C6FB /* SocialShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF8229B229856980091C6FB /* SocialShare.swift */; };
@@ -67,6 +68,7 @@
 		BE3ECC52229B003100CDBF47 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		BE4B930B229A951C00C4959C /* MyHelperClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyHelperClass.swift; sourceTree = "<group>"; };
 		BE51DDCF22EF3527005DC3DC /* SplashScreenTablet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SplashScreenTablet.png; sourceTree = "<group>"; };
+		BE51DDD122EF3895005DC3DC /* IpadLaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = IpadLaunchScreen.storyboard; sourceTree = "<group>"; };
 		BEC5553922EEC84C00F161C3 /* HowzatLaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = HowzatLaunchScreen.storyboard; sourceTree = "<group>"; };
 		BEF82299229856890091C6FB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BEF8229B229856980091C6FB /* SocialShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocialShare.swift; sourceTree = "<group>"; };
@@ -149,6 +151,7 @@
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				BE4B930B229A951C00C4959C /* MyHelperClass.swift */,
 				BEC5553922EEC84C00F161C3 /* HowzatLaunchScreen.storyboard */,
+				BE51DDD122EF3895005DC3DC /* IpadLaunchScreen.storyboard */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -249,6 +252,7 @@
 				9740EEB41CF90195004384FC /* Debug.xcconfig in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				BE51DDD222EF3895005DC3DC /* IpadLaunchScreen.storyboard in Resources */,
 				BE1BA8E422EF22C400FFE6CD /* splashscreen.png in Resources */,
 				BEF8229A229856890091C6FB /* GoogleService-Info.plist in Resources */,
 			);
