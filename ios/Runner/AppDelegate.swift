@@ -53,10 +53,10 @@ import CoreLocation
         
         UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller)
         /* Init Services*/
+        initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         initPushNotifications(application);
         initFlutterChannels();
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
-        initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         enableLocationServices();
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
@@ -111,12 +111,12 @@ import CoreLocation
     private func initBranchPlugin(didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?){
         Branch.setUseTestBranchKey(false);
         Branch.getInstance().initSession(launchOptions: launchOptions) { (params, error) in
-            self.bBranchLodead = true;
             if let error = error {
                 print(error);
             } else if let params = params {
                 self.initBranchSession(branchResultData:params as? [String: AnyObject]);
             }
+            self.bBranchLodead = true;
         }
     }
     
@@ -155,7 +155,7 @@ import CoreLocation
                         refCodeFromBranchTrail0=branchData!["refCode"]! as? String ?? "";
                     }
                     else{
-                        refCodeFromBranchTrail0=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                        refCodeFromBranchTrail0=MyHelperClass.getQueryStringParameter(url: installReferring_link0, param: "refCode") ?? "";
                     }
                 }
             }
@@ -169,7 +169,7 @@ import CoreLocation
                         refCodeFromBranchTrail1=installParams!["refCode"]! as? String ?? "";
                     }
                     else{
-                        refCodeFromBranchTrail1=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                        refCodeFromBranchTrail1=MyHelperClass.getQueryStringParameter(url: installReferring_link1, param: "refCode") ?? "";
                     }
                 }
             }
@@ -189,13 +189,13 @@ import CoreLocation
             }
         }
         
-        if (installReferring_link0 != "") {
+        if (installReferring_link0.count > 2 ) {
             installReferring_link = installReferring_link0;
             
-        } else if (installReferring_link1 != "") {
+        } else if (installReferring_link1.count > 2) {
             installReferring_link = installReferring_link1;
             
-        } else if (installReferring_link2 != "") {
+        } else if (installReferring_link2.count > 2) {
             installReferring_link = installReferring_link2;
         }
         
