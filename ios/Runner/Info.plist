@@ -62,13 +62,17 @@
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Howzat would like to access your calender to select your DOB</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Howzat requires access to the camera to upload Identity document  </string>
+	<key>NSContactsUsageDescription</key>
+	<string>Howzat would like to access your contacts for faster google login</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Howzat would like to access your location as the app is available for Indian market only.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need microphone access for uploading videos</string>
@@ -79,7 +83,7 @@
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>HowzatLaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiresFullScreen</key>
@@ -100,10 +104,5 @@
 	<string>~47b65866</string>
 	<key>branch_key</key>
 	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
-    <key>NSCalendarsUsageDescription</key>
-    <string>Howzat would like to access your calender to select your DOB</string>
-    <key>NSContactsUsageDescription</key>
-    <string>Howzat would like to access your contacts for faster google login</string>
-    
 </dict>
 </plist>

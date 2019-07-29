@@ -18,6 +18,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:permission/permission.dart';
+import 'package:flutter_device_type/flutter_device_type.dart';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
@@ -43,6 +44,7 @@ class SplashScreenState extends State<SplashScreen>
   String maintenanceMsg = "";
   double loadingPercent = 0.0;
   bool bUnderMaintenence = false;
+  bool isTablet=false;
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
@@ -135,6 +137,9 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   initServices() async {
+    if( Device.get().isTablet ){
+       isTablet=true;
+    }
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
     if (isIos) {
@@ -333,13 +338,14 @@ class SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: AppConfig.of(context).channelId == "10"
+      body: AppConfig.of(context).channelId == "10" || AppConfig.of(context).channelId == "13"
           ? Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 image: DecorationImage(
-                  image: AssetImage("images/splashscreen.png"),
+                  image: AssetImage(!isTablet?"images/splashscreen.png":"images/SplashScreenTablet.png"),
                   fit: BoxFit.fitWidth,
+                  
                   alignment: Alignment.topCenter,
                 ),
               ),
@@ -354,7 +360,7 @@ class SplashScreenState extends State<SplashScreen>
                 Container(
                   decoration: (AppConfig.of(context).channelId == "10"
                       ? BoxDecoration(color: Theme.of(context).primaryColor)
-                      : (AppConfig.of(context).channelId == "13"
+                      : (AppConfig.of(context).channelId == "9"
                           ? BoxDecoration(color: Theme.of(context).primaryColor)
                           : null)),
                 ),

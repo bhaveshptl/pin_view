@@ -83,6 +83,7 @@ class SignupState extends State<Signup> {
   initServices() async {
     await getLocalStorageValues();
     await getAndroidDeviceInfo();
+    await _initBranchStuff();
   }
 
   getLocalStorageValues() {
@@ -150,7 +151,15 @@ class SignupState extends State<Signup> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN);
   }
 
-  _initBranchStuff() {
+  _initBranchStuff() async {
+    _getInstallReferringLink().then((String installReferringLink) {
+      if(installReferringLink.length>2){
+         setState(() {
+        _installReferringLink = installReferringLink;
+      });
+      }
+    });
+
     _getBranchRefCode().then((String refcode) {
       _pfRefCode = refcode;
       setState(() {
@@ -158,11 +167,7 @@ class SignupState extends State<Signup> {
       });
     });
 
-    _getInstallReferringLink().then((String installReferringLink) {
-      setState(() {
-        _installReferringLink = installReferringLink;
-      });
-    });
+    
   }
 
   showLoader(bool bShow) {
