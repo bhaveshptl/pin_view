@@ -74,7 +74,8 @@ class LobbyState extends State<Lobby>
     _mapSportTypes = sports.mapSports;
     _controller = TabController(vsync: this, length: _mapSportTypes.length);
     _getBanners();
-    _getSportsType();
+    // _getSportsType();
+    _sportType = _mapSportTypes[_mapSportTypes.keys.toList()[0]];
     _controller.addListener(() {
       if (!_controller.indexIsChanging) {
         setState(() {
@@ -246,10 +247,11 @@ class LobbyState extends State<Lobby>
     });
   }
 
-  _onSportSelectionChaged(int _sport) {
-    if (_sportType != _sport) {
-      _sportType = _sport;
-      _controller.index = _sport - 1;
+  _onSportSelectionChaged(int _sportIndex) {
+    int sportId = sports.mapSports[sports.mapSports.keys.toList()[_sportIndex]];
+    if (_sportType != sportId) {
+      _sportType = sportId;
+      _controller.index = _sportIndex;
       SharedPrefHelper().saveSportsType(_sportType.toString());
     } else if (_sportType <= 0) {
       setState(() {
@@ -648,8 +650,10 @@ class LobbyState extends State<Lobby>
         ),
         body: getActivePage(),
         bottomNavigationBar: LobbyBottomNavigation(
-            isIos, _onNavigationSelectionChange,
-            activeIndex: _activeIndex),
+          isIos,
+          _onNavigationSelectionChange,
+          activeIndex: _activeIndex,
+        ),
       ),
     );
   }

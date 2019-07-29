@@ -53,9 +53,9 @@ class RouteLauncher {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => AddCash(
-                depositData: depositData,
-                prefilledAmount: prefilledAmount,
-              ),
+            depositData: depositData,
+            prefilledAmount: prefilledAmount,
+          ),
         ),
       );
       if (result != null) {
@@ -145,6 +145,10 @@ class RouteLauncher {
         onComplete();
         browserLaunchChannel.invokeMethod(
             "launchInBrowser", "https://m.jungleerummy.com/client/lobby");
+        break;
+      case "LINK":
+        onComplete();
+        browserLaunchChannel.invokeMethod("launchInBrowser", banner["link"]);
         break;
       default:
     }
@@ -344,8 +348,8 @@ class RouteLauncher {
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => Withdraw(
-              data: response,
-            ),
+          data: response,
+        ),
       ),
     );
   }
@@ -383,8 +387,8 @@ class RouteLauncher {
       await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => EarnCash(
-                data: response,
-              ),
+            data: response,
+          ),
         ),
       );
     }
@@ -429,8 +433,8 @@ class RouteLauncher {
       Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => MyAccount(
-                accountData: data,
-              ),
+            accountData: data,
+          ),
         ),
       );
     }

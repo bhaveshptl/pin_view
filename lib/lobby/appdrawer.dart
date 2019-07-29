@@ -7,6 +7,7 @@ import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/createteam/sports.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/signin/signin.dart';
@@ -96,6 +97,8 @@ class AppDrawerState extends State<AppDrawer> {
       BaseUrl().apiUrl + ApiUtil.LOGOUT_URL,
       headers: {'Content-type': 'application/json', "cookie": cookie},
     ).then((http.Response res) {
+      SharedPrefHelper.internal().saveSportsType(
+          sports.mapSports[sports.mapSports.keys.toList()[0]].toString());
       print(res);
     });
     webEngageEventLogout();
@@ -168,13 +171,13 @@ class AppDrawerState extends State<AppDrawer> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: isIos ? Uri.encodeFull(url) : url,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
+          url: isIos ? Uri.encodeFull(url) : url,
+          appBar: AppBar(
+            title: Text(
+              title.toUpperCase(),
             ),
+          ),
+        ),
       ),
     );
   }
@@ -533,7 +536,7 @@ class AppDrawerState extends State<AppDrawer> {
                       ),
                       onTap: () {
                         browserLaunchChannel.invokeMethod("launchInBrowser",
-                            "https://m.jungleerummy.com/client/lobby?ad=howzat-crosssell-SideMenu&utm_source=howzat&utm_medium=Banners&utm_campaign=howzat-crosssell-SideMenu");
+                            BaseUrl().staticPageUrls["RUMMY"]);
                       },
                     ),
                   ],
