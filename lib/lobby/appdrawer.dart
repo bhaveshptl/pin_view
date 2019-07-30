@@ -574,7 +574,7 @@ class AppDrawerState extends State<AppDrawer> {
             padding: EdgeInsets.symmetric(vertical: verticalPadding),
             child: ListTile(
               leading: Image.asset(
-                "images/HowtoPlay.png",
+                "images/blog.png",
                 width: 30.0,
               ),
               title: Text(

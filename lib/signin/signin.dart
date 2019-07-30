@@ -25,6 +25,7 @@ import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:location_permissions/location_permissions.dart';
+
 class SignInPage extends StatefulWidget {
   SignInPage();
 
@@ -46,7 +47,7 @@ class SignInPageState extends State<SignInPage> {
   bool bUpdateAppConfirmationShown = false;
   bool disableBranchIOAttribution = false;
   bool isIos = false;
-  String location_longitude="";
+  String location_longitude = "";
   String location_latitude = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
 
@@ -200,7 +201,7 @@ class SignInPageState extends State<SignInPage> {
 
   Future<String> setLongLatValues() async {
     PermissionStatus permission =
-          await LocationPermissions().requestPermissions();
+        await LocationPermissions().requestPermissions();
     Map<dynamic, dynamic> value;
     PermissionStatus permissionStatus =
         await LocationPermissions().checkPermissionStatus();
@@ -209,21 +210,20 @@ class SignInPageState extends State<SignInPage> {
         value = await utils_platform.invokeMethod('getLocationLongLat');
         print("^^^^^^^^^Inside the Geo location********");
         print(value);
-        if(value["bAccessGiven"] != null){
-        if(value["bAccessGiven"]=="true"){
-          location_longitude=value["longitude"];
-          location_latitude=value["latitude"];
+        if (value["bAccessGiven"] != null) {
+          if (value["bAccessGiven"] == "true") {
+            location_longitude = value["longitude"];
+            location_latitude = value["latitude"];
+          }
         }
-      } 
       } catch (e) {
-         print("^^^^^^^^^Inside the Geo location error ********");
+        print("^^^^^^^^^Inside the Geo location error ********");
         print(e);
         value = null;
       }
     } else if (permissionStatus.toString() ==
         PermissionStatus.denied.toString()) {
       await showLocationPermissionInformationPopup();
-      
     } else {
       PermissionStatus permission =
           await LocationPermissions().requestPermissions();
@@ -235,78 +235,74 @@ class SignInPageState extends State<SignInPage> {
     return showDialog(
       context: context,
       builder: (context) => WillPopScope(
-            onWillPop: () {},
-            child: AlertDialog(
-              contentPadding: EdgeInsets.all(0.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    height: 80.0,
-                    color: Theme.of(context).primaryColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SvgPicture.asset(
-                          "images/logo_white.svg",
-                          color: Colors.white,
-                          width: 40.0,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Image.asset(
-                            "images/logo_name_white.png",
-                            height: 20.0,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: RichText(
-                            textAlign: TextAlign.justify,
-                            text: TextSpan(
-                              style: TextStyle(
-                                color: Colors.black87,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Howzat needs access to your location.Please allow access to your location settings and restart app to move forward.",
-                                ),
-                                
-                               
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(right: 8.0),
-                  child: FlatButton(
-                    child: Text("Settings"),
-                    onPressed: () {
-                      openSettingForGrantingPermissions();
-                                          
-                    },
-                  ),
-                ),
-              ],
-            ),
+        onWillPop: () {},
+        child: AlertDialog(
+          contentPadding: EdgeInsets.all(0.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
           ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                height: 80.0,
+                color: Theme.of(context).primaryColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SvgPicture.asset(
+                      "images/logo_white.svg",
+                      color: Colors.white,
+                      width: 40.0,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Image.asset(
+                        "images/logo_name_white.png",
+                        height: 20.0,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: RichText(
+                        textAlign: TextAlign.justify,
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: Colors.black87,
+                          ),
+                          children: [
+                            TextSpan(
+                              text:
+                                  "Howzat needs access to your location.Please allow access to your location settings and restart app to move forward.",
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: FlatButton(
+                child: Text("Settings"),
+                onPressed: () {
+                  openSettingForGrantingPermissions();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
       barrierDismissible: false,
     );
   }
@@ -315,12 +311,12 @@ class SignInPageState extends State<SignInPage> {
     bool isOpened = await LocationPermissions().openAppSettings();
     PermissionStatus permissionStatus =
         await LocationPermissions().checkPermissionStatus();
-    if (permissionStatus.toString() == PermissionStatus.granted.toString()){
-         print("We are inside granted permission");
-         Navigator.of(context).pop();
-       }else{
-          print("We are outside granted permission");
-       } 
+    if (permissionStatus.toString() == PermissionStatus.granted.toString()) {
+      print("We are inside granted permission");
+      Navigator.of(context).pop();
+    } else {
+      print("We are outside granted permission");
+    }
   }
 
   _doSignIn(String _authName, String _password) async {
@@ -361,8 +357,8 @@ class SignInPageState extends State<SignInPage> {
       "refCode": _pfRefCode,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter,
-      "location_longitude":location_longitude,
-      "location_latitude":location_latitude
+      "location_longitude": location_longitude,
+      "location_latitude": location_latitude
     };
 
     bool disableBranchIOAttribution =
@@ -507,8 +503,8 @@ class SignInPageState extends State<SignInPage> {
       "model": model,
       "manufacturer": manufacturer,
       "serial": serial,
-      "location_longitude":location_longitude,
-      "location_latitude":location_latitude
+      "location_longitude": location_longitude,
+      "location_latitude": location_latitude
     };
 
     bool disableBranchIOAttribution =
@@ -676,7 +672,7 @@ class SignInPageState extends State<SignInPage> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: <Widget>[
               SvgPicture.asset(

@@ -630,7 +630,7 @@ class JoinContestState extends State<JoinContest> {
               ],
             ),
       bottomNavigationBar: Container(
-        height: 72.0,
+        height: 64.0,
         padding:isIos?EdgeInsets.only(bottom: 7.5):null,
         decoration: BoxDecoration(
           color: Colors.white,

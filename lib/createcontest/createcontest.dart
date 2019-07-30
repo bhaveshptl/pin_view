@@ -900,7 +900,7 @@ class CreateContestState extends State<CreateContest> {
         ],
       ),
       bottomNavigationBar: Container(
-        height: 72.0,
+        height: 64.0,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [

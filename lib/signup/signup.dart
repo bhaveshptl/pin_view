@@ -743,7 +743,7 @@ class SignupState extends State<Signup> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         title: Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
             children: <Widget>[
               // Image.asset("images/logo_white.png"),

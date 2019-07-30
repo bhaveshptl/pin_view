@@ -44,7 +44,7 @@ class SplashScreenState extends State<SplashScreen>
   String maintenanceMsg = "";
   double loadingPercent = 0.0;
   bool bUnderMaintenence = false;
-  bool isTablet=false;
+  bool isTablet = false;
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
@@ -137,8 +137,8 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   initServices() async {
-    if( Device.get().isTablet ){
-       isTablet=true;
+    if (Device.get().isTablet) {
+      isTablet = true;
     }
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
@@ -336,24 +336,45 @@ class SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    double aspectRatio = MediaQuery.of(context).size.aspectRatio;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: AppConfig.of(context).channelId == "10" || AppConfig.of(context).channelId == "13"
-          ? Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                  image: AssetImage(!isTablet?"images/splashscreen.png":"images/SplashScreenTablet.png"),
-                  fit: BoxFit.fitWidth,
-                  
-                  alignment: Alignment.topCenter,
+      body: AppConfig.of(context).channelId == "10" ||
+              AppConfig.of(context).channelId == "13"
+          ? Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    image: DecorationImage(
+                      image: AssetImage(!isTablet
+                          ? "images/splashscreen.png"
+                          : "images/SplashScreenTablet.png"),
+                      fit: BoxFit.fitWidth,
+                      alignment: aspectRatio > 0.5625
+                          ? Alignment.bottomCenter
+                          : Alignment.topCenter,
+                    ),
+                  ),
+                  // child: Image.asset(
+                  //   "images/splashscreen.png",
+                  //   fit: BoxFit.fitWidth,
+                  //   alignment: Alignment.topCenter,
+                  // ),
                 ),
-              ),
-              // child: Image.asset(
-              //   "images/splashscreen.png",
-              //   fit: BoxFit.fitWidth,
-              //   alignment: Alignment.topCenter,
-              // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: LinearProgressIndicator(
+                        value: loadingPercent / 100,
+                        backgroundColor: Colors.white12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             )
           : Stack(
               children: <Widget>[
