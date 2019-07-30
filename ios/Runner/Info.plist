@@ -84,6 +84,8 @@
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>HowzatLaunchScreen</string>
+	<key>UILaunchStoryboardName~ipad</key>
+	<string>IpadLaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiresFullScreen</key>
