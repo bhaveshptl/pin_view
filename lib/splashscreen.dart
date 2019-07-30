@@ -18,7 +18,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:permission/permission.dart';
-import 'package:flutter_device_type/flutter_device_type.dart';
+import 'dart:math';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
@@ -44,7 +44,6 @@ class SplashScreenState extends State<SplashScreen>
   String maintenanceMsg = "";
   double loadingPercent = 0.0;
   bool bUnderMaintenence = false;
-  bool isTablet = false;
   static const firebase_fcm_platform =
       const MethodChannel('com.algorin.pf.fcm');
   static const branch_io_platform =
@@ -136,10 +135,7 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  initServices() async {
-    if (Device.get().isTablet) {
-      isTablet = true;
-    }
+  initServices() async {   
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
     if (isIos) {
@@ -334,6 +330,16 @@ class SplashScreenState extends State<SplashScreen>
     );
   }
 
+  static bool isTablet(MediaQueryData query) {
+    var size = query.size;
+    var diagonal = sqrt(
+      (size.width * size.width) + 
+      (size.height * size.height)
+    );
+    var isTablet = diagonal > 1100.0;
+    return isTablet;
+  }
+
   @override
   Widget build(BuildContext context) {
     double aspectRatio = MediaQuery.of(context).size.aspectRatio;
@@ -348,7 +354,7 @@ class SplashScreenState extends State<SplashScreen>
                   decoration: BoxDecoration(
                     color: Colors.white,
                     image: DecorationImage(
-                      image: AssetImage(!isTablet
+                      image: AssetImage(!isTablet(MediaQuery.of(context))
                           ? "images/splashscreen.png"
                           : "images/SplashScreenTablet.png"),
                       fit: BoxFit.fitWidth,
