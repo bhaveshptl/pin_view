@@ -104,9 +104,10 @@ class PlayingStyleTab extends StatelessWidget {
                                   "Players".toUpperCase(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .subhead
+                                      .caption
                                       .copyWith(
                                         color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                 ),
                                 sortedBy == "NAME"
@@ -114,7 +115,7 @@ class PlayingStyleTab extends StatelessWidget {
                                         isAscending
                                             ? Icons.arrow_downward
                                             : Icons.arrow_upward,
-                                        size: 18.0,
+                                        size: 14.0,
                                         color: Colors.grey.shade600,
                                       )
                                     : Container(),
@@ -137,25 +138,23 @@ class PlayingStyleTab extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Container(
-                                  width: 50.0,
-                                  child: Text(
-                                    "Points".toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .copyWith(
-                                          color: Colors.grey.shade600,
-                                        ),
-                                  ),
+                                Text(
+                                  "Points".toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                                 sortedBy == "SCORE"
                                     ? Icon(
                                         isAscending
                                             ? Icons.arrow_downward
                                             : Icons.arrow_upward,
-                                        size: 18.0,
+                                        size: 14.0,
                                         color: Colors.grey.shade600,
                                       )
                                     : Container(),
@@ -176,26 +175,25 @@ class PlayingStyleTab extends StatelessWidget {
                             height: 28.0,
                             alignment: Alignment.centerLeft,
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Expanded(
-                                  child: Text(
-                                    "Credits".toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                  ),
+                                Text(
+                                  "Credits".toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey.shade600,
+                                      ),
                                 ),
                                 sortedBy == "CREDITS"
                                     ? Icon(
                                         isAscending
                                             ? Icons.arrow_downward
                                             : Icons.arrow_upward,
-                                        size: 18.0,
+                                        size: 14.0,
                                         color: Colors.grey.shade600,
                                       )
                                     : Container(),
@@ -205,7 +203,7 @@ class PlayingStyleTab extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        width: 40.0,
+                        width: 48.0,
                       ),
                     ],
                   ),

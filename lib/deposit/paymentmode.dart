@@ -680,7 +680,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "email": widget.paymentMode["email"] == null
           ? emailController.text == ""
               ? "${widget.paymentMode["mobile"]}@howzat.com"
-              : emailController.text == ""
+              : emailController.text
           : widget.paymentMode["email"],
       "phone": widget.paymentMode["mobile"] == null
           ? phoneController.text == "" ? "9876543210" : phoneController.text
