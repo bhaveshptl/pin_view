@@ -345,6 +345,10 @@ class SplashScreenState extends State<SplashScreen>
     double aspectRatio = MediaQuery.of(context).size.aspectRatio;
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+         child: Container(),
+       ),
       body: AppConfig.of(context).channelId == "10" ||
               AppConfig.of(context).channelId == "13"
           ? Stack(
