@@ -100,7 +100,7 @@ class FantasyWebSocket {
   }
 
   _startPingPong() {
-    _pingPongTimer = Timer(Duration(seconds: 2), () {
+    _pingPongTimer = Timer(Duration(seconds: 20), () {
       if (!bConnectionProcessInProgress) {
         iPingCount++;
         if (iPingCount > 3) {
