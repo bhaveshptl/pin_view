@@ -29,6 +29,11 @@ public class BranchClass  extends FlutterApplication {
                 .setDebugMode(true)
                 .build();
         registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, config));
+        FlutterApplication flutterApplication = new FlutterApplication();
+        registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(flutterApplication, config));
+
+
+
     }
 
 }

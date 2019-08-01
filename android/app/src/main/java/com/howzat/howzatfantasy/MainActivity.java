@@ -10,6 +10,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 import android.content.Context;
+
+import com.howzat.howzatfantasy.services.BranchClass;
 import com.howzat.howzatfantasy.services.DeviceInfo;
 import com.howzat.howzatfantasy.services.MyHelperClass;
 
@@ -29,6 +31,7 @@ import io.branch.referral.util.BranchContentSchema;
 import io.branch.referral.util.BranchEvent;
 import io.branch.referral.util.ContentMetadata;
 import io.flutter.app.FlutterActivity;
+import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
@@ -111,6 +114,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 .build();
         this.getApplication()
                 .registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
+        FlutterApplication flutterApplication = new FlutterApplication();
+        BranchClass branchClass =new BranchClass();
+        flutterApplication.registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(flutterApplication, webEngageConfig));
+        branchClass.registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(branchClass, webEngageConfig));
         weAnalytics = WebEngage.get().analytics();
         weUser = WebEngage.get().user();
 
