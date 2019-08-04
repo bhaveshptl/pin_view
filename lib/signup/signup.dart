@@ -38,12 +38,10 @@ class SignupState extends State<Signup> {
   String _pfRefCode;
   String googleAddId = "";
   bool _obscureText = true;
-  String _installAndroid_link;
   bool isIos = false;
   bool _bShowReferralInput = false;
   String _installReferring_link = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
-  String _installReferringLink = "";
   String chosenloginTypeByUser = "";
   String location_longitude="";
   String location_latitude = "";
@@ -152,10 +150,10 @@ class SignupState extends State<Signup> {
   }
 
   _initBranchStuff() async {
-    _getInstallReferringLink().then((String installReferringLink) {
-      if(installReferringLink.length>2){
+    _getInstallReferringLink().then((String value) {
+      if(value.length>2){
          setState(() {
-        _installReferringLink = installReferringLink;
+        _installReferring_link = value;
       });
       }
     });
