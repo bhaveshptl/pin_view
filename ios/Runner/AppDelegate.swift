@@ -619,10 +619,13 @@ import CoreLocation
         if(data["first_name"] != nil){
             let value:String = data["first_name"] as! String;
             weUser.setFirstName(value);
+            weUser.setAttribute("first_name", withStringValue:value);
+            
         }
         if(data["lastName"] != nil){
             let value:String = data["lastName"] as! String;
             weUser.setLastName(value);
+            weUser.setAttribute("last_name", withStringValue:value);
         }
         if(data["login_name"] != nil){
             let value:String = data["login_name"] as! String;
@@ -722,6 +725,10 @@ import CoreLocation
             var valueinS:String = String(format: "%.0f", valueinD);
             let value = NSNumber(value: valueinD);
             weUser.setAttribute("balance", withValue:value);
+        }
+        if(data["accountStatus"] != nil){
+            let value:String = data["accountStatus"] as! String;
+            weUser.setAttribute("accountStatus", withValue:value);
         }
         return "Data is used";
     }

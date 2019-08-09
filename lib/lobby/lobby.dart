@@ -186,11 +186,11 @@ class LobbyState extends State<Lobby>
        userInfo["lastName"] = profileData["lname"];
     }
     if(profileData["status"]=="ACTIVE"){
-     userInfo["accountStatus"] = 1;
+     userInfo["accountStatus"] = "1";
     }else if(profileData["status"]=="CLOSED"){
-     userInfo["accountStatus"] = 2;
+     userInfo["accountStatus"] = "2";
     }else if(profileData["status"]=="BLOCKED"){
-     userInfo["accountStatus"] = 3;
+     userInfo["accountStatus"] = "3";
     }
     userInfo["pincode"] =
         profileData["pincode"] != null ? profileData["pincode"] : "";
