@@ -493,9 +493,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
        
         if(arguments.get("first_name") != null && ((String) arguments.get("first_name")).length()>0){
             weUser.setFirstName((String)arguments.get("first_name"));
+            weUser.setAttribute("first_name", (String)arguments.get("first_name"));
         }
         if(arguments.get("lastName") != null && ((String) arguments.get("lastName")).length()>0){
             weUser.setLastName((String)arguments.get("lastName"));
+            weUser.setAttribute("last_name", (String)arguments.get("lastName"));
         }
         if(arguments.get("login_name") != null && ((String) arguments.get("login_name")).length()>0){
             weUser.setAttribute("userName", (String)arguments.get("login_name"));
@@ -567,6 +569,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(arguments.get("user_balance_webengage") != null){
             double user_balance_webengage = new Double(arguments.get("user_balance_webengage").toString());
             weUser.setAttribute("balance",Math.round(user_balance_webengage * 100.0) / 100.0 );
+        }
+        if(arguments.get("accountStatus") != null){
+            weUser.setAttribute("accountStatus",arguments.get("accountStatus").toString() );
         }
         
         return "Refreshed user Date is used";

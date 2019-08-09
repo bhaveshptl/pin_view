@@ -179,6 +179,19 @@ class LobbyState extends State<Lobby>
         verificationStatus["address_verification"];
     userInfo["email_verification"] = verificationStatus["email_verification"];
     Map<String, dynamic> profileData = await _getProfileData();
+    if(profileData["fname"] != null){
+        userInfo["first_name"] = profileData["fname"];
+    }
+    if(profileData["lname"] != null){
+       userInfo["lastName"] = profileData["lname"];
+    }
+    if(profileData["status"]=="ACTIVE"){
+     userInfo["accountStatus"] = 1;
+    }else if(profileData["status"]=="CLOSED"){
+     userInfo["accountStatus"] = 2;
+    }else if(profileData["status"]=="BLOCKED"){
+     userInfo["accountStatus"] = 3;
+    }
     userInfo["pincode"] =
         profileData["pincode"] != null ? profileData["pincode"] : "";
     userInfo["dob"] = profileData["dob"] != null ? profileData["dob"] : "";
