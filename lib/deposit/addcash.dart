@@ -321,6 +321,9 @@ class AddCashState extends State<AddCash> {
 
     widget.depositData.chooseAmountData.amountTiles.forEach(
       (chooseAmount) {
+        bool bIsBonusApplicable = selectedPromo != null &&
+            chooseAmount >= selectedPromo["minimum"] &&
+            chooseAmount <= selectedPromo["maximum"];
         int curTileIndex = i;
         tiles.add(
           Stack(
@@ -434,17 +437,16 @@ class AddCashState extends State<AddCash> {
                         padding: EdgeInsets.only(left: 8.0),
                         child: Row(
                           children: <Widget>[
-                            Image.asset(
-                              "images/Bonus-gift.png",
-                              height: 20.0,
-                            ),
+                            bIsBonusApplicable
+                                ? Image.asset(
+                                    "images/Bonus-gift.png",
+                                    height: 20.0,
+                                  )
+                                : Container(),
                             Padding(
                               padding: EdgeInsets.only(left: 8.0),
                               child: Text(
-                                (selectedPromo != null &&
-                                        chooseAmount >=
-                                            selectedPromo["minimum"] &&
-                                        chooseAmount <= selectedPromo["maximum"]
+                                (bIsBonusApplicable
                                     ? (strings.rupee +
                                         getFirstDepositBonusAmount(chooseAmount)
                                             .toStringAsFixed(0) +
