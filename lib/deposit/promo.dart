@@ -244,7 +244,7 @@ class _PromoStateInput extends State<PromoInput> {
                             children: <Widget>[
                               Expanded(
                                 child: Text(
-                                  "Bonus Amount",
+                                  "Playable Bonus",
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .body1

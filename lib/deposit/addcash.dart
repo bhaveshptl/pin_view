@@ -361,10 +361,10 @@ class AddCashState extends State<AddCash> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Expanded(
-                        flex: 2,
-                        child: Container(),
-                      ),
+                      // Expanded(
+                      //   flex: 2,
+                      //   child: Container(),
+                      // ),
                       Expanded(
                         flex: 1,
                         child: Text(
@@ -418,80 +418,80 @@ class AddCashState extends State<AddCash> {
                   ),
                 ),
               ),
-              IgnorePointer(
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: 50.0,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: ExactAssetImage("images/Ribbon.png"),
-                              alignment: Alignment.centerLeft),
-                        ),
-                        margin: EdgeInsets.only(left: 10.0, right: 32.0),
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Row(
-                          children: <Widget>[
-                            Image.asset(
-                              "images/Bonus-gift.png",
-                              height: 20.0,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                (selectedPromo != null &&
-                                        chooseAmount >=
-                                            selectedPromo["minimum"] &&
-                                        chooseAmount <= selectedPromo["maximum"]
-                                    ? (strings.rupee +
-                                        getFirstDepositBonusAmount(chooseAmount)
-                                            .toStringAsFixed(0) +
-                                        " Bonus")
-                                    : "No Bonus"),
-                                style: isIos
-                                    ? Theme.of(context)
-                                        .primaryTextTheme
-                                        .body1
-                                        .copyWith(
-                                          color: (selectedPromo != null &&
-                                                  chooseAmount >=
-                                                      selectedPromo[
-                                                          "minimum"] &&
-                                                  chooseAmount <=
-                                                      selectedPromo["maximum"])
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        )
-                                    : Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .copyWith(
-                                          color: (selectedPromo != null &&
-                                                  chooseAmount >=
-                                                      selectedPromo[
-                                                          "minimum"] &&
-                                                  chooseAmount <=
-                                                      selectedPromo["maximum"])
-                                              ? Theme.of(context).primaryColor
-                                              : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Container(),
-                    )
-                  ],
-                ),
-              ),
+              // IgnorePointer(
+              //   child: Row(
+              //     children: <Widget>[
+              //       Expanded(
+              //         flex: 2,
+              //         child: Container(
+              //           height: 50.0,
+              //           decoration: BoxDecoration(
+              //             image: DecorationImage(
+              //                 image: ExactAssetImage("images/Ribbon.png"),
+              //                 alignment: Alignment.centerLeft),
+              //           ),
+              //           margin: EdgeInsets.only(left: 10.0, right: 32.0),
+              //           padding: EdgeInsets.only(left: 8.0),
+              //           child: Row(
+              //             children: <Widget>[
+              //               Image.asset(
+              //                 "images/Bonus-gift.png",
+              //                 height: 20.0,
+              //               ),
+              //               Padding(
+              //                 padding: EdgeInsets.only(left: 8.0),
+              //                 child: Text(
+              //                   (selectedPromo != null &&
+              //                           chooseAmount >=
+              //                               selectedPromo["minimum"] &&
+              //                           chooseAmount <= selectedPromo["maximum"]
+              //                       ? (strings.rupee +
+              //                           getFirstDepositBonusAmount(chooseAmount)
+              //                               .toStringAsFixed(0) +
+              //                           " Bonus")
+              //                       : "No Bonus"),
+              //                   style: isIos
+              //                       ? Theme.of(context)
+              //                           .primaryTextTheme
+              //                           .body1
+              //                           .copyWith(
+              //                             color: (selectedPromo != null &&
+              //                                     chooseAmount >=
+              //                                         selectedPromo[
+              //                                             "minimum"] &&
+              //                                     chooseAmount <=
+              //                                         selectedPromo["maximum"])
+              //                                 ? Theme.of(context).primaryColor
+              //                                 : Colors.red,
+              //                             fontWeight: FontWeight.bold,
+              //                           )
+              //                       : Theme.of(context)
+              //                           .primaryTextTheme
+              //                           .subhead
+              //                           .copyWith(
+              //                             color: (selectedPromo != null &&
+              //                                     chooseAmount >=
+              //                                         selectedPromo[
+              //                                             "minimum"] &&
+              //                                     chooseAmount <=
+              //                                         selectedPromo["maximum"])
+              //                                 ? Theme.of(context).primaryColor
+              //                                 : Colors.red,
+              //                             fontWeight: FontWeight.bold,
+              //                           ),
+              //                 ),
+              //               )
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //       Expanded(
+              //         flex: 2,
+              //         child: Container(),
+              //       )
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         );
@@ -795,7 +795,7 @@ class AddCashState extends State<AddCash> {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          "Bonus Amount",
+                          "Playable Bonus",
                           style:
                               Theme.of(context).primaryTextTheme.body1.copyWith(
                                     color: Colors.black,
