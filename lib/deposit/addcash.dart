@@ -321,6 +321,9 @@ class AddCashState extends State<AddCash> {
 
     widget.depositData.chooseAmountData.amountTiles.forEach(
       (chooseAmount) {
+        bool bIsBonusApplicable = selectedPromo != null &&
+            chooseAmount >= selectedPromo["minimum"] &&
+            chooseAmount <= selectedPromo["maximum"];
         int curTileIndex = i;
         tiles.add(
           Stack(
