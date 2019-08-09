@@ -116,7 +116,7 @@ class MyAccountState extends State<MyAccount> {
                       : CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      "Plable Bonus",
+                      "Playable Bonus",
                       style: TextStyle(
                         fontSize:
                             Theme.of(context).primaryTextTheme.body1.fontSize,
