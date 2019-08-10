@@ -728,7 +728,7 @@ import CoreLocation
         }
         if(data["accountStatus"] != nil){
             let value:String = data["accountStatus"] as! String;
-            weUser.setAttribute("accountStatus", withValue:value);
+            weUser.setAttribute("accountStatus", withStringValue:value);
         }
         return "Data is used";
     }
