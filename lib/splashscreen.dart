@@ -69,7 +69,7 @@ class SplashScreenState extends State<SplashScreen>
 
   getRequiredData() async {
     if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
-      await checkForPermission();
+     await checkForPermission();
     }
     setLoadingPercentage(0.0);
     await updateStringTable();
@@ -234,10 +234,10 @@ class SplashScreenState extends State<SplashScreen>
 
   askForPermission() async {
     final result =
-        await Permission.requestSinglePermission(PermissionName.WriteStorage);
+        await Permission.requestPermissions([PermissionName.WriteStorage]);
     if (result != null) {
       setState(() {
-        permissionStatus = result;
+       permissionStatus = result[0].permissionStatus;
       });
     }
     return result;
