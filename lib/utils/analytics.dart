@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:device_info/device_info.dart';
 import 'package:package_info/package_info.dart';
@@ -8,41 +9,61 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import 'package:crypto/src/digest_sink.dart';
-
 
 class AnalyticsManager {
   String source;
   String journey;
+  static int userId;
   static String _url;
   static Timer _timer;
   static Visit _visit;
   static int _duration;
+  static int _timeout;
   static bool isEnabled;
+  String analyticsCookie;
   static DateTime _lastBatchUploadTime;
   static List<Event> analyticsEvents = [];
   static DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   static const webengage_platform =
       const MethodChannel('com.algorin.pf.webengage');
-  static const utils_platform = const MethodChannel('com.algorin.pf.utils');    
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
 
   AnalyticsManager._internal();
-  factory AnalyticsManager() => AnalyticsManager._internal();
+  static final AnalyticsManager _analyticsManager =
+      AnalyticsManager._internal();
+  factory AnalyticsManager() => _analyticsManager;
 
-  init({String url, int duration = 5, String channelId}) async {
+  init({
+    String url,
+    int timeout = 30,
+    int duration = 5,
+    String channelId,
+  }) async {
     _url = url;
     _duration = duration;
+    _timeout = timeout;
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    AndroidDeviceInfo androidInfo;
+    IosDeviceInfo iosDeviceInfo;
+    if (!Platform.isIOS) {
+      androidInfo = await deviceInfo.androidInfo;
+    } else {
+      iosDeviceInfo = await deviceInfo.iosInfo;
+    }
     String firebasedeviceid;
     await SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN)
         .then((onValue) {
       firebasedeviceid = onValue;
     });
+
+    String refCode = await SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH);
+
+    SharedPrefHelper.internal()
+        .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
 
     _visit = Visit(
       appVersion: double.parse(packageInfo.version),
@@ -51,28 +72,32 @@ class AnalyticsManager {
       creativeId: 0,
       deviceId: firebasedeviceid,
       domain: Uri.parse(BaseUrl().apiUrl).host,
-      googleAddId: "string",
+      googleAddId: "",
       id: 0,
-      manufacturer: androidInfo.manufacturer,
-      model: androidInfo.model,
+      manufacturer: Platform.isIOS ? "Apple" : androidInfo.manufacturer,
+      model: Platform.isIOS ? iosDeviceInfo.model : androidInfo.model,
       networkOp: "",
-      networkType: "string",
-      osName: androidInfo.host,
-      osVersion: androidInfo.version.release,
+      networkType: "",
+      osName: Platform.isIOS ? iosDeviceInfo.systemName : androidInfo.host,
+      osVersion: Platform.isIOS
+          ? iosDeviceInfo.systemVersion
+          : androidInfo.version.release,
       partnerId: 0,
       productId: 1,
-      providerId: "string",
-      refCode: "string",
-      refURL: "string",
-      serial: androidInfo.androidId,
+      providerId: "",
+      refCode: refCode,
+      refURL: "",
+      serial: Platform.isIOS
+          ? iosDeviceInfo.identifierForVendor
+          : androidInfo.androidId,
       sessionId: "",
       uid: 0,
-      userId: 0,
-      utmCampaign: "string",
-      utmContent: "string",
-      utmMedium: "string",
-      utmSource: "string",
-      utmTerm: "string",
+      userId: userId,
+      utmCampaign: "",
+      utmContent: "",
+      utmMedium: "",
+      utmSource: "",
+      utmTerm: "",
     );
   }
 
@@ -81,7 +106,7 @@ class AnalyticsManager {
       _timer = Timer(Duration(seconds: _duration), () async {
         if (_lastBatchUploadTime == null ||
             _lastBatchUploadTime.difference(DateTime.now()) >
-                Duration(minutes: 30)) {
+                Duration(minutes: _timeout)) {
           final result = await uploadEventBatch();
         } else {
           uploadEventBatch();
@@ -91,34 +116,51 @@ class AnalyticsManager {
     }
   }
 
+  setUser(Map<String, dynamic> user) {
+    userId = user["user_id"];
+    if (_visit != null) {
+      _visit.userId = user["user_id"];
+    }
+  }
+
+  setContext(Map<String, dynamic> context) {
+    _visit.utmCampaign = context["utm_Campaign"];
+    _visit.utmContent = context["utm_Content"];
+    _visit.utmMedium = context["utm_Medium"];
+    _visit.utmSource = context["utm_Source"];
+    _visit.utmTerm = context["utm_Term"];
+  }
+
   Future<bool> uploadEventBatch() async {
-    String cookie;
-    await SharedPrefHelper.internal()
-        .getFromSharedPref(ApiUtil.ANALYTICS_COOKIE)
-        .then((onValue) {
-      cookie = onValue;
-    });
+    if (analyticsCookie == null || analyticsCookie == "") {
+      await SharedPrefHelper.internal()
+          .getFromSharedPref(ApiUtil.ANALYTICS_COOKIE)
+          .then((onValue) {
+        analyticsCookie = onValue;
+      });
+    }
 
     if (analyticsEvents.length > 0) {
       _visit.clientTimestamp = DateTime.now().millisecondsSinceEpoch;
       Map<String, dynamic> payload = {
-        "events": analyticsEvents,
+        "events": analyticsEvents.getRange(0, analyticsEvents.length).toList(),
         "visit": _visit
       };
-      analyticsEvents = [];
+      analyticsEvents.removeRange(0, analyticsEvents.length);
       return http.Client()
           .post(
         _url,
         headers: {
-          'cookie': cookie,
+          'cookie': analyticsCookie,
           'Content-type': 'application/json',
         },
         body: json.encode(payload),
       )
           .then((http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
-          SharedPrefHelper().saveToSharedPref(
-              ApiUtil.ANALYTICS_COOKIE, res.headers["set-cookie"]);
+          analyticsCookie = res.headers["set-cookie"];
+          SharedPrefHelper()
+              .saveToSharedPref(ApiUtil.ANALYTICS_COOKIE, analyticsCookie);
           _lastBatchUploadTime = DateTime.now();
           return true;
         }
@@ -142,11 +184,11 @@ class AnalyticsManager {
   }
 
   setJourney(String journey) {
-    journey = journey;
+    this.journey = journey;
   }
 
   setSource(String source) {
-    source = source;
+    this.source = source;
   }
 
   static Future<String> webengageTrackEvent(Map<dynamic, dynamic> data) async {
@@ -160,11 +202,12 @@ class AnalyticsManager {
     return "";
   }
 
-  static Future<String> trackEventsWithAttributes(Map<dynamic, dynamic> data) async {
+  static Future<String> trackEventsWithAttributes(
+      Map<dynamic, dynamic> data) async {
     String result = "";
     try {
-      result =
-          await webengage_platform.invokeMethod('trackEventsWithAttributes', data);
+      result = await webengage_platform.invokeMethod(
+          'trackEventsWithAttributes', data);
     } catch (e) {
       print(e);
     }
@@ -182,18 +225,20 @@ class AnalyticsManager {
     return "";
   }
 
-  static Future<String> webengageCustomAttributeTrackUser(Map<dynamic, dynamic> data) async {
+  static Future<String> webengageCustomAttributeTrackUser(
+      Map<dynamic, dynamic> data) async {
     String result = "";
     try {
-      result =
-          await webengage_platform.invokeMethod('webengageCustomAttributeTrackUser', data);
+      result = await webengage_platform.invokeMethod(
+          'webengageCustomAttributeTrackUser', data);
     } catch (e) {
       print(e);
     }
     return "";
   }
 
-  static Future<String> webengageAddScreenData(Map<dynamic, dynamic> data) async {
+  static Future<String> webengageAddScreenData(
+      Map<dynamic, dynamic> data) async {
     String result = "";
     try {
       result =
@@ -204,21 +249,18 @@ class AnalyticsManager {
     return "";
   }
 
-
-
-  static String  dosha256Encoding(String dataString){
+  static String dosha256Encoding(String dataString) {
     var bytes = utf8.encode(dataString); // data being hashed
     var key = utf8.encode('tyu7CVYUiiop67XTHophyRTyUItYRtErTTYUZAS');
 
-
     //var digest = sha1.convert(bytes);
 
-     var hmacSha256 = new Hmac(sha256, key); // HMAC-SHA256
+    var hmacSha256 = new Hmac(sha256, key); // HMAC-SHA256
     var digest = hmacSha256.convert(bytes);
-     return digest.toString();
+    return digest.toString();
   }
 
-   static Future<String> deleteInternalStorageFile(String filename) async {
+  static Future<String> deleteInternalStorageFile(String filename) async {
     String value;
     try {
       value = await utils_platform.invokeMethod(
@@ -226,6 +268,4 @@ class AnalyticsManager {
     } catch (e) {}
     return value;
   }
-
-
 }

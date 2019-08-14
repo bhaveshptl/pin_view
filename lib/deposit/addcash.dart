@@ -16,6 +16,7 @@ import 'package:playfantasy/commonwidgets/textbox.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/deposit/promo.dart';
+import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -158,10 +159,12 @@ class AddCashState extends State<AddCash> {
   }
 
   initWebview() {
-    flutterWebviewPlugin.launch(
-      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-      hidden: true,
-    );
+    try {
+      flutterWebviewPlugin.launch(
+        BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+        hidden: true,
+      );
+    } catch (e) {}
   }
 
   _launchStaticPage(String name) {
@@ -250,11 +253,36 @@ class AddCashState extends State<AddCash> {
             ),
           );
         } else {
+          AnalyticsManager().addEvent(
+            Event(
+              name: "pay_failed",
+              v1: amount,
+              v2: response["modeOptionId"],
+              v3: 1,
+              v6: int.parse(response["gatewayId"].toString()),
+              s1: selectedPromo["promoCode"],
+              s2: response["orderId"],
+            ),
+          );
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
         }
       } else {
+        AnalyticsManager().addEvent(
+          Event(
+            name: "pay_success",
+            v1: amount,
+            v2: response["modeOptionId"],
+            v3: 1,
+            v4: int.parse(response["withdrawable"]) +
+                int.parse(response["nonWithdrawable"]) +
+                int.parse(response["depositBucket"]),
+            v6: int.parse(payload["gatewayId"].toString()),
+            s1: selectedPromo["promoCode"],
+            s2: response["orderId"],
+          ),
+        );
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
@@ -321,9 +349,6 @@ class AddCashState extends State<AddCash> {
 
     widget.depositData.chooseAmountData.amountTiles.forEach(
       (chooseAmount) {
-        bool bIsBonusApplicable = selectedPromo != null &&
-            chooseAmount >= selectedPromo["minimum"] &&
-            chooseAmount <= selectedPromo["maximum"];
         int curTileIndex = i;
         tiles.add(
           Stack(
@@ -351,6 +376,18 @@ class AddCashState extends State<AddCash> {
                             )
                           : widget.depositData.chooseAmountData
                               .amountTiles[curTileIndex];
+                      addAnalyticsEvent(
+                        event: Event(
+                          name: "deposit_tile",
+                          v1: selectedAmount,
+                          v3: widget.depositData.chooseAmountData.isFirstDeposit
+                              ? 0
+                              : 1,
+                          s1: selectedPromo == null
+                              ? ""
+                              : selectedPromo["promoCode"],
+                        ),
+                      );
                       customAmountController.text = selectedAmount.toString();
                       setState(() {
                         selectedTileindex = curTileIndex;
@@ -364,10 +401,6 @@ class AddCashState extends State<AddCash> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      // Expanded(
-                      //   flex: 2,
-                      //   child: Container(),
-                      // ),
                       Expanded(
                         flex: 1,
                         child: Text(
@@ -421,80 +454,6 @@ class AddCashState extends State<AddCash> {
                   ),
                 ),
               ),
-              // IgnorePointer(
-              //   child: Row(
-              //     children: <Widget>[
-              //       Expanded(
-              //         flex: 2,
-              //         child: Container(
-              //           height: 50.0,
-              //           decoration: BoxDecoration(
-              //             image: DecorationImage(
-              //                 image: ExactAssetImage("images/Ribbon.png"),
-              //                 alignment: Alignment.centerLeft),
-              //           ),
-              //           margin: EdgeInsets.only(left: 10.0, right: 32.0),
-              //           padding: EdgeInsets.only(left: 8.0),
-              //           child: Row(
-              //             children: <Widget>[
-              //               Image.asset(
-              //                 "images/Bonus-gift.png",
-              //                 height: 20.0,
-              //               ),
-              //               Padding(
-              //                 padding: EdgeInsets.only(left: 8.0),
-              //                 child: Text(
-              //                   (selectedPromo != null &&
-              //                           chooseAmount >=
-              //                               selectedPromo["minimum"] &&
-              //                           chooseAmount <= selectedPromo["maximum"]
-              //                       ? (strings.rupee +
-              //                           getFirstDepositBonusAmount(chooseAmount)
-              //                               .toStringAsFixed(0) +
-              //                           " Bonus")
-              //                       : "No Bonus"),
-              //                   style: isIos
-              //                       ? Theme.of(context)
-              //                           .primaryTextTheme
-              //                           .body1
-              //                           .copyWith(
-              //                             color: (selectedPromo != null &&
-              //                                     chooseAmount >=
-              //                                         selectedPromo[
-              //                                             "minimum"] &&
-              //                                     chooseAmount <=
-              //                                         selectedPromo["maximum"])
-              //                                 ? Theme.of(context).primaryColor
-              //                                 : Colors.red,
-              //                             fontWeight: FontWeight.bold,
-              //                           )
-              //                       : Theme.of(context)
-              //                           .primaryTextTheme
-              //                           .subhead
-              //                           .copyWith(
-              //                             color: (selectedPromo != null &&
-              //                                     chooseAmount >=
-              //                                         selectedPromo[
-              //                                             "minimum"] &&
-              //                                     chooseAmount <=
-              //                                         selectedPromo["maximum"])
-              //                                 ? Theme.of(context).primaryColor
-              //                                 : Colors.red,
-              //                             fontWeight: FontWeight.bold,
-              //                           ),
-              //                 ),
-              //               )
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //       Expanded(
-              //         flex: 2,
-              //         child: Container(),
-              //       )
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         );
@@ -597,6 +556,10 @@ class AddCashState extends State<AddCash> {
     return tiles;
   }
 
+  addAnalyticsEvent({Event event}) {
+    AnalyticsManager().addEvent(event);
+  }
+
   onRepeatTransaction() async {
     int amount =
         amountController.text != "" ? int.parse(amountController.text) : 0;
@@ -613,21 +576,34 @@ class AddCashState extends State<AddCash> {
               widget.depositData.chooseAmountData.depositLimit.toString()),
         ),
       );
-    } else if (selectedPromo == null) {
-      initRepeatDeposit();
     } else {
-      final result = await validatePromo(amount);
-      if (result != null) {
-        Map<String, dynamic> paymentMode = json.decode(result);
-        selectedPromo = paymentMode["details"];
-        if (paymentMode["error"] == true) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(paymentMode["msg"]),
-            ),
-          );
-        } else {
-          initRepeatDeposit();
+      dynamic paymentDetails =
+          widget.depositData.chooseAmountData.lastPaymentArray[0];
+      addAnalyticsEvent(
+        event: Event(
+            name: "repeat_transaction",
+            v1: amount,
+            v2: paymentDetails["modeOptionId"],
+            v3: 1,
+            v6: int.parse(paymentDetails["gatewayId"].toString()),
+            s1: selectedPromo != null ? selectedPromo["promoCode"] : ""),
+      );
+      if (selectedPromo == null) {
+        initRepeatDeposit();
+      } else {
+        final result = await validatePromo(amount);
+        if (result != null) {
+          Map<String, dynamic> paymentMode = json.decode(result);
+          selectedPromo = paymentMode["details"];
+          if (paymentMode["error"] == true) {
+            _scaffoldKey.currentState.showSnackBar(
+              SnackBar(
+                content: Text(paymentMode["msg"]),
+              ),
+            );
+          } else {
+            initRepeatDeposit();
+          }
         }
       }
     }
@@ -674,6 +650,7 @@ class AddCashState extends State<AddCash> {
         builder: (BuildContext context) {
           return PromoInput(
             amount: amount,
+            isFirstDeposit: widget.depositData.chooseAmountData.isFirstDeposit,
             promoCodes: promoCodes,
             selectedPromo: selectedPromo,
           );
@@ -691,6 +668,15 @@ class AddCashState extends State<AddCash> {
         if (promoResult != null) {
           Map<String, dynamic> paymentMode = json.decode(promoResult);
           if (paymentMode["error"] == true) {
+            AnalyticsManager().addEvent(
+              Event(
+                name: "apply_promo_error",
+                v1: amount,
+                v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+                s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
+                s5: paymentMode["msg"],
+              ),
+            );
             _scaffoldKey.currentState.showSnackBar(
               SnackBar(
                 content: Text(paymentMode["msg"]),
@@ -698,6 +684,15 @@ class AddCashState extends State<AddCash> {
             );
           } else {
             selectedPromo = paymentMode["details"];
+            AnalyticsManager().addEvent(
+              Event(
+                name: "apply_promo_sucess",
+                v1: amount,
+                v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+                s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
+                s5: paymentMode["message"],
+              ),
+            );
             _scaffoldKey.currentState.showSnackBar(
               SnackBar(
                 content: Text(paymentMode["message"]),
@@ -1111,6 +1106,15 @@ class AddCashState extends State<AddCash> {
       if (result != null) {
         Map<String, dynamic> paymentMode = json.decode(result);
         if (paymentMode["error"] == true) {
+          addAnalyticsEvent(
+            event: Event(
+              name: "proceed_validation_error",
+              v1: amount,
+              v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+              s1: selectedPromo != null ? selectedPromo["promoCode"] : "",
+              s3: paymentMode["msg"],
+            ),
+          );
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
               content: Text(paymentMode["msg"]),
@@ -1338,6 +1342,26 @@ class AddCashState extends State<AddCash> {
                                         onChanged: widget
                                                 .depositData.bAllowRepeatDeposit
                                             ? (bool checked) {
+                                                dynamic paymentDetails = widget
+                                                    .depositData
+                                                    .chooseAmountData
+                                                    .lastPaymentArray[0];
+                                                addAnalyticsEvent(
+                                                  event: Event(
+                                                    name: "repeat",
+                                                    v1: amount,
+                                                    v2: paymentDetails[
+                                                        "modeOptionId"],
+                                                    v3: 1,
+                                                    v5: checked ? 1 : 0,
+                                                    v6: paymentDetails[
+                                                        "gatewayId"],
+                                                    s1: selectedPromo != null
+                                                        ? selectedPromo[
+                                                            "promoCode"]
+                                                        : "",
+                                                  ),
+                                                );
                                                 setState(() {
                                                   bRepeatTransaction = checked;
                                                 });
@@ -1374,59 +1398,12 @@ class AddCashState extends State<AddCash> {
           ),
         ],
       ),
-      // Padding(
-      //   padding: EdgeInsets.all(16.0),
-      //   child: Row(
-      //     children: <Widget>[
-      //       Expanded(
-      //         child: Container(
-      //           height: 48.0,
-      //           child: ColorButton(
-      //             onPressed: () {
-      //               if (bRepeatTransaction) {
-      //                 onRepeatTransaction();
-      //               } else {
-      //                 onProceed();
-      //               }
-      //             },
-      //             child: Row(
-      //               mainAxisAlignment: MainAxisAlignment.center,
-      //               children: <Widget>[
-      //                 Text(
-      //                   "DEPOSIT " +
-      //                       (amountController.text != ""
-      //                           ? strings.rupee + amount.toString()
-      //                           : ""),
-      //                   style: Theme.of(context)
-      //                       .primaryTextTheme
-      //                       .headline
-      //                       .copyWith(
-      //                         color: Colors.white,
-      //                         fontWeight: FontWeight.bold,
-      //                       ),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //         ),
-      //       )
-      //     ],
-      //   ),
-      // ),
     ];
 
     return rows;
   }
 
   onProceed({int amount}) async {
-    // AnalyticsManager().addEvent(
-    //   Event(
-    //     name: "deposit_tile",
-    //     v1: widget.depositData.chooseAmountData.isFirstDeposit ? 1 : 0,
-    //     v2: amount,
-    //     s1: promoController.text,
-    //   ),
-    // );
     if ((widget.depositData.chooseAmountData.isFirstDeposit && amount == 0) ||
         (!widget.depositData.chooseAmountData.isFirstDeposit &&
             amountController.text == "")) {
@@ -1457,6 +1434,14 @@ class AddCashState extends State<AddCash> {
             ),
           );
         } else {
+          addAnalyticsEvent(
+            event: Event(
+              name: "proceed_req",
+              v1: amount,
+              v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+              s1: selectedPromo != null ? selectedPromo["promoCode"] : "",
+            ),
+          );
           final result = await proceedToPaymentMode(amount);
           if (result != null) {
             initPayment(json.decode(result), amount);
@@ -1491,8 +1476,18 @@ class AddCashState extends State<AddCash> {
     return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         showLoader(false);
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
+        bool bSuccess = res.statusCode >= 200 && res.statusCode <= 299;
+        addAnalyticsEvent(
+            event: Event(
+          name: "proceed_res",
+          v1: amount,
+          v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+          v5: bSuccess ? 0 : 1,
+        ));
+        if (bSuccess) {
           return res.body;
+        } else {
+          return null;
         }
       },
     ).whenComplete(() {
@@ -1616,6 +1611,15 @@ class AddCashState extends State<AddCash> {
       index++;
     });
 
+    AnalyticsManager().addEvent(Event(
+      name: "pay_securely",
+      v1: amount,
+      v2: payload["modeOptionId"],
+      v3: 1,
+      v6: int.parse(payload["gatewayId"].toString()),
+      s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
+    ));
+
     showLoader(true);
 
     /*Web Engage  Event*/
@@ -1691,8 +1695,33 @@ class AddCashState extends State<AddCash> {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
+          AnalyticsManager().addEvent(
+            Event(
+              name: "pay_failed",
+              v1: amount,
+              v2: response["modeOptionId"],
+              v3: 1,
+              v6: int.parse(response["gatewayId"].toString()),
+              s1: selectedPromo["promoCode"],
+              s2: response["orderId"],
+            ),
+          );
         }
       } else {
+        AnalyticsManager().addEvent(
+          Event(
+            name: "pay_success",
+            v1: amount,
+            v2: response["modeOptionId"],
+            v3: 1,
+            v4: int.parse(response["withdrawable"]) +
+                int.parse(response["nonWithdrawable"]) +
+                int.parse(response["depositBucket"]),
+            v6: int.parse(response["gatewayId"].toString()),
+            s1: selectedPromo["promoCode"],
+            s2: response["orderId"],
+          ),
+        );
         branchEventTransactionSuccess(response);
         Navigator.of(context).pop(result);
       }
@@ -1828,6 +1857,14 @@ class AddCashState extends State<AddCash> {
   }
 
   setDepositAmount(int amount) {
+    addAnalyticsEvent(
+      event: Event(
+        name: "deposit_tile",
+        v1: amount,
+        v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+        s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
+      ),
+    );
     amountController.text = amount.toString();
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/lobby/lobby.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
@@ -35,6 +36,7 @@ class AuthResult {
           .saveCookieToStorage(response.headers["set-cookie"]);
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY, response.body);
+      AnalyticsManager().setUser(json.decode(response.body));
       SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
       await setWSCookie();
       Navigator.of(scaffoldKey.currentContext).pushReplacement(

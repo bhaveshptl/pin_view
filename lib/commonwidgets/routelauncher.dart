@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -7,15 +6,16 @@ import 'package:package_info/package_info.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/deposit/addcash.dart';
 import 'package:playfantasy/earncash/earncash.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
-import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/withdraw/withdraw.dart';
 import 'package:playfantasy/profilepages/update.dart';
@@ -44,11 +44,24 @@ class RouteLauncher {
     BuildContext context, {
     Function onSuccess,
     Function onFailed,
+    String source,
     Function onComplete,
     double prefilledAmount,
   }) async {
     Deposit depositData = await getDepositInfo(context);
     showLoader(context, false);
+
+    try {
+      addAnalyticsEvent(
+        journey: "Deposit",
+        source: source,
+        event: Event(
+          name: "addcash",
+          v3: depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+        ),
+      );
+    } catch (e) {}
+
     if (depositData != null) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
@@ -65,10 +78,22 @@ class RouteLauncher {
           onSuccess(result);
         }
       }
+      AnalyticsManager().setJourney("");
+      AnalyticsManager().setSource("");
     }
     if (onComplete != null) {
       onComplete();
     }
+  }
+
+  addAnalyticsEvent({
+    @required String journey,
+    @required String source,
+    @required Event event,
+  }) {
+    AnalyticsManager().setJourney(journey);
+    AnalyticsManager().setSource(source);
+    AnalyticsManager().addEvent(event);
   }
 
   showTransactionResult(
@@ -124,7 +149,8 @@ class RouteLauncher {
   }) async {
     switch (banner["CTA"]) {
       case "DEPOSIT":
-        launchAddCash(scaffoldKey.currentContext, onComplete: onComplete);
+        launchAddCash(scaffoldKey.currentContext,
+            onComplete: onComplete, source: banner["id"]);
         break;
       case "REFERRAL":
         launchEarnCash(scaffoldKey, onComplete: onComplete);
@@ -405,14 +431,16 @@ class RouteLauncher {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           return json.decode(res.body);
-        } else {
+        } else if (scaffoldKey != null) {
           showMessage(scaffoldKey.currentState,
               "Something went wrong. Please try again later.");
           return null;
         }
       },
     ).whenComplete(() {
-      showLoader(scaffoldKey.currentContext, false);
+      if (scaffoldKey != null) {
+        showLoader(scaffoldKey.currentContext, false);
+      }
     });
   }
 

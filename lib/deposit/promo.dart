@@ -2,13 +2,17 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/modal/analytics.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class PromoInput extends StatefulWidget {
   final int amount;
+  final bool isFirstDeposit;
   final dynamic selectedPromo;
   final List<dynamic> promoCodes;
-  PromoInput({this.promoCodes, this.amount, this.selectedPromo});
+  PromoInput(
+      {this.promoCodes, this.amount, this.isFirstDeposit, this.selectedPromo});
 
   @override
   _PromoStateInput createState() => _PromoStateInput();
@@ -54,6 +58,14 @@ class _PromoStateInput extends State<PromoInput> {
     if (selectedPromo != null) {
       setBonusAmount();
     }
+    AnalyticsManager().addEvent(
+      Event(
+        name: "have_promo_code",
+        v1: widget.amount,
+        v3: widget.isFirstDeposit ? 0 : 1,
+        s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
+      ),
+    );
   }
 
   getBonusAmountForPromo(promoCode) {
@@ -408,6 +420,14 @@ class _PromoStateInput extends State<PromoInput> {
         selectedPromo = null;
       });
     }
+    AnalyticsManager().addEvent(
+      Event(
+        name: "select_promo_code",
+        v1: widget.amount,
+        v3: widget.isFirstDeposit ? 0 : 1,
+        s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
+      ),
+    );
   }
 
   getPromoExpiry(promoCode) {
@@ -609,6 +629,16 @@ class _PromoStateInput extends State<PromoInput> {
                 onPressed: selectedPromo == null
                     ? null
                     : () {
+                        AnalyticsManager().addEvent(
+                          Event(
+                            name: "apply_promo_code",
+                            v1: widget.amount,
+                            v3: widget.isFirstDeposit ? 0 : 1,
+                            s1: selectedPromo == null
+                                ? ""
+                                : selectedPromo["promoCode"],
+                          ),
+                        );
                         Navigator.of(context).pop(selectedPromo);
                       },
               ),

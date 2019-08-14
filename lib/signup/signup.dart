@@ -392,6 +392,7 @@ class SignupState extends State<Signup> {
             print(e);
           }
         });
+        AnalyticsManager().setContext(_payload["context"]);
       }
     } else if (PrivateAttribution.getPrivateAttributionName() == "oppo") {
       _payload["context"]["utm_source"] = "Oppo";

@@ -27,12 +27,13 @@ class SplashScreen extends StatefulWidget {
   final String fcmSubscribeId;
   final bool disableBranchIOAttribution;
 
-  SplashScreen(
-      {this.apiBaseUrl,
-      this.fcmSubscribeId,
-      this.analyticsUrl,
-      this.channelId,
-      this.disableBranchIOAttribution});
+  SplashScreen({
+    this.apiBaseUrl,
+    this.fcmSubscribeId,
+    this.analyticsUrl,
+    this.channelId,
+    this.disableBranchIOAttribution,
+  });
 
   @override
   SplashScreenState createState() => SplashScreenState();
@@ -91,6 +92,15 @@ class SplashScreenState extends State<SplashScreen>
       );
     }
 
+    AnalyticsManager.isEnabled = initData["analyticsEnabled"];
+    AnalyticsManager().init(
+      channelId: widget.channelId,
+      duration: initData["analyticsSendInterval"],
+      timeout: initData["visitTimeout"],
+      url: analyticsUrl,
+    );
+    AnalyticsManager().statAnalytics();
+
     if (result) {
       final wsCookie = json.decode(await setWSCookie());
       if (wsCookie != null && wsCookie != "") {
@@ -135,7 +145,7 @@ class SplashScreenState extends State<SplashScreen>
     });
   }
 
-  initServices() async {   
+  initServices() async {
     await _getFirebaseToken();
     await _subscribeToFirebaseTopic(widget.fcmSubscribeId);
     if (isIos) {
@@ -282,7 +292,7 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   setInitData(Map<String, dynamic> initData) async {
-    analyticsUrl = initData["strClickStreamURL"];
+    analyticsUrl = initData["analyticsURL"];
     BaseUrl().setApiUrl(widget.apiBaseUrl);
     BaseUrl().setWebSocketUrl(initData["websocketUrl"]);
     BaseUrl().setContestShareUrl(initData["contestShareUrl"]);
@@ -332,10 +342,8 @@ class SplashScreenState extends State<SplashScreen>
 
   static bool isTablet(MediaQueryData query) {
     var size = query.size;
-    var diagonal = sqrt(
-      (size.width * size.width) + 
-      (size.height * size.height)
-    );
+    var diagonal =
+        sqrt((size.width * size.width) + (size.height * size.height));
     var isTablet = diagonal > 1100.0;
     return isTablet;
   }
@@ -347,8 +355,8 @@ class SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0.0),
-         child: Container(),
-       ),
+        child: Container(),
+      ),
       body: AppConfig.of(context).channelId == "10" ||
               AppConfig.of(context).channelId == "13"
           ? Stack(

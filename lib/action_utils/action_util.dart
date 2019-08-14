@@ -181,6 +181,7 @@ class ActionUtil {
           if (result["launchJoinConfirmation"]) {
             routeLauncher.launchAddCash(
               context,
+              source: "contestbalance",
               prefilledAmount: contest.entryFee - usableBonus > 25
                   ? contest.entryFee - usableBonus
                   : 25,

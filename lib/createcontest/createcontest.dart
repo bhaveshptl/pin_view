@@ -282,7 +282,8 @@ class CreateContestState extends State<CreateContest> {
 
   _launchDepositJourneyForJoinContest(Contest contest) async {
     showLoader(true);
-    routeLauncher.launchAddCash(context, onSuccess: (result) {
+    routeLauncher.launchAddCash(context, source: "createcontest",
+        onSuccess: (result) {
       if (result != null) {
         _onCreateContest();
       }
@@ -323,9 +324,9 @@ class CreateContestState extends State<CreateContest> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: _l1Data,
-            ),
+          league: widget.league,
+          l1Data: _l1Data,
+        ),
       ),
     );
 
@@ -534,10 +535,12 @@ class CreateContestState extends State<CreateContest> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: UnderlineTextBox(
-                                keyboardType: isIos? TextInputType.text:TextInputType.number,
+                                keyboardType: isIos
+                                    ? TextInputType.text
+                                    : TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
-                                       WhitelistingTextInputFormatter.digitsOnly
-                                                  ],
+                                  WhitelistingTextInputFormatter.digitsOnly
+                                ],
                                 labelText: "Entry Fee (1 - 10,000)",
                                 contentPadding:
                                     EdgeInsets.symmetric(vertical: 4.0),
@@ -560,10 +563,12 @@ class CreateContestState extends State<CreateContest> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 8.0),
                               child: UnderlineTextBox(
-                                keyboardType:isIos? TextInputType.text:TextInputType.number,
+                                keyboardType: isIos
+                                    ? TextInputType.text
+                                    : TextInputType.number,
                                 inputFormatters: <TextInputFormatter>[
-                                       WhitelistingTextInputFormatter.digitsOnly
-                                                  ],
+                                  WhitelistingTextInputFormatter.digitsOnly
+                                ],
                                 labelText: "Number of Entries (2-100)",
                                 contentPadding:
                                     EdgeInsets.symmetric(vertical: 4.0),
@@ -916,7 +921,7 @@ class CreateContestState extends State<CreateContest> {
           children: <Widget>[
             Container(
               height: 48.0,
-              padding:isIos?EdgeInsets.only(bottom: 7.0):null,
+              padding: isIos ? EdgeInsets.only(bottom: 7.0) : null,
               child: ColorButton(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),

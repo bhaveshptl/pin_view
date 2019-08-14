@@ -14,6 +14,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
+import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -68,10 +69,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   void initState() {
     super.initState();
     setPaymentModeList();
-    flutterWebviewPlugin.launch(
-      BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
-      hidden: true,
-    );
+    try {
+      flutterWebviewPlugin.launch(
+        BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
+        hidden: true,
+      );
+    } catch (e) {}
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
@@ -83,6 +86,21 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     };
 
     webengagePaymentModeInitEvent();
+
+    AnalyticsManager().addEvent(Event(
+      name: "payment_mode_screen",
+      v1: widget.amount,
+      v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+      v7: getFLEM(),
+      s1: widget.promoCode,
+    ));
+  }
+
+  int getFLEM() {
+    return (firstNameController.text == "" ? 0 : 1000) +
+        (lastNameController.text == "" ? 0 : 100) +
+        (widget.paymentMode["email"] == "" ? 0 : 10) +
+        (widget.paymentMode["mobile"] == "" ? 0 : 1);
   }
 
   webengagePaymentModeInitEvent() {
@@ -116,13 +134,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: url,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
+          url: url,
+          appBar: AppBar(
+            title: Text(
+              title.toUpperCase(),
             ),
+          ),
+        ),
       ),
     );
   }
@@ -167,8 +185,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   processSuccessResponse(Map<dynamic, dynamic> payload) {
-    print("<<<<<<<<<<<<<<Procees succes response>>>>>>>>>>>>");
-    print(payload);
     showLoader(false);
     http.Request req =
         http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
@@ -177,8 +193,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
-      print("Response");
-      print(response);
+
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
@@ -189,19 +204,23 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           ActionUtil().showMsgOnTop(
               "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
               context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-          //     ),
-          //   ),
-          // );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
         }
       } else {
+        AnalyticsManager().addEvent(
+          Event(
+            name: "pay_success",
+            v1: widget.amount,
+            v2: payload["modeOptionId"],
+            v3: payload["firstDepositor"] ? 0 : 1,
+            v6: int.parse(payload["gatewayId"].toString()),
+            s1: widget.promoCode,
+            s2: response["orderId"],
+          ),
+        );
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
@@ -283,7 +302,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 child: FlatButton(
                   padding: EdgeInsets.all(0.0),
                   onPressed: () {
-                    if (validateUserInfo()) {
+                    if (validateUserInfo(type["type"])) {
                       onPaySecurely(
                           widget.paymentMode["choosePayment"]["paymentInfo"]
                               [type["type"]][0],
@@ -356,7 +375,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 child: FlatButton(
                   padding: EdgeInsets.all(0.0),
                   onPressed: () {
-                    if (validateUserInfo()) {
+                    if (validateUserInfo(type["type"])) {
                       onPaySecurely(
                           widget.paymentMode["choosePayment"]["paymentInfo"]
                               [type["type"]][0],
@@ -415,6 +434,15 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 headerBuilder: (context, isExpanded) {
                   return FlatButton(
                     onPressed: () {
+                      AnalyticsManager().addEvent(
+                        Event(
+                          name: "pay_mode_select",
+                          v1: widget.amount,
+                          v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+                          v7: getFLEM(),
+                          s3: type["type"],
+                        ),
+                      );
                       setState(() {
                         lastPaymentExpanded = !lastPaymentExpanded;
                       });
@@ -448,6 +476,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         children: <Widget>[
                           DropdownButton(
                             onChanged: (value) {
+                              AnalyticsManager().addEvent(
+                                Event(
+                                  name: "pay_option_select",
+                                  v1: widget.amount,
+                                  v2: value["info"]["modeOptionId"],
+                                  v6: int.parse(value["info"].toString()),
+                                  v7: getFLEM(),
+                                  s3: value["name"],
+                                ),
+                              );
                               setState(() {
                                 lastPaymentMethod = value;
                               });
@@ -473,7 +511,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                 height: 48.0,
                                 child: ColorButton(
                                   onPressed: () {
-                                    if (validateUserInfo()) {
+                                    if (validateUserInfo(type["type"])) {
                                       onPaySecurely(
                                         lastPaymentMethod,
                                         type["type"],
@@ -528,6 +566,15 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             headerBuilder: (context, isExpanded) {
               return FlatButton(
                 onPressed: () {
+                  AnalyticsManager().addEvent(
+                    Event(
+                      name: "pay_mode_select",
+                      v1: widget.amount,
+                      v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+                      v7: getFLEM(),
+                      s3: type["type"],
+                    ),
+                  );
                   setState(() {
                     if (_selectedItemIndex == index) {
                       _selectedItemIndex = -1;
@@ -564,6 +611,17 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     children: <Widget>[
                       DropdownButton(
                         onChanged: (value) {
+                          AnalyticsManager().addEvent(
+                            Event(
+                              name: "pay_option_select",
+                              v1: widget.amount,
+                              v2: value["info"]["modeOptionId"],
+                              v6: int.parse(
+                                  value["info"]["gatewayId"].toString()),
+                              v7: getFLEM(),
+                              s3: value["name"],
+                            ),
+                          );
                           setState(() {
                             selectedPaymentMethod[type["type"]] = value;
                           });
@@ -589,7 +647,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             height: 48.0,
                             child: ColorButton(
                               onPressed: () {
-                                if (validateUserInfo()) {
+                                if (validateUserInfo(type["type"])) {
                                   onPaySecurely(
                                       selectedPaymentMethod[type["type"]],
                                       type["type"]);
@@ -621,24 +679,68 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return items;
   }
 
-  bool validateUserInfo() {
+  bool validateUserInfo(String paymentType) {
     if (widget.paymentMode["isFirstDeposit"]) {
+      AnalyticsManager().addEvent(
+        Event(
+          name: "pay_securely_validation",
+          v1: widget.amount,
+          v2: selectedPaymentMethod[paymentType]["info"]["modeOptionId"],
+          v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+          v6: int.parse(selectedPaymentMethod[paymentType]["info"]["gatewayId"]
+              .toString()),
+          v7: getFLEM(),
+        ),
+      );
       return true;
     } else if ((widget.paymentMode["first_name"] == null &&
         firstNameController.text == "")) {
+      AnalyticsManager().addEvent(
+        Event(
+          name: "pay_securely_validation",
+          v1: widget.amount,
+          v2: selectedPaymentMethod[paymentType]["info"]["modeOptionId"],
+          v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+          v6: int.parse(selectedPaymentMethod[paymentType]["info"]["gatewayId"]
+              .toString()),
+          v7: getFLEM(),
+          s5: "First name is required to proceed.",
+        ),
+      );
       ActionUtil().showMsgOnTop("First name is required to proceed.", context);
-      // showSnackbar("First name is required to proceed.");
       return false;
     } else if (widget.paymentMode["mobile"] == null &&
         phoneController.text == "") {
+      AnalyticsManager().addEvent(
+        Event(
+          name: "pay_securely_validation",
+          v1: widget.amount,
+          v2: selectedPaymentMethod[paymentType]["info"]["modeOptionId"],
+          v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+          v6: int.parse(selectedPaymentMethod[paymentType]["info"]["gatewayId"]
+              .toString()),
+          v7: getFLEM(),
+          s5: "Mobile number is required to proceed.",
+        ),
+      );
       ActionUtil()
           .showMsgOnTop("Mobile number is required to proceed.", context);
-      // showSnackbar("Mobile number is required to proceed.");
       return false;
     } else if (widget.paymentMode["email"] == null &&
         emailController.text == "") {
+      AnalyticsManager().addEvent(
+        Event(
+          name: "pay_securely_validation",
+          v1: widget.amount,
+          v2: selectedPaymentMethod[paymentType]["info"]["modeOptionId"],
+          v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+          v6: int.parse(selectedPaymentMethod[paymentType]["info"]["gatewayId"]
+              .toString()),
+          v7: getFLEM(),
+          s5: "Email id is required to proceed.",
+        ),
+      );
       ActionUtil().showMsgOnTop("Email id is required to proceed.", context);
-      // showSnackbar("Email id is required to proceed.");
       return false;
     } else {
       return true;
@@ -700,6 +802,17 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "isFirstDeposit": widget.paymentMode["isFirstDeposit"],
       "native": true,
     };
+
+    AnalyticsManager().addEvent(Event(
+      name: "pay_securely",
+      v1: widget.amount,
+      v2: payload["modeOptionId"],
+      v3: widget.paymentMode["isFirstDeposit"] ? 0 : 1,
+      v6: int.parse(payload["gatewayId"].toString()),
+      v7: getFLEM(),
+      s1: widget.promoCode,
+    ));
+
     if (payload["first_name"] == "Howzat" ||
         payload["last_name"] == "User" ||
         payload["phone"] == "9876543210" ||
@@ -746,19 +859,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     ? "https://d2cbroser6kssl.cloudfront.net/images/icons/smart11_logo.png"
                     : "https://d2cbroser6kssl.cloudfront.net/images/howzat/logo/howzat-logo-red-bg-v1.png")
           });
-        } else {
-          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text("Opps!! Try again later."),
-          //   ),
-          // );
-        }
+        } else {}
       }).whenComplete(() {
         showLoader(false);
       });
     } else {
-      initPayment(BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString);
+      initPayment(
+          BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString, payload);
     }
   }
 
@@ -769,13 +876,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     AnalyticsManager.trackEventsWithAttributes(eventdata);
   }
 
-  initPayment(String url) async {
+  initPayment(String url, Map<String, dynamic> payload) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => InitPay(
-              url: url,
-              waitForCookieset: bWaitForCookieset,
-            ),
+          url: url,
+          waitForCookieset: bWaitForCookieset,
+        ),
       ),
     );
 
@@ -788,7 +895,32 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         _showTransactionFailed(response);
         branchEventTransactionFailed(response);
         webengageEventTransactionFailed(response);
+        AnalyticsManager().addEvent(
+          Event(
+            name: "pay_failed",
+            v1: widget.amount,
+            v2: response["modeOptionId"],
+            v3: response["firstDepositor"] != "false" ? 0 : 1,
+            v6: int.parse(response.toString()),
+            s1: widget.promoCode,
+            s2: response["orderId"],
+          ),
+        );
       } else {
+        AnalyticsManager().addEvent(
+          Event(
+            name: "pay_success",
+            v1: widget.amount,
+            v2: response["modeOptionId"],
+            v3: response["firstDepositor"] != "false" ? 0 : 1,
+            v4: int.parse(response["withdrawable"]) +
+                int.parse(response["nonWithdrawable"]) +
+                int.parse(response["depositBucket"]),
+            v6: int.parse(payload["gatewayId"].toString()),
+            s1: widget.promoCode,
+            s2: response["orderId"],
+          ),
+        );
         Navigator.of(context).pop(result);
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
@@ -916,8 +1048,32 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       context: context,
       builder: (BuildContext context) {
         return TransactionFailed(transactionResult, () {
+          AnalyticsManager().addEvent(
+            Event(
+              name: "pay_failed_retry",
+              v1: widget.amount,
+              v2: transactionResult["modeOptionId"],
+              v3: transactionResult["firstDepositor"] ? 0 : 1,
+              s1: widget.promoCode,
+              s2: transactionResult["orderId"] != null
+                  ? transactionResult["orderId"]
+                  : transactionResult["txnId"],
+            ),
+          );
           Navigator.of(context).pop();
         }, () {
+          AnalyticsManager().addEvent(
+            Event(
+              name: "pay_failed_cancel",
+              v1: widget.amount,
+              v2: transactionResult["modeOptionId"],
+              v3: transactionResult["firstDepositor"] != "false" ? 0 : 1,
+              s1: widget.promoCode,
+              s2: transactionResult["orderId"] != null
+                  ? transactionResult["orderId"]
+                  : transactionResult["txnId"],
+            ),
+          );
           Navigator.of(context).pop();
           Navigator.of(context).pop(json.encode(transactionResult));
         });

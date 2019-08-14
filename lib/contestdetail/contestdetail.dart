@@ -492,10 +492,10 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateTeam(
-                  l1Data: _l1Data,
-                  league: widget.league,
-                  mode: TeamCreationMode.CREATE_TEAM,
-                ),
+              l1Data: _l1Data,
+              league: widget.league,
+              mode: TeamCreationMode.CREATE_TEAM,
+            ),
           ),
         );
 
@@ -545,9 +545,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: _l1Data,
-            ),
+          league: widget.league,
+          l1Data: _l1Data,
+        ),
       ),
     );
 
@@ -665,7 +665,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   _launchDepositJourneyForJoinContest(Contest contest) async {
     final curContest = contest;
     showLoader(true);
-    routeLauncher.launchAddCash(context, onSuccess: (result) {
+    routeLauncher.launchAddCash(context, source: "contestbalance",
+        onSuccess: (result) {
       if (result != null) {
         _onJoinContest(curContest);
       }
@@ -1002,12 +1003,12 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                               FantasyPageRoute(
                                 pageBuilder: (BuildContext context) =>
                                     TeamPreview(
-                                      myTeam: myTeam,
-                                      league: widget.league,
-                                      l1Data: _l1Data,
-                                      allowEditTeam: bIsMyTeam,
-                                      fanTeamRules: _l1Data.league.fanTeamRules,
-                                    ),
+                                  myTeam: myTeam,
+                                  league: widget.league,
+                                  l1Data: _l1Data,
+                                  allowEditTeam: bIsMyTeam,
+                                  fanTeamRules: _l1Data.league.fanTeamRules,
+                                ),
                               ),
                             );
                           }

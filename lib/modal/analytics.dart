@@ -90,12 +90,12 @@ class Visit {
   final String serial;
   final String sessionId;
   final int uid;
-  final int userId;
-  final String utmCampaign;
-  final String utmContent;
-  final String utmMedium;
-  final String utmSource;
-  final String utmTerm;
+  int userId;
+  String utmCampaign;
+  String utmContent;
+  String utmMedium;
+  String utmSource;
+  String utmTerm;
   Visit({
     this.appVersion = 0,
     this.channelId = 0,

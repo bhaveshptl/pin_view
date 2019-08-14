@@ -179,18 +179,18 @@ class LobbyState extends State<Lobby>
         verificationStatus["address_verification"];
     userInfo["email_verification"] = verificationStatus["email_verification"];
     Map<String, dynamic> profileData = await _getProfileData();
-    if(profileData["fname"] != null){
-        userInfo["first_name"] = profileData["fname"];
+    if (profileData["fname"] != null) {
+      userInfo["first_name"] = profileData["fname"];
     }
-    if(profileData["lname"] != null){
-       userInfo["lastName"] = profileData["lname"];
+    if (profileData["lname"] != null) {
+      userInfo["lastName"] = profileData["lname"];
     }
-    if(profileData["status"]=="ACTIVE"){
-     userInfo["accountStatus"] = "1";
-    }else if(profileData["status"]=="CLOSED"){
-     userInfo["accountStatus"] = "2";
-    }else if(profileData["status"]=="BLOCKED"){
-     userInfo["accountStatus"] = "3";
+    if (profileData["status"] == "ACTIVE") {
+      userInfo["accountStatus"] = "1";
+    } else if (profileData["status"] == "CLOSED") {
+      userInfo["accountStatus"] = "2";
+    } else if (profileData["status"] == "BLOCKED") {
+      userInfo["accountStatus"] = "3";
     }
     userInfo["pincode"] =
         profileData["pincode"] != null ? profileData["pincode"] : "";
@@ -293,7 +293,7 @@ class LobbyState extends State<Lobby>
         }
         break;
       case 2:
-        _launchAddCash();
+        _launchAddCash(source: "bottom");
         break;
       case 3:
         showLoader(true);
@@ -312,10 +312,11 @@ class LobbyState extends State<Lobby>
     }
   }
 
-  _launchAddCash() async {
+  _launchAddCash({String source}) async {
     showLoader(true);
     routeLauncher.launchAddCash(
       context,
+      source: source,
       onComplete: () {
         showLoader(false);
       },
@@ -635,7 +636,7 @@ class LobbyState extends State<Lobby>
                   ],
                 ),
                 onPressed: () {
-                  _launchAddCash();
+                  _launchAddCash(source: "topright");
                 },
               ),
               // InkWell(
