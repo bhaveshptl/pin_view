@@ -43,6 +43,7 @@
     <dimen name="paynimo_textView_textSize_large">20sp</dimen>
     <dimen name="paynimo_textView_padding_left">5dp</dimen>
     <dimen name="paynimo_textView_padding_top">5dp</dimen>
+     <dimen name="paynimo_textimage_size">30sp</dimen>
 
     <!-- Payment Tab button Dimensions -->
     <dimen name="paynimo_switchButtonLeftNotPressedStrokeWidth">1dp</dimen>
@@ -76,5 +77,8 @@
     
     <!-- Payment Screen Dimensions -->
     <dimen name="paynimo_payment_screens_padding">5dp</dimen>
+
+     <!-- Paynimo Vaulted Card List Row Dimensions -->
+    <dimen name="paynimo_vaultedCardsRowHeight">65dp</dimen>
 
 </resources>
