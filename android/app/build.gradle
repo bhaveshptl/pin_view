@@ -229,6 +229,10 @@ dependencies {
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'com.webengage:android-sdk:3.12.1'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
