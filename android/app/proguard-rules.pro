@@ -14,6 +14,9 @@
 -dontwarn io.flutter.view.**
 -dontwarn io.flutter.plugin.**
 -dontwarn com.razorpay.**
+-dontwarn com.squareup.**
+
+
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
@@ -24,4 +27,12 @@
 -dontwarn com.razorpay.**
 -keep class com.razorpay.** {*;}
 
+-dontwarn com.squareup.**
+-keep class com.squareup.** {*;}
+
 -optimizations !method/inlining/*
+
+-ignorewarnings
+-keep class * {
+    public private *;
+}

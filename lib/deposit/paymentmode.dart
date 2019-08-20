@@ -51,6 +51,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   final flutterWebviewPlugin = FlutterWebviewPlugin();
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
+  static const techprocess_platform =
+      const MethodChannel('com.algorin.pf.techprocess');    
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -160,6 +162,23 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return "";
   }
 
+  Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
+    Map<dynamic, dynamic> value = new Map();
+    try {
+      value =
+          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      showLoader(false);
+      print("((((((((((Tech Process Result)))))))))))");
+      print(value);
+      if (Platform.isIOS) {
+       
+      }
+    } catch (e) {
+      showLoader(false);
+    }
+    return "";
+  }
+
   Future<String> initRazorpayNativePlugin() async {
     String value = "";
     try {
@@ -174,6 +193,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       case 'onRazorPayPaymentSuccess':
         processSuccessResponse(json.decode(methodCall.arguments));
         break;
+      case 'onTechProcessPaymentFail':
+      case 'onTechProcessPaymentSuccess':
+        onTechProcessSuccessResponse(json.decode(methodCall.arguments));
+        break;  
       default:
     }
   }
@@ -229,6 +252,53 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       showLoader(false);
     });
   }
+
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
+    print("<<<<<<<<<<<<<<Procees succes response>>>>>>>>>>>>");
+    print(payload);
+    showLoader(false);
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
+    req.body = json.encode(payload);
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      Map<String, dynamic> response = json.decode(res.body);
+      print("Response");
+      print(response);
+      if ((response["authStatus"] as String).toLowerCase() ==
+              "Declined".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Failed".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Fail".toLowerCase()) {
+        if (response["orderId"] == null) {
+          ActionUtil().showMsgOnTop(
+              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+          //     ),
+          //   ),
+          // );
+        } else {
+          _showTransactionFailed(response);
+          branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
+        }
+      } else {
+        branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response);
+        Navigator.of(context).pop(res.body);
+      }
+    }).whenComplete(() {
+      showLoader(false);
+    });
+
+  }
+
 
   setPaymentModeList() {
     int i = 0;

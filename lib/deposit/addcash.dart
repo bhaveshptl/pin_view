@@ -63,6 +63,8 @@ class AddCashState extends State<AddCash> {
 
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
+  static const techprocess_platform =
+      const MethodChannel('com.algorin.pf.techprocess');    
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -205,6 +207,23 @@ class AddCashState extends State<AddCash> {
     return "";
   }
 
+  Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
+    Map<dynamic, dynamic> value = new Map();
+    try {
+      value =
+          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      showLoader(false);
+      print("((((((((((Tech Process Result)))))))))))");
+      print(value);
+      if (Platform.isIOS) {
+       
+      }
+    } catch (e) {
+      showLoader(false);
+    }
+    return "";
+  }
+
   Future<String> initRazorpayNativePlugin() async {
     String value = "";
     try {
@@ -219,6 +238,10 @@ class AddCashState extends State<AddCash> {
       case 'onRazorPayPaymentSuccess':
         processSuccessResponse(json.decode(methodCall.arguments));
         break;
+      case 'onTechProcessPaymentFail':
+      case 'onTechProcessPaymentSuccess':
+        onTechProcessSuccessResponse(json.decode(methodCall.arguments));
+        break;  
       default:
     }
   }
@@ -291,6 +314,71 @@ class AddCashState extends State<AddCash> {
       showLoader(false);
     });
   }
+
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
+   showLoader(false);
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
+    req.body = json.encode(payload);
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      Map<String, dynamic> response = json.decode(res.body);
+      if ((response["authStatus"] as String).toLowerCase() ==
+              "Declined".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Failed".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Fail".toLowerCase()) {
+        if (response["orderId"] == null) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: Text(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              ),
+            ),
+          );
+        } else {
+          AnalyticsManager().addEvent(
+            Event(
+              name: "pay_failed",
+              v1: amount,
+              v2: response["modeOptionId"],
+              v3: 1,
+              v6: int.parse(response["gatewayId"].toString()),
+              s1: selectedPromo["promoCode"],
+              s2: response["orderId"],
+            ),
+          );
+          _showTransactionFailed(response);
+          branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
+        }
+      } else {
+        AnalyticsManager().addEvent(
+          Event(
+            name: "pay_success",
+            v1: amount,
+            v2: response["modeOptionId"],
+            v3: 1,
+            v4: int.parse(response["withdrawable"]) +
+                int.parse(response["nonWithdrawable"]) +
+                int.parse(response["depositBucket"]),
+            v6: int.parse(payload["gatewayId"].toString()),
+            s1: selectedPromo["promoCode"],
+            s2: response["orderId"],
+          ),
+        );
+        branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response);
+        Navigator.of(context).pop(res.body);
+      }
+    }).whenComplete(() {
+      showLoader(false);
+    });
+
+  }
+
 
   setDepositInfo() async {
     amountController.text =

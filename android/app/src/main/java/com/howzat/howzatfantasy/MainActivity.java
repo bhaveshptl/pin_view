@@ -65,6 +65,9 @@ import com.webengage.sdk.android.WebEngage;
 import com.webengage.sdk.android.Analytics;
 import com.webengage.sdk.android.User;
 import com.webengage.sdk.android.utils.Gender;
+import com.paynimo.android.payment.PaymentActivity;
+import com.paynimo.android.payment.PaymentModesActivity;
+import com.paynimo.android.payment.util.Constant;
 
 public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
@@ -74,6 +77,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
     private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
     private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
+    private static final String TECH_PROCESS_CHANNEL="com.algorin.pf.techprocess";
     public static Context applicationContext;
 
     MyHelperClass myHeperClass;
@@ -338,6 +342,21 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                     }
                 });
+
+        new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL)
+                .setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                        if (methodCall.method.equals("_openTechProcessNative")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            initTechProcessPayment(arguments);
+                            String razocode = "testrazo";
+                            result.success(razocode);
+
+                        } else {
+                            result.notImplemented();
+                        }
+                        }});
 
         new MethodChannel(getFlutterView(), PF_FCM_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
@@ -1006,6 +1025,252 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void notImplemented() {
                     }
                 });
+    }
+
+
+    public void onTechProcessPaymentFail(String response, PaymentData data) {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("paymentId", data.getPaymentId());
+            object.put("signature", data.getSignature());
+            object.put("orderId", data.getOrderId());
+            object.put("status", "failed");
+        } catch (JSONException e) {
+
+        }
+
+        new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentFail",
+                object.toString(), new MethodChannel.Result() {
+                    @Override
+                    public void success(Object o) {
+                    }
+
+                    @Override
+                    public void error(String s, String s1, Object o) {
+                    }
+
+                    @Override
+                    public void notImplemented() {
+                    }
+                });
+    }
+
+    public void onTechProcessPaymentSuccess(String razorpayPaymentID, PaymentData data) {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("paymentId", data.getPaymentId());
+            object.put("signature", data.getSignature());
+            object.put("orderId", data.getOrderId());
+            object.put("status", "paid");
+        } catch (JSONException e) {
+
+        }
+
+        new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentSuccess",
+                object.toString(), new MethodChannel.Result() {
+                    @Override
+                    public void success(Object o) {
+                    }
+
+                    @Override
+                    public void error(String s, String s1, Object o) {
+                    }
+
+                    @Override
+                    public void notImplemented() {
+                    }
+                });
+    }
+
+
+
+
+
+    private void initTechProcessPayment(Map<String, Object> arguments){
+
+        String email= (String) arguments.get("email");
+        String phone = (String) arguments.get("phone");
+        String  amount = (String) arguments.get("amount");
+        int amount_integer = Integer.parseInt(amount);
+        int amount_integer_in_rupees = amount_integer/100;
+        String amount_in_rupees= String.valueOf(amount_integer_in_rupees);
+        String date= "27-06-2017";
+        String orderId= (String) arguments.get("orderId");
+        String paymentMode="";
+
+        com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
+
+        checkout.setMerchantIdentifier("T456537");
+        checkout.setTransactionIdentifier(orderId);
+        checkout.setTransactionReference ("ORD0001");
+        checkout.setTransactionType (PaymentActivity.TRANSACTION_TYPE_SALE);
+        checkout.setTransactionSubType (PaymentActivity.TRANSACTION_SUBTYPE_DEBIT);
+        checkout.setTransactionCurrency ("INR");
+        checkout.setTransactionAmount (amount_in_rupees);
+        checkout.setTransactionDateTime (date);
+
+
+
+        checkout.setConsumerIdentifier ("");
+        checkout.setConsumerEmailID (email);
+        checkout.setConsumerMobileNumber (phone);
+        checkout.setConsumerAccountNo ("");
+
+
+
+        checkout.addCartItem("FIRST",amount_in_rupees,"0.0", "0.0", "", "", "","");
+
+
+
+        Intent authIntent = new Intent(this, PaymentModesActivity.class);
+        authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT,
+                checkout);
+        authIntent.putExtra(PaymentActivity.EXTRA_PUBLIC_KEY,
+                "1234-6666-6789-56");
+
+        //PAYMENT_METHOD_ DEFAULT
+        //.PAYMENT_METHOD_CARDS
+        //PaymentActivity.PAYMENT_METHOD_NETBANKING
+        //PaymentActivity.PAYMENT_METHOD_WALLETS
+        //PaymentActivity.PAYMENT_METHOD_UPI
+        //PaymentActivity.PAYMENT_METHOD_MVISA
+        //PaymentActivity.PAYMENT_METHOD_EMI
+        //PaymentActivity.PAYMENT_METHOD_CASHCARDS
+
+
+
+        authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
+                PaymentActivity.PAYMENT_METHOD_NETBANKING);
+
+
+
+
+        startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == PaymentActivity.REQUEST_CODE) {
+
+            Log.d("TECHPROCESS", "Result Code :" +PaymentActivity.REQUEST_CODE );
+            if (resultCode == PaymentActivity.RESULT_OK) {
+                // PAyment  was successful
+                Log.d("TECHPROCESS", "Result Code :" + RESULT_OK);
+                if (data != null) {
+                    try {
+                        com.paynimo.android.payment.model.Checkout checkout_res = (com.paynimo.android.payment.model.Checkout) data.getSerializableExtra(Constant.ARGUMENT_DATA_CHECKOUT);
+                        String transactionType = checkout_res.getMerchantRequestPayload().getTransaction().getType();
+                        String transactionSubType = checkout_res.getMerchantRequestPayload().getTransaction().getSubType();
+
+                        if (transactionType != null && transactionType.equalsIgnoreCase(PaymentActivity.TRANSACTION_TYPE_PREAUTH)
+                                && transactionSubType != null && transactionSubType
+                                .equalsIgnoreCase(PaymentActivity.TRANSACTION_SUBTYPE_RESERVE)){
+                            // Transaction Completed and Got SUCCESS
+                            if (checkout_res.getMerchantResponsePayload()
+                                    .getPaymentMethod().getPaymentTransaction()
+                                    .getStatusCode().equalsIgnoreCase(PaymentActivity.TRANSACTION_STATUS_PREAUTH_RESERVE_SUCCESS)) {
+
+
+
+
+                                if (checkout_res.getMerchantResponsePayload()
+                                        .getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode().equalsIgnoreCase("")) {
+
+
+
+                                }
+
+                            }
+
+                            else {
+                                /* some error from bank side*/
+
+                                Log.d("Checkout Response Obj", checkout_res.getMerchantResponsePayload().toString());
+
+                            }
+
+                        } else {
+                            /* Transaction Completed and Got SUCCESS*/
+                            if (checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode().equalsIgnoreCase(PaymentActivity.TRANSACTION_STATUS_SALES_DEBIT_SUCCESS)) {
+                                if (checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId() != null && checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId().isEmpty()) {
+                                    Log.v("TRANSACTION SI STATUS=>",
+                                            "SI Transaction Not Initiated");
+                                } else if (checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId() != null && !checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId().isEmpty()) {
+                                }
+                            }
+                            else if (checkout_res
+                                    .getMerchantResponsePayload().getPaymentMethod()			.getPaymentTransaction().getStatusCode().equalsIgnoreCase(
+                                            PaymentActivity.TRANSACTION_STATUS_DIGITAL_MANDATE_SUCCESS
+                                    )) {
+
+                                if (checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId() != null
+                                        && !checkout_res
+                                        .getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId().isEmpty()) {
+
+                                } else {
+
+
+
+                                }
+                            }
+                            else {
+
+
+
+                            }
+
+                        }
+
+                        String statusCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode();
+                        String statusMessage =checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusMessage();
+                        String errorMessage = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getErrorMessage();
+                        String amount =checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getAmount();
+                        String dateTime = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getDateTime();
+                        String merchantTransactionIdentifier=checkout_res.getMerchantResponsePayload().getMerchantTransactionIdentifier();
+                        String identifier = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getIdentifier() ;
+                        String bankSelectionCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getBankSelectionCode();
+                        String bankReferenceIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBankReferenceIdentifier();
+                        String refundIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getRefundIdentifier();
+                        String balanceAmount= checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBalanceAmount();
+                        String instrumentAliasName=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentAliasName();
+                        String  SIMandateId=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
+                        String SIMandateStatus=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
+                        String  SIMandateErrorCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("Exception", e.toString());
+                    }
+
+                }
+            }
+            else if (resultCode == PaymentActivity.RESULT_ERROR) {
+                if (data.hasExtra(PaymentActivity.RETURN_ERROR_CODE) &&
+                        data.hasExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION)) {
+                    String error_code = (String) data
+                            .getStringExtra(PaymentActivity.RETURN_ERROR_CODE);
+                    String error_desc = (String) data
+                            .getStringExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION);
+
+                }
+            }
+            else if (resultCode == PaymentActivity.RESULT_CANCELED) {
+
+
+            }
+        }
     }
 
     /* Firebase Push notification */
