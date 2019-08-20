@@ -902,6 +902,37 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
 
     showLoader(true);
+    print("<<<<<<<<<<<<<<<Payment Info>>>>>>>");
+    print(paymentModeDetails["info"]);
+    if(paymentModeDetails["info"]["gateway"]=="TECHPROCESS"){
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_SEAMLESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": (payload["depositAmount"] * 100).toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+    }
 
     if (paymentModeDetails["info"]["isSeamless"]) {
       http.Request req = http.Request(

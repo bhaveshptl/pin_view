@@ -332,7 +332,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_openRazorpayNative")) {
                             Map<String, Object> arguments = methodCall.arguments();
-                            startPayment(arguments);
+                           startPayment(arguments);
                             String razocode = "testrazo";
                             result.success(razocode);
 
@@ -1160,6 +1160,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 // PAyment  was successful
                 Log.d("TECHPROCESS", "Result Code :" + RESULT_OK);
                 if (data != null) {
+                    Log.d("TECHPROCESS", "Data is not null");
                     try {
                         com.paynimo.android.payment.model.Checkout checkout_res = (com.paynimo.android.payment.model.Checkout) data.getSerializableExtra(Constant.ARGUMENT_DATA_CHECKOUT);
                         String transactionType = checkout_res.getMerchantRequestPayload().getTransaction().getType();
@@ -1168,18 +1169,19 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         if (transactionType != null && transactionType.equalsIgnoreCase(PaymentActivity.TRANSACTION_TYPE_PREAUTH)
                                 && transactionSubType != null && transactionSubType
                                 .equalsIgnoreCase(PaymentActivity.TRANSACTION_SUBTYPE_RESERVE)){
+                            Log.d("TECHPROCESS", "Transaction sub type is reserve");
                             // Transaction Completed and Got SUCCESS
                             if (checkout_res.getMerchantResponsePayload()
                                     .getPaymentMethod().getPaymentTransaction()
                                     .getStatusCode().equalsIgnoreCase(PaymentActivity.TRANSACTION_STATUS_PREAUTH_RESERVE_SUCCESS)) {
 
-
+                                Log.d("TECHPROCESS", "Transaction Status Preauth");
 
 
                                 if (checkout_res.getMerchantResponsePayload()
                                         .getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode().equalsIgnoreCase("")) {
 
-
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
                                 }
 
@@ -1187,6 +1189,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                             else {
                                 /* some error from bank side*/
+                                Log.d("TECHPROCESS", "Some error");
 
                                 Log.d("Checkout Response Obj", checkout_res.getMerchantResponsePayload().toString());
 
@@ -1194,7 +1197,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                         } else {
                             /* Transaction Completed and Got SUCCESS*/
+                            Log.d("TECHPROCESS", "Transaction sub type is reserve");
                             if (checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode().equalsIgnoreCase(PaymentActivity.TRANSACTION_STATUS_SALES_DEBIT_SUCCESS)) {
+                                Log.d("TECHPROCESS", "Transaction sub type is reserve");
                                 if (checkout_res.getMerchantResponsePayload().
                                         getPaymentMethod().getPaymentTransaction().
                                         getInstruction().getId() != null && checkout_res.getMerchantResponsePayload().
@@ -1207,20 +1212,26 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                         getInstruction().getId() != null && !checkout_res.getMerchantResponsePayload().
                                         getPaymentMethod().getPaymentTransaction().
                                         getInstruction().getId().isEmpty()) {
+
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
                                 }
                             }
                             else if (checkout_res
                                     .getMerchantResponsePayload().getPaymentMethod()			.getPaymentTransaction().getStatusCode().equalsIgnoreCase(
                                             PaymentActivity.TRANSACTION_STATUS_DIGITAL_MANDATE_SUCCESS
                                     )) {
+                                Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
                                 if (checkout_res.getMerchantResponsePayload().
                                         getPaymentMethod().getPaymentTransaction().
                                         getInstruction().getId() != null
                                         && !checkout_res
                                         .getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId().isEmpty()) {
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
                                 } else {
+
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
 
 
@@ -1228,9 +1239,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             }
                             else {
 
-
+                                Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
                             }
+                            Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
                         }
 
@@ -1257,16 +1269,27 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 }
             }
             else if (resultCode == PaymentActivity.RESULT_ERROR) {
+
+                Log.d("Exception", "Error");
                 if (data.hasExtra(PaymentActivity.RETURN_ERROR_CODE) &&
                         data.hasExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION)) {
+
                     String error_code = (String) data
                             .getStringExtra(PaymentActivity.RETURN_ERROR_CODE);
+                    Log.d("Exception", error_code);
                     String error_desc = (String) data
                             .getStringExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION);
+
+                    Log.d("Exception", error_desc);
+
+                    Log.d("TEchProcess" + " Code=>", error_code);
+                    Log.d("TEchProcess" + " Desc=>", error_desc);
 
                 }
             }
             else if (resultCode == PaymentActivity.RESULT_CANCELED) {
+
+                Log.d("Exception", "Cancled");
 
 
             }
