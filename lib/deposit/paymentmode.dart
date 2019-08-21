@@ -551,7 +551,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                   name: "pay_option_select",
                                   v1: widget.amount,
                                   v2: value["info"]["modeOptionId"],
-                                  v6: int.parse(value["info"].toString()),
+                                  v6: int.parse(
+                                      value["info"]["gatewayId"].toString()),
                                   v7: getFLEM(),
                                   s3: value["name"],
                                 ),
