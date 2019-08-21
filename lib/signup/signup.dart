@@ -97,14 +97,17 @@ class SignupState extends State<Signup> {
     Future<dynamic> installReferringlinkFromBranch = SharedPrefHelper.internal()
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
     installReferringlinkFromBranch.then((value) {
-      if (value != null && value.length > 0) {
-        _installReferring_link = value;
+      if (value != null) {
+        if(value.length > 3){
+           _installReferring_link = value;
+        }
       } else {
         _getInstallReferringLink().then((String link) {
-          _installReferring_link = link;
-          setState(() {
+           if (value != null) {
+             if(link.length>3){
             _installReferring_link = link;
-          });
+          }
+           }
         });
       }
     });
@@ -152,9 +155,7 @@ class SignupState extends State<Signup> {
   _initBranchStuff() async {
     _getInstallReferringLink().then((String value) {
       if(value.length>2){
-         setState(() {
         _installReferring_link = value;
-      });
       }
     });
 
@@ -164,8 +165,6 @@ class SignupState extends State<Signup> {
         _referralCodeController.text = _pfRefCode;
       });
     });
-
-    
   }
 
   showLoader(bool bShow) {
