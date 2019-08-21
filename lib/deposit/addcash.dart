@@ -1062,6 +1062,19 @@ class AddCashState extends State<AddCash> {
                                 ),
                               ),
                               onTap: () {
+                                AnalyticsManager().addEvent(
+                                  Event(
+                                    name: "remove_promo_code",
+                                    v1: amount,
+                                    v3: widget.depositData.chooseAmountData
+                                            .isFirstDeposit
+                                        ? 0
+                                        : 1,
+                                    s1: selectedPromo == null
+                                        ? ""
+                                        : selectedPromo["promoCode"],
+                                  ),
+                                );
                                 setState(() {
                                   selectedPromo = null;
                                 });

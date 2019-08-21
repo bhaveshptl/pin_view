@@ -66,7 +66,9 @@ class AnalyticsManager {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
 
     _visit = Visit(
-      appVersion: double.parse(packageInfo.version),
+      appVersion: double.parse(packageInfo.version.split(".")[0] +
+          "." +
+          packageInfo.version.split(".")[1]),
       channelId: int.parse(HttpManager.channelId),
       clientTimestamp: 0,
       creativeId: 0,
