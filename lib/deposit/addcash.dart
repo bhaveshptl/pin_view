@@ -1624,6 +1624,15 @@ class AddCashState extends State<AddCash> {
 
   initPayment(Map<String, dynamic> paymentMode, int amount) async {
     if (paymentMode["error"] == true) {
+      addAnalyticsEvent(
+        event: Event(
+          name: "proceed_validation_error",
+          v1: amount,
+          v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
+          s1: selectedPromo != null ? selectedPromo["promoCode"] : "",
+          s3: paymentMode["msg"],
+        ),
+      );
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text(paymentMode["msg"]),

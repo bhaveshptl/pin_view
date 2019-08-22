@@ -99,10 +99,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   int getFLEM() {
-    return (firstNameController.text == "" ? 0 : 1000) +
-        (lastNameController.text == "" ? 0 : 100) +
-        (widget.paymentMode["email"] == "" ? 0 : 10) +
-        (widget.paymentMode["mobile"] == "" ? 0 : 1);
+    return (firstNameController.text == "" ? 1000 : 2000) +
+        (lastNameController.text == "" ? 100 : 200) +
+        (widget.paymentMode["email"] == "" ? 10 : 20) +
+        (widget.paymentMode["mobile"] == "" ? 1 : 2);
   }
 
   webengagePaymentModeInitEvent() {
@@ -335,6 +335,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           selectedPaymentMethod[type["type"]] = widget
               .paymentMode["choosePayment"]["paymentInfo"][type["type"]][0];
         }
+      } else {
+        selectedPaymentMethod[type["type"]] =
+            widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]][0];
       }
       i++;
     });
