@@ -258,7 +258,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     print(payload);
     showLoader(false);
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -909,7 +909,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
-              ApiUtil.INIT_PAYMENT_SEAMLESS +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
               querParamString));
       return HttpManager(http.Client())
           .sendRequest(req)
