@@ -637,10 +637,10 @@ class SignInPageState extends State<SignInPage> {
     loginData.putIfAbsent("mobile", () => "");
 
     if (loginData["email_id"].length > 3) {
-      email = AnalyticsManager.dosha256Encoding(loginData["email_id"]);
+      email = await AnalyticsManager.dosha256Encoding(loginData["email_id"]);
     }
     if (loginData["mobile"].length > 3) {
-      phone = AnalyticsManager.dosha256Encoding("+91" + loginData["mobile"]);
+      phone =await AnalyticsManager.dosha256Encoding("+91" + loginData["mobile"]);
     }
     signupdata["phone"] = phone;
     signupdata["email"] = email;

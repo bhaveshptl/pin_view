@@ -25,6 +25,7 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/utils/analytics.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
@@ -142,6 +143,7 @@ class LobbyState extends State<Lobby>
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> user = json.decode(res.body)["user"];
         setWebEngageKeys(user);
+        
         SharedPrefHelper.internal().saveToSharedPref(
             ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
         return User.fromJson(user);
@@ -155,6 +157,8 @@ class LobbyState extends State<Lobby>
 
   setWebEngageKeys(Map<dynamic, dynamic> data) async {
     Map<dynamic, dynamic> userInfo = new Map();
+
+    
     userInfo["first_name"] =
         data["first_name"] != null ? data["first_name"] : "";
     userInfo["lastName"] = data["lastName"] != null ? data["lastName"] : "";
@@ -179,6 +183,14 @@ class LobbyState extends State<Lobby>
         verificationStatus["address_verification"];
     userInfo["email_verification"] = verificationStatus["email_verification"];
     Map<String, dynamic> profileData = await _getProfileData();
+
+    if(profileData["email"] != null ){
+      userInfo["email"] = await AnalyticsManager.dosha256Encoding(profileData["email"]); 
+    }
+    if(profileData["mobile"] != null ){
+      String mobile = await AnalyticsManager.dosha256Encoding("+91" + profileData["mobile"].toString());
+      userInfo["mobile"] =mobile;
+    }    
     if (profileData["fname"] != null) {
       userInfo["first_name"] = profileData["fname"];
     }

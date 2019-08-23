@@ -666,9 +666,9 @@ class SignupState extends State<Signup> {
     String phone = "";
     String email = "";
     if (isMobileNumber(_authName)) {
-      phone = AnalyticsManager.dosha256Encoding("+91" + _authName);
+      phone = await AnalyticsManager.dosha256Encoding("+91" + _authName);
     } else {
-      email = AnalyticsManager.dosha256Encoding(_authName);
+      email = await AnalyticsManager.dosha256Encoding(_authName);
     }
     signupdata["phone"] = phone;
     signupdata["email"] = email;
