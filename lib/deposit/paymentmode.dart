@@ -103,12 +103,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         (widget.paymentMode["email"] == "" ||
                 widget.paymentMode["email"] == null ||
                 widget.paymentMode["email"].toString().endsWith("@howzat.com")
-            ? 10
+            ? (emailController.text == "" ? 10 : 20)
             : 20) +
         (widget.paymentMode["mobile"] == "" ||
                 widget.paymentMode["mobile"] == null ||
                 widget.paymentMode["mobile"] == "9876543210"
-            ? 1
+            ? (phoneController.text == "" ? 1 : 2)
             : 2);
   }
 
@@ -621,6 +621,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                           event.setModeOptionId(value["info"]["modeOptionId"]);
                           event.setGatewayId(
                               int.parse(value["info"]["gatewayId"].toString()));
+                          event.setFirstDeposit(
+                              widget.paymentMode["isFirstDeposit"]);
                           event.setFLEM(getFLEM());
                           event.setPaymentOptionType(value["name"]);
 
