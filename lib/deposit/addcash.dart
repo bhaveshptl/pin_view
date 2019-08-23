@@ -253,36 +253,36 @@ class AddCashState extends State<AddCash> {
             ),
           );
         } else {
-          AnalyticsManager().addEvent(
-            Event(
-              name: "pay_failed",
-              v1: amount,
-              v2: response["modeOptionId"],
-              v3: 1,
-              v6: int.parse(response["gatewayId"].toString()),
-              s1: selectedPromo["promoCode"],
-              s2: response["orderId"],
-            ),
-          );
+          Event event = Event(name: "pay_failed");
+          event.setDepositAmount(amount);
+          event.setModeOptionId(response["modeOptionId"]);
+          event.setFirstDeposit(false);
+          event.setGatewayId(int.parse(response["gatewayId"].toString()));
+          event.setPromoCode(
+              selectedPromo == null ? "" : selectedPromo["promoCode"]);
+          event.setOrderId(response["orderId"]);
+          AnalyticsManager().addEvent(event);
+
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
         }
       } else {
-        AnalyticsManager().addEvent(
-          Event(
-            name: "pay_success",
-            v1: amount,
-            v2: response["modeOptionId"],
-            v3: 1,
-            v4: int.parse(response["withdrawable"]) +
-                int.parse(response["nonWithdrawable"]) +
-                int.parse(response["depositBucket"]),
-            v6: int.parse(payload["gatewayId"].toString()),
-            s1: selectedPromo["promoCode"],
-            s2: response["orderId"],
-          ),
+        Event event = Event(name: "pay_success");
+        event.setDepositAmount(amount);
+        event.setModeOptionId(response["modeOptionId"]);
+        event.setFirstDeposit(false);
+        event.setUserBalance(
+          int.parse(response["withdrawable"]) +
+              int.parse(response["nonWithdrawable"]) +
+              int.parse(response["depositBucket"]),
         );
+        event.setGatewayId(int.parse(response["gatewayId"].toString()));
+        event.setPromoCode(
+            selectedPromo == null ? "" : selectedPromo["promoCode"]);
+        event.setOrderId(response["orderId"]);
+
+        AnalyticsManager().addEvent(event);
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
@@ -376,18 +376,16 @@ class AddCashState extends State<AddCash> {
                             )
                           : widget.depositData.chooseAmountData
                               .amountTiles[curTileIndex];
-                      addAnalyticsEvent(
-                        event: Event(
-                          name: "deposit_tile",
-                          v1: selectedAmount,
-                          v3: widget.depositData.chooseAmountData.isFirstDeposit
-                              ? 0
-                              : 1,
-                          s1: selectedPromo == null
-                              ? ""
-                              : selectedPromo["promoCode"],
-                        ),
-                      );
+
+                      Event event = Event(name: "deposit_tile");
+                      event.setDepositAmount(selectedAmount);
+                      event.setFirstDeposit(
+                          widget.depositData.chooseAmountData.isFirstDeposit);
+                      event.setPromoCode(selectedPromo == null
+                          ? ""
+                          : selectedPromo["promoCode"]);
+                      addAnalyticsEvent(event: event);
+
                       customAmountController.text = selectedAmount.toString();
                       setState(() {
                         selectedTileindex = curTileIndex;
@@ -579,15 +577,17 @@ class AddCashState extends State<AddCash> {
     } else {
       dynamic paymentDetails =
           widget.depositData.chooseAmountData.lastPaymentArray[0];
-      addAnalyticsEvent(
-        event: Event(
-            name: "repeat_transaction",
-            v1: amount,
-            v2: paymentDetails["modeOptionId"],
-            v3: 1,
-            v6: int.parse(paymentDetails["gatewayId"].toString()),
-            s1: selectedPromo != null ? selectedPromo["promoCode"] : ""),
-      );
+
+      Event event = Event(name: "repeat_transaction");
+      event.setDepositAmount(amount);
+      event.setModeOptionId(paymentDetails["modeOptionId"]);
+      event.setFirstDeposit(false);
+      event.setGatewayId(int.parse(paymentDetails["gatewayId"].toString()));
+      event.setPromoCode(
+          selectedPromo != null ? selectedPromo["promoCode"] : "");
+
+      addAnalyticsEvent(event: event);
+
       if (selectedPromo == null) {
         initRepeatDeposit();
       } else {
@@ -668,15 +668,16 @@ class AddCashState extends State<AddCash> {
         if (promoResult != null) {
           Map<String, dynamic> paymentMode = json.decode(promoResult);
           if (paymentMode["error"] == true) {
-            AnalyticsManager().addEvent(
-              Event(
-                name: "apply_promo_error",
-                v1: amount,
-                v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-                s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
-                s5: paymentMode["msg"],
-              ),
-            );
+            Event event = Event(name: "apply_promo_error");
+            event.setDepositAmount(amount);
+            event.setFirstDeposit(
+                widget.depositData.chooseAmountData.isFirstDeposit);
+            event.setPromoCode(
+                selectedPromo != null ? selectedPromo["promoCode"] : "");
+            event.setErrorMessage(paymentMode["msg"]);
+
+            AnalyticsManager().addEvent(event);
+
             _scaffoldKey.currentState.showSnackBar(
               SnackBar(
                 content: Text(paymentMode["msg"]),
@@ -684,15 +685,16 @@ class AddCashState extends State<AddCash> {
             );
           } else {
             selectedPromo = paymentMode["details"];
-            AnalyticsManager().addEvent(
-              Event(
-                name: "apply_promo_sucess",
-                v1: amount,
-                v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-                s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
-                s5: paymentMode["message"],
-              ),
-            );
+            Event event = Event(name: "apply_promo_sucess");
+            event.setDepositAmount(amount);
+            event.setFirstDeposit(
+                widget.depositData.chooseAmountData.isFirstDeposit);
+            event.setPromoCode(
+                selectedPromo != null ? selectedPromo["promoCode"] : "");
+            event.setErrorMessage(paymentMode["message"]);
+
+            AnalyticsManager().addEvent(event);
+
             _scaffoldKey.currentState.showSnackBar(
               SnackBar(
                 content: Text(paymentMode["message"]),
@@ -1062,19 +1064,16 @@ class AddCashState extends State<AddCash> {
                                 ),
                               ),
                               onTap: () {
-                                AnalyticsManager().addEvent(
-                                  Event(
-                                    name: "remove_promo_code",
-                                    v1: amount,
-                                    v3: widget.depositData.chooseAmountData
-                                            .isFirstDeposit
-                                        ? 0
-                                        : 1,
-                                    s1: selectedPromo == null
-                                        ? ""
-                                        : selectedPromo["promoCode"],
-                                  ),
-                                );
+                                Event event = Event(name: "remove_promo_code");
+                                event.setDepositAmount(amount);
+                                event.setFirstDeposit(widget.depositData
+                                    .chooseAmountData.isFirstDeposit);
+                                event.setPromoCode(selectedPromo == null
+                                    ? ""
+                                    : selectedPromo["promoCode"]);
+
+                                AnalyticsManager().addEvent(event);
+
                                 setState(() {
                                   selectedPromo = null;
                                 });
@@ -1119,15 +1118,16 @@ class AddCashState extends State<AddCash> {
       if (result != null) {
         Map<String, dynamic> paymentMode = json.decode(result);
         if (paymentMode["error"] == true) {
-          addAnalyticsEvent(
-            event: Event(
-              name: "proceed_validation_error",
-              v1: amount,
-              v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-              s1: selectedPromo != null ? selectedPromo["promoCode"] : "",
-              s3: paymentMode["msg"],
-            ),
-          );
+          Event event = Event(name: "proceed_validation_error");
+          event.setDepositAmount(amount);
+          event.setFirstDeposit(
+              widget.depositData.chooseAmountData.isFirstDeposit);
+          event.setPromoCode(
+              selectedPromo != null ? selectedPromo["promoCode"] : "");
+          event.setErrorMessage(paymentMode["msg"]);
+
+          addAnalyticsEvent(event: event);
+
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
               content: Text(paymentMode["msg"]),
@@ -1359,22 +1359,27 @@ class AddCashState extends State<AddCash> {
                                                     .depositData
                                                     .chooseAmountData
                                                     .lastPaymentArray[0];
-                                                addAnalyticsEvent(
-                                                  event: Event(
-                                                    name: "repeat",
-                                                    v1: amount,
-                                                    v2: paymentDetails[
-                                                        "modeOptionId"],
-                                                    v3: 1,
-                                                    v5: checked ? 1 : 0,
-                                                    v6: paymentDetails[
-                                                        "gatewayId"],
-                                                    s1: selectedPromo != null
+
+                                                Event event =
+                                                    Event(name: "repeat");
+                                                event.setDepositAmount(amount);
+                                                event.setModeOptionId(
+                                                    paymentDetails[
+                                                        "modeOptionId"]);
+                                                event.setFirstDeposit(false);
+                                                event.setPaymentRepeatChecked(
+                                                    checked);
+                                                event.setGatewayId(
+                                                    paymentDetails[
+                                                        "gatewayId"]);
+                                                event.setPromoCode(
+                                                    selectedPromo != null
                                                         ? selectedPromo[
                                                             "promoCode"]
-                                                        : "",
-                                                  ),
-                                                );
+                                                        : "");
+
+                                                addAnalyticsEvent(event: event);
+
                                                 setState(() {
                                                   bRepeatTransaction = checked;
                                                 });
@@ -1447,14 +1452,15 @@ class AddCashState extends State<AddCash> {
             ),
           );
         } else {
-          addAnalyticsEvent(
-            event: Event(
-              name: "proceed_req",
-              v1: amount,
-              v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-              s1: selectedPromo != null ? selectedPromo["promoCode"] : "",
-            ),
-          );
+          Event event = Event(name: "proceed_req");
+          event.setDepositAmount(amount);
+          event.setFirstDeposit(
+              widget.depositData.chooseAmountData.isFirstDeposit);
+          event.setPromoCode(
+              selectedPromo != null ? selectedPromo["promoCode"] : "");
+
+          addAnalyticsEvent(event: event);
+
           final result = await proceedToPaymentMode(amount);
           if (result != null) {
             initPayment(json.decode(result), amount);
@@ -1490,13 +1496,15 @@ class AddCashState extends State<AddCash> {
       (http.Response res) {
         showLoader(false);
         bool bSuccess = res.statusCode >= 200 && res.statusCode <= 299;
-        addAnalyticsEvent(
-            event: Event(
-          name: "proceed_res",
-          v1: amount,
-          v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-          v5: bSuccess ? 0 : 1,
-        ));
+
+        Event event = Event(name: "proceed_res");
+        event.setDepositAmount(amount);
+        event.setFirstDeposit(
+            widget.depositData.chooseAmountData.isFirstDeposit);
+        event.setPaymentSuccess(bSuccess);
+
+        addAnalyticsEvent(event: event);
+
         if (bSuccess) {
           return res.body;
         } else {
@@ -1536,15 +1544,15 @@ class AddCashState extends State<AddCash> {
 
   initPayment(Map<String, dynamic> paymentMode, int amount) async {
     if (paymentMode["error"] == true) {
-      addAnalyticsEvent(
-        event: Event(
-          name: "proceed_validation_error",
-          v1: amount,
-          v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-          s1: selectedPromo != null ? selectedPromo["promoCode"] : "",
-          s3: paymentMode["msg"],
-        ),
-      );
+      Event event = Event(name: "proceed_validation_error");
+      event.setDepositAmount(amount);
+      event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
+      event.setPromoCode(
+          selectedPromo != null ? selectedPromo["promoCode"] : "");
+      event.setErrorMessage(paymentMode["msg"]);
+
+      addAnalyticsEvent(event: event);
+
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text(paymentMode["msg"]),
@@ -1633,14 +1641,15 @@ class AddCashState extends State<AddCash> {
       index++;
     });
 
-    AnalyticsManager().addEvent(Event(
-      name: "pay_securely",
-      v1: amount,
-      v2: payload["modeOptionId"],
-      v3: 1,
-      v6: int.parse(payload["gatewayId"].toString()),
-      s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
-    ));
+    Event event = Event(name: "pay_securely");
+    event.setDepositAmount(amount);
+    event.setModeOptionId(payload["modeOptionId"]);
+    event.setFirstDeposit(false);
+    event.setGatewayId(int.parse(payload["gatewayId"].toString()));
+    event.setFLEM(2222);
+    event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
+
+    AnalyticsManager().addEvent(event);
 
     showLoader(true);
 
@@ -1717,33 +1726,35 @@ class AddCashState extends State<AddCash> {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
-          AnalyticsManager().addEvent(
-            Event(
-              name: "pay_failed",
-              v1: amount,
-              v2: response["modeOptionId"],
-              v3: 1,
-              v6: int.parse(response["gatewayId"].toString()),
-              s1: selectedPromo["promoCode"],
-              s2: response["orderId"],
-            ),
-          );
+
+          Event event = Event(name: "pay_failed");
+          event.setDepositAmount(amount);
+          event.setModeOptionId(response["modeOptionId"]);
+          event.setFirstDeposit(false);
+          event.setGatewayId(int.parse(response["gatewayId"].toString()));
+          event.setPromoCode(
+              selectedPromo == null ? "" : selectedPromo["promoCode"]);
+          event.setOrderId(response["orderId"]);
+
+          AnalyticsManager().addEvent(event);
         }
       } else {
-        AnalyticsManager().addEvent(
-          Event(
-            name: "pay_success",
-            v1: amount,
-            v2: response["modeOptionId"],
-            v3: 1,
-            v4: int.parse(response["withdrawable"]) +
-                int.parse(response["nonWithdrawable"]) +
-                int.parse(response["depositBucket"]),
-            v6: int.parse(response["gatewayId"].toString()),
-            s1: selectedPromo["promoCode"],
-            s2: response["orderId"],
-          ),
+        Event event = Event(name: "pay_success");
+        event.setDepositAmount(amount);
+        event.setModeOptionId(response["modeOptionId"]);
+        event.setFirstDeposit(false);
+        event.setUserBalance(
+          int.parse(response["withdrawable"]) +
+              int.parse(response["nonWithdrawable"]) +
+              int.parse(response["depositBucket"]),
         );
+        event.setGatewayId(int.parse(response["gatewayId"].toString()));
+        event.setPromoCode(
+            selectedPromo == null ? "" : selectedPromo["promoCode"]);
+        event.setOrderId(response["orderId"]);
+
+        AnalyticsManager().addEvent(event);
+
         branchEventTransactionSuccess(response);
         Navigator.of(context).pop(result);
       }
@@ -1879,14 +1890,13 @@ class AddCashState extends State<AddCash> {
   }
 
   setDepositAmount(int amount) {
-    addAnalyticsEvent(
-      event: Event(
-        name: "deposit_tile",
-        v1: amount,
-        v3: widget.depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-        s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
-      ),
-    );
+    Event event = Event(name: "deposit_tile");
+    event.setDepositAmount(amount);
+    event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
+    event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
+
+    addAnalyticsEvent(event: event);
+
     amountController.text = amount.toString();
   }
 

@@ -7,18 +7,18 @@ class Event {
   String source;
   String journey;
   int userId;
-  final int v1;
-  final int v2;
-  final int v3;
-  final int v4;
-  final int v5;
-  final int v6;
-  final int v7;
-  final String s1;
-  final String s2;
-  final String s3;
-  final String s4;
-  final String s5;
+  int v1;
+  int v2;
+  int v3;
+  int v4;
+  int v5;
+  int v6;
+  int v7;
+  String s1;
+  String s2;
+  String s3;
+  String s4;
+  String s5;
 
   Event({
     this.appVersion = 0,
@@ -29,18 +29,18 @@ class Event {
     this.source = "",
     this.journey = "",
     this.userId = 0,
-    this.v1 = 0,
-    this.v2 = 0,
-    this.v3 = 0,
-    this.v4 = 0,
-    this.v5 = 0,
-    this.v6 = 0,
-    this.v7 = 0,
-    this.s1 = "",
-    this.s2 = "",
-    this.s3 = "",
-    this.s4 = "",
-    this.s5 = "",
+    // this.v1 = 0,
+    // this.v2 = 0,
+    // this.v3 = 0,
+    // this.v4 = 0,
+    // this.v5 = 0,
+    // this.v6 = 0,
+    // this.v7 = 0,
+    // this.s1 = "",
+    // this.s2 = "",
+    // this.s3 = "",
+    // this.s4 = "",
+    // this.s5 = "",
   });
 
   Map<String, dynamic> toJson() => {
@@ -65,6 +65,62 @@ class Event {
         "s4": s4,
         "s5": s5,
       };
+
+  setDepositAmount(int amount) {
+    this.v1 = amount;
+  }
+
+  setModeOptionId(int id) {
+    this.v2 = id;
+  }
+
+  setFirstDeposit(bool isFirstDeposit) {
+    this.v3 = isFirstDeposit ? 0 : 1;
+  }
+
+  setUserBalance(int amount) {
+    this.v4 = amount;
+  }
+
+  setPaymentRepeatChecked(bool isChecked) {
+    this.v5 = isChecked ? 1 : 0;
+  }
+
+  setPayModeExpanded(bool isExpanded) {
+    this.v5 = isExpanded ? 0 : 1;
+  }
+
+  setPaymentSuccess(bool isSuccess) {
+    this.v5 = isSuccess ? 0 : 1;
+  }
+
+  setGatewayId(int id) {
+    this.v6 = id;
+  }
+
+  setFLEM(int value) {
+    this.v7 = value;
+  }
+
+  setPromoCode(String promoCode) {
+    this.s1 = promoCode;
+  }
+
+  setOrderId(String orderId) {
+    this.s2 = orderId;
+  }
+
+  setErrorMessage(String msg) {
+    this.s5 = msg;
+  }
+
+  setPaymentType(String type) {
+    this.s3 = type;
+  }
+
+  setPaymentOptionType(String type) {
+    this.s3 = type;
+  }
 }
 
 class Visit {

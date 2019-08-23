@@ -52,13 +52,12 @@ class RouteLauncher {
     showLoader(context, false);
 
     try {
+      Event event = Event(name: "addcash");
+      event.setFirstDeposit(depositData.chooseAmountData.isFirstDeposit);
       addAnalyticsEvent(
         journey: "Deposit",
         source: source,
-        event: Event(
-          name: "addcash",
-          v3: depositData.chooseAmountData.isFirstDeposit ? 0 : 1,
-        ),
+        event: event,
       );
     } catch (e) {}
 
