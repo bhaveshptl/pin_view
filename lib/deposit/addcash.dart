@@ -26,6 +26,7 @@ import 'package:playfantasy/deposit/paymentmode.dart';
 import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -130,6 +131,7 @@ class AddCashState extends State<AddCash> {
     });
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
+    techprocess_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
       isIos = true;
@@ -316,14 +318,18 @@ class AddCashState extends State<AddCash> {
   }
 
   onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
-   showLoader(false);
+   print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
+    print(payload);
+    showLoader(false);
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SUCCESS_PAY));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
+      print("<<<<<<<<<<<<<<TEch Process success Response");
+      print(response);
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
@@ -331,44 +337,22 @@ class AddCashState extends State<AddCash> {
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
         if (response["orderId"] == null) {
-          _scaffoldKey.currentState.showSnackBar(
-            SnackBar(
-              content: Text(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-              ),
-            ),
-          );
+          ActionUtil().showMsgOnTop(
+              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+          //     ),
+          //   ),
+          // );
         } else {
-          AnalyticsManager().addEvent(
-            Event(
-              name: "pay_failed",
-              v1: amount,
-              v2: response["modeOptionId"],
-              v3: 1,
-              v6: int.parse(response["gatewayId"].toString()),
-              s1: selectedPromo["promoCode"],
-              s2: response["orderId"],
-            ),
-          );
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
         }
       } else {
-        AnalyticsManager().addEvent(
-          Event(
-            name: "pay_success",
-            v1: amount,
-            v2: response["modeOptionId"],
-            v3: 1,
-            v4: int.parse(response["withdrawable"]) +
-                int.parse(response["nonWithdrawable"]) +
-                int.parse(response["depositBucket"]),
-            v6: int.parse(payload["gatewayId"].toString()),
-            s1: selectedPromo["promoCode"],
-            s2: response["orderId"],
-          ),
-        );
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
@@ -376,7 +360,6 @@ class AddCashState extends State<AddCash> {
     }).whenComplete(() {
       showLoader(false);
     });
-
   }
 
 
@@ -1746,8 +1729,38 @@ class AddCashState extends State<AddCash> {
     eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
     eventdata["data"] = payload;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-
-    if (paymentModeDetails["isSeamless"]) {
+    print("<<<<<<Inside payment check>>>>>");  
+    if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
+      print("<<<<<<We are inside techprocess seelless");
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": (payload["depositAmount"] * 100).toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+    }
+    else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
