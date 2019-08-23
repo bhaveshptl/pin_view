@@ -10,6 +10,7 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:flutter/services.dart';
 import 'package:crypto/crypto.dart';
+import 'package:cipher2/cipher2.dart';
 
 class AnalyticsManager {
   String source;
@@ -251,15 +252,12 @@ class AnalyticsManager {
     return "";
   }
 
-  static String dosha256Encoding(String dataString) {
-    var bytes = utf8.encode(dataString); // data being hashed
-    var key = utf8.encode('tyu7CVYUiiop67XTHophyRTyUItYRtErTTYUZAS');
-
-    //var digest = sha1.convert(bytes);
-
-    var hmacSha256 = new Hmac(sha256, key); // HMAC-SHA256
-    var digest = hmacSha256.convert(bytes);
-    return digest.toString();
+  static  Future<String> dosha256Encoding(String dataString) async {
+    String key = 'ntTyUio@yiou78CZ65RTvyuoi';
+    String iv = 'tyuio6rt43et';
+    String encryptedString = await Cipher2.encryptAesCbc128Padding7(dataString, key, iv);
+    
+    return encryptedString;
   }
 
   static Future<String> deleteInternalStorageFile(String filename) async {

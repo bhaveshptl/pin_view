@@ -106,6 +106,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     }
 
+    
+
+
+
     private void initWebEngage() {
         WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866")
                 .setDebugMode(true)
@@ -494,6 +498,14 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(arguments.get("first_name") != null && ((String) arguments.get("first_name")).length()>0){
             weUser.setFirstName((String)arguments.get("first_name"));
             weUser.setAttribute("first_name", (String)arguments.get("first_name"));
+        }
+        if(arguments.get("email") != null && ((String) arguments.get("email")).length()>0){
+            weUser.setHashedEmail((String)arguments.get("email"));
+
+        }
+        if(arguments.get("mobile") != null && ((String) arguments.get("mobile")).length()>0){
+            weUser.setHashedPhoneNumber((String)arguments.get("mobile"));
+
         }
         if(arguments.get("lastName") != null && ((String) arguments.get("lastName")).length()>0){
             weUser.setLastName((String)arguments.get("lastName"));
