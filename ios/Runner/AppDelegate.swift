@@ -627,6 +627,15 @@ import CoreLocation
             weUser.setLastName(value);
             weUser.setAttribute("last_name", withStringValue:value);
         }
+        if(data["email"] != nil){
+            let value:String = data["email"] as! String;
+            weUser.setHashedEmail(value);
+        }
+        if(data["mobile"] != nil){
+            let value:String = data["mobile"] as! String;
+            weUser.setHashedPhone(value);
+            
+        }
         if(data["login_name"] != nil){
             let value:String = data["login_name"] as! String;
             weUser.setAttribute("userName", withStringValue:value);
