@@ -253,10 +253,9 @@ class AnalyticsManager {
   }
 
   static  Future<String> dosha256Encoding(String dataString) async {
-    String key = 'ntTyUio@yiou78CZ65RTvyuoi';
-    String iv = 'tyuio6rt43et';
+    String key = '9*x@xAg5aDFyVnl@';
+    String iv = '8wruyqyi7@yrloc5';
     String encryptedString = await Cipher2.encryptAesCbc128Padding7(dataString, key, iv);
-    
     return encryptedString;
   }
 

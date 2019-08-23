@@ -58,14 +58,12 @@ class _PromoStateInput extends State<PromoInput> {
     if (selectedPromo != null) {
       setBonusAmount();
     }
-    AnalyticsManager().addEvent(
-      Event(
-        name: "have_promo_code",
-        v1: widget.amount,
-        v3: widget.isFirstDeposit ? 0 : 1,
-        s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
-      ),
-    );
+    Event event = Event(name: "have_promo_code");
+    event.setDepositAmount(widget.amount);
+    event.setFirstDeposit(widget.isFirstDeposit);
+    event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
+
+    AnalyticsManager().addEvent(event);
   }
 
   getBonusAmountForPromo(promoCode) {
@@ -420,14 +418,12 @@ class _PromoStateInput extends State<PromoInput> {
         selectedPromo = null;
       });
     }
-    AnalyticsManager().addEvent(
-      Event(
-        name: "select_promo_code",
-        v1: widget.amount,
-        v3: widget.isFirstDeposit ? 0 : 1,
-        s1: selectedPromo == null ? "" : selectedPromo["promoCode"],
-      ),
-    );
+    Event event = Event(name: "select_promo_code");
+    event.setDepositAmount(widget.amount);
+    event.setFirstDeposit(widget.isFirstDeposit);
+    event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
+
+    AnalyticsManager().addEvent(event);
   }
 
   getPromoExpiry(promoCode) {
@@ -629,16 +625,14 @@ class _PromoStateInput extends State<PromoInput> {
                 onPressed: selectedPromo == null
                     ? null
                     : () {
-                        AnalyticsManager().addEvent(
-                          Event(
-                            name: "apply_promo_code",
-                            v1: widget.amount,
-                            v3: widget.isFirstDeposit ? 0 : 1,
-                            s1: selectedPromo == null
-                                ? ""
-                                : selectedPromo["promoCode"],
-                          ),
-                        );
+                        Event event = Event(name: "apply_promo_code");
+                        event.setDepositAmount(widget.amount);
+                        event.setFirstDeposit(widget.isFirstDeposit);
+                        event.setPromoCode(selectedPromo == null
+                            ? ""
+                            : selectedPromo["promoCode"]);
+
+                        AnalyticsManager().addEvent(event);
                         Navigator.of(context).pop(selectedPromo);
                       },
               ),
