@@ -79,6 +79,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     } catch (e) {}
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
+    techprocess_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
     }
@@ -253,8 +254,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
-    print("<<<<<<<<<<<<<<Procees succes response>>>>>>>>>>>>");
+  onTechProcessSuccessResponse(Map<dynamic, dynamic>  payload){
+    print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
     http.Request req =
@@ -264,7 +265,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
-      print("Response");
+      print("<<<<<<<<<<<<<<TEch Process success Response");
       print(response);
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
@@ -831,6 +832,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   onPaySecurely(Map<String, dynamic> paymentModeDetails, String type) async {
     String querParamString = '';
+    print("Gateway name>>>>>>>Check");
+    print(paymentModeDetails["info"]["gatewayId"]);
+    print(paymentModeDetails["info"]["gateway"]);
+
     Map<String, dynamic> payload = {
       "channelId": AppConfig.of(context).channelId,
       "orderId": null,
@@ -840,6 +845,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "paymentOption": paymentModeDetails["name"],
       "gateway": paymentModeDetails["info"]["gateway"],
       "gatewayName": paymentModeDetails["info"]["gateway"],
+
       "gatewayId": paymentModeDetails["info"]["gatewayId"],
       "accessToken": paymentModeDetails["info"]["accessToken"],
       "requestType": paymentModeDetails["info"]["requestType"],
@@ -908,7 +914,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     showLoader(true);
     print("<<<<<<<<<<<<<<<Payment Info>>>>>>>");
     print(paymentModeDetails["info"]);
-    if(paymentModeDetails["info"]["gateway"]=="TECHPROCESS"){
+    if(paymentModeDetails["info"]["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["info"]["isSeamless"]){
+      print("<<<<<<We are inside techprocess seelless");
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
@@ -938,7 +945,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       });
     }
 
-    if (paymentModeDetails["info"]["isSeamless"]) {
+    else if (paymentModeDetails["info"]["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +

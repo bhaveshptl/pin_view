@@ -115,8 +115,11 @@ class ApiUtil {
   static const PAYMENT_SUCCESS = "/assets/payment-response.html";
   static const SUCCESS_PAY =
       "/api/payment/success-razor-pay?type_id=4&source=RAZORPAY";
+  // static const TECHPROCESS_SUCCESS_PAY =
+  //     "/api/v2/payment/success-pay?type_id=5&source=TECHPROCESS_SEAMLESS"; 
+
   static const TECHPROCESS_SUCCESS_PAY =
-      "/api/payment/success-techprocess?type_id=4&source=RAZORPAY";    
+      "/api/payment/success-techprocess?type_id=5&source=TECHPROCESS_SEAMLESS";    
   static const SAVE_SHEET = "/api/v2/lobby/quiz/save-answer-sheet";
   static const JOIN_PREDICTION_CONTEST = "/api/v2/lobby/quiz/join";
   static const GET_MY_CONTEST_MY_SHEETS =

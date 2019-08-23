@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 import android.content.Context;
 
+import com.google.gson.Gson;
 import com.howzat.howzatfantasy.services.BranchClass;
 import com.howzat.howzatfantasy.services.DeviceInfo;
 import com.howzat.howzatfantasy.services.MyHelperClass;
@@ -1055,36 +1056,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 });
     }
 
-    public void onTechProcessPaymentSuccess(String razorpayPaymentID, PaymentData data) {
-        JSONObject object = new JSONObject();
-        try {
-            object.put("paymentId", data.getPaymentId());
-            object.put("signature", data.getSignature());
-            object.put("orderId", data.getOrderId());
-            object.put("status", "paid");
-        } catch (JSONException e) {
-
-        }
-
+    public void onTechProcessPaymentSuccess(JSONObject  data) {
         new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentSuccess",
-                object.toString(), new MethodChannel.Result() {
+                data.toString(), new MethodChannel.Result() {
                     @Override
                     public void success(Object o) {
+                        Log.d("TECHPROCESS",  "Success" );
                     }
-
                     @Override
                     public void error(String s, String s1, Object o) {
+                        Log.d("TECHPROCESS",  "Success" );
                     }
-
                     @Override
                     public void notImplemented() {
+                        Log.d("TECHPROCESS",  "Success" );
                     }
                 });
     }
-
-
-
-
 
     private void initTechProcessPayment(Map<String, Object> arguments){
 
@@ -1109,19 +1097,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         checkout.setTransactionAmount (amount_in_rupees);
         checkout.setTransactionDateTime (date);
 
-
-
         checkout.setConsumerIdentifier ("");
         checkout.setConsumerEmailID (email);
         checkout.setConsumerMobileNumber (phone);
         checkout.setConsumerAccountNo ("");
 
-
-
         checkout.addCartItem("FIRST",amount_in_rupees,"0.0", "0.0", "", "", "","");
-
-
-
         Intent authIntent = new Intent(this, PaymentModesActivity.class);
         authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT,
                 checkout);
@@ -1136,18 +1117,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         //PaymentActivity.PAYMENT_METHOD_MVISA
         //PaymentActivity.PAYMENT_METHOD_EMI
         //PaymentActivity.PAYMENT_METHOD_CASHCARDS
-
-
-
+        
         authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
                 PaymentActivity.PAYMENT_METHOD_NETBANKING);
-
-
-
-
         startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
-
-
     }
 
     @Override
@@ -1206,7 +1179,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                         getPaymentMethod().getPaymentTransaction().
                                         getInstruction().getId().isEmpty()) {
                                     Log.v("TRANSACTION SI STATUS=>",
-                                            "SI Transaction Not Initiated");
+                                            checkout_res.getMerchantResponsePayload().toString());
+                                    Log.v("TRANSACTION SI STATUS=>",
+                                            checkout_res.getMerchantResponsePayload().toString());
+
+
+
                                 } else if (checkout_res.getMerchantResponsePayload().
                                         getPaymentMethod().getPaymentTransaction().
                                         getInstruction().getId() != null && !checkout_res.getMerchantResponsePayload().
@@ -1261,6 +1239,22 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         String  SIMandateId=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
                         String SIMandateStatus=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
                         String  SIMandateErrorCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
+                        Log.d("TECHPROCESS", statusCode);
+                        if(statusCode.equals("0300")){
+                            Gson gson = new Gson();
+                            String jsonString = gson.toJson(checkout_res.getMerchantResponsePayload());
+                            try {
+                                JSONObject request = new JSONObject(jsonString);
+                                request.put("amount",amount);
+                                request.put("orderId",merchantTransactionIdentifier);
+                                request.put("status",1);
+                                onTechProcessPaymentSuccess(request);
+
+                            } catch (JSONException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                         Log.d("Exception", e.toString());
