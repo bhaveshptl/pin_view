@@ -78,8 +78,8 @@ class Event {
     this.v3 = isFirstDeposit ? 0 : 1;
   }
 
-  setUserBalance(int amount) {
-    this.v4 = amount;
+  setUserBalance(double amount) {
+    this.v4 = amount.toInt();
   }
 
   setPaymentRepeatChecked(bool isChecked) {

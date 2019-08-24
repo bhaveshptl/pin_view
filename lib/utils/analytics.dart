@@ -9,7 +9,6 @@ import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:flutter/services.dart';
-import 'package:crypto/crypto.dart';
 import 'package:cipher2/cipher2.dart';
 
 class AnalyticsManager {
