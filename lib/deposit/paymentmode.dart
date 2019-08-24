@@ -178,8 +178,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       value =
           await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
       showLoader(false);
-      print("((((((((((Tech Process Result)))))))))))");
-      print(value);
       if (Platform.isIOS) {
        
       }
@@ -858,7 +856,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "paymentOption": paymentModeDetails["name"],
       "gateway": paymentModeDetails["info"]["gateway"],
       "gatewayName": paymentModeDetails["info"]["gateway"],
-
       "gatewayId": paymentModeDetails["info"]["gatewayId"],
       "accessToken": paymentModeDetails["info"]["accessToken"],
       "requestType": paymentModeDetails["info"]["requestType"],
@@ -941,12 +938,19 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             "name": AppConfig.of(context).appName,
             "email": payload["email"],
             "phone": payload["phone"],
-            "amount": (payload["depositAmount"] * 100).toString(),
+            "amount": payload["depositAmount"].toString(),
             "orderId": response["action"]["value"],
             "method": (payload["paymentType"] as String).indexOf("CARD") == -1
                 ? payload["paymentType"].toLowerCase()
                 : "card",
-            
+            "userId":"123",
+            "date":"27-06-2017",
+            "extra_public_key":"1234-6666-6789-56",
+            "tp_nameOnTheCard":"",
+            "tp_expireYear":"",
+            "tp_expireMonth":"",
+            "tp_cvv":"",
+            "tp_cardNumber":""
           });
         } else {
           ActionUtil().showMsgOnTop("Opps!! Try again later.", context);

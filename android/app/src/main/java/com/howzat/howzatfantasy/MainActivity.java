@@ -1090,48 +1090,68 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         String email= (String) arguments.get("email");
         String phone = (String) arguments.get("phone");
-        String  amount = (String) arguments.get("amount");
-        int amount_integer = Integer.parseInt(amount);
-        int amount_integer_in_rupees = amount_integer/100;
-        String amount_in_rupees= String.valueOf(amount_integer_in_rupees);
-        String date= "27-06-2017";
+        String amount_in_rupees= (String) arguments.get("amount");
+        String date= (String) arguments.get("date");
         String orderId= (String) arguments.get("orderId");
-        String paymentMode="";
-
+        String paymentMethod=(String) arguments.get("method");
+        String userId=(String) arguments.get("method");
+        String extra_public_key =(String) arguments.get("extra_public_key");
+        /*Prepare a checkout object*/
         com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
-
         checkout.setMerchantIdentifier("T456537");
         checkout.setTransactionIdentifier(orderId);
-        checkout.setTransactionReference ("ORD0001");
+        checkout.setTransactionReference (orderId);
         checkout.setTransactionType (PaymentActivity.TRANSACTION_TYPE_SALE);
         checkout.setTransactionSubType (PaymentActivity.TRANSACTION_SUBTYPE_DEBIT);
         checkout.setTransactionCurrency ("INR");
         checkout.setTransactionAmount (amount_in_rupees);
         checkout.setTransactionDateTime (date);
-
-        checkout.setConsumerIdentifier ("");
+        /*User Info*/
+        checkout.setConsumerIdentifier (userId);
         checkout.setConsumerEmailID (email);
         checkout.setConsumerMobileNumber (phone);
-        checkout.setConsumerAccountNo ("");
+        checkout.setConsumerAccountNo (userId);
 
         checkout.addCartItem("FIRST",amount_in_rupees,"0.0", "0.0", "", "", "","");
-        Intent authIntent = new Intent(this, PaymentModesActivity.class);
-        authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT,
-                checkout);
-        authIntent.putExtra(PaymentActivity.EXTRA_PUBLIC_KEY,
-                "1234-6666-6789-56");
 
-        //PAYMENT_METHOD_ DEFAULT
-        //.PAYMENT_METHOD_CARDS
-        //PaymentActivity.PAYMENT_METHOD_NETBANKING
-        //PaymentActivity.PAYMENT_METHOD_WALLETS
-        //PaymentActivity.PAYMENT_METHOD_UPI
-        //PaymentActivity.PAYMENT_METHOD_MVISA
-        //PaymentActivity.PAYMENT_METHOD_EMI
-        //PaymentActivity.PAYMENT_METHOD_CASHCARDS
+        /**************** Auth Intent ****************/
+        Intent authIntent = new Intent(this, PaymentModesActivity.class);
+        authIntent.putExtra(PaymentActivity.EXTRA_PUBLIC_KEY, extra_public_key);
+
+        if(paymentMethod.equals("netbanking")){
+            authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_NETBANKING);
+        }else if(paymentMethod.equals("card")){
+
+            boolean cardDataCapturingRequired=true;
+            if(cardDataCapturingRequired){
+                String cardNo=(String) arguments.get("tp_cardNumber");
+                String expiryMonth=(String) arguments.get("tp_expireMonth");
+                String expiryYear=(String) arguments.get("tp_expireYear");
+                String cvv=(String) arguments.get("tp_cvv");
+                String nameOnCard=(String) arguments.get("tp_nameOnTheCard");
+                /*Data Capturing Page at Merchant End For - New Card*/
+                checkout.setPaymentInstrumentIdentifier(cardNo);
+                checkout.setPaymentInstrumentExpiryMonth(expiryMonth);
+                checkout.setPaymentInstrumentExpiryYear(expiryYear);
+                checkout.setPaymentInstrumentVerificationCode(cvv);
+                checkout.setPaymentInstrumentHolderName(nameOnCard);
+                checkout.setTransactionIsRegistration("Y");
+                checkout.setTransactionMerchantInitiated("Y");
+                authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_CARDS);
+            }else{
+                String cvv=(String) arguments.get("tp_cvv");
+                checkout.setTransactionMerchantInitiated("Y");
+                checkout.setPaymentInstrumentToken("123234");
+                checkout.setPaymentInstrumentVerificationCode(cvv);
+            }
+        }
+        else{
+            authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
+                    PaymentActivity.PAYMENT_METHOD_DEFAULT);
+        }
         
-        authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
-                PaymentActivity.PAYMENT_METHOD_NETBANKING);
+        /*Now call the payment activity*/
+        authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT, checkout);
         startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
     }
 
