@@ -275,17 +275,17 @@ class AddCashState extends State<AddCash> {
       } else {
         Event event = Event(name: "pay_success");
         event.setDepositAmount(amount);
-        event.setModeOptionId(razorpayPayload["modeOptionId"]);
+        event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(false);
         event.setUserBalance(
-          int.parse(response["withdrawable"].toString()) +
-              int.parse(response["nonWithdrawable"].toString()) +
-              int.parse(response["depositBucket"].toString()),
+          response["withdrawable"].toDouble() +
+              response["nonWithdrawable"].toDouble() +
+              response["depositBucket"].toDouble(),
         );
-        event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
+        event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(
             selectedPromo == null ? "" : selectedPromo["promoCode"]);
-        event.setOrderId(razorpayPayload["orderId"]);
+        event.setOrderId(response["orderId"]);
 
         AnalyticsManager().addEvent(event);
         branchEventTransactionSuccess(response);
@@ -1752,9 +1752,9 @@ class AddCashState extends State<AddCash> {
         event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(false);
         event.setUserBalance(
-          int.parse(response["withdrawable"].toString()) +
-              int.parse(response["nonWithdrawable"].toString()) +
-              int.parse(response["depositBucket"].toString()),
+          response["withdrawable"].toDouble() +
+              response["nonWithdrawable"].toDouble() +
+              response["depositBucket"].toDouble(),
         );
         event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(
