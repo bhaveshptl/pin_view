@@ -2,6 +2,7 @@ package com.howzat.howzatfantasy;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,7 +20,11 @@ import com.howzat.howzatfantasy.services.MyHelperClass;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +96,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private User weUser;
     Function callback;
     boolean bBranchLodead = false;
+    private String indusosPostResult;
+    private boolean bActivateIndiusOSAttribution=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,12 +114,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     public void onStart() {
         super.onStart();
-        initBranchPlugin();
 
+        if(bActivateIndiusOSAttribution){
+            initIndusOSBranchAttribution();
+            /*For indus OS branch attribution call the async call first and then init the branch plugin*/
+        }else{
+            initBranchPlugin();
+        }
     }
 
-    
-
+    private void initIndusOSBranchAttribution(){
+        if (!getSharedPreferences("branch", 0).getBoolean("branchTrackUrlHit", false)) {
+            IndusOSAttribution runner = new IndusOSAttribution();
+            runner.execute();
+        }else {
+            initBranchPlugin();
+        }
+    }
 
 
     private void initWebEngage() {
@@ -1560,5 +1578,53 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
         return params;
     }
+
+
+    private class IndusOSAttribution extends AsyncTask<Void, Void, String> {
+        String branch_tracking_url_indusos="https://11zy.app.link/howzat_indus?%243p=a_indus_os&%24aaid={aaid}";
+        @Override
+        protected String doInBackground(Void... params) {
+            String retVal = "false";
+            String advertId = null;
+            try {
+                advertId = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext).getId();
+
+            } catch (IOException |GooglePlayServicesNotAvailableException |GooglePlayServicesRepairableException e) {}
+            String BRANCH_TRACK_URL = branch_tracking_url_indusos;
+
+            String track_url = BRANCH_TRACK_URL.replace("{aaid}",advertId) + "&%24s2s=true";
+            HttpURLConnection urlConnection = null;
+            try {
+                URL url = new URL(track_url);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder result = new StringBuilder();
+                String line ;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append('\n').append(line);
+                }
+                String response = result.toString();
+                bufferedReader.close();
+                JSONObject object = new JSONObject(response);
+                if(object.getBoolean("success")){
+                    retVal = "true";
+                };
+            } catch (Exception e) {}
+            finally {
+                urlConnection.disconnect();
+            }
+            return retVal;
+        }
+        @Override
+        protected void onPostExecute(String response) {
+            if("true".equalsIgnoreCase(response)){
+                indusosPostResult=response;
+                SharedPreferences sharedPreferences = getSharedPreferences("branch", 0);
+                sharedPreferences.edit().putBoolean("branchTrackUrlHit", true).apply();
+                initBranchPlugin();
+            }
+        }
+    }
+
 
 }
