@@ -53,6 +53,8 @@ class AddCashState extends State<AddCash> {
   int selectedTileindex = 0;
   bool bShowBonusDistribution = false;
 
+  Map<String, dynamic> razorpayPayload;
+
   TextEditingController promoController = TextEditingController();
   TextEditingController amountController = TextEditingController();
   TextEditingController customAmountController = TextEditingController();
@@ -244,6 +246,19 @@ class AddCashState extends State<AddCash> {
               "Failed".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
+        Event event = Event(name: "pay_failed");
+        event.setDepositAmount(amount);
+        event.setModeOptionId(razorpayPayload["modeOptionId"]);
+        event.setFirstDeposit(false);
+        event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
+        event.setPromoCode(
+            selectedPromo == null ? "" : selectedPromo["promoCode"]);
+        event.setOrderId(response["orderId"] == null
+            ? razorpayPayload["orderId"]
+            : response["orderId"]);
+
+        AnalyticsManager().addEvent(event);
+
         if (response["orderId"] == null) {
           _scaffoldKey.currentState.showSnackBar(
             SnackBar(
@@ -253,16 +268,6 @@ class AddCashState extends State<AddCash> {
             ),
           );
         } else {
-          Event event = Event(name: "pay_failed");
-          event.setDepositAmount(amount);
-          event.setModeOptionId(response["modeOptionId"]);
-          event.setFirstDeposit(false);
-          event.setGatewayId(int.parse(response["gatewayId"].toString()));
-          event.setPromoCode(
-              selectedPromo == null ? "" : selectedPromo["promoCode"]);
-          event.setOrderId(response["orderId"]);
-          AnalyticsManager().addEvent(event);
-
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
@@ -270,17 +275,17 @@ class AddCashState extends State<AddCash> {
       } else {
         Event event = Event(name: "pay_success");
         event.setDepositAmount(amount);
-        event.setModeOptionId(response["modeOptionId"]);
+        event.setModeOptionId(razorpayPayload["modeOptionId"]);
         event.setFirstDeposit(false);
         event.setUserBalance(
-          int.parse(response["withdrawable"]) +
-              int.parse(response["nonWithdrawable"]) +
-              int.parse(response["depositBucket"]),
+          int.parse(response["withdrawable"].toString()) +
+              int.parse(response["nonWithdrawable"].toString()) +
+              int.parse(response["depositBucket"].toString()),
         );
-        event.setGatewayId(int.parse(response["gatewayId"].toString()));
+        event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
         event.setPromoCode(
             selectedPromo == null ? "" : selectedPromo["promoCode"]);
-        event.setOrderId(response["orderId"]);
+        event.setOrderId(razorpayPayload["orderId"]);
 
         AnalyticsManager().addEvent(event);
         branchEventTransactionSuccess(response);
@@ -1669,6 +1674,9 @@ class AddCashState extends State<AddCash> {
           .sendRequest(req)
           .then((http.Response res) {
         Map<String, dynamic> response = json.decode(res.body);
+        razorpayPayload = payload;
+        razorpayPayload["orderId"] = response["action"]["value"];
+
         _openRazorpayNative({
           "name": AppConfig.of(context).appName,
           "email": payload["email"],
@@ -1744,9 +1752,9 @@ class AddCashState extends State<AddCash> {
         event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(false);
         event.setUserBalance(
-          int.parse(response["withdrawable"]) +
-              int.parse(response["nonWithdrawable"]) +
-              int.parse(response["depositBucket"]),
+          int.parse(response["withdrawable"].toString()) +
+              int.parse(response["nonWithdrawable"].toString()) +
+              int.parse(response["depositBucket"].toString()),
         );
         event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(
@@ -1880,8 +1888,26 @@ class AddCashState extends State<AddCash> {
       context: context,
       builder: (BuildContext context) {
         return TransactionFailed(transactionResult, () {
+          Event event = Event(name: "pay_failed_retry");
+          event.setDepositAmount(amount);
+          event.setModeOptionId(transactionResult["modeOptionId"]);
+          event.setFirstDeposit(transactionResult["firstDepositor"] != "false");
+          event.setPromoCode(
+              selectedPromo == null ? "" : selectedPromo["promoCode"]);
+          event.setOrderId(transactionResult["orderId"]);
+
           Navigator.of(context).pop();
         }, () {
+          Event event = Event(name: "pay_failed_cancel");
+          event.setDepositAmount(amount);
+          event.setModeOptionId(transactionResult["modeOptionId"]);
+          event.setFirstDeposit(transactionResult["firstDepositor"] != "false");
+          event.setPromoCode(
+              selectedPromo == null ? "" : selectedPromo["promoCode"]);
+          event.setOrderId(transactionResult["orderId"]);
+
+          AnalyticsManager().addEvent(event);
+
           Navigator.of(context).pop();
           Navigator.of(context).pop(json.encode(transactionResult));
         });
