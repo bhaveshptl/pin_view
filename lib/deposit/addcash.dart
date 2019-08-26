@@ -1735,44 +1735,44 @@ class AddCashState extends State<AddCash> {
     eventdata["data"] = payload;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
     print("<<<<<<Inside payment check>>>>>");  
-    if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
-      print("<<<<<<We are inside techprocess seelless");
-      http.Request req = http.Request(
-          "GET",
-          Uri.parse(BaseUrl().apiUrl +
-              ApiUtil.INIT_PAYMENT_TECHPROCESS +
-              querParamString));
-      return HttpManager(http.Client())
-          .sendRequest(req)
-          .then((http.Response res) {
-        Map<String, dynamic> response = json.decode(res.body);
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          _openTechProcessNative({
-            "name": AppConfig.of(context).appName,
-            "email": payload["email"],
-            "phone": payload["phone"],
-            "amount": payload["depositAmount"].toString(),
-            "orderId": response["action"]["value"],
-            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-                ? payload["paymentType"].toLowerCase()
-                : "card",
-            "userId":"123",
-            "date":"27-06-2017",
-            "extra_public_key":"1234-6666-6789-56",
-            "tp_nameOnTheCard":"",
-            "tp_expireYear":"",
-            "tp_expireMonth":"",
-            "tp_cvv":"",
-            "tp_cardNumber":""
-          });
-        } else {
-          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-        }
-      }).whenComplete(() {
-        showLoader(false);
-      });
-    }
-    else if (paymentModeDetails["isSeamless"]) {
+    // if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
+    //   print("<<<<<<We are inside techprocess seelless");
+    //   http.Request req = http.Request(
+    //       "GET",
+    //       Uri.parse(BaseUrl().apiUrl +
+    //           ApiUtil.INIT_PAYMENT_TECHPROCESS +
+    //           querParamString));
+    //   return HttpManager(http.Client())
+    //       .sendRequest(req)
+    //       .then((http.Response res) {
+    //     Map<String, dynamic> response = json.decode(res.body);
+    //     if (res.statusCode >= 200 && res.statusCode <= 299) {
+    //       _openTechProcessNative({
+    //         "name": AppConfig.of(context).appName,
+    //         "email": payload["email"],
+    //         "phone": payload["phone"],
+    //         "amount": payload["depositAmount"].toString(),
+    //         "orderId": response["action"]["value"],
+    //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+    //             ? payload["paymentType"].toLowerCase()
+    //             : "card",
+    //         "userId":"123",
+    //         "date":"27-06-2017",
+    //         "extra_public_key":"1234-6666-6789-56",
+    //         "tp_nameOnTheCard":"",
+    //         "tp_expireYear":"",
+    //         "tp_expireMonth":"",
+    //         "tp_cvv":"",
+    //         "tp_cardNumber":""
+    //       });
+    //     } else {
+    //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+    //     }
+    //   }).whenComplete(() {
+    //     showLoader(false);
+    //   });
+    // }
+    if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
