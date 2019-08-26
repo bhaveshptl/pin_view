@@ -32,12 +32,16 @@ class Lobby extends StatefulWidget {
   final List<dynamic> logs;
   final bool isForceUpdate;
   final bool updateAvailable;
-
+  final bool activateDeepLinkingNavigation;
+  final Map<String, dynamic> deepLinkingNavigationData;
+  
   Lobby({
     this.logs,
     this.appUrl,
     this.isForceUpdate,
     this.updateAvailable,
+    this.activateDeepLinkingNavigation,
+    this.deepLinkingNavigationData
   });
 
   @override
