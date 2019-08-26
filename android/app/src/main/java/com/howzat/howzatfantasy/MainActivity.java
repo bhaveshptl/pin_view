@@ -1173,11 +1173,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+    private void techProcessResultListner(int requestCode, int resultCode, Intent data) {
         if (requestCode == PaymentActivity.REQUEST_CODE) {
-
             Log.d("TECHPROCESS", "Result Code :" +PaymentActivity.REQUEST_CODE );
             if (resultCode == PaymentActivity.RESULT_OK) {
                 // PAyment  was successful
@@ -1334,11 +1331,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             else if (resultCode == PaymentActivity.RESULT_CANCELED) {
 
                 Log.d("Exception", "Cancled");
-
-
             }
         }
     }
+
+    
 
     /* Firebase Push notification */
     public void initPushNotifications() {
