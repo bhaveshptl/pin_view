@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 import android.content.Context;
 
+import com.google.gson.Gson;
 import com.howzat.howzatfantasy.services.BranchClass;
 import com.howzat.howzatfantasy.services.DeviceInfo;
 import com.howzat.howzatfantasy.services.MyHelperClass;
@@ -70,6 +71,9 @@ import com.webengage.sdk.android.WebEngage;
 import com.webengage.sdk.android.Analytics;
 import com.webengage.sdk.android.User;
 import com.webengage.sdk.android.utils.Gender;
+import com.paynimo.android.payment.PaymentActivity;
+import com.paynimo.android.payment.PaymentModesActivity;
+import com.paynimo.android.payment.util.Constant;
 
 public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
@@ -79,6 +83,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
     private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
     private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
+    private static final String TECH_PROCESS_CHANNEL="com.algorin.pf.techprocess";
     public static Context applicationContext;
 
     MyHelperClass myHeperClass;
@@ -350,7 +355,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_openRazorpayNative")) {
                             Map<String, Object> arguments = methodCall.arguments();
-                            startPayment(arguments);
+                           startPayment(arguments);
                             String razocode = "testrazo";
                             result.success(razocode);
 
@@ -360,6 +365,21 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                     }
                 });
+
+        new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL)
+                .setMethodCallHandler(new MethodChannel.MethodCallHandler() {
+                    @Override
+                    public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+                        if (methodCall.method.equals("_openTechProcessNative")) {
+                            Map<String, Object> arguments = methodCall.arguments();
+                            initTechProcessPayment(arguments);
+                            String razocode = "testrazo";
+                            result.success(razocode);
+
+                        } else {
+                            result.notImplemented();
+                        }
+                        }});
 
         new MethodChannel(getFlutterView(), PF_FCM_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
@@ -1036,6 +1056,288 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void notImplemented() {
                     }
                 });
+    }
+
+
+    public void onTechProcessPaymentFail(String response, PaymentData data) {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("paymentId", data.getPaymentId());
+            object.put("signature", data.getSignature());
+            object.put("orderId", data.getOrderId());
+            object.put("status", "failed");
+        } catch (JSONException e) {
+
+        }
+
+        new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentFail",
+                object.toString(), new MethodChannel.Result() {
+                    @Override
+                    public void success(Object o) {
+                    }
+
+                    @Override
+                    public void error(String s, String s1, Object o) {
+                    }
+
+                    @Override
+                    public void notImplemented() {
+                    }
+                });
+    }
+
+    public void onTechProcessPaymentSuccess(JSONObject  data) {
+        new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentSuccess",
+                data.toString(), new MethodChannel.Result() {
+                    @Override
+                    public void success(Object o) {
+                        Log.d("TECHPROCESS",  "Success" );
+                    }
+                    @Override
+                    public void error(String s, String s1, Object o) {
+                        Log.d("TECHPROCESS",  "Success" );
+                    }
+                    @Override
+                    public void notImplemented() {
+                        Log.d("TECHPROCESS",  "Success" );
+                    }
+                });
+    }
+
+    private void initTechProcessPayment(Map<String, Object> arguments){
+
+        String email= (String) arguments.get("email");
+        String phone = (String) arguments.get("phone");
+        String amount_in_rupees= (String) arguments.get("amount");
+        String date= (String) arguments.get("date");
+        String orderId= (String) arguments.get("orderId");
+        String paymentMethod=(String) arguments.get("method");
+        String userId=(String) arguments.get("method");
+        String extra_public_key =(String) arguments.get("extra_public_key");
+        /*Prepare a checkout object*/
+        com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
+        checkout.setMerchantIdentifier("T456537");
+        checkout.setTransactionIdentifier(orderId);
+        checkout.setTransactionReference (orderId);
+        checkout.setTransactionType (PaymentActivity.TRANSACTION_TYPE_SALE);
+        checkout.setTransactionSubType (PaymentActivity.TRANSACTION_SUBTYPE_DEBIT);
+        checkout.setTransactionCurrency ("INR");
+        checkout.setTransactionAmount (amount_in_rupees);
+        checkout.setTransactionDateTime (date);
+        /*User Info*/
+        checkout.setConsumerIdentifier (userId);
+        checkout.setConsumerEmailID (email);
+        checkout.setConsumerMobileNumber (phone);
+        checkout.setConsumerAccountNo (userId);
+
+        checkout.addCartItem("FIRST",amount_in_rupees,"0.0", "0.0", "", "", "","");
+
+        /**************** Auth Intent ****************/
+        Intent authIntent = new Intent(this, PaymentModesActivity.class);
+        authIntent.putExtra(PaymentActivity.EXTRA_PUBLIC_KEY, extra_public_key);
+
+        if(paymentMethod.equals("netbanking")){
+            authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_NETBANKING);
+        }else if(paymentMethod.equals("card")){
+
+            boolean cardDataCapturingRequired=true;
+            if(cardDataCapturingRequired){
+                String cardNo=(String) arguments.get("tp_cardNumber");
+                String expiryMonth=(String) arguments.get("tp_expireMonth");
+                String expiryYear=(String) arguments.get("tp_expireYear");
+                String cvv=(String) arguments.get("tp_cvv");
+                String nameOnCard=(String) arguments.get("tp_nameOnTheCard");
+                /*Data Capturing Page at Merchant End For - New Card*/
+                checkout.setPaymentInstrumentIdentifier(cardNo);
+                checkout.setPaymentInstrumentExpiryMonth(expiryMonth);
+                checkout.setPaymentInstrumentExpiryYear(expiryYear);
+                checkout.setPaymentInstrumentVerificationCode(cvv);
+                checkout.setPaymentInstrumentHolderName(nameOnCard);
+                checkout.setTransactionIsRegistration("Y");
+                checkout.setTransactionMerchantInitiated("Y");
+                authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_CARDS);
+            }else{
+                String cvv=(String) arguments.get("tp_cvv");
+                checkout.setTransactionMerchantInitiated("Y");
+                checkout.setPaymentInstrumentToken("123234");
+                checkout.setPaymentInstrumentVerificationCode(cvv);
+            }
+        }
+        else{
+            authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
+                    PaymentActivity.PAYMENT_METHOD_DEFAULT);
+        }
+        
+        /*Now call the payment activity*/
+        authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT, checkout);
+        startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == PaymentActivity.REQUEST_CODE) {
+
+            Log.d("TECHPROCESS", "Result Code :" +PaymentActivity.REQUEST_CODE );
+            if (resultCode == PaymentActivity.RESULT_OK) {
+                // PAyment  was successful
+                Log.d("TECHPROCESS", "Result Code :" + RESULT_OK);
+                if (data != null) {
+                    Log.d("TECHPROCESS", "Data is not null");
+                    try {
+                        com.paynimo.android.payment.model.Checkout checkout_res = (com.paynimo.android.payment.model.Checkout) data.getSerializableExtra(Constant.ARGUMENT_DATA_CHECKOUT);
+                        String transactionType = checkout_res.getMerchantRequestPayload().getTransaction().getType();
+                        String transactionSubType = checkout_res.getMerchantRequestPayload().getTransaction().getSubType();
+
+                        if (transactionType != null && transactionType.equalsIgnoreCase(PaymentActivity.TRANSACTION_TYPE_PREAUTH)
+                                && transactionSubType != null && transactionSubType
+                                .equalsIgnoreCase(PaymentActivity.TRANSACTION_SUBTYPE_RESERVE)){
+                            Log.d("TECHPROCESS", "Transaction sub type is reserve");
+                            // Transaction Completed and Got SUCCESS
+                            if (checkout_res.getMerchantResponsePayload()
+                                    .getPaymentMethod().getPaymentTransaction()
+                                    .getStatusCode().equalsIgnoreCase(PaymentActivity.TRANSACTION_STATUS_PREAUTH_RESERVE_SUCCESS)) {
+
+                                Log.d("TECHPROCESS", "Transaction Status Preauth");
+
+
+                                if (checkout_res.getMerchantResponsePayload()
+                                        .getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode().equalsIgnoreCase("")) {
+
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
+
+                                }
+
+                            }
+
+                            else {
+                                /* some error from bank side*/
+                                Log.d("TECHPROCESS", "Some error");
+
+                                Log.d("Checkout Response Obj", checkout_res.getMerchantResponsePayload().toString());
+
+                            }
+
+                        } else {
+                            /* Transaction Completed and Got SUCCESS*/
+                            Log.d("TECHPROCESS", "Transaction sub type is reserve");
+                            if (checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode().equalsIgnoreCase(PaymentActivity.TRANSACTION_STATUS_SALES_DEBIT_SUCCESS)) {
+                                Log.d("TECHPROCESS", "Transaction sub type is reserve");
+                                if (checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId() != null && checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId().isEmpty()) {
+                                    Log.v("TRANSACTION SI STATUS=>",
+                                            checkout_res.getMerchantResponsePayload().toString());
+                                    Log.v("TRANSACTION SI STATUS=>",
+                                            checkout_res.getMerchantResponsePayload().toString());
+
+
+
+                                } else if (checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId() != null && !checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId().isEmpty()) {
+
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
+                                }
+                            }
+                            else if (checkout_res
+                                    .getMerchantResponsePayload().getPaymentMethod()			.getPaymentTransaction().getStatusCode().equalsIgnoreCase(
+                                            PaymentActivity.TRANSACTION_STATUS_DIGITAL_MANDATE_SUCCESS
+                                    )) {
+                                Log.d("TECHPROCESS", "Transaction sub type is reserve");
+
+                                if (checkout_res.getMerchantResponsePayload().
+                                        getPaymentMethod().getPaymentTransaction().
+                                        getInstruction().getId() != null
+                                        && !checkout_res
+                                        .getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId().isEmpty()) {
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
+
+                                } else {
+
+                                    Log.d("TECHPROCESS", "Transaction sub type is reserve");
+
+
+
+                                }
+                            }
+                            else {
+
+                                Log.d("TECHPROCESS", "Transaction sub type is reserve");
+
+                            }
+                            Log.d("TECHPROCESS", "Transaction sub type is reserve");
+
+                        }
+
+                        String statusCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode();
+                        String statusMessage =checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusMessage();
+                        String errorMessage = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getErrorMessage();
+                        String amount =checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getAmount();
+                        String dateTime = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getDateTime();
+                        String merchantTransactionIdentifier=checkout_res.getMerchantResponsePayload().getMerchantTransactionIdentifier();
+                        String identifier = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getIdentifier() ;
+                        String bankSelectionCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getBankSelectionCode();
+                        String bankReferenceIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBankReferenceIdentifier();
+                        String refundIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getRefundIdentifier();
+                        String balanceAmount= checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBalanceAmount();
+                        String instrumentAliasName=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentAliasName();
+                        String  SIMandateId=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
+                        String SIMandateStatus=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
+                        String  SIMandateErrorCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
+                        Log.d("TECHPROCESS", statusCode);
+                        if(statusCode.equals("0300")){
+                            Gson gson = new Gson();
+                            String jsonString = gson.toJson(checkout_res.getMerchantResponsePayload());
+                            try {
+                                JSONObject request = new JSONObject(jsonString);
+                                request.put("amount",amount);
+                                request.put("orderId",merchantTransactionIdentifier);
+                                request.put("status",1);
+                                onTechProcessPaymentSuccess(request);
+
+                            } catch (JSONException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Log.d("Exception", e.toString());
+                    }
+
+                }
+            }
+            else if (resultCode == PaymentActivity.RESULT_ERROR) {
+
+                Log.d("Exception", "Error");
+                if (data.hasExtra(PaymentActivity.RETURN_ERROR_CODE) &&
+                        data.hasExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION)) {
+
+                    String error_code = (String) data
+                            .getStringExtra(PaymentActivity.RETURN_ERROR_CODE);
+                    Log.d("Exception", error_code);
+                    String error_desc = (String) data
+                            .getStringExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION);
+
+                    Log.d("Exception", error_desc);
+
+                    Log.d("TEchProcess" + " Code=>", error_code);
+                    Log.d("TEchProcess" + " Desc=>", error_desc);
+
+                }
+            }
+            else if (resultCode == PaymentActivity.RESULT_CANCELED) {
+
+                Log.d("Exception", "Cancled");
+
+
+            }
+        }
     }
 
     /* Firebase Push notification */

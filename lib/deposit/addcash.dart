@@ -26,6 +26,7 @@ import 'package:playfantasy/deposit/paymentmode.dart';
 import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -65,6 +66,8 @@ class AddCashState extends State<AddCash> {
 
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
+  static const techprocess_platform =
+      const MethodChannel('com.algorin.pf.techprocess');    
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -130,6 +133,7 @@ class AddCashState extends State<AddCash> {
     });
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
+    techprocess_platform.setMethodCallHandler(myUtilsHandler);
     if (Platform.isIOS) {
       initRazorpayNativePlugin();
       isIos = true;
@@ -207,6 +211,23 @@ class AddCashState extends State<AddCash> {
     return "";
   }
 
+  Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
+    Map<dynamic, dynamic> value = new Map();
+    try {
+      value =
+          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      showLoader(false);
+      print("((((((((((Tech Process Result)))))))))))");
+      print(value);
+      if (Platform.isIOS) {
+       
+      }
+    } catch (e) {
+      showLoader(false);
+    }
+    return "";
+  }
+
   Future<String> initRazorpayNativePlugin() async {
     String value = "";
     try {
@@ -221,6 +242,10 @@ class AddCashState extends State<AddCash> {
       case 'onRazorPayPaymentSuccess':
         processSuccessResponse(json.decode(methodCall.arguments));
         break;
+      case 'onTechProcessPaymentFail':
+      case 'onTechProcessPaymentSuccess':
+        onTechProcessSuccessResponse(json.decode(methodCall.arguments));
+        break;  
       default:
     }
   }
@@ -296,6 +321,52 @@ class AddCashState extends State<AddCash> {
       showLoader(false);
     });
   }
+
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
+   print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
+    print(payload);
+    showLoader(false);
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
+    req.body = json.encode(payload);
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      Map<String, dynamic> response = json.decode(res.body);
+      print("<<<<<<<<<<<<<<TEch Process success Response");
+      print(response);
+      if ((response["authStatus"] as String).toLowerCase() ==
+              "Declined".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Failed".toLowerCase() ||
+          (response["authStatus"] as String).toLowerCase() ==
+              "Fail".toLowerCase()) {
+        if (response["orderId"] == null) {
+          ActionUtil().showMsgOnTop(
+              "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+              context);
+          // _scaffoldKey.currentState.showSnackBar(
+          //   SnackBar(
+          //     content: Text(
+          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+          //     ),
+          //   ),
+          // );
+        } else {
+          _showTransactionFailed(response);
+          branchEventTransactionFailed(response);
+          webengageEventTransactionFailed(response);
+        }
+      } else {
+        branchEventTransactionSuccess(response);
+        webengageEventTransactionSuccess(response);
+        Navigator.of(context).pop(res.body);
+      }
+    }).whenComplete(() {
+      showLoader(false);
+    });
+  }
+
 
   setDepositInfo() async {
     amountController.text =
@@ -1663,8 +1734,45 @@ class AddCashState extends State<AddCash> {
     eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
     eventdata["data"] = payload;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-
-    if (paymentModeDetails["isSeamless"]) {
+    print("<<<<<<Inside payment check>>>>>");  
+    if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
+      print("<<<<<<We are inside techprocess seelless");
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": payload["depositAmount"].toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            "userId":"123",
+            "date":"27-06-2017",
+            "extra_public_key":"1234-6666-6789-56",
+            "tp_nameOnTheCard":"",
+            "tp_expireYear":"",
+            "tp_expireMonth":"",
+            "tp_cvv":"",
+            "tp_cardNumber":""
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+    }
+    else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +

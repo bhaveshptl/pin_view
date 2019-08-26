@@ -53,6 +53,7 @@ class SplashScreenState extends State<SplashScreen>
   PermissionStatus permissionStatus = PermissionStatus.allow;
   bool isIos = false;
   bool disableBranchIOAttribution = false;
+  bool activateDeepLinkingNavigation = false;
 
   @override
   void initState() {
@@ -111,11 +112,8 @@ class SplashScreenState extends State<SplashScreen>
 
       setLoadingPercentage(99.0);
       SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
-      Navigator.of(context).pushReplacement(
-        FantasyPageRoute(
-          pageBuilder: (context) => Lobby(),
-        ),
-      );
+      navigateToHomePage();
+      
     } else {
       setLoadingPercentage(99.0);
       final result =
@@ -123,6 +121,23 @@ class SplashScreenState extends State<SplashScreen>
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => result == null ? Signup() : SignInPage(),
+        ),
+      );
+    }
+  }
+
+  navigateToHomePage(){
+    if(activateDeepLinkingNavigation){
+      Map<String, dynamic> deepLinkingNavigationData = new  Map();
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => Lobby(activateDeepLinkingNavigation:true,deepLinkingNavigationData:deepLinkingNavigationData),
+        ),
+      );
+    }else{
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => Lobby(activateDeepLinkingNavigation:false),
         ),
       );
     }
