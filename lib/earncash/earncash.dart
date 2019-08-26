@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -300,8 +299,7 @@ class EarnCashState extends State<EarnCash> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text:
-                                "For every friends that plays, you both will earn ",
+                            text: "For every friend that plays, you will earn ",
                           ),
                           TextSpan(
                             text: strings.rupee + refAAmount.toString(),
