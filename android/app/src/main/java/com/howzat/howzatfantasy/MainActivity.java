@@ -1173,7 +1173,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
     }
 
-    private void techProcessResultListner(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PaymentActivity.REQUEST_CODE) {
             Log.d("TECHPROCESS", "Result Code :" +PaymentActivity.REQUEST_CODE );
             if (resultCode == PaymentActivity.RESULT_OK) {
