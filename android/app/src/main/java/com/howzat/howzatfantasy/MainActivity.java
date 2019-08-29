@@ -1114,6 +1114,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String paymentMethod=(String) arguments.get("method");
         String userId=(String) arguments.get("method");
         String extra_public_key =(String) arguments.get("extra_public_key");
+        boolean cardDataCapturingRequired =(boolean) arguments.get("cardDataCapturingRequired");
         /*Prepare a checkout object*/
         com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
         checkout.setMerchantIdentifier("T456537");
@@ -1139,8 +1140,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(paymentMethod.equals("netbanking")){
             authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_NETBANKING);
         }else if(paymentMethod.equals("card")){
-
-            boolean cardDataCapturingRequired=true;
+            
             if(cardDataCapturingRequired){
                 String cardNo=(String) arguments.get("tp_cardNumber");
                 String expiryMonth=(String) arguments.get("tp_expireMonth");
@@ -1158,9 +1158,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_CARDS);
             }else{
                 String cvv=(String) arguments.get("tp_cvv");
+                String tp_instrumentToken=(String) arguments.get("tp_instrumentToken");
                 checkout.setTransactionMerchantInitiated("Y");
-                checkout.setPaymentInstrumentToken("123234");
+                checkout.setPaymentInstrumentToken(tp_instrumentToken);
                 checkout.setPaymentInstrumentVerificationCode(cvv);
+
+                authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
+                        PaymentActivity.PAYMENT_METHOD_CARDS);
             }
         }
         else{
@@ -1170,7 +1174,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         
         /*Now call the payment activity*/
         authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT, checkout);
-        startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
+        try{
+            startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
+        }catch(Exception e){
+            System.out.println(e.toString());
+        }
     }
 
     @Override

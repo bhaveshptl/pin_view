@@ -428,6 +428,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         cformExpDate = cformExpDateController.text;
         cformExpMonth = cformExpDate.split("/")[0];
         cformExpYear = cformExpDate.split("/")[1];
+        cformExpYear="20"+cformExpYear;
       });
     });
     cformNameOnCardController.addListener(() {
@@ -447,12 +448,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
     cformCardNumberController.addListener(() {
       setState(() {
-        cformCardNumber = cformCardNumberController.text;
+        cformCardNumber=cformCardNumberController.text.replaceAll(new RegExp(r"\s\b|\b\s"), "");
       });
     });
   }
 
-  Form getTechProcessCardPaymentUI(String paymentType) {
+  Form getCardPaymentFormWidget(String paymentType) {
     return Form(
         key: _formKey,
         child: Column(
@@ -642,6 +643,55 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         ));
   }
 
+  ExpansionPanelList getCardPaymentUIExpansionWidget(
+      Map<String, dynamic> type, String paymentType) {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        Event event = Event(name: "pay_mode_select");
+        event.setDepositAmount(widget.amount);
+        event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+        event.setFLEM(getFLEM());
+        event.setPayModeExpanded(isExpanded);
+        event.setPaymentType(type["type"]);
+        AnalyticsManager().addEvent(event);
+        setState(() {
+          lastPaymentExpanded = !lastPaymentExpanded;
+        });
+      },
+      children: [
+        ExpansionPanel(
+          isExpanded: lastPaymentExpanded,
+          canTapOnHeader: true,
+          headerBuilder: (context, isExpanded) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: SvgPicture.network(
+                        type["logo"],
+                        width: 24.0,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(type["label"]),
+                    ),
+                  ],
+                )
+              ],
+            );
+          },
+          body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: getCardPaymentFormWidget(type["type"])),
+        ),
+      ],
+    );
+  }
+
   getPaymentModeWidgetButtons() {
     List<Widget> items = [];
     int i = 0;
@@ -652,6 +702,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
+          ["info"]["detailRequired"];
+      if (showCardDetailsUI) {
+        print("entered into the UI part......");
+      }    
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
@@ -725,6 +783,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
+          ["info"]["detailRequired"];
+      if (showCardDetailsUI) {
+        print("entered into the UI part......");
+      }        
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
@@ -921,6 +987,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
+          ["info"]["detailRequired"];
+      if (showCardDetailsUI) {
+        print("entered into the UI part......");
+      }        
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
@@ -1220,11 +1294,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     //         "userId":"123",
     //         "date":"27-06-2017",
     //         "extra_public_key":"1234-6666-6789-56",
-    //         "tp_nameOnTheCard":"",
-    //         "tp_expireYear":"",
-    //         "tp_expireMonth":"",
-    //         "tp_cvv":"",
-    //         "tp_cardNumber":""
+    //         "tp_nameOnTheCard": cformNameOnTheCard,
+    //         "tp_expireYear": cformExpYear,
+    //         "tp_expireMonth": cformExpMonth,
+    //         "tp_cvv": cformCVV,
+    //         "tp_cardNumber": cformCardNumber,
+    //         "tp_instrumentToken": "",
+    //         "cardDataCapturingRequired": true
     //       });
     //     } else {
     //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
