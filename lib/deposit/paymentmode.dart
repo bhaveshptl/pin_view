@@ -23,6 +23,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:playfantasy/utils/maskedTextController.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
@@ -52,7 +53,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const techprocess_platform =
-      const MethodChannel('com.algorin.pf.techprocess');    
+      const MethodChannel('com.algorin.pf.techprocess');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -68,11 +69,32 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Map<String, dynamic> razorpayPayload;
+  /* Card payment UI */
+  final _formKey = new GlobalKey<FormState>();
+  TextEditingController cformNameOnCardController = TextEditingController();
+  TextEditingController cformCVVController = TextEditingController();
+  TextEditingController cformCardNumberController =
+      MaskedTextController(mask: '0000 0000 0000 0000 0000 0000');
+  TextEditingController cformExpDateController =
+      MaskedTextController(mask: '00/00');
+  String cformNameOnTheCard = "";
+  String cformCVV = "";
+  String cformCardNumber = "";
+  String cformExpMonth = "";
+  String cformExpYear = "";
+  String cformExpDate = "";
+  bool cformSaveCardDetails = false;
+  bool cformObscureCVV = false;
+  FocusNode cformCVVFocusnode = FocusNode();
+  FocusNode cformExpDateFocusnode = FocusNode();
+  FocusNode cformNameFocusnode = FocusNode();
+  FocusNode cformCardNumberFocusnode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     setPaymentModeList();
+    cformControllerListener();
     try {
       flutterWebviewPlugin.launch(
         BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
@@ -175,12 +197,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      value =
-          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      value = await techprocess_platform.invokeMethod(
+          '_openTechProcessNative', payload);
       showLoader(false);
-      if (Platform.isIOS) {
-       
-      }
+      if (Platform.isIOS) {}
     } catch (e) {
       showLoader(false);
     }
@@ -204,7 +224,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       case 'onTechProcessPaymentFail':
       case 'onTechProcessPaymentSuccess':
         onTechProcessSuccessResponse(json.decode(methodCall.arguments));
-        break;  
+        break;
       default:
     }
   }
@@ -277,12 +297,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic>  payload){
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
     print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -320,9 +340,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     }).whenComplete(() {
       showLoader(false);
     });
-
   }
-
 
   setPaymentModeList() {
     int i = 0;
@@ -374,6 +392,254 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     firstNameController.text = widget.paymentMode["first_name"] == null
         ? ""
         : widget.paymentMode["first_name"];
+  }
+
+  /** Card Payment ui*/
+  String validateTheExpireDate(String date) {
+    String value = date.toString();
+    var mnthlst = new List(12);
+    mnthlst = [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12"
+    ];
+    if (value.isEmpty) {
+      return "Please enter Exp Month";
+    } else if (!mnthlst.contains(cformExpMonth)) {
+      return "Please enter valid month";
+    } else {
+      return null;
+    }
+  }
+
+  cformControllerListener() {
+    cformExpDateController.addListener(() {
+      print(cformExpDateController.text);
+      setState(() {
+        cformExpDate = cformExpDateController.text;
+        cformExpMonth = cformExpDate.split("/")[0];
+        cformExpYear = cformExpDate.split("/")[1];
+      });
+    });
+    cformNameOnCardController.addListener(() {
+      setState(() {
+        cformNameOnTheCard = cformNameOnCardController.text;
+      });
+    });
+    cformCVVController.addListener(() {
+      setState(() {
+        cformCVV = cformCVVController.text;
+      });
+    });
+    cformNameOnCardController.addListener(() {
+      setState(() {
+        cformExpDate = cformNameOnCardController.text;
+      });
+    });
+    cformCardNumberController.addListener(() {
+      setState(() {
+        cformCardNumber = cformCardNumberController.text;
+      });
+    });
+  }
+
+  Form getTechProcessCardPaymentUI(String paymentType) {
+    return Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(top: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformCardNumberController,
+                          focusNode: cformCardNumberFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCardNumberFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformExpDateFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Card Number',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter the card number";
+                            }
+                          },
+                          keyboardType: TextInputType.number,
+                        )),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformExpDateController,
+                          focusNode: cformExpDateFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformExpDateFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformCVVFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Expired Date(MM/YY)',
+                            counterText: "",
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            return validateTheExpireDate(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
+                        )),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      height: 48.0,
+                      child: TextFormField(
+                          controller: cformCVVController,
+                          focusNode: cformCVVFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCVVFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformNameFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'CVV',
+                            counterText: "",
+                            fillColor: Colors.blue,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter a valid CVV";
+                            }
+                          },
+                          maxLength: 4,
+                          obscureText: cformObscureCVV,
+                          keyboardType: TextInputType.number),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformNameOnCardController,
+                          focusNode: cformNameFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCVVFocusnode.unfocus();
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Card Holder's Name",
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter name on the Card";
+                            } else {
+                              return null;
+                            }
+                          },
+                        )),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Row(children: <Widget>[
+                  Checkbox(
+                    value: cformSaveCardDetails,
+                    onChanged: (bool value) {
+                      setState(() {
+                        cformSaveCardDetails = value;
+                      });
+                    },
+                  ),
+                  Text("Save card")
+                ])),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            if (validateUserInfo(paymentType)) {
+                              onPaySecurely(selectedPaymentMethod[paymentType],
+                                  paymentType);
+                            }
+                          }
+                        },
+                        child: Text(
+                          strings.get("PAY_SECURELY").toUpperCase(),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.white,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 
   getPaymentModeWidgetButtons() {
@@ -968,7 +1234,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     //   });
     // }
 
-   if (paymentModeDetails["info"]["isSeamless"]) {
+    if (paymentModeDetails["info"]["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
