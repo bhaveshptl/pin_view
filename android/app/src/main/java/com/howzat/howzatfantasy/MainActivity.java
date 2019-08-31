@@ -13,6 +13,8 @@ import android.widget.Toast;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 import com.howzat.howzatfantasy.services.BranchClass;
 import com.howzat.howzatfantasy.services.DeviceInfo;
 import com.howzat.howzatfantasy.services.MyHelperClass;
@@ -70,12 +72,16 @@ import com.webengage.sdk.android.WebEngage;
 
 import com.webengage.sdk.android.Analytics;
 import com.webengage.sdk.android.User;
+import com.webengage.sdk.android.actions.render.InAppNotificationData;
+import com.webengage.sdk.android.actions.render.PushNotificationData;
 import com.webengage.sdk.android.utils.Gender;
 import com.paynimo.android.payment.PaymentActivity;
 import com.paynimo.android.payment.PaymentModesActivity;
 import com.paynimo.android.payment.util.Constant;
+import com.webengage.sdk.android.callbacks.InAppNotificationCallbacks;
+import com.webengage.sdk.android.callbacks.PushNotificationCallbacks;
 
-public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
+public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener ,PushNotificationCallbacks, InAppNotificationCallbacks{
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
     private static final String RAZORPAY_IO_CHANNEL = "com.algorin.pf.razorpay";
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
@@ -121,6 +127,61 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }else{
             initBranchPlugin();
         }
+    }
+
+
+    @Override
+    public PushNotificationData onPushNotificationReceived(Context context, PushNotificationData notificationData) {
+        return notificationData;
+    }
+
+    @Override
+    public void onPushNotificationShown(Context context, PushNotificationData notificationData) {
+    }
+
+    @Override
+    public boolean onPushNotificationClicked(Context context, PushNotificationData notificationData) {
+        // try {
+        //     Gson gson = new Gson();
+        //     String customData = gson.toJson(notificationData.getCustomData());
+        //     JSONObject cusTomeDataJson = new JSONObject(customData);
+        //     String enableDeepLinking = cusTomeDataJson.getJSONObject("mMap").getString("enableDeepLinking");
+        //     String disableDeepLinking_android = cusTomeDataJson.getJSONObject("mMap").getString("disableDeepLinking_android");
+        //     String dLR_page = cusTomeDataJson.getJSONObject("mMap").getString("dLR_page");
+        //     String dLR_matchID = cusTomeDataJson.getJSONObject("mMap").getString("dLR_matchID");
+        // } catch (JSONException e) {
+        //     System.out.println(e);
+        // }
+        return false;
+    }
+
+    @Override
+    public boolean onPushNotificationActionClicked(Context context, PushNotificationData notificationData, String buttonID) {
+        return false;
+    }
+
+    @Override
+    public void onPushNotificationDismissed(Context context, PushNotificationData notificationData) {
+    }
+
+    @Override
+    public InAppNotificationData onInAppNotificationPrepared(Context context, InAppNotificationData notificationData) {
+        return notificationData;
+    }
+
+    @Override
+    public void onInAppNotificationShown(Context context, InAppNotificationData notificationData) {
+
+    }
+
+    @Override
+    public void onInAppNotificationDismissed(Context context, InAppNotificationData notificationData) {
+
+    }
+
+    @Override
+    public boolean onInAppNotificationClicked(Context context, InAppNotificationData notificationData, String actionId) {
+        return false;
     }
 
     private void initIndusOSBranchAttribution(){
