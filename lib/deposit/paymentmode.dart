@@ -772,6 +772,86 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return items;
   }
 
+  getPaymentModeWidgetButtonsV2() {
+    /* This is for Other payment methods */
+    List<Widget> items = [];
+    int i = 0;
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length ==
+              1 &&
+          lastPaymentArray["paymentType"] != type["type"] &&
+          !showCardDetailsUI) {
+        if (i != 0) {
+          items.add(
+            Divider(height: 2.0),
+          );
+        }
+        items.add(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  padding: EdgeInsets.all(0.0),
+                  onPressed: () {
+                    if (validateUserInfo(type["type"])) {
+                      onPaySecurely(
+                          widget.paymentMode["choosePayment"]["paymentInfo"]
+                              [type["type"]][0],
+                          type["type"]);
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              SvgPicture.network(
+                                type["logo"],
+                                width: 24.0,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  type["label"],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Colors.black26,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        i++;
+      }
+    });
+    return items;
+  }
+
   getLastPaymentWidget() {
     List<Widget> items = [];
     int i = 0;
@@ -977,6 +1057,262 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return items;
   }
 
+    getLastPaymentWidgetV2() {
+    List<Widget> items = [];
+    int i = 0;
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
+
+    widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length ==
+              1 &&
+          lastPaymentArray["paymentType"] == type["type"] &&
+          !showCardDetailsUI) {
+        if (i != 0) {
+          items.add(
+            Divider(height: 2.0),
+          );
+        }
+        items.add(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  padding: EdgeInsets.all(0.0),
+                  onPressed: () {
+                    if (validateUserInfo(type["type"])) {
+                      onPaySecurely(
+                          widget.paymentMode["choosePayment"]["paymentInfo"]
+                              [type["type"]][0],
+                          type["type"]);
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              SvgPicture.network(
+                                type["logo"],
+                                width: 24.0,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  type["label"],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Colors.black26,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        i++;
+      } else if (widget
+                  .paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length >
+              1 &&
+          lastPaymentArray["paymentType"] == type["type"] &&
+          !showCardDetailsUI) {
+        items.add(
+          ExpansionPanelList(
+            expansionCallback: (int index, bool isExpanded) {
+              Event event = Event(name: "pay_mode_select");
+              event.setDepositAmount(widget.amount);
+              event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+              event.setFLEM(getFLEM());
+              event.setPayModeExpanded(isExpanded);
+              event.setPaymentType(type["type"]);
+
+              AnalyticsManager().addEvent(event);
+
+              setState(() {
+                lastPaymentExpanded = !lastPaymentExpanded;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                isExpanded: lastPaymentExpanded,
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: SvgPicture.network(
+                              type["logo"],
+                              width: 24.0,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(type["label"]),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+                body: Padding(
+                  padding:
+                      EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          DropdownButton(
+                            onChanged: (value) {
+                              Event event = Event(name: "pay_option_select");
+                              event.setDepositAmount(widget.amount);
+                              event.setModeOptionId(
+                                  value["info"]["modeOptionId"]);
+                              event.setGatewayId(int.parse(
+                                  value["info"]["gatewayId"].toString()));
+                              event.setFirstDeposit(
+                                  widget.paymentMode["isFirstDeposit"]);
+                              event.setFLEM(getFLEM());
+                              event.setPaymentOptionType(value["name"]);
+
+                              AnalyticsManager().addEvent(event);
+
+                              setState(() {
+                                lastPaymentMethod = value;
+                                selectedPaymentMethod[type["type"]] = value;
+                              });
+                            },
+                            value: lastPaymentMethod,
+                            items: (widget.paymentMode["choosePayment"]
+                                    ["paymentInfo"][type["type"]] as List)
+                                .map((item) {
+                              return DropdownMenuItem(
+                                child: Text(item["info"]["label"]),
+                                value: item,
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 48.0,
+                                child: ColorButton(
+                                  onPressed: () {
+                                    if (validateUserInfo(type["type"])) {
+                                      onPaySecurely(
+                                        lastPaymentMethod,
+                                        type["type"],
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    strings.get("PAY_SECURELY").toUpperCase(),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .copyWith(
+                                          color: Colors.white,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else if (lastPaymentArray["paymentType"] == type["type"] &&
+          showCardDetailsUI) {
+        items.add(
+          ExpansionPanelList(
+            expansionCallback: (int index, bool isExpanded) {
+              Event event = Event(name: "pay_mode_select");
+              event.setDepositAmount(widget.amount);
+              event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+              event.setFLEM(getFLEM());
+              event.setPayModeExpanded(isExpanded);
+              event.setPaymentType(type["type"]);
+
+              AnalyticsManager().addEvent(event);
+
+              setState(() {
+                lastPaymentExpanded = !lastPaymentExpanded;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                isExpanded: lastPaymentExpanded,
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: SvgPicture.network(
+                              type["logo"],
+                              width: 24.0,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(type["label"]),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+                body: Padding(
+                    padding:
+                        EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+                    child: getCardPaymentFormWidget(type["type"])),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+    return items;
+  }
+
   getPaymentModeWidgetList() {
     List<ExpansionPanel> items = [];
     int i = 0;
@@ -1093,6 +1429,175 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                   )
                 ],
               ),
+            ),
+          ),
+        );
+        i++;
+      }
+    });
+    return items;
+  }
+
+
+  getPaymentModeWidgetListV2() {
+    List<ExpansionPanel> items = [];
+    int i = 0;
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length >
+              1 &&
+          lastPaymentArray["paymentType"] != type["type"]) {
+        items.add(
+          ExpansionPanel(
+            isExpanded: _selectedItemIndex == i,
+            canTapOnHeader: true,
+            headerBuilder: (context, isExpanded) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: SvgPicture.network(
+                          type["logo"],
+                          width: 24.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(type["label"]),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            },
+            body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      DropdownButton(
+                        onChanged: (value) {
+                          Event event = Event(name: "pay_option_select");
+                          event.setDepositAmount(widget.amount);
+                          event.setModeOptionId(value["info"]["modeOptionId"]);
+                          event.setGatewayId(
+                              int.parse(value["info"]["gatewayId"].toString()));
+                          event.setFirstDeposit(
+                              widget.paymentMode["isFirstDeposit"]);
+                          event.setFLEM(getFLEM());
+                          event.setPaymentOptionType(value["name"]);
+
+                          AnalyticsManager().addEvent(event);
+
+                          setState(() {
+                            selectedPaymentMethod[type["type"]] = value;
+                          });
+                        },
+                        value: selectedPaymentMethod[type["type"]],
+                        items: (widget.paymentMode["choosePayment"]
+                                ["paymentInfo"][type["type"]] as List)
+                            .map((item) {
+                          return DropdownMenuItem(
+                            child: Text(item["info"]["label"]),
+                            value: item,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            height: 48.0,
+                            child: ColorButton(
+                              onPressed: () {
+                                if (validateUserInfo(type["type"])) {
+                                  onPaySecurely(
+                                      selectedPaymentMethod[type["type"]],
+                                      type["type"]);
+                                }
+                              },
+                              child: Text(
+                                strings.get("PAY_SECURELY").toUpperCase(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.white,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+        i++;
+      }
+    });
+
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+      if (showCardDetailsUI &&
+          lastPaymentArray["paymentType"] != type["type"]) {
+        items.add(
+          ExpansionPanel(
+            isExpanded: _selectedItemIndex == i,
+            canTapOnHeader: true,
+            headerBuilder: (context, isExpanded) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: SvgPicture.network(
+                          type["logo"],
+                          width: 24.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(type["label"]),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            },
+            body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: getCardPaymentFormWidget(type["type"]),
             ),
           ),
         );
