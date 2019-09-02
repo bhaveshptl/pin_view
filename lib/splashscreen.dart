@@ -128,7 +128,9 @@ class SplashScreenState extends State<SplashScreen>
 
   navigateToHomePage(){
     if(activateDeepLinkingNavigation){
+      String dLRPage="";
       Map<String, dynamic> deepLinkingNavigationData = new  Map();
+      deepLinkingNavigationData["dLR_page"]=dLRPage;
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(activateDeepLinkingNavigation:true,deepLinkingNavigationData:deepLinkingNavigationData),

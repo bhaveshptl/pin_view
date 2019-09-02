@@ -90,6 +90,7 @@ class LobbyState extends State<Lobby>
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
     });
+    deepLinkingPageRouting();
   }
 
   @override
@@ -120,6 +121,16 @@ class LobbyState extends State<Lobby>
       },
       barrierDismissible: false,
     );
+  }
+
+  deepLinkingPageRouting(){
+    if(widget.activateDeepLinkingNavigation){
+      if(widget.deepLinkingNavigationData["dLR_page"]=="earnCash"){
+        routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
+          showLoader(false);
+        });
+      }
+    }
   }
 
   updateUserInfo() async {
