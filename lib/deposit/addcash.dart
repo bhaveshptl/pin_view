@@ -27,6 +27,7 @@ import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'cardpayment.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -2050,6 +2051,20 @@ class AddCashState extends State<AddCash> {
     }
   }
 
+  _showChangePasswordDialog() async {
+    Map<String, dynamic>  result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CardPaymentForm();
+      },
+    );
+    if (result != null) {
+      if(result["validData"]=true){
+
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
