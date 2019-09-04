@@ -295,7 +295,8 @@ class VerificationState extends State<Verification> {
   }
 
   Future getImage(Function callback) async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery,maxWidth: 1200);
+    var image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, maxWidth: 1200);
 
     if (image != null) {
       callback(image);
@@ -451,31 +452,21 @@ class VerificationState extends State<Verification> {
                         children: [
                           ExpansionPanel(
                             isExpanded: _selectedItemIndex == 0,
+                            canTapOnHeader: true,
                             headerBuilder: (context, isExpanded) {
-                              return FlatButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if (_selectedItemIndex == 0) {
-                                      _selectedItemIndex = -1;
-                                    } else {
-                                      _selectedItemIndex = 0;
-                                    }
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Text(
-                                        strings.get("EMAIL"),
-                                      ),
-                                      _bIsEmailVerified
-                                          ? Icon(Icons.check_circle_outline)
-                                          : Icon(Icons.remove_circle_outline),
-                                    ],
-                                  ),
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      strings.get("EMAIL"),
+                                    ),
+                                    _bIsEmailVerified
+                                        ? Icon(Icons.check_circle_outline)
+                                        : Icon(Icons.remove_circle_outline),
+                                  ],
                                 ),
                               );
                             },
@@ -491,7 +482,7 @@ class VerificationState extends State<Verification> {
                                           ? Column(
                                               children: <Widget>[
                                                 ListTile(
-                                                  leading: Text(
+                                                  title: Text(
                                                       "Verification mail sent successfully. Please check your mail and visit verification link to verify your email."),
                                                 )
                                               ],
@@ -499,7 +490,7 @@ class VerificationState extends State<Verification> {
                                           : Column(
                                               children: <Widget>[
                                                 ListTile(
-                                                  leading: TextFormField(
+                                                  title: TextFormField(
                                                     controller:
                                                         _emailController,
                                                     keyboardType: TextInputType
@@ -555,7 +546,7 @@ class VerificationState extends State<Verification> {
                                                   ),
                                                 ),
                                                 ListTile(
-                                                  leading: Row(
+                                                  title: Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment.end,
                                                     children: <Widget>[
@@ -576,7 +567,9 @@ class VerificationState extends State<Verification> {
                                             )
                                       : Column(
                                           children: <Widget>[
-                                            ListTile(leading: Text(email)),
+                                            ListTile(
+                                              title: Text(email),
+                                            ),
                                           ],
                                         ),
                                 ),
@@ -585,31 +578,21 @@ class VerificationState extends State<Verification> {
                           ),
                           ExpansionPanel(
                             isExpanded: _selectedItemIndex == 1,
+                            canTapOnHeader: true,
                             headerBuilder: (context, isExpanded) {
-                              return FlatButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if (_selectedItemIndex == 1) {
-                                      _selectedItemIndex = -1;
-                                    } else {
-                                      _selectedItemIndex = 1;
-                                    }
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Text(
-                                        strings.get("MOBILE"),
-                                      ),
-                                      _bIsMobileVerified
-                                          ? Icon(Icons.check_circle_outline)
-                                          : Icon(Icons.remove_circle_outline),
-                                    ],
-                                  ),
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      strings.get("MOBILE"),
+                                    ),
+                                    _bIsMobileVerified
+                                        ? Icon(Icons.check_circle_outline)
+                                        : Icon(Icons.remove_circle_outline),
+                                  ],
                                 ),
                               );
                             },
@@ -625,7 +608,7 @@ class VerificationState extends State<Verification> {
                                       ? Column(
                                           children: <Widget>[
                                             ListTile(
-                                              leading: SimpleTextBox(
+                                              title: SimpleTextBox(
                                                 controller: _mobileController,
                                                 keyboardType:
                                                     TextInputType.phone,
@@ -641,7 +624,7 @@ class VerificationState extends State<Verification> {
                                             ),
                                             _bIsOTPSent
                                                 ? ListTile(
-                                                    leading: TextFormField(
+                                                    title: TextFormField(
                                                       validator: (value) {
                                                         if (value.isEmpty) {
                                                           return 'Please enter OTP.';
@@ -700,7 +683,7 @@ class VerificationState extends State<Verification> {
                                               ),
                                             ),
                                             ListTile(
-                                              leading: Row(
+                                              title: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.end,
                                                 children: <Widget>[
@@ -733,7 +716,7 @@ class VerificationState extends State<Verification> {
                                       : Column(
                                           children: <Widget>[
                                             ListTile(
-                                              leading: Text(
+                                              title: Text(
                                                 mobile.toString(),
                                               ),
                                             ),
@@ -745,42 +728,30 @@ class VerificationState extends State<Verification> {
                           ),
                           ExpansionPanel(
                             isExpanded: _selectedItemIndex == 2,
+                            canTapOnHeader: true,
                             headerBuilder: (context, isExpanded) {
-                              return FlatButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if (_selectedItemIndex == 2) {
-                                      _selectedItemIndex = -1;
-                                    } else {
-                                      _selectedItemIndex = 2;
-                                    }
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Column(
-                                        children: <Widget>[
-                                          Text(
-                                            "KYC Verification",
-                                          ),
-                                          Text(
-                                            "(ID and Address)",
-                                          ),
-                                        ],
-                                      ),
-                                      _verificationStatus == "VERIFIED"
-                                          ? Icon(Icons.check_circle_outline)
-                                          : _verificationStatus ==
-                                                  "DOC_SUBMITTED"
-                                              ? Icon(Icons.check)
-                                              : Icon(
-                                                  Icons.remove_circle_outline)
-                                    ],
-                                  ),
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Column(
+                                      children: <Widget>[
+                                        Text(
+                                          "KYC Verification",
+                                        ),
+                                        Text(
+                                          "(ID and Address)",
+                                        ),
+                                      ],
+                                    ),
+                                    _verificationStatus == "VERIFIED"
+                                        ? Icon(Icons.check_circle_outline)
+                                        : _verificationStatus == "DOC_SUBMITTED"
+                                            ? Icon(Icons.check)
+                                            : Icon(Icons.remove_circle_outline)
+                                  ],
                                 ),
                               );
                             },

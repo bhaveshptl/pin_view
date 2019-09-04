@@ -67,7 +67,7 @@ class AddCashState extends State<AddCash> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const techprocess_platform =
-      const MethodChannel('com.algorin.pf.techprocess');    
+      const MethodChannel('com.algorin.pf.techprocess');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -214,14 +214,12 @@ class AddCashState extends State<AddCash> {
   Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      value =
-          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      value = await techprocess_platform.invokeMethod(
+          '_openTechProcessNative', payload);
       showLoader(false);
       print("((((((((((Tech Process Result)))))))))))");
       print(value);
-      if (Platform.isIOS) {
-       
-      }
+      if (Platform.isIOS) {}
     } catch (e) {
       showLoader(false);
     }
@@ -245,7 +243,7 @@ class AddCashState extends State<AddCash> {
       case 'onTechProcessPaymentFail':
       case 'onTechProcessPaymentSuccess':
         onTechProcessSuccessResponse(json.decode(methodCall.arguments));
-        break;  
+        break;
       default:
     }
   }
@@ -322,12 +320,12 @@ class AddCashState extends State<AddCash> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
-   print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
+    print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -366,7 +364,6 @@ class AddCashState extends State<AddCash> {
       showLoader(false);
     });
   }
-
 
   setDepositInfo() async {
     amountController.text =
@@ -1734,7 +1731,7 @@ class AddCashState extends State<AddCash> {
     eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
     eventdata["data"] = payload;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-    print("<<<<<<Inside payment check>>>>>");  
+    print("<<<<<<Inside payment check>>>>>");
     // if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
     //   print("<<<<<<We are inside techprocess seelless");
     //   http.Request req = http.Request(
@@ -1843,33 +1840,41 @@ class AddCashState extends State<AddCash> {
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
 
-          Event event = Event(name: "pay_failed");
+          try {
+            Event event = Event(name: "pay_failed");
+            event.setDepositAmount(amount);
+            event.setModeOptionId(response["modeOptionId"]);
+            event.setFirstDeposit(false);
+            event.setGatewayId(int.parse(response["gatewayId"].toString()));
+            event.setPromoCode(
+                selectedPromo == null ? "" : selectedPromo["promoCode"]);
+            event.setOrderId(response["orderId"]);
+
+            AnalyticsManager().addEvent(event);
+          } catch (e) {
+            print(e);
+          }
+        }
+      } else {
+        try {
+          Event event = Event(name: "pay_success");
           event.setDepositAmount(amount);
           event.setModeOptionId(response["modeOptionId"]);
           event.setFirstDeposit(false);
+          event.setUserBalance(
+            double.parse(response["withdrawable"]) +
+                double.parse(response["nonWithdrawable"]) +
+                double.parse(response["depositBucket"]),
+          );
           event.setGatewayId(int.parse(response["gatewayId"].toString()));
           event.setPromoCode(
               selectedPromo == null ? "" : selectedPromo["promoCode"]);
           event.setOrderId(response["orderId"]);
 
           AnalyticsManager().addEvent(event);
+        } catch (e) {
+          print(e);
         }
-      } else {
-        Event event = Event(name: "pay_success");
-        event.setDepositAmount(amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(false);
-        event.setUserBalance(
-          response["withdrawable"].toDouble() +
-              response["nonWithdrawable"].toDouble() +
-              response["depositBucket"].toDouble(),
-        );
-        event.setGatewayId(int.parse(response["gatewayId"].toString()));
-        event.setPromoCode(
-            selectedPromo == null ? "" : selectedPromo["promoCode"]);
-        event.setOrderId(response["orderId"]);
-
-        AnalyticsManager().addEvent(event);
 
         branchEventTransactionSuccess(response);
         Navigator.of(context).pop(result);
