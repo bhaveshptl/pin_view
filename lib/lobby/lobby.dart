@@ -124,13 +124,13 @@ class LobbyState extends State<Lobby>
   }
 
   deepLinkingPageRouting(){
-    if(widget.activateDeepLinkingNavigation){
-      if(widget.deepLinkingNavigationData["dLR_page"]=="earnCash"){
-        routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
-          showLoader(false);
-        });
-      }
-    }
+    // if(widget.activateDeepLinkingNavigation){
+    //   if(widget.deepLinkingNavigationData["dLR_page"]=="earnCash"){
+    //     routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
+    //       showLoader(false);
+    //     });
+    //   }
+    // }
   }
 
   updateUserInfo() async {
