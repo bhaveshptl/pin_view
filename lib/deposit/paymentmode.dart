@@ -23,6 +23,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:playfantasy/utils/maskedTextController.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
@@ -68,11 +69,32 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Map<String, dynamic> razorpayPayload;
+  /* Card payment UI */
+  final _formKey = new GlobalKey<FormState>();
+  TextEditingController cformNameOnCardController = TextEditingController();
+  TextEditingController cformCVVController = TextEditingController();
+  TextEditingController cformCardNumberController =
+      MaskedTextController(mask: '0000 0000 0000 0000 0000 0000');
+  TextEditingController cformExpDateController =
+      MaskedTextController(mask: '00/00');
+  String cformNameOnTheCard = "";
+  String cformCVV = "";
+  String cformCardNumber = "";
+  String cformExpMonth = "";
+  String cformExpYear = "";
+  String cformExpDate = "";
+  bool cformSaveCardDetails = false;
+  bool cformObscureCVV = false;
+  FocusNode cformCVVFocusnode = FocusNode();
+  FocusNode cformExpDateFocusnode = FocusNode();
+  FocusNode cformNameFocusnode = FocusNode();
+  FocusNode cformCardNumberFocusnode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     setPaymentModeList();
+    cformControllerListener();
     try {
       flutterWebviewPlugin.launch(
         BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
@@ -372,6 +394,304 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : widget.paymentMode["first_name"];
   }
 
+  /** Card Payment ui*/
+  String validateTheExpireDate(String date) {
+    String value = date.toString();
+    var mnthlst = new List(12);
+    mnthlst = [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12"
+    ];
+    if (value.isEmpty) {
+      return "Please enter Exp Month";
+    } else if (!mnthlst.contains(cformExpMonth)) {
+      return "Please enter valid month";
+    } else {
+      return null;
+    }
+  }
+
+  cformControllerListener() {
+    cformExpDateController.addListener(() {
+      print(cformExpDateController.text);
+      setState(() {
+        cformExpDate = cformExpDateController.text;
+        cformExpMonth = cformExpDate.split("/")[0];
+        cformExpYear = cformExpDate.split("/")[1];
+        cformExpYear="20"+cformExpYear;
+      });
+    });
+    cformNameOnCardController.addListener(() {
+      setState(() {
+        cformNameOnTheCard = cformNameOnCardController.text;
+      });
+    });
+    cformCVVController.addListener(() {
+      setState(() {
+        cformCVV = cformCVVController.text;
+      });
+    });
+    cformNameOnCardController.addListener(() {
+      setState(() {
+        cformExpDate = cformNameOnCardController.text;
+      });
+    });
+    cformCardNumberController.addListener(() {
+      setState(() {
+        cformCardNumber=cformCardNumberController.text.replaceAll(new RegExp(r"\s\b|\b\s"), "");
+      });
+    });
+  }
+
+  Form getCardPaymentFormWidget(String paymentType) {
+    return Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(top: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformCardNumberController,
+                          focusNode: cformCardNumberFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCardNumberFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformExpDateFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Card Number',
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter the card number";
+                            }
+                          },
+                          keyboardType: TextInputType.number,
+                        )),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformExpDateController,
+                          focusNode: cformExpDateFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformExpDateFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformCVVFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Expiry Date(MM/YY)',
+                            counterText: "",
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            return validateTheExpireDate(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
+                        )),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      height: 48.0,
+                      child: TextFormField(
+                          controller: cformCVVController,
+                          focusNode: cformCVVFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCVVFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformNameFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'CVV',
+                            counterText: "",
+                            fillColor: Colors.blue,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter a valid CVV";
+                            }
+                          },
+                          maxLength: 4,
+                          obscureText: cformObscureCVV,
+                          keyboardType: TextInputType.number),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformNameOnCardController,
+                          focusNode: cformNameFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCVVFocusnode.unfocus();
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Card Holder's Name",
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter name on the Card";
+                            } else {
+                              return null;
+                            }
+                          },
+                        )),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Row(children: <Widget>[
+                  Checkbox(
+                    value: cformSaveCardDetails,
+                    onChanged: (bool value) {
+                      setState(() {
+                        cformSaveCardDetails = value;
+                      });
+                    },
+                  ),
+                  Text("Securely  save this  card")
+                ])),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            if (validateUserInfo(paymentType)) {
+                              onPaySecurely(selectedPaymentMethod[paymentType],
+                                  paymentType);
+                            }
+                          }
+                        },
+                        child: Text(
+                          strings.get("PAY_SECURELY").toUpperCase(),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.white,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ));
+  }
+
+  ExpansionPanelList getCardPaymentUIExpansionWidget(
+      Map<String, dynamic> type, String paymentType) {
+    return ExpansionPanelList(
+      expansionCallback: (int index, bool isExpanded) {
+        Event event = Event(name: "pay_mode_select");
+        event.setDepositAmount(widget.amount);
+        event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+        event.setFLEM(getFLEM());
+        event.setPayModeExpanded(isExpanded);
+        event.setPaymentType(type["type"]);
+        AnalyticsManager().addEvent(event);
+        setState(() {
+          lastPaymentExpanded = !lastPaymentExpanded;
+        });
+      },
+      children: [
+        ExpansionPanel(
+          isExpanded: lastPaymentExpanded,
+          canTapOnHeader: true,
+          headerBuilder: (context, isExpanded) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: SvgPicture.network(
+                        type["logo"],
+                        width: 24.0,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(type["label"]),
+                    ),
+                  ],
+                )
+              ],
+            );
+          },
+          body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: getCardPaymentFormWidget(type["type"])),
+        ),
+      ],
+    );
+  }
+
   getPaymentModeWidgetButtons() {
     List<Widget> items = [];
     int i = 0;
@@ -382,10 +702,98 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
+          ["info"]["detailRequired"];
+      if (showCardDetailsUI) {
+       
+      }    
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
           lastPaymentArray["paymentType"] != type["type"]) {
+        if (i != 0) {
+          items.add(
+            Divider(height: 2.0),
+          );
+        }
+        items.add(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  padding: EdgeInsets.all(0.0),
+                  onPressed: () {
+                    if (validateUserInfo(type["type"])) {
+                      onPaySecurely(
+                          widget.paymentMode["choosePayment"]["paymentInfo"]
+                              [type["type"]][0],
+                          type["type"]);
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              SvgPicture.network(
+                                type["logo"],
+                                width: 24.0,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  type["label"],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Colors.black26,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        i++;
+      }
+    });
+    return items;
+  }
+
+  getPaymentModeWidgetButtonsV2() {
+    /* This is for Other payment methods */
+    List<Widget> items = [];
+    int i = 0;
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length ==
+              1 &&
+          lastPaymentArray["paymentType"] != type["type"] &&
+          !showCardDetailsUI) {
         if (i != 0) {
           items.add(
             Divider(height: 2.0),
@@ -455,6 +863,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
+          ["info"]["detailRequired"];
+      if (showCardDetailsUI) {
+       
+      }        
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
@@ -641,6 +1057,262 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return items;
   }
 
+    getLastPaymentWidgetV2() {
+    List<Widget> items = [];
+    int i = 0;
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
+
+    widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length ==
+              1 &&
+          lastPaymentArray["paymentType"] == type["type"] &&
+          !showCardDetailsUI) {
+        if (i != 0) {
+          items.add(
+            Divider(height: 2.0),
+          );
+        }
+        items.add(
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  padding: EdgeInsets.all(0.0),
+                  onPressed: () {
+                    if (validateUserInfo(type["type"])) {
+                      onPaySecurely(
+                          widget.paymentMode["choosePayment"]["paymentInfo"]
+                              [type["type"]][0],
+                          type["type"]);
+                    }
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Expanded(
+                          child: Row(
+                            children: <Widget>[
+                              SvgPicture.network(
+                                type["logo"],
+                                width: 24.0,
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  type["label"],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Colors.black26,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+        i++;
+      } else if (widget
+                  .paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length >
+              1 &&
+          lastPaymentArray["paymentType"] == type["type"] &&
+          !showCardDetailsUI) {
+        items.add(
+          ExpansionPanelList(
+            expansionCallback: (int index, bool isExpanded) {
+              Event event = Event(name: "pay_mode_select");
+              event.setDepositAmount(widget.amount);
+              event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+              event.setFLEM(getFLEM());
+              event.setPayModeExpanded(isExpanded);
+              event.setPaymentType(type["type"]);
+
+              AnalyticsManager().addEvent(event);
+
+              setState(() {
+                lastPaymentExpanded = !lastPaymentExpanded;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                isExpanded: lastPaymentExpanded,
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: SvgPicture.network(
+                              type["logo"],
+                              width: 24.0,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(type["label"]),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+                body: Padding(
+                  padding:
+                      EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          DropdownButton(
+                            onChanged: (value) {
+                              Event event = Event(name: "pay_option_select");
+                              event.setDepositAmount(widget.amount);
+                              event.setModeOptionId(
+                                  value["info"]["modeOptionId"]);
+                              event.setGatewayId(int.parse(
+                                  value["info"]["gatewayId"].toString()));
+                              event.setFirstDeposit(
+                                  widget.paymentMode["isFirstDeposit"]);
+                              event.setFLEM(getFLEM());
+                              event.setPaymentOptionType(value["name"]);
+
+                              AnalyticsManager().addEvent(event);
+
+                              setState(() {
+                                lastPaymentMethod = value;
+                                selectedPaymentMethod[type["type"]] = value;
+                              });
+                            },
+                            value: lastPaymentMethod,
+                            items: (widget.paymentMode["choosePayment"]
+                                    ["paymentInfo"][type["type"]] as List)
+                                .map((item) {
+                              return DropdownMenuItem(
+                                child: Text(item["info"]["label"]),
+                                value: item,
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Container(
+                                height: 48.0,
+                                child: ColorButton(
+                                  onPressed: () {
+                                    if (validateUserInfo(type["type"])) {
+                                      onPaySecurely(
+                                        lastPaymentMethod,
+                                        type["type"],
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    strings.get("PAY_SECURELY").toUpperCase(),
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .copyWith(
+                                          color: Colors.white,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else if (lastPaymentArray["paymentType"] == type["type"] &&
+          showCardDetailsUI) {
+        items.add(
+          ExpansionPanelList(
+            expansionCallback: (int index, bool isExpanded) {
+              Event event = Event(name: "pay_mode_select");
+              event.setDepositAmount(widget.amount);
+              event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+              event.setFLEM(getFLEM());
+              event.setPayModeExpanded(isExpanded);
+              event.setPaymentType(type["type"]);
+
+              AnalyticsManager().addEvent(event);
+
+              setState(() {
+                lastPaymentExpanded = !lastPaymentExpanded;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                isExpanded: lastPaymentExpanded,
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: SvgPicture.network(
+                              type["logo"],
+                              width: 24.0,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(type["label"]),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+                body: Padding(
+                    padding:
+                        EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+                    child: getCardPaymentFormWidget(type["type"])),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+    return items;
+  }
+
   getPaymentModeWidgetList() {
     List<ExpansionPanel> items = [];
     int i = 0;
@@ -651,6 +1323,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
+          ["info"]["detailRequired"];
+      if (showCardDetailsUI) {
+       
+      }        
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
@@ -749,6 +1429,175 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                   )
                 ],
               ),
+            ),
+          ),
+        );
+        i++;
+      }
+    });
+    return items;
+  }
+
+
+  getPaymentModeWidgetListV2() {
+    List<ExpansionPanel> items = [];
+    int i = 0;
+    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
+                ["userInfo"]["lastPaymentArray"] !=
+            null
+        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
+        : {};
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+
+      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
+                  .length >
+              1 &&
+          lastPaymentArray["paymentType"] != type["type"]) {
+        items.add(
+          ExpansionPanel(
+            isExpanded: _selectedItemIndex == i,
+            canTapOnHeader: true,
+            headerBuilder: (context, isExpanded) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: SvgPicture.network(
+                          type["logo"],
+                          width: 24.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(type["label"]),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            },
+            body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      DropdownButton(
+                        onChanged: (value) {
+                          Event event = Event(name: "pay_option_select");
+                          event.setDepositAmount(widget.amount);
+                          event.setModeOptionId(value["info"]["modeOptionId"]);
+                          event.setGatewayId(
+                              int.parse(value["info"]["gatewayId"].toString()));
+                          event.setFirstDeposit(
+                              widget.paymentMode["isFirstDeposit"]);
+                          event.setFLEM(getFLEM());
+                          event.setPaymentOptionType(value["name"]);
+
+                          AnalyticsManager().addEvent(event);
+
+                          setState(() {
+                            selectedPaymentMethod[type["type"]] = value;
+                          });
+                        },
+                        value: selectedPaymentMethod[type["type"]],
+                        items: (widget.paymentMode["choosePayment"]
+                                ["paymentInfo"][type["type"]] as List)
+                            .map((item) {
+                          return DropdownMenuItem(
+                            child: Text(item["info"]["label"]),
+                            value: item,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            height: 48.0,
+                            child: ColorButton(
+                              onPressed: () {
+                                if (validateUserInfo(type["type"])) {
+                                  onPaySecurely(
+                                      selectedPaymentMethod[type["type"]],
+                                      type["type"]);
+                                }
+                              },
+                              child: Text(
+                                strings.get("PAY_SECURELY").toUpperCase(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.white,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+        i++;
+      }
+    });
+
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+      if (showCardDetailsUI &&
+          lastPaymentArray["paymentType"] != type["type"]) {
+        items.add(
+          ExpansionPanel(
+            isExpanded: _selectedItemIndex == i,
+            canTapOnHeader: true,
+            headerBuilder: (context, isExpanded) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: SvgPicture.network(
+                          type["logo"],
+                          width: 24.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(type["label"]),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            },
+            body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: getCardPaymentFormWidget(type["type"]),
             ),
           ),
         );
@@ -924,10 +1773,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
 
     showLoader(true);
-    print("<<<<<<<<<<<<<<<Payment Info>>>>>>>");
-    print(paymentModeDetails["info"]);
     // if(paymentModeDetails["info"]["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["info"]["isSeamless"]){
-    //   print("<<<<<<We are inside techprocess seelless");
+    //   var dateNow = new DateTime.now();
+    //   var formatter = new DateFormat('dd-MM-yyyy');
+    //   String formattedDate = formatter.format(dateNow);
     //   http.Request req = http.Request(
     //       "GET",
     //       Uri.parse(BaseUrl().apiUrl +
@@ -947,14 +1796,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
     //             ? payload["paymentType"].toLowerCase()
     //             : "card",
-    //         "userId":"123",
-    //         "date":"27-06-2017",
+    //         "userId":widget.paymentMode["user_id"].toString(),
+    //         "date":formattedDate,
     //         "extra_public_key":"1234-6666-6789-56",
-    //         "tp_nameOnTheCard":"",
-    //         "tp_expireYear":"",
-    //         "tp_expireMonth":"",
-    //         "tp_cvv":"",
-    //         "tp_cardNumber":""
+    //         "tp_nameOnTheCard": cformNameOnTheCard,
+    //         "tp_expireYear": cformExpYear,
+    //         "tp_expireMonth": cformExpMonth,
+    //         "tp_cvv": cformCVV,
+    //         "tp_cardNumber": cformCardNumber,
+    //         "tp_instrumentToken": "",
+    //         "cardDataCapturingRequired": true
     //       });
     //     } else {
     //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);

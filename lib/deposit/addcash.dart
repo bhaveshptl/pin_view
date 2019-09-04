@@ -27,6 +27,7 @@ import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'cardpayment.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -1731,9 +1732,10 @@ class AddCashState extends State<AddCash> {
     eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
     eventdata["data"] = payload;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-    print("<<<<<<Inside payment check>>>>>");
     // if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
-    //   print("<<<<<<We are inside techprocess seelless");
+    //   var dateNow = new DateTime.now();
+    //   var formatter = new DateFormat('dd-MM-yyyy');
+    //   String formattedDate = formatter.format(dateNow);
     //   http.Request req = http.Request(
     //       "GET",
     //       Uri.parse(BaseUrl().apiUrl +
@@ -1753,14 +1755,16 @@ class AddCashState extends State<AddCash> {
     //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
     //             ? payload["paymentType"].toLowerCase()
     //             : "card",
-    //         "userId":"123",
-    //         "date":"27-06-2017",
+    //         "userId":paymentModeDetails["userId"].toString(),
+    //         "date":formattedDate,
     //         "extra_public_key":"1234-6666-6789-56",
     //         "tp_nameOnTheCard":"",
     //         "tp_expireYear":"",
     //         "tp_expireMonth":"",
     //         "tp_cvv":"",
-    //         "tp_cardNumber":""
+    //         "tp_cardNumber":"",
+    //          "tp_instrumentToken": "",
+    //         "cardDataCapturingRequired": false
     //       });
     //     } else {
     //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
@@ -2052,6 +2056,18 @@ class AddCashState extends State<AddCash> {
           : customAmountController.text);
 
       onProceed(amount: customAmount);
+    }
+  }
+
+  _showCardPaymentDialog() async {
+    Map<String, dynamic> result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CardPaymentForm();
+      },
+    );
+    if (result != null) {
+      if (result["validData"] = true) {}
     }
   }
 

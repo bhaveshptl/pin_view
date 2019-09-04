@@ -2,7 +2,9 @@ package com.howzat.howzatfantasy.services;
 
 import android.graphics.Color;
 
+import com.howzat.howzatfantasy.MainActivity;
 import com.howzat.howzatfantasy.R;
+import com.webengage.sdk.android.WebEngage;
 import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
 import com.webengage.sdk.android.WebEngageConfig;
 
@@ -31,8 +33,8 @@ public class BranchClass  extends FlutterApplication {
         registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, config));
         FlutterApplication flutterApplication = new FlutterApplication();
         registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(flutterApplication, config));
-
-
+        WebEngage.registerPushNotificationCallback(new MainActivity());
+        WebEngage.registerInAppNotificationCallback(new MainActivity());
 
     }
 
