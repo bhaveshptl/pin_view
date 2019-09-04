@@ -508,7 +508,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                 .requestFocus(cformCVVFocusnode);
                           },
                           decoration: const InputDecoration(
-                            labelText: 'Expired Date(MM/YY)',
+                            labelText: 'Expiry Date(MM/YY)',
                             counterText: "",
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
@@ -608,7 +608,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                       });
                     },
                   ),
-                  Text("Save card")
+                  Text("Securely  save this  card")
                 ])),
             Padding(
               padding: EdgeInsets.only(top: 8.0),
@@ -708,7 +708,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
           ["info"]["detailRequired"];
       if (showCardDetailsUI) {
-        print("entered into the UI part......");
+       
       }    
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
@@ -869,7 +869,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
           ["info"]["detailRequired"];
       if (showCardDetailsUI) {
-        print("entered into the UI part......");
+       
       }        
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
@@ -1329,7 +1329,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]
           ["info"]["detailRequired"];
       if (showCardDetailsUI) {
-        print("entered into the UI part......");
+       
       }        
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
@@ -1773,10 +1773,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
 
     showLoader(true);
-    print("<<<<<<<<<<<<<<<Payment Info>>>>>>>");
-    print(paymentModeDetails["info"]);
     // if(paymentModeDetails["info"]["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["info"]["isSeamless"]){
-    //   print("<<<<<<We are inside techprocess seelless");
+    //   var dateNow = new DateTime.now();
+    //   var formatter = new DateFormat('dd-MM-yyyy');
+    //   String formattedDate = formatter.format(dateNow);
     //   http.Request req = http.Request(
     //       "GET",
     //       Uri.parse(BaseUrl().apiUrl +
@@ -1796,8 +1796,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
     //             ? payload["paymentType"].toLowerCase()
     //             : "card",
-    //         "userId":"123",
-    //         "date":"27-06-2017",
+    //         "userId":widget.paymentMode["user_id"].toString(),
+    //         "date":formattedDate,
     //         "extra_public_key":"1234-6666-6789-56",
     //         "tp_nameOnTheCard": cformNameOnTheCard,
     //         "tp_expireYear": cformExpYear,

@@ -68,7 +68,7 @@ class AddCashState extends State<AddCash> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const techprocess_platform =
-      const MethodChannel('com.algorin.pf.techprocess');    
+      const MethodChannel('com.algorin.pf.techprocess');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -215,14 +215,12 @@ class AddCashState extends State<AddCash> {
   Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      value =
-          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      value = await techprocess_platform.invokeMethod(
+          '_openTechProcessNative', payload);
       showLoader(false);
       print("((((((((((Tech Process Result)))))))))))");
       print(value);
-      if (Platform.isIOS) {
-       
-      }
+      if (Platform.isIOS) {}
     } catch (e) {
       showLoader(false);
     }
@@ -246,7 +244,7 @@ class AddCashState extends State<AddCash> {
       case 'onTechProcessPaymentFail':
       case 'onTechProcessPaymentSuccess':
         onTechProcessSuccessResponse(json.decode(methodCall.arguments));
-        break;  
+        break;
       default:
     }
   }
@@ -323,12 +321,12 @@ class AddCashState extends State<AddCash> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
-   print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
+    print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -367,7 +365,6 @@ class AddCashState extends State<AddCash> {
       showLoader(false);
     });
   }
-
 
   setDepositInfo() async {
     amountController.text =
@@ -1735,9 +1732,10 @@ class AddCashState extends State<AddCash> {
     eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
     eventdata["data"] = payload;
     AnalyticsManager.trackEventsWithAttributes(eventdata);
-    print("<<<<<<Inside payment check>>>>>");  
     // if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
-    //   print("<<<<<<We are inside techprocess seelless");
+    //   var dateNow = new DateTime.now();
+    //   var formatter = new DateFormat('dd-MM-yyyy');
+    //   String formattedDate = formatter.format(dateNow);
     //   http.Request req = http.Request(
     //       "GET",
     //       Uri.parse(BaseUrl().apiUrl +
@@ -1757,14 +1755,16 @@ class AddCashState extends State<AddCash> {
     //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
     //             ? payload["paymentType"].toLowerCase()
     //             : "card",
-    //         "userId":"123",
-    //         "date":"27-06-2017",
+    //         "userId":paymentModeDetails["userId"].toString(),
+    //         "date":formattedDate,
     //         "extra_public_key":"1234-6666-6789-56",
     //         "tp_nameOnTheCard":"",
     //         "tp_expireYear":"",
     //         "tp_expireMonth":"",
     //         "tp_cvv":"",
-    //         "tp_cardNumber":""
+    //         "tp_cardNumber":"",
+    //          "tp_instrumentToken": "",
+    //         "cardDataCapturingRequired": false
     //       });
     //     } else {
     //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
@@ -2051,20 +2051,18 @@ class AddCashState extends State<AddCash> {
     }
   }
 
-  _showChangePasswordDialog() async {
-    Map<String, dynamic>  result = await showDialog(
+  _showCardPaymentDialog() async {
+    Map<String, dynamic> result = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return CardPaymentForm();
       },
     );
     if (result != null) {
-      if(result["validData"]=true){
-
-      }
+      if (result["validData"] = true) {}
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(

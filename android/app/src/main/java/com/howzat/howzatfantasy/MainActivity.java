@@ -129,6 +129,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     public PushNotificationData onPushNotificationReceived(Context context, PushNotificationData notificationData) {
@@ -331,6 +335,36 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     public void onNewIntent(Intent intent) {
         this.setIntent(intent);
+    }
+
+    private Map _deepLinkingRoutingHandler(){
+        Map<String, Object> deepLinkinDataObject = new HashMap();
+        final Intent intent = getIntent();
+        try {
+            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    if (error == null) {
+                        String data = referringParams.toString();
+                        String dl_page_route = referringParams.optString("dl_page_route", "");
+                        if(dl_page_route.length()>2){
+                            deepLinkinDataObject.put("activateDeepLinkingNavigation",true);
+                            deepLinkinDataObject.put("dl_page_route",dl_page_route);
+
+                        }else{
+                            deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
+
+
+                        }
+                    } else {
+                        deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
+                    }
+                }
+            }, intent.getData(), this);
+        } catch (Exception e) {
+            deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
+        }
+        return deepLinkinDataObject;
     }
 
     protected void initFlutterChannels() {
@@ -549,8 +583,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 } else if ( methodCall.method.equals("onUserInfoRefreshed")) {
                     Map<String, Object> arguments = methodCall.arguments();
                     onUserInfoRefreshed(arguments);
-                }
-                else{
+                } else if (methodCall.method.equals("_deepLinkingRoutingHandler")) {
+                    Map<String,Object> resultObject =_deepLinkingRoutingHandler();
+                    result.success(resultObject);
+
+                } else {
                     result.notImplemented();
                 }
             }
@@ -1173,7 +1210,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String date= (String) arguments.get("date");
         String orderId= (String) arguments.get("orderId");
         String paymentMethod=(String) arguments.get("method");
-        String userId=(String) arguments.get("method");
+        String userId=(String) arguments.get("userId");
         String extra_public_key =(String) arguments.get("extra_public_key");
         boolean cardDataCapturingRequired =(boolean) arguments.get("cardDataCapturingRequired");
         /*Prepare a checkout object*/
@@ -1220,10 +1257,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             }else{
                 String cvv=(String) arguments.get("tp_cvv");
                 String tp_instrumentToken=(String) arguments.get("tp_instrumentToken");
-                checkout.setTransactionMerchantInitiated("Y");
+                checkout.setTransactionMerchantInitiated("N");
+                checkout.setPaymentMethodToken("00000");
                 checkout.setPaymentInstrumentToken(tp_instrumentToken);
                 checkout.setPaymentInstrumentVerificationCode(cvv);
-
                 authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
                         PaymentActivity.PAYMENT_METHOD_CARDS);
             }
