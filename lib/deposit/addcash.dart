@@ -242,6 +242,20 @@ class AddCashState extends State<AddCash> {
         processSuccessResponse(json.decode(methodCall.arguments));
         break;
       case 'onTechProcessPaymentFail':
+        Map<dynamic, dynamic> failedDataInfo =
+            json.decode(methodCall.arguments);
+        if (failedDataInfo["errorMessage"] != null) {
+          if (failedDataInfo["errorMessage"].length > 2) {
+            ActionUtil().showMsgOnTop(
+                failedDataInfo["errorMessage"].toString(), context);
+          } else {
+            ActionUtil().showMsgOnTop(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+                context);
+          }
+        }
+        break;
+
       case 'onTechProcessPaymentSuccess':
         onTechProcessSuccessResponse(json.decode(methodCall.arguments));
         break;
@@ -1668,6 +1682,21 @@ class AddCashState extends State<AddCash> {
     }
   }
 
+  Future<Map<String,dynamic>> openCardForm() async {
+    Map<String, dynamic> cardPaymentFormresult = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CardPaymentForm();
+      },
+    );
+    if (cardPaymentFormresult != null) {
+      return cardPaymentFormresult;
+    } else {
+      return null;
+    }
+    
+  }
+
   paySecurely(int amount) async {
     String querParamString = '';
     Map<String, dynamic> userDetails = widget.depositData.refreshData;
@@ -1705,7 +1734,7 @@ class AddCashState extends State<AddCash> {
       "isFirstDeposit": false,
       "native": true,
     };
-
+    
     int index = 0;
     payload.forEach((key, value) {
       if (index != 0) {
@@ -1724,56 +1753,83 @@ class AddCashState extends State<AddCash> {
     event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
 
     AnalyticsManager().addEvent(event);
-
     showLoader(true);
 
-    /*Web Engage  Event*/
-    Map<dynamic, dynamic> eventdata = new Map();
-    eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
-    eventdata["data"] = payload;
-    AnalyticsManager.trackEventsWithAttributes(eventdata);
-    // if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
-    //   var dateNow = new DateTime.now();
-    //   var formatter = new DateFormat('dd-MM-yyyy');
-    //   String formattedDate = formatter.format(dateNow);
-    //   http.Request req = http.Request(
-    //       "GET",
-    //       Uri.parse(BaseUrl().apiUrl +
-    //           ApiUtil.INIT_PAYMENT_TECHPROCESS +
-    //           querParamString));
-    //   return HttpManager(http.Client())
-    //       .sendRequest(req)
-    //       .then((http.Response res) {
-    //     Map<String, dynamic> response = json.decode(res.body);
-    //     if (res.statusCode >= 200 && res.statusCode <= 299) {
-    //       _openTechProcessNative({
-    //         "name": AppConfig.of(context).appName,
-    //         "email": payload["email"],
-    //         "phone": payload["phone"],
-    //         "amount": payload["depositAmount"].toString(),
-    //         "orderId": response["action"]["value"],
-    //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-    //             ? payload["paymentType"].toLowerCase()
-    //             : "card",
-    //         "userId":paymentModeDetails["userId"].toString(),
-    //         "date":formattedDate,
-    //         "extra_public_key":"1234-6666-6789-56",
-    //         "tp_nameOnTheCard":"",
-    //         "tp_expireYear":"",
-    //         "tp_expireMonth":"",
-    //         "tp_cvv":"",
-    //         "tp_cardNumber":"",
-    //          "tp_instrumentToken": "",
-    //         "cardDataCapturingRequired": false
-    //       });
-    //     } else {
-    //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-    //     }
-    //   }).whenComplete(() {
-    //     showLoader(false);
-    //   });
-    // }
-    if (paymentModeDetails["isSeamless"]) {
+    try {
+      /*Web Engage  Event*/
+      Map<dynamic, dynamic> eventdata = new Map();
+      eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
+      Map<String, dynamic> wePayloadData = payload;
+      wePayloadData.removeWhere((key, value) => value == null);
+      eventdata["data"] = wePayloadData;
+      AnalyticsManager.trackEventsWithAttributes(eventdata);
+    } catch (e) {
+      print("Error for PROCEED_TO_REPEAT_TRANSACTION event " + e.toString());
+    }
+    if (paymentModeDetails["gateway"] == "TECHPROCESS_SEAMLESS" &&
+        paymentModeDetails["isSeamless"]) {
+      var dateNow = new DateTime.now();
+      var formatter = new DateFormat('dd-MM-yyyy');
+      String formattedDate = formatter.format(dateNow);
+      String method = (payload["paymentType"] as String).indexOf("CARD") == -1
+          ? payload["paymentType"].toLowerCase()
+          : "card";
+      String cformCVV = "";
+      String cformNameOnTheCard = "";
+      String cformCardNumber = "";
+      String cformExpMonth = "";
+      String cformExpYear = "";
+      print("payment method");
+      print(method);
+      if (method == "card") {
+        Map<String, dynamic> cardPaymentFormresult = await openCardForm();
+        if (cardPaymentFormresult["validData"] = true) {
+          cformCVV = cardPaymentFormresult["cformCVV"].toString();
+          cformNameOnTheCard =
+              cardPaymentFormresult["cformNameOnTheCard"].toString();
+          cformCardNumber = cardPaymentFormresult["cformCardNumber"].toString();
+          cformExpMonth = cardPaymentFormresult["cformExpMonth"].toString();
+          cformExpYear = cardPaymentFormresult["cformExpYear"].toString();
+        }
+      }
+
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": payload["depositAmount"].toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            "userId": paymentModeDetails["userId"].toString(),
+            "date": formattedDate,
+            "extra_public_key": "1234-6666-6789-56",
+            "tp_nameOnTheCard": cformNameOnTheCard,
+            "tp_expireYear": cformExpYear,
+            "tp_expireMonth": cformExpMonth,
+            "tp_cvv": cformCVV,
+            "tp_cardNumber": cformCardNumber,
+            "tp_instrumentToken": "",
+            "cardDataCapturingRequired": true
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+    } else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +

@@ -1157,12 +1157,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    public void onTechProcessPaymentFail(String response, PaymentData data) {
+    public void onTechProcessPaymentFail(Map<String, Object> arguments) {
         JSONObject object = new JSONObject();
         try {
-            object.put("paymentId", data.getPaymentId());
-            object.put("signature", data.getSignature());
-            object.put("orderId", data.getOrderId());
+            object.put("errorCode", (String)arguments.get("errorCode"));
+            object.put("errorMessage",(String) arguments.get("errorMessage"));
             object.put("status", "failed");
         } catch (JSONException e) {
 
@@ -1171,7 +1170,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentFail",
                 object.toString(), new MethodChannel.Result() {
                     @Override
-                    public void success(Object o) {
+                    public void success(Object o) {                       
                     }
 
                     @Override
@@ -1391,6 +1390,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         String refundIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getRefundIdentifier();
                         String balanceAmount= checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBalanceAmount();
                         String instrumentAliasName=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentAliasName();
+                        String  instrumentToken=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentToken();
                         String  SIMandateId=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
                         String SIMandateStatus=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
                         String  SIMandateErrorCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
@@ -1403,16 +1403,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                 request.put("amount",amount);
                                 request.put("orderId",merchantTransactionIdentifier);
                                 request.put("status",1);
+                                request.put("instrumentAliasName",instrumentAliasName);
+                                request.put("instrumentToken",instrumentToken);
                                 onTechProcessPaymentSuccess(request);
 
                             } catch (JSONException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
+                        }else{
+
+                            Map<String, Object> errorArguments =new HashMap();
+                            errorArguments.put("errorCode",statusCode);
+                            errorArguments.put("errorMessage","");
+                            onTechProcessPaymentFail(errorArguments);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d("Exception", e.toString());
+                        e.printStackTrace();                   
                     }
 
                 }
@@ -1429,16 +1436,28 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String error_desc = (String) data
                             .getStringExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION);
 
-                    Log.d("Exception", error_desc);
-
-                    Log.d("TEchProcess" + " Code=>", error_code);
-                    Log.d("TEchProcess" + " Desc=>", error_desc);
+                    Map<String, Object> errorArguments =new HashMap();
+                    errorArguments.put("errorCode","");
+                    if(error_code.equals("ERROR_PAYNIMO_023")){
+                        errorArguments.put("errorMessage","Enter valid card details");
+                    }
+                    else{
+                        errorArguments.put("errorMessage"," ");
+                    }
+                    onTechProcessPaymentFail(errorArguments);
 
                 }
             }
             else if (resultCode == PaymentActivity.RESULT_CANCELED) {
 
                 Log.d("Exception", "Cancled");
+
+                Map<String, Object> errorArguments =new HashMap();
+                errorArguments.put("errorCode","");
+                errorArguments.put("errorMessage","Payment cancled by user");
+                onTechProcessPaymentFail(errorArguments);
+                onTechProcessPaymentFail(errorArguments);
+
             }
         }
     }
