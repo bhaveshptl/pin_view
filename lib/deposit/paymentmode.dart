@@ -1488,30 +1488,38 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         branchEventTransactionFailed(response);
         webengageEventTransactionFailed(response);
 
-        Event event = Event(name: "pay_failed");
-        event.setDepositAmount(widget.amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(response["firstDepositor"] != "false");
-        event.setGatewayId(int.parse(payload["gatewayId"].toString()));
-        event.setPromoCode(widget.promoCode);
-        event.setOrderId(response["orderId"]);
+        try {
+          Event event = Event(name: "pay_failed");
+          event.setDepositAmount(widget.amount);
+          event.setModeOptionId(response["modeOptionId"]);
+          event.setFirstDeposit(response["firstDepositor"] != "false");
+          event.setGatewayId(int.parse(payload["gatewayId"].toString()));
+          event.setPromoCode(widget.promoCode);
+          event.setOrderId(response["orderId"]);
 
-        AnalyticsManager().addEvent(event);
+          AnalyticsManager().addEvent(event);
+        } catch (e) {
+          print(e);
+        }
       } else {
-        Event event = Event(name: "pay_success");
-        event.setDepositAmount(widget.amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(response["firstDepositor"] != "false");
-        event.setUserBalance(
-          response["withdrawable"].toDouble() +
-              response["nonWithdrawable"].toDouble() +
-              response["depositBucket"].toDouble(),
-        );
-        event.setGatewayId(int.parse(payload["gatewayId"].toString()));
-        event.setPromoCode(widget.promoCode);
-        event.setOrderId(response["orderId"]);
+        try {
+          Event event = Event(name: "pay_success");
+          event.setDepositAmount(widget.amount);
+          event.setModeOptionId(response["modeOptionId"]);
+          event.setFirstDeposit(response["firstDepositor"] != "false");
+          event.setUserBalance(
+            double.parse(response["withdrawable"]) +
+                double.parse(response["nonWithdrawable"]) +
+                double.parse(response["depositBucket"]),
+          );
+          event.setGatewayId(int.parse(payload["gatewayId"].toString()));
+          event.setPromoCode(widget.promoCode);
+          event.setOrderId(response["orderId"]);
 
-        AnalyticsManager().addEvent(event);
+          AnalyticsManager().addEvent(event);
+        } catch (e) {
+          print(e);
+        }
 
         Navigator.of(context).pop(result);
         branchEventTransactionSuccess(response);
