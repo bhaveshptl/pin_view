@@ -101,7 +101,7 @@ class WithdrawState extends State<Withdraw>
     HttpManager(http.Client()).sendRequest(req).then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        _withdrawData = Withhdraw.fromJson(response["data"]);
+        _withdrawData = Withhdraw.fromJson(response);
       } else {
         JoinContestError error = JoinContestError(response["error"]);
         int errorCode = error.getErrorCode();
@@ -850,8 +850,8 @@ class WithdrawState extends State<Withdraw>
           await showDialog(
             context: context,
             builder: (context) => WithdrawSuccess(
-                  withdrawResponse: json.decode(res.body),
-                ),
+              withdrawResponse: json.decode(res.body),
+            ),
           );
         } else {
           Map<String, dynamic> response = json.decode(res.body);

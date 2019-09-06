@@ -23,12 +23,14 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:playfantasy/utils/maskedTextController.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
   final String url;
   final String promoCode;
   final double bonusAmount;
+  final bool expandPreferredMethod;
   final Map<String, dynamic> paymentMode;
 
   ChoosePaymentMode({
@@ -37,6 +39,7 @@ class ChoosePaymentMode extends StatefulWidget {
     this.promoCode,
     this.url,
     this.paymentMode,
+    this.expandPreferredMethod
   });
 
   @override
@@ -52,7 +55,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const techprocess_platform =
-      const MethodChannel('com.algorin.pf.techprocess');    
+      const MethodChannel('com.algorin.pf.techprocess');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -68,11 +71,34 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Map<String, dynamic> razorpayPayload;
+  /* Card payment UI */
+  final _formKey = new GlobalKey<FormState>();
+  TextEditingController cformNameOnCardController = TextEditingController();
+  TextEditingController cformCVVController = TextEditingController();
+  TextEditingController cformCardNumberController =
+      MaskedTextController(mask: '0000 0000 0000 0000 0000 0000');
+  TextEditingController cformExpDateController =
+      MaskedTextController(mask: '00/00');
+  String cformNameOnTheCard = "";
+  String cformCVV = "";
+  String cformCardNumber = "";
+  String cformExpMonth = "";
+  String cformExpYear = "";
+  String cformExpDate = "";
+  String cformCardImagePath = "images/bank_card.png";
+  bool cformSaveCardDetails = false;
+  bool cformObscureCVV = true;
+  FocusNode cformCVVFocusnode = FocusNode();
+  FocusNode cformExpDateFocusnode = FocusNode();
+  FocusNode cformNameFocusnode = FocusNode();
+  FocusNode cformCardNumberFocusnode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     setPaymentModeList();
+    lastPaymentExpanded=widget.expandPreferredMethod;
+    cformControllerListener();
     try {
       flutterWebviewPlugin.launch(
         BaseUrl().apiUrl + ApiUtil.COOKIE_PAGE,
@@ -175,12 +201,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      value =
-          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      value = await techprocess_platform.invokeMethod(
+          '_openTechProcessNative', payload);
       showLoader(false);
-      if (Platform.isIOS) {
-       
-      }
+      if (Platform.isIOS) {}
     } catch (e) {
       showLoader(false);
     }
@@ -202,9 +226,22 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         processSuccessResponse(json.decode(methodCall.arguments));
         break;
       case 'onTechProcessPaymentFail':
+        Map<dynamic, dynamic> failedDataInfo =
+            json.decode(methodCall.arguments);
+        if (failedDataInfo["errorMessage"] != null) {
+          if (failedDataInfo["errorMessage"].length > 2) {
+            ActionUtil().showMsgOnTop(
+                failedDataInfo["errorMessage"].toString(), context);
+          } else {
+            ActionUtil().showMsgOnTop(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+                context);
+          }
+        }
+        break;
       case 'onTechProcessPaymentSuccess':
         onTechProcessSuccessResponse(json.decode(methodCall.arguments));
-        break;  
+        break;
       default:
     }
   }
@@ -277,12 +314,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic>  payload){
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
     print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -320,9 +357,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     }).whenComplete(() {
       showLoader(false);
     });
-
   }
-
 
   setPaymentModeList() {
     int i = 0;
@@ -376,7 +411,312 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : widget.paymentMode["first_name"];
   }
 
+  /** Card Payment ui*/
+  String validateTheExpireDate(String date) {
+    String value = date.toString();
+    var mnthlst = new List(12);
+    mnthlst = [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10",
+      "11",
+      "12"
+    ];
+    if (value.isEmpty) {
+      return "Please enter Exp Month";
+    } else if (!mnthlst.contains(cformExpMonth)) {
+      return "Please enter valid month";
+    } else {
+      return null;
+    }
+  }
+
+  cformControllerListener() {
+    cformExpDateController.addListener(() {
+      print(cformExpDateController.text);
+      setState(() {
+        cformExpDate = cformExpDateController.text;
+        cformExpMonth = cformExpDate.split("/")[0];
+        cformExpYear = cformExpDate.split("/")[1];
+        cformExpYear = "20" + cformExpYear;
+      });
+    });
+    cformNameOnCardController.addListener(() {
+      setState(() {
+        cformNameOnTheCard = cformNameOnCardController.text;
+      });
+    });
+    cformCVVController.addListener(() {
+      setState(() {
+        cformCVV = cformCVVController.text;
+      });
+    });
+    cformNameOnCardController.addListener(() {
+      setState(() {
+        cformExpDate = cformNameOnCardController.text;
+      });
+    });
+    cformCardNumberController.addListener(() {
+      List<String> visa = ["4"];
+      List<String> americanExpress = ["34", "37"];
+      List<String> discover = ["6011", "622126", "622925", "644", "649", "65"];
+      List<String> mastercard = [
+        "51",
+        "55",
+        "2221",
+        "2229",
+        "223",
+        "229",
+        "23",
+        "26",
+        "270",
+        "271",
+        "2720"
+      ];
+
+      setState(() {
+        cformCardNumber = cformCardNumberController.text
+            .replaceAll(new RegExp(r"\s\b|\b\s"), "");
+      });
+
+      if (cformCardNumber.startsWith("4")) {
+        /*Visa Card*/
+        setState(() {
+          cformCardImagePath = "images/bank_visa.png";
+        });
+      }
+      if (cformCardNumber.startsWith("34") ||
+          cformCardNumber.startsWith("37")) {
+        setState(() {
+          cformCardImagePath = "images/amex.png";
+        });
+      }
+      for (var c in mastercard) {
+        if (cformCardNumber.startsWith(c)) {
+          setState(() {
+            cformCardImagePath = "images/bank_mastercad.png";
+          });
+        }
+      }
+
+      for (var c in discover) {
+        if (cformCardNumber.startsWith(c)) {
+          setState(() {
+            cformCardImagePath = "images/bank_discover.png";
+          });
+        }
+      }
+    });
+  }
+
+  void _toggleCVVVisibility() {
+    
+  }
+
+  Form getCardPaymentFormWidget(String paymentType) {
+    return Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(top: 2.0,bottom: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                            controller: cformCardNumberController,
+                            focusNode: cformCardNumberFocusnode,
+                            onFieldSubmitted: (value) {
+                              cformCardNumberFocusnode.unfocus();
+                              FocusScope.of(context)
+                                  .requestFocus(cformExpDateFocusnode);
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Card Number',
+                              counterText: "",
+                              suffixIcon: Padding(
+                                padding:
+                                    const EdgeInsetsDirectional.only(end: 8.0),
+                                child: Image.asset(cformCardImagePath,
+                                    height: 2, width: 1),
+                              ),
+                              contentPadding: EdgeInsets.all(12.0),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black38,
+                                ),
+                              ),
+                            ),
+                            validator: (String value) {
+                              if (value.isEmpty) {
+                                return "Please enter the card number";
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            maxLength: 23)),
+                  )
+                ],
+              ),
+            ),
+            Padding(
+                padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                        flex: 8,
+                        child: TextFormField(
+                          controller: cformExpDateController,
+                          focusNode: cformExpDateFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformExpDateFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformCVVFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'Expiry Date',
+                             hintText:"MM/YY",
+                            counterText: "",
+                            contentPadding: EdgeInsets.all(12.0),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            return validateTheExpireDate(value);
+                          },
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
+                        )),
+                    Expanded(
+                      flex: 1,
+                      child: Container(),
+                    ),
+                    Expanded(
+                      flex: 8,
+                      child: TextFormField(
+                          controller: cformCVVController,
+                          focusNode: cformCVVFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCVVFocusnode.unfocus();
+                            FocusScope.of(context)
+                                .requestFocus(cformNameFocusnode);
+                          },
+                          decoration: const InputDecoration(
+                            labelText: 'CVV',
+                            counterText: "",
+                            contentPadding: EdgeInsets.all(12.0),
+                            fillColor: Colors.blue,
+                            
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter a valid CVV";
+                            }
+                          },
+                          maxLength: 4,
+                          obscureText: cformObscureCVV,
+                          keyboardType: TextInputType.number),
+                    )
+                  ],
+                )),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                        height: 48.0,
+                        child: TextFormField(
+                          controller: cformNameOnCardController,
+                          focusNode: cformNameFocusnode,
+                          onFieldSubmitted: (value) {
+                            cformCVVFocusnode.unfocus();
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Card Holder's Name",
+                            contentPadding: EdgeInsets.all(12.0),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black38,
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value.isEmpty) {
+                              return "Please enter name on the Card";
+                            } else {
+                              return null;
+                            }
+                          },
+                        )),
+                  )
+                ],
+              ),
+            ),
+            // Padding(
+            //     padding: EdgeInsets.only(top: 16.0),
+            //     child: Row(children: <Widget>[
+            //       Checkbox(
+            //         value: cformSaveCardDetails,
+            //         onChanged: (bool value) {
+            //           setState(() {
+            //             cformSaveCardDetails = value;
+            //           });
+            //         },
+            //       ),
+            //       Text("Securely  save this  card")
+            //     ])),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      height: 48.0,
+                      child: ColorButton(
+                        onPressed: () {
+                          if (_formKey.currentState.validate()) {
+                            if (validateUserInfo(paymentType)) {
+                              onPaySecurely(selectedPaymentMethod[paymentType],
+                                  paymentType);
+                            }
+                          }
+                        },
+                        child: Text(
+                          strings.get("PAY_SECURELY").toUpperCase(),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Colors.white,
+                                  ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ));
+  }
+
   getPaymentModeWidgetButtons() {
+    /* This is for Other payment methods */
     List<Widget> items = [];
     int i = 0;
     Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
@@ -386,10 +726,17 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
-          lastPaymentArray["paymentType"] != type["type"]) {
+          lastPaymentArray["paymentType"] != type["type"] &&
+          !showCardDetailsUI) {
         if (i != 0) {
           items.add(
             Divider(height: 2.0),
@@ -459,10 +806,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
-          lastPaymentArray["paymentType"] == type["type"]) {
+          lastPaymentArray["paymentType"] == type["type"] &&
+          !showCardDetailsUI) {
         if (i != 0) {
           items.add(
             Divider(height: 2.0),
@@ -520,7 +873,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                   .paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
-          lastPaymentArray["paymentType"] == type["type"]) {
+          lastPaymentArray["paymentType"] == type["type"] &&
+          !showCardDetailsUI) {
         items.add(
           ExpansionPanelList(
             expansionCallback: (int index, bool isExpanded) {
@@ -640,6 +994,58 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             ],
           ),
         );
+      } else if (lastPaymentArray["paymentType"] == type["type"] &&
+          showCardDetailsUI) {
+        items.add(
+          ExpansionPanelList(
+            expansionCallback: (int index, bool isExpanded) {
+              Event event = Event(name: "pay_mode_select");
+              event.setDepositAmount(widget.amount);
+              event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+              event.setFLEM(getFLEM());
+              event.setPayModeExpanded(isExpanded);
+              event.setPaymentType(type["type"]);
+
+              AnalyticsManager().addEvent(event);
+
+              setState(() {
+                lastPaymentExpanded = !lastPaymentExpanded;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                isExpanded: lastPaymentExpanded,
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(left: 16.0),
+                            child: SvgPicture.network(
+                              type["logo"],
+                              width: 24.0,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(type["label"]),
+                          ),
+                        ],
+                      )
+                    ],
+                  );
+                },
+                body: Padding(
+                    padding:
+                        EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+                    child: getCardPaymentFormWidget(type["type"])),
+              ),
+            ],
+          ),
+        );
       }
     });
     return items;
@@ -655,10 +1061,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
-          lastPaymentArray["paymentType"] != type["type"]) {
+          lastPaymentArray["paymentType"] != type["type"] && !showCardDetailsUI) {
         items.add(
           ExpansionPanel(
             isExpanded: _selectedItemIndex == i,
@@ -753,6 +1165,51 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                   )
                 ],
               ),
+            ),
+          ),
+        );
+        i++;
+      }
+    });
+
+    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
+        .forEach((type) {
+      String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];
+      if (showCardDetailsUI &&
+          lastPaymentArray["paymentType"] != type["type"]) {
+        items.add(
+          ExpansionPanel(
+            isExpanded: _selectedItemIndex == i,
+            canTapOnHeader: true,
+            headerBuilder: (context, isExpanded) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.0),
+                        child: SvgPicture.network(
+                          type["logo"],
+                          width: 24.0,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(type["label"]),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            },
+            body: Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
+              child: getCardPaymentFormWidget(type["type"]),
             ),
           ),
         );
@@ -928,47 +1385,48 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
 
     showLoader(true);
-    print("<<<<<<<<<<<<<<<Payment Info>>>>>>>");
-    print(paymentModeDetails["info"]);
-    // if(paymentModeDetails["info"]["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["info"]["isSeamless"]){
-    //   print("<<<<<<We are inside techprocess seelless");
-    //   http.Request req = http.Request(
-    //       "GET",
-    //       Uri.parse(BaseUrl().apiUrl +
-    //           ApiUtil.INIT_PAYMENT_TECHPROCESS +
-    //           querParamString));
-    //   return HttpManager(http.Client())
-    //       .sendRequest(req)
-    //       .then((http.Response res) {
-    //     Map<String, dynamic> response = json.decode(res.body);
-    //     if (res.statusCode >= 200 && res.statusCode <= 299) {
-    //       _openTechProcessNative({
-    //         "name": AppConfig.of(context).appName,
-    //         "email": payload["email"],
-    //         "phone": payload["phone"],
-    //         "amount": payload["depositAmount"].toString(),
-    //         "orderId": response["action"]["value"],
-    //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-    //             ? payload["paymentType"].toLowerCase()
-    //             : "card",
-    //         "userId":"123",
-    //         "date":"27-06-2017",
-    //         "extra_public_key":"1234-6666-6789-56",
-    //         "tp_nameOnTheCard":"",
-    //         "tp_expireYear":"",
-    //         "tp_expireMonth":"",
-    //         "tp_cvv":"",
-    //         "tp_cardNumber":""
-    //       });
-    //     } else {
-    //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-    //     }
-    //   }).whenComplete(() {
-    //     showLoader(false);
-    //   });
-    // }
-
-   if (paymentModeDetails["info"]["isSeamless"]) {
+    if (paymentModeDetails["info"]["gateway"] == "TECHPROCESS_SEAMLESS" &&
+        paymentModeDetails["info"]["isSeamless"]) {
+      var dateNow = new DateTime.now();
+      var formatter = new DateFormat('dd-MM-yyyy');
+      String formattedDate = formatter.format(dateNow);
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": payload["depositAmount"].toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            "userId": widget.paymentMode["user_id"].toString(),
+            "date": formattedDate,
+            "extra_public_key": "1234-6666-6789-56",
+            "tp_nameOnTheCard": cformNameOnTheCard,
+            "tp_expireYear": cformExpYear,
+            "tp_expireMonth": cformExpMonth,
+            "tp_cvv": cformCVV,
+            "tp_cardNumber": cformCardNumber,
+            "tp_instrumentToken": "",
+            "cardDataCapturingRequired": true
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+    } else if (paymentModeDetails["info"]["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
@@ -1033,30 +1491,38 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         branchEventTransactionFailed(response);
         webengageEventTransactionFailed(response);
 
-        Event event = Event(name: "pay_failed");
-        event.setDepositAmount(widget.amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(response["firstDepositor"] != "false");
-        event.setGatewayId(int.parse(payload["gatewayId"].toString()));
-        event.setPromoCode(widget.promoCode);
-        event.setOrderId(response["orderId"]);
+        try {
+          Event event = Event(name: "pay_failed");
+          event.setDepositAmount(widget.amount);
+          event.setModeOptionId(response["modeOptionId"]);
+          event.setFirstDeposit(response["firstDepositor"] != "false");
+          event.setGatewayId(int.parse(payload["gatewayId"].toString()));
+          event.setPromoCode(widget.promoCode);
+          event.setOrderId(response["orderId"]);
 
-        AnalyticsManager().addEvent(event);
+          AnalyticsManager().addEvent(event);
+        } catch (e) {
+          print(e);
+        }
       } else {
-        Event event = Event(name: "pay_success");
-        event.setDepositAmount(widget.amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(response["firstDepositor"] != "false");
-        event.setUserBalance(
-          response["withdrawable"].toDouble() +
-              response["nonWithdrawable"].toDouble() +
-              response["depositBucket"].toDouble(),
-        );
-        event.setGatewayId(int.parse(payload["gatewayId"].toString()));
-        event.setPromoCode(widget.promoCode);
-        event.setOrderId(response["orderId"]);
+        try {
+          Event event = Event(name: "pay_success");
+          event.setDepositAmount(widget.amount);
+          event.setModeOptionId(response["modeOptionId"]);
+          event.setFirstDeposit(response["firstDepositor"] != "false");
+          event.setUserBalance(
+            double.parse(response["withdrawable"]) +
+                double.parse(response["nonWithdrawable"]) +
+                double.parse(response["depositBucket"]),
+          );
+          event.setGatewayId(int.parse(payload["gatewayId"].toString()));
+          event.setPromoCode(widget.promoCode);
+          event.setOrderId(response["orderId"]);
 
-        AnalyticsManager().addEvent(event);
+          AnalyticsManager().addEvent(event);
+        } catch (e) {
+          print(e);
+        }
 
         Navigator.of(context).pop(result);
         branchEventTransactionSuccess(response);
@@ -1218,13 +1684,19 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 ["userInfo"]["lastPaymentArray"] !=
             null
         ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
-        : {};
+        : {};      
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+
+       String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];    
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
-          lastPaymentArray["paymentType"] != type["type"]) {
+          lastPaymentArray["paymentType"] != type["type"]   || showCardDetailsUI) {
         paymentModes.add(type);
       }
     });

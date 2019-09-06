@@ -13,6 +13,8 @@ import android.widget.Toast;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonObject;
 import com.howzat.howzatfantasy.services.BranchClass;
 import com.howzat.howzatfantasy.services.DeviceInfo;
 import com.howzat.howzatfantasy.services.MyHelperClass;
@@ -70,12 +72,16 @@ import com.webengage.sdk.android.WebEngage;
 
 import com.webengage.sdk.android.Analytics;
 import com.webengage.sdk.android.User;
+import com.webengage.sdk.android.actions.render.InAppNotificationData;
+import com.webengage.sdk.android.actions.render.PushNotificationData;
 import com.webengage.sdk.android.utils.Gender;
 import com.paynimo.android.payment.PaymentActivity;
 import com.paynimo.android.payment.PaymentModesActivity;
 import com.paynimo.android.payment.util.Constant;
+import com.webengage.sdk.android.callbacks.InAppNotificationCallbacks;
+import com.webengage.sdk.android.callbacks.PushNotificationCallbacks;
 
-public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener {
+public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener ,PushNotificationCallbacks, InAppNotificationCallbacks{
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
     private static final String RAZORPAY_IO_CHANNEL = "com.algorin.pf.razorpay";
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
@@ -121,6 +127,65 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }else{
             initBranchPlugin();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public PushNotificationData onPushNotificationReceived(Context context, PushNotificationData notificationData) {
+        return notificationData;
+    }
+
+    @Override
+    public void onPushNotificationShown(Context context, PushNotificationData notificationData) {
+    }
+
+    @Override
+    public boolean onPushNotificationClicked(Context context, PushNotificationData notificationData) {
+        // try {
+        //     Gson gson = new Gson();
+        //     String customData = gson.toJson(notificationData.getCustomData());
+        //     JSONObject cusTomeDataJson = new JSONObject(customData);
+        //     String enableDeepLinking = cusTomeDataJson.getJSONObject("mMap").getString("enableDeepLinking");
+        //     String disableDeepLinking_android = cusTomeDataJson.getJSONObject("mMap").getString("disableDeepLinking_android");
+        //     String dLR_page = cusTomeDataJson.getJSONObject("mMap").getString("dLR_page");
+        //     String dLR_matchID = cusTomeDataJson.getJSONObject("mMap").getString("dLR_matchID");
+        // } catch (JSONException e) {
+        //     System.out.println(e);
+        // }
+        return false;
+    }
+
+    @Override
+    public boolean onPushNotificationActionClicked(Context context, PushNotificationData notificationData, String buttonID) {
+        return false;
+    }
+
+    @Override
+    public void onPushNotificationDismissed(Context context, PushNotificationData notificationData) {
+    }
+
+    @Override
+    public InAppNotificationData onInAppNotificationPrepared(Context context, InAppNotificationData notificationData) {
+        return notificationData;
+    }
+
+    @Override
+    public void onInAppNotificationShown(Context context, InAppNotificationData notificationData) {
+
+    }
+
+    @Override
+    public void onInAppNotificationDismissed(Context context, InAppNotificationData notificationData) {
+
+    }
+
+    @Override
+    public boolean onInAppNotificationClicked(Context context, InAppNotificationData notificationData, String actionId) {
+        return false;
     }
 
     private void initIndusOSBranchAttribution(){
@@ -270,6 +335,36 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     public void onNewIntent(Intent intent) {
         this.setIntent(intent);
+    }
+
+    private Map _deepLinkingRoutingHandler(){
+        Map<String, Object> deepLinkinDataObject = new HashMap();
+        final Intent intent = getIntent();
+        try {
+            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    if (error == null) {
+                        String data = referringParams.toString();
+                        String dl_page_route = referringParams.optString("dl_page_route", "");
+                        if(dl_page_route.length()>2){
+                            deepLinkinDataObject.put("activateDeepLinkingNavigation",true);
+                            deepLinkinDataObject.put("dl_page_route",dl_page_route);
+
+                        }else{
+                            deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
+
+
+                        }
+                    } else {
+                        deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
+                    }
+                }
+            }, intent.getData(), this);
+        } catch (Exception e) {
+            deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
+        }
+        return deepLinkinDataObject;
     }
 
     protected void initFlutterChannels() {
@@ -488,8 +583,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 } else if ( methodCall.method.equals("onUserInfoRefreshed")) {
                     Map<String, Object> arguments = methodCall.arguments();
                     onUserInfoRefreshed(arguments);
-                }
-                else{
+                } else if (methodCall.method.equals("_deepLinkingRoutingHandler")) {
+                    Map<String,Object> resultObject =_deepLinkingRoutingHandler();
+                    result.success(resultObject);
+
+                } else {
                     result.notImplemented();
                 }
             }
@@ -1059,12 +1157,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    public void onTechProcessPaymentFail(String response, PaymentData data) {
+    public void onTechProcessPaymentFail(Map<String, Object> arguments) {
         JSONObject object = new JSONObject();
         try {
-            object.put("paymentId", data.getPaymentId());
-            object.put("signature", data.getSignature());
-            object.put("orderId", data.getOrderId());
+            object.put("errorCode", (String)arguments.get("errorCode"));
+            object.put("errorMessage",(String) arguments.get("errorMessage"));
             object.put("status", "failed");
         } catch (JSONException e) {
 
@@ -1073,7 +1170,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentFail",
                 object.toString(), new MethodChannel.Result() {
                     @Override
-                    public void success(Object o) {
+                    public void success(Object o) {                       
                     }
 
                     @Override
@@ -1112,8 +1209,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String date= (String) arguments.get("date");
         String orderId= (String) arguments.get("orderId");
         String paymentMethod=(String) arguments.get("method");
-        String userId=(String) arguments.get("method");
+        String userId=(String) arguments.get("userId");
         String extra_public_key =(String) arguments.get("extra_public_key");
+        boolean cardDataCapturingRequired =(boolean) arguments.get("cardDataCapturingRequired");
         /*Prepare a checkout object*/
         com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
         checkout.setMerchantIdentifier("T456537");
@@ -1139,8 +1237,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         if(paymentMethod.equals("netbanking")){
             authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_NETBANKING);
         }else if(paymentMethod.equals("card")){
-
-            boolean cardDataCapturingRequired=true;
+            
             if(cardDataCapturingRequired){
                 String cardNo=(String) arguments.get("tp_cardNumber");
                 String expiryMonth=(String) arguments.get("tp_expireMonth");
@@ -1158,9 +1255,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_CARDS);
             }else{
                 String cvv=(String) arguments.get("tp_cvv");
-                checkout.setTransactionMerchantInitiated("Y");
-                checkout.setPaymentInstrumentToken("123234");
+                String tp_instrumentToken=(String) arguments.get("tp_instrumentToken");
+                checkout.setTransactionMerchantInitiated("N");
+                checkout.setPaymentMethodToken("00000");
+                checkout.setPaymentInstrumentToken(tp_instrumentToken);
                 checkout.setPaymentInstrumentVerificationCode(cvv);
+                authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
+                        PaymentActivity.PAYMENT_METHOD_CARDS);
             }
         }
         else{
@@ -1170,10 +1271,16 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         
         /*Now call the payment activity*/
         authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT, checkout);
-        startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
+        try{
+            startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
+        }catch(Exception e){
+            System.out.println(e.toString());
+        }
     }
 
-    private void techProcessResultListner(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PaymentActivity.REQUEST_CODE) {
             Log.d("TECHPROCESS", "Result Code :" +PaymentActivity.REQUEST_CODE );
             if (resultCode == PaymentActivity.RESULT_OK) {
@@ -1283,6 +1390,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         String refundIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getRefundIdentifier();
                         String balanceAmount= checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBalanceAmount();
                         String instrumentAliasName=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentAliasName();
+                        String  instrumentToken=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentToken();
                         String  SIMandateId=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
                         String SIMandateStatus=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
                         String  SIMandateErrorCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
@@ -1295,16 +1403,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                 request.put("amount",amount);
                                 request.put("orderId",merchantTransactionIdentifier);
                                 request.put("status",1);
+                                request.put("instrumentAliasName",instrumentAliasName);
+                                request.put("instrumentToken",instrumentToken);
                                 onTechProcessPaymentSuccess(request);
 
                             } catch (JSONException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
+                        }else{
+
+                            Map<String, Object> errorArguments =new HashMap();
+                            errorArguments.put("errorCode",statusCode);
+                            errorArguments.put("errorMessage","");
+                            onTechProcessPaymentFail(errorArguments);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d("Exception", e.toString());
+                        e.printStackTrace();                   
                     }
 
                 }
@@ -1321,16 +1436,28 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String error_desc = (String) data
                             .getStringExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION);
 
-                    Log.d("Exception", error_desc);
-
-                    Log.d("TEchProcess" + " Code=>", error_code);
-                    Log.d("TEchProcess" + " Desc=>", error_desc);
+                    Map<String, Object> errorArguments =new HashMap();
+                    errorArguments.put("errorCode","");
+                    if(error_code.equals("ERROR_PAYNIMO_023")){
+                        errorArguments.put("errorMessage","Enter valid card details");
+                    }
+                    else{
+                        errorArguments.put("errorMessage"," ");
+                    }
+                    onTechProcessPaymentFail(errorArguments);
 
                 }
             }
             else if (resultCode == PaymentActivity.RESULT_CANCELED) {
 
                 Log.d("Exception", "Cancled");
+
+                Map<String, Object> errorArguments =new HashMap();
+                errorArguments.put("errorCode","");
+                errorArguments.put("errorMessage","Payment cancled by user");
+                onTechProcessPaymentFail(errorArguments);
+                onTechProcessPaymentFail(errorArguments);
+
             }
         }
     }

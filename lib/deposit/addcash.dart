@@ -27,6 +27,7 @@ import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'cardpayment.dart';
 
 class AddCash extends StatefulWidget {
   final String source;
@@ -45,6 +46,7 @@ class AddCashState extends State<AddCash> {
   bool bShowPromoInput = false;
   bool bRepeatTransaction = true;
   bool bWaitForCookieset = true;
+  bool expandPreferredMethod =false;
   bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
@@ -67,7 +69,7 @@ class AddCashState extends State<AddCash> {
   static const razorpay_platform =
       const MethodChannel('com.algorin.pf.razorpay');
   static const techprocess_platform =
-      const MethodChannel('com.algorin.pf.techprocess');    
+      const MethodChannel('com.algorin.pf.techprocess');
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const webengage_platform =
@@ -214,14 +216,12 @@ class AddCashState extends State<AddCash> {
   Future<String> _openTechProcessNative(Map<String, dynamic> payload) async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      value =
-          await techprocess_platform.invokeMethod('_openTechProcessNative', payload);
+      value = await techprocess_platform.invokeMethod(
+          '_openTechProcessNative', payload);
       showLoader(false);
       print("((((((((((Tech Process Result)))))))))))");
       print(value);
-      if (Platform.isIOS) {
-       
-      }
+      if (Platform.isIOS) {}
     } catch (e) {
       showLoader(false);
     }
@@ -243,9 +243,23 @@ class AddCashState extends State<AddCash> {
         processSuccessResponse(json.decode(methodCall.arguments));
         break;
       case 'onTechProcessPaymentFail':
+        Map<dynamic, dynamic> failedDataInfo =
+            json.decode(methodCall.arguments);
+        if (failedDataInfo["errorMessage"] != null) {
+          if (failedDataInfo["errorMessage"].length > 2) {
+            ActionUtil().showMsgOnTop(
+                failedDataInfo["errorMessage"].toString(), context);
+          } else {
+            ActionUtil().showMsgOnTop(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+                context);
+          }
+        }
+        break;
+
       case 'onTechProcessPaymentSuccess':
         onTechProcessSuccessResponse(json.decode(methodCall.arguments));
-        break;  
+        break;
       default:
     }
   }
@@ -322,12 +336,12 @@ class AddCashState extends State<AddCash> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload){
-   print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
+  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
+    print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
-    http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
     req.body = json.encode(payload);
     return HttpManager(http.Client())
         .sendRequest(req)
@@ -366,7 +380,6 @@ class AddCashState extends State<AddCash> {
       showLoader(false);
     });
   }
-
 
   setDepositInfo() async {
     amountController.text =
@@ -1640,6 +1653,7 @@ class AddCashState extends State<AddCash> {
         FantasyPageRoute(
           pageBuilder: (context) => ChoosePaymentMode(
             amount: amount,
+            expandPreferredMethod:expandPreferredMethod,
             paymentMode: paymentMode,
             bonusAmount: widget.depositData.chooseAmountData.isFirstDeposit
                 ? getFirstDepositBonusAmount(amount)
@@ -1669,6 +1683,21 @@ class AddCashState extends State<AddCash> {
       paySecurely(amount);
     }
   }
+
+  Future<Map<String, dynamic>> openCardForm() async {
+    Map<String, dynamic> cardPaymentFormresult = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CardPaymentForm();
+      },
+    );
+    if (cardPaymentFormresult != null) {
+      return cardPaymentFormresult;
+    } else {
+      return null;
+    }
+    
+      }
 
   paySecurely(int amount) async {
     String querParamString = '';
@@ -1726,53 +1755,85 @@ class AddCashState extends State<AddCash> {
     event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
 
     AnalyticsManager().addEvent(event);
-
     showLoader(true);
 
-    /*Web Engage  Event*/
-    Map<dynamic, dynamic> eventdata = new Map();
-    eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
-    eventdata["data"] = payload;
-    AnalyticsManager.trackEventsWithAttributes(eventdata);
-    print("<<<<<<Inside payment check>>>>>");  
-    // if(paymentModeDetails["gateway"]=="TECHPROCESS_SEAMLESS"&&paymentModeDetails["isSeamless"]){
-    //   print("<<<<<<We are inside techprocess seelless");
-    //   http.Request req = http.Request(
-    //       "GET",
-    //       Uri.parse(BaseUrl().apiUrl +
-    //           ApiUtil.INIT_PAYMENT_TECHPROCESS +
-    //           querParamString));
-    //   return HttpManager(http.Client())
-    //       .sendRequest(req)
-    //       .then((http.Response res) {
-    //     Map<String, dynamic> response = json.decode(res.body);
-    //     if (res.statusCode >= 200 && res.statusCode <= 299) {
-    //       _openTechProcessNative({
-    //         "name": AppConfig.of(context).appName,
-    //         "email": payload["email"],
-    //         "phone": payload["phone"],
-    //         "amount": payload["depositAmount"].toString(),
-    //         "orderId": response["action"]["value"],
-    //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-    //             ? payload["paymentType"].toLowerCase()
-    //             : "card",
-    //         "userId":"123",
-    //         "date":"27-06-2017",
-    //         "extra_public_key":"1234-6666-6789-56",
-    //         "tp_nameOnTheCard":"",
-    //         "tp_expireYear":"",
-    //         "tp_expireMonth":"",
-    //         "tp_cvv":"",
-    //         "tp_cardNumber":""
-    //       });
-    //     } else {
-    //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-    //     }
-    //   }).whenComplete(() {
-    //     showLoader(false);
-    //   });
-    // }
-    if (paymentModeDetails["isSeamless"]) {
+    try {
+      /*Web Engage  Event*/
+      Map<dynamic, dynamic> eventdata = new Map();
+      eventdata["eventName"] = "PROCEED_TO_REPEAT_TRANSACTION";
+      Map<String, dynamic> wePayloadData = payload;
+      wePayloadData.removeWhere((key, value) => value == null);
+      eventdata["data"] = wePayloadData;
+      AnalyticsManager.trackEventsWithAttributes(eventdata);
+    } catch (e) {
+      print("Error for PROCEED_TO_REPEAT_TRANSACTION event " + e.toString());
+    }
+    if (paymentModeDetails["gateway"] == "TECHPROCESS_SEAMLESS" &&
+        paymentModeDetails["isSeamless"]) {
+      var dateNow = new DateTime.now();
+      var formatter = new DateFormat('dd-MM-yyyy');
+      String formattedDate = formatter.format(dateNow);
+      String method = (payload["paymentType"] as String).indexOf("CARD") == -1
+          ? payload["paymentType"].toLowerCase()
+          : "card";
+      String cformCVV = "";
+      String cformNameOnTheCard = "";
+      String cformCardNumber = "";
+      String cformExpMonth = "";
+      String cformExpYear = "";
+      if (method == "card") {
+        // Map<String, dynamic> cardPaymentFormresult = await openCardForm();
+        // if (cardPaymentFormresult["validData"] = true) {
+        //   cformCVV = cardPaymentFormresult["cformCVV"].toString();
+        //   cformNameOnTheCard =
+        //       cardPaymentFormresult["cformNameOnTheCard"].toString();
+        //   cformCardNumber = cardPaymentFormresult["cformCardNumber"].toString();
+        //   cformExpMonth = cardPaymentFormresult["cformExpMonth"].toString();
+        //   cformExpYear = cardPaymentFormresult["cformExpYear"].toString();
+        // }
+        expandPreferredMethod=true;
+        onProceed();
+        
+      } else {
+  
+        http.Request req = http.Request(
+            "GET",
+            Uri.parse(BaseUrl().apiUrl +
+                ApiUtil.INIT_PAYMENT_TECHPROCESS +
+                querParamString));
+        return HttpManager(http.Client())
+            .sendRequest(req)
+            .then((http.Response res) {
+          Map<String, dynamic> response = json.decode(res.body);        
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            _openTechProcessNative({
+              "name": AppConfig.of(context).appName,
+              "email": payload["email"],
+              "phone": payload["phone"],
+              "amount": payload["depositAmount"].toString(),
+              "orderId": response["action"]["value"],
+              "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                  ? payload["paymentType"].toLowerCase()
+                  : "card",
+              "userId": paymentModeDetails["userId"].toString(),
+              "date": formattedDate,
+              "extra_public_key": "1234-6666-6789-56",
+              "tp_nameOnTheCard": cformNameOnTheCard,
+              "tp_expireYear": cformExpYear,
+              "tp_expireMonth": cformExpMonth,
+              "tp_cvv": cformCVV,
+              "tp_cardNumber": cformCardNumber,
+              "tp_instrumentToken": "",
+              "cardDataCapturingRequired": true
+            });
+          } else {
+            ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+          }
+        }).whenComplete(() {
+          showLoader(false);
+        });
+      }
+    } else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
@@ -1843,33 +1904,41 @@ class AddCashState extends State<AddCash> {
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
 
-          Event event = Event(name: "pay_failed");
+          try {
+            Event event = Event(name: "pay_failed");
+            event.setDepositAmount(amount);
+            event.setModeOptionId(response["modeOptionId"]);
+            event.setFirstDeposit(false);
+            event.setGatewayId(int.parse(response["gatewayId"].toString()));
+            event.setPromoCode(
+                selectedPromo == null ? "" : selectedPromo["promoCode"]);
+            event.setOrderId(response["orderId"]);
+
+            AnalyticsManager().addEvent(event);
+          } catch (e) {
+            print(e);
+          }
+        }
+      } else {
+        try {
+          Event event = Event(name: "pay_success");
           event.setDepositAmount(amount);
           event.setModeOptionId(response["modeOptionId"]);
           event.setFirstDeposit(false);
+          event.setUserBalance(
+            double.parse(response["withdrawable"]) +
+                double.parse(response["nonWithdrawable"]) +
+                double.parse(response["depositBucket"]),
+          );
           event.setGatewayId(int.parse(response["gatewayId"].toString()));
           event.setPromoCode(
               selectedPromo == null ? "" : selectedPromo["promoCode"]);
           event.setOrderId(response["orderId"]);
 
           AnalyticsManager().addEvent(event);
+        } catch (e) {
+          print(e);
         }
-      } else {
-        Event event = Event(name: "pay_success");
-        event.setDepositAmount(amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(false);
-        event.setUserBalance(
-          response["withdrawable"].toDouble() +
-              response["nonWithdrawable"].toDouble() +
-              response["depositBucket"].toDouble(),
-        );
-        event.setGatewayId(int.parse(response["gatewayId"].toString()));
-        event.setPromoCode(
-            selectedPromo == null ? "" : selectedPromo["promoCode"]);
-        event.setOrderId(response["orderId"]);
-
-        AnalyticsManager().addEvent(event);
 
         branchEventTransactionSuccess(response);
         Navigator.of(context).pop(result);

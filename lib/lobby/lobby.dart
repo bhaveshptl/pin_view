@@ -8,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
+import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -90,6 +92,7 @@ class LobbyState extends State<Lobby>
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
     });
+    //WidgetsBinding.instance .addPostFrameCallback((_) => deepLinkingPageRouting(context));
   }
 
   @override
@@ -119,6 +122,36 @@ class LobbyState extends State<Lobby>
         );
       },
       barrierDismissible: false,
+    );
+  }
+
+  deepLinkingPageRouting(BuildContext context) async {
+    if(widget.activateDeepLinkingNavigation){
+      if(widget.deepLinkingNavigationData["dLR_page"]=="earnCash"){
+        routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
+          showLoader(false);
+        });
+      }
+
+      if(widget.deepLinkingNavigationData["dLR_page"]=="addCash"){
+         _launchAddCash(source: "bottom");
+      }
+    }
+  }
+
+
+  onLeagueSelect(BuildContext context, League league) {
+    //showLoader(true, context);
+    Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (context) => LeagueDetail(
+              league,
+              leagues: _leagues,
+              sportType: _sportType,
+              onSportChange: _onSportSelectionChaged,
+              mapSportTypes: _mapSportTypes,
+            ),
+      ),
     );
   }
 

@@ -71,7 +71,7 @@ class SplashScreenState extends State<SplashScreen>
 
   getRequiredData() async {
     if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
-     await checkForPermission();
+      await checkForPermission();
     }
     setLoadingPercentage(0.0);
     await updateStringTable();
@@ -80,6 +80,8 @@ class SplashScreenState extends State<SplashScreen>
     if (!isIos) {
       await _initBranchIoPlugin();
     }
+    Map<dynamic, dynamic> deepLinkingRoutingHandler =
+        await _deepLinkingRoutingHandler();
     await setInitData(initData);
     setLoadingPercentage(60.0);
     final result = await AuthCheck().checkStatus(widget.apiBaseUrl);
@@ -112,8 +114,7 @@ class SplashScreenState extends State<SplashScreen>
 
       setLoadingPercentage(99.0);
       SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
-      navigateToHomePage();
-      
+      navigateToHomePage(deepLinkingRoutingHandler);
     } else {
       setLoadingPercentage(99.0);
       final result =
@@ -126,18 +127,28 @@ class SplashScreenState extends State<SplashScreen>
     }
   }
 
-  navigateToHomePage(){
-    if(activateDeepLinkingNavigation){
-      Map<String, dynamic> deepLinkingNavigationData = new  Map();
+  navigateToHomePage( Map<dynamic, dynamic> deepLinkingData) {
+    // if(deepLinkingData["activateDeepLinkingNavigation"] !=null){
+    //   activateDeepLinkingNavigation=deepLinkingData["activateDeepLinkingNavigation"];                    
+    // }
+    if (activateDeepLinkingNavigation) {
+      String dLRPage = "";
+      if(deepLinkingData["dl_page_route"] !=null){
+       //dLRPage=deepLinkingData["dl_page_route"];
+      }
+      Map<String, dynamic> deepLinkingNavigationData = new Map();
+      deepLinkingNavigationData["dLR_page"] = dLRPage;
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
-          pageBuilder: (context) => Lobby(activateDeepLinkingNavigation:true,deepLinkingNavigationData:deepLinkingNavigationData),
+          pageBuilder: (context) => Lobby(
+              activateDeepLinkingNavigation: true,
+              deepLinkingNavigationData: deepLinkingNavigationData),
         ),
       );
-    }else{
+    } else {
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
-          pageBuilder: (context) => Lobby(activateDeepLinkingNavigation:false),
+          pageBuilder: (context) => Lobby(activateDeepLinkingNavigation: false),
         ),
       );
     }
@@ -166,6 +177,23 @@ class SplashScreenState extends State<SplashScreen>
     if (isIos) {
       await _initBranchIoPlugin();
     }
+  }
+
+  Future<Map<dynamic, dynamic>> _deepLinkingRoutingHandler() async {
+    Map<dynamic, dynamic> value = new Map();
+     try {
+      final value = await utils_platform
+          .invokeMethod('_deepLinkingRoutingHandler');
+       print("I received data");   
+       print(value); 
+       return value;  
+    } catch (e) {
+       print("I received data with error ");   
+       print(e.toString());  
+       return value;
+    }
+    //value["activateDeepLinkingNavigation"] = true;
+    
   }
 
   _initBranchIoPlugin() async {
@@ -262,7 +290,7 @@ class SplashScreenState extends State<SplashScreen>
         await Permission.requestPermissions([PermissionName.WriteStorage]);
     if (result != null) {
       setState(() {
-       permissionStatus = result[0].permissionStatus;
+        permissionStatus = result[0].permissionStatus;
       });
     }
     return result;
