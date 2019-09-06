@@ -46,6 +46,7 @@ class AddCashState extends State<AddCash> {
   bool bShowPromoInput = false;
   bool bRepeatTransaction = true;
   bool bWaitForCookieset = true;
+  bool expandPreferredMethod =false;
   bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
@@ -1652,6 +1653,7 @@ class AddCashState extends State<AddCash> {
         FantasyPageRoute(
           pageBuilder: (context) => ChoosePaymentMode(
             amount: amount,
+            expandPreferredMethod:expandPreferredMethod,
             paymentMode: paymentMode,
             bonusAmount: widget.depositData.chooseAmountData.isFirstDeposit
                 ? getFirstDepositBonusAmount(amount)
@@ -1682,7 +1684,7 @@ class AddCashState extends State<AddCash> {
     }
   }
 
-  Future<Map<String,dynamic>> openCardForm() async {
+  Future<Map<String, dynamic>> openCardForm() async {
     Map<String, dynamic> cardPaymentFormresult = await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1695,7 +1697,7 @@ class AddCashState extends State<AddCash> {
       return null;
     }
     
-  }
+      }
 
   paySecurely(int amount) async {
     String querParamString = '';
@@ -1734,7 +1736,7 @@ class AddCashState extends State<AddCash> {
       "isFirstDeposit": false,
       "native": true,
     };
-    
+
     int index = 0;
     payload.forEach((key, value) {
       if (index != 0) {
@@ -1779,56 +1781,58 @@ class AddCashState extends State<AddCash> {
       String cformCardNumber = "";
       String cformExpMonth = "";
       String cformExpYear = "";
-      print("payment method");
-      print(method);
       if (method == "card") {
-        Map<String, dynamic> cardPaymentFormresult = await openCardForm();
-        if (cardPaymentFormresult["validData"] = true) {
-          cformCVV = cardPaymentFormresult["cformCVV"].toString();
-          cformNameOnTheCard =
-              cardPaymentFormresult["cformNameOnTheCard"].toString();
-          cformCardNumber = cardPaymentFormresult["cformCardNumber"].toString();
-          cformExpMonth = cardPaymentFormresult["cformExpMonth"].toString();
-          cformExpYear = cardPaymentFormresult["cformExpYear"].toString();
-        }
+        // Map<String, dynamic> cardPaymentFormresult = await openCardForm();
+        // if (cardPaymentFormresult["validData"] = true) {
+        //   cformCVV = cardPaymentFormresult["cformCVV"].toString();
+        //   cformNameOnTheCard =
+        //       cardPaymentFormresult["cformNameOnTheCard"].toString();
+        //   cformCardNumber = cardPaymentFormresult["cformCardNumber"].toString();
+        //   cformExpMonth = cardPaymentFormresult["cformExpMonth"].toString();
+        //   cformExpYear = cardPaymentFormresult["cformExpYear"].toString();
+        // }
+        expandPreferredMethod=true;
+        onProceed();
+        
+      } else {
+  
+        http.Request req = http.Request(
+            "GET",
+            Uri.parse(BaseUrl().apiUrl +
+                ApiUtil.INIT_PAYMENT_TECHPROCESS +
+                querParamString));
+        return HttpManager(http.Client())
+            .sendRequest(req)
+            .then((http.Response res) {
+          Map<String, dynamic> response = json.decode(res.body);        
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            _openTechProcessNative({
+              "name": AppConfig.of(context).appName,
+              "email": payload["email"],
+              "phone": payload["phone"],
+              "amount": payload["depositAmount"].toString(),
+              "orderId": response["action"]["value"],
+              "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                  ? payload["paymentType"].toLowerCase()
+                  : "card",
+              "userId": paymentModeDetails["userId"].toString(),
+              "date": formattedDate,
+              "extra_public_key": "1234-6666-6789-56",
+              "tp_nameOnTheCard": cformNameOnTheCard,
+              "tp_expireYear": cformExpYear,
+              "tp_expireMonth": cformExpMonth,
+              "tp_cvv": cformCVV,
+              "tp_cardNumber": cformCardNumber,
+              "tp_instrumentToken": "",
+              "cardDataCapturingRequired": true
+            });
+          } else {
+            ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+          }
+        }).whenComplete(() {
+          showLoader(false);
+        });
       }
-
-      http.Request req = http.Request(
-          "GET",
-          Uri.parse(BaseUrl().apiUrl +
-              ApiUtil.INIT_PAYMENT_TECHPROCESS +
-              querParamString));
-      return HttpManager(http.Client())
-          .sendRequest(req)
-          .then((http.Response res) {
-        Map<String, dynamic> response = json.decode(res.body);
-        if (res.statusCode >= 200 && res.statusCode <= 299) {
-          _openTechProcessNative({
-            "name": AppConfig.of(context).appName,
-            "email": payload["email"],
-            "phone": payload["phone"],
-            "amount": payload["depositAmount"].toString(),
-            "orderId": response["action"]["value"],
-            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-                ? payload["paymentType"].toLowerCase()
-                : "card",
-            "userId": paymentModeDetails["userId"].toString(),
-            "date": formattedDate,
-            "extra_public_key": "1234-6666-6789-56",
-            "tp_nameOnTheCard": cformNameOnTheCard,
-            "tp_expireYear": cformExpYear,
-            "tp_expireMonth": cformExpMonth,
-            "tp_cvv": cformCVV,
-            "tp_cardNumber": cformCardNumber,
-            "tp_instrumentToken": "",
-            "cardDataCapturingRequired": true
-          });
-        } else {
-          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-        }
-      }).whenComplete(() {
-        showLoader(false);
-      });
     } else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
@@ -2112,18 +2116,6 @@ class AddCashState extends State<AddCash> {
           : customAmountController.text);
 
       onProceed(amount: customAmount);
-    }
-  }
-
-  _showCardPaymentDialog() async {
-    Map<String, dynamic> result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CardPaymentForm();
-      },
-    );
-    if (result != null) {
-      if (result["validData"] = true) {}
     }
   }
 

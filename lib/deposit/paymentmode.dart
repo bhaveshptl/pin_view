@@ -30,6 +30,7 @@ class ChoosePaymentMode extends StatefulWidget {
   final String url;
   final String promoCode;
   final double bonusAmount;
+  final bool expandPreferredMethod;
   final Map<String, dynamic> paymentMode;
 
   ChoosePaymentMode({
@@ -38,6 +39,7 @@ class ChoosePaymentMode extends StatefulWidget {
     this.promoCode,
     this.url,
     this.paymentMode,
+    this.expandPreferredMethod
   });
 
   @override
@@ -95,6 +97,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   void initState() {
     super.initState();
     setPaymentModeList();
+    lastPaymentExpanded=widget.expandPreferredMethod;
     cformControllerListener();
     try {
       flutterWebviewPlugin.launch(
@@ -1067,7 +1070,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
-          lastPaymentArray["paymentType"] != type["type"]) {
+          lastPaymentArray["paymentType"] != type["type"] && !showCardDetailsUI) {
         items.add(
           ExpansionPanel(
             isExpanded: _selectedItemIndex == i,
@@ -1681,13 +1684,19 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 ["userInfo"]["lastPaymentArray"] !=
             null
         ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
-        : {};
+        : {};      
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
+
+       String cFormPaymentType = type["type"];
+      int cFormPaymentBankIndex = 0;
+      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
+              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
+          ["detailRequired"];    
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
-          lastPaymentArray["paymentType"] != type["type"]) {
+          lastPaymentArray["paymentType"] != type["type"]   || showCardDetailsUI) {
         paymentModes.add(type);
       }
     });
