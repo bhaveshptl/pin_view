@@ -54,6 +54,7 @@ class SplashScreenState extends State<SplashScreen>
   bool isIos = false;
   bool disableBranchIOAttribution = false;
   bool activateDeepLinkingNavigation = false;
+  Map<dynamic, dynamic> deepLinkingRoutingData;
 
   @override
   void initState() {
@@ -79,9 +80,8 @@ class SplashScreenState extends State<SplashScreen>
     final initData = await getInitData();
     if (!isIos) {
       await _initBranchIoPlugin();
+      deepLinkingRoutingData = await _deepLinkingRoutingHandler();
     }
-    Map<dynamic, dynamic> deepLinkingRoutingHandler =
-        await _deepLinkingRoutingHandler();
     await setInitData(initData);
     setLoadingPercentage(60.0);
     final result = await AuthCheck().checkStatus(widget.apiBaseUrl);
@@ -114,7 +114,7 @@ class SplashScreenState extends State<SplashScreen>
 
       setLoadingPercentage(99.0);
       SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
-      navigateToHomePage(deepLinkingRoutingHandler);
+      navigateToHomePage();
     } else {
       setLoadingPercentage(99.0);
       final result =
@@ -127,22 +127,37 @@ class SplashScreenState extends State<SplashScreen>
     }
   }
 
-  navigateToHomePage( Map<dynamic, dynamic> deepLinkingData) {
-    // if(deepLinkingData["activateDeepLinkingNavigation"] !=null){
-    //   activateDeepLinkingNavigation=deepLinkingData["activateDeepLinkingNavigation"];                    
-    // }
-    if (activateDeepLinkingNavigation) {
-      String dLRPage = "";
-      if(deepLinkingData["dl_page_route"] !=null){
-       //dLRPage=deepLinkingData["dl_page_route"];
+  navigateToHomePage() {
+    if (deepLinkingRoutingData != null) {
+      if (deepLinkingRoutingData["activateDeepLinkingNavigation"] != null) {
+        activateDeepLinkingNavigation =
+            deepLinkingRoutingData["activateDeepLinkingNavigation"];
       }
-      Map<String, dynamic> deepLinkingNavigationData = new Map();
-      deepLinkingNavigationData["dLR_page"] = dLRPage;
+    }
+
+    if (activateDeepLinkingNavigation) {
+      Map<String, dynamic> dNdata = new Map();
+      dNdata["dl_page_route"] =
+          deepLinkingRoutingData["dl_page_route"] != null
+              ? deepLinkingRoutingData["dl_page_route"]
+              : " ";
+      dNdata["dl_leagueId"] =
+          deepLinkingRoutingData["dl_leagueId"] != null
+              ? deepLinkingRoutingData["dl_leagueId"]
+              : " ";
+      dNdata["dl_ac_promocode"] =
+          deepLinkingRoutingData["dl_ac_promocode"] != null
+              ? deepLinkingRoutingData["dl_ac_promocode"]
+              : " ";
+      dNdata["dl_ac_promoamount"] =
+          deepLinkingRoutingData["dl_ac_promoamount"] != null
+              ? deepLinkingRoutingData["dl_ac_promoamount"]
+              : " ";        
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(
               activateDeepLinkingNavigation: true,
-              deepLinkingNavigationData: deepLinkingNavigationData),
+              deepLinkingNavigationData: dNdata),
         ),
       );
     } else {
@@ -181,19 +196,13 @@ class SplashScreenState extends State<SplashScreen>
 
   Future<Map<dynamic, dynamic>> _deepLinkingRoutingHandler() async {
     Map<dynamic, dynamic> value = new Map();
-     try {
-      final value = await utils_platform
-          .invokeMethod('_deepLinkingRoutingHandler');
-       print("I received data");   
-       print(value); 
-       return value;  
+    try {
+      final value =
+          await utils_platform.invokeMethod('_deepLinkingRoutingHandler');
+      return value;
     } catch (e) {
-       print("I received data with error ");   
-       print(e.toString());  
-       return value;
+      return value;
     }
-    //value["activateDeepLinkingNavigation"] = true;
-    
   }
 
   _initBranchIoPlugin() async {

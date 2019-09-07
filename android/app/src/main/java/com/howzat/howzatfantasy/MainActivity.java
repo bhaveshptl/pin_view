@@ -104,11 +104,14 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     boolean bBranchLodead = false;
     private String indusosPostResult;
     private boolean bActivateIndiusOSAttribution=false;
+    Map<String, Object> deepLinkingDataObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         applicationContext=getApplicationContext();
+        deepLinkingDataObject = new HashMap();
+        deepLinkingDataObject.put("activateDeepLinkingNavigation",false);
         initPushNotifications();
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
@@ -223,6 +226,20 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
                     Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     bBranchLodead = true;
+                    String dl_page_route = referringParams.optString("dl_page_route", "");
+                    String dl_leagueId = referringParams.optString("dl_leagueId", "");
+                    String dl_ac_promocode = referringParams.optString("dl_ac_promocode", "");
+                    String dl_ac_promoamount = referringParams.optString("dl_ac_promoamount", "");
+                    System.out.print(dl_page_route);
+                    System.out.print(dl_page_route);
+                    if(dl_page_route.length()>2){
+                        deepLinkingDataObject.put("activateDeepLinkingNavigation",true);
+                        deepLinkingDataObject.put("dl_page_route",dl_page_route);
+                        deepLinkingDataObject.put("dl_leagueId",dl_leagueId);
+                        deepLinkingDataObject.put("dl_ac_promocode",dl_ac_promocode);
+                        deepLinkingDataObject.put("dl_ac_promoamount",dl_ac_promoamount);
+
+                    }
                     if (error == null) {
                         initBranchSession(referringParams);
                         Log.i("BRANCH SDK", referringParams.toString());
@@ -338,33 +355,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private Map _deepLinkingRoutingHandler(){
-        Map<String, Object> deepLinkinDataObject = new HashMap();
-        final Intent intent = getIntent();
-        try {
-            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
-                @Override
-                public void onInitFinished(JSONObject referringParams, BranchError error) {
-                    if (error == null) {
-                        String data = referringParams.toString();
-                        String dl_page_route = referringParams.optString("dl_page_route", "");
-                        if(dl_page_route.length()>2){
-                            deepLinkinDataObject.put("activateDeepLinkingNavigation",true);
-                            deepLinkinDataObject.put("dl_page_route",dl_page_route);
-
-                        }else{
-                            deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
-
-
-                        }
-                    } else {
-                        deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
-                    }
-                }
-            }, intent.getData(), this);
-        } catch (Exception e) {
-            deepLinkinDataObject.put("activateDeepLinkingNavigation",false);
-        }
-        return deepLinkinDataObject;
+        return deepLinkingDataObject;
     }
 
     protected void initFlutterChannels() {
