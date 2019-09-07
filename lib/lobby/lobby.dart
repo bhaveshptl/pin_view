@@ -13,6 +13,7 @@ import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
+import 'package:playfantasy/profilepages/verification.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -36,15 +37,14 @@ class Lobby extends StatefulWidget {
   final bool updateAvailable;
   final bool activateDeepLinkingNavigation;
   final Map<String, dynamic> deepLinkingNavigationData;
-  
-  Lobby({
-    this.logs,
-    this.appUrl,
-    this.isForceUpdate,
-    this.updateAvailable,
-    this.activateDeepLinkingNavigation,
-    this.deepLinkingNavigationData
-  });
+
+  Lobby(
+      {this.logs,
+      this.appUrl,
+      this.isForceUpdate,
+      this.updateAvailable,
+      this.activateDeepLinkingNavigation,
+      this.deepLinkingNavigationData});
 
   @override
   State<StatefulWidget> createState() => LobbyState();
@@ -92,7 +92,8 @@ class LobbyState extends State<Lobby>
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
     });
-    //WidgetsBinding.instance .addPostFrameCallback((_) => deepLinkingPageRouting(context));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => deepLinkingPageRouting(context));
   }
 
   @override
@@ -125,34 +126,86 @@ class LobbyState extends State<Lobby>
     );
   }
 
-  deepLinkingPageRouting(BuildContext context) async {
-    if(widget.activateDeepLinkingNavigation){
-      if(widget.deepLinkingNavigationData["dLR_page"]=="earnCash"){
-        routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
-          showLoader(false);
-        });
-      }
 
-      if(widget.deepLinkingNavigationData["dLR_page"]=="addCash"){
-         _launchAddCash(source: "bottom");
+  bool _isNumeric(String str) {
+    if(str == null) {
+      return false;
+    }
+    return double.tryParse(str) != null;
+  }
+  deepLinkingPageRouting(BuildContext context) async {
+    if (widget.activateDeepLinkingNavigation != null) {
+      if (widget.activateDeepLinkingNavigation) {
+        String routePage = widget.deepLinkingNavigationData["dl_page_route"];
+        switch (routePage) {
+          case "earnCash":
+            routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
+              showLoader(false);
+            });
+            break;
+          case "addCash":
+            String promoCode =
+                widget.deepLinkingNavigationData["dl_ac_promocode"].toString();
+
+            String promoAmountString = widget
+                .deepLinkingNavigationData["dl_ac_promoamount"]
+                .toString();
+            var promoAmountDouble = 0.0;
+            if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
+                promoAmountDouble=double.parse(promoAmountString);
+                _launchAddCash(source: "bottom", promoCode: promoCode,prefilledAmount:promoAmountDouble);
+            }else{
+               _launchAddCash(source: "bottom", promoCode: promoCode);
+            }
+            break;
+          case "verification":
+            Navigator.of(context).push(
+              FantasyPageRoute(
+                pageBuilder: (context) => Verification(),
+              ),
+            );
+            break;
+          case "withdraw":
+            routeLauncher.launchWithdraw(scaffoldKey, onComplete: () {
+              showLoader(false);
+            });
+            break;
+
+          case "lobby1":
+            if (_leagues != null) {
+              int dl_leagueId = 0;
+              try {
+                String leagueString =
+                    widget.deepLinkingNavigationData["dl_leagueId"].toString();
+                dl_leagueId = int.parse(leagueString);
+              } catch (e) {}
+              launchL1ByDeepLinking(context, _leagues, dl_leagueId);
+            }
+            break;
+        }
       }
     }
   }
 
-
-  onLeagueSelect(BuildContext context, League league) {
-    //showLoader(true, context);
-    Navigator.of(context).push(
-      FantasyPageRoute(
-        pageBuilder: (context) => LeagueDetail(
-              league,
-              leagues: _leagues,
-              sportType: _sportType,
-              onSportChange: _onSportSelectionChaged,
-              mapSportTypes: _mapSportTypes,
+  launchL1ByDeepLinking(
+      BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) {
+    if (_leaguesList != null) {
+      for (var league in _leaguesList) {
+        if (league.leagueId == leagueIdFromDLData) {
+          Navigator.of(context).push(
+            FantasyPageRoute(
+              pageBuilder: (context) => LeagueDetail(
+                league,
+                leagues: _leagues,
+                sportType: _sportType,
+                onSportChange: _onSportSelectionChaged,
+                mapSportTypes: _mapSportTypes,
+              ),
             ),
-      ),
-    );
+          );
+        }
+      }
+    }
   }
 
   updateUserInfo() async {
@@ -180,7 +233,7 @@ class LobbyState extends State<Lobby>
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> user = json.decode(res.body)["user"];
         setWebEngageKeys(user);
-        
+
         SharedPrefHelper.internal().saveToSharedPref(
             ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
         return User.fromJson(user);
@@ -195,7 +248,6 @@ class LobbyState extends State<Lobby>
   setWebEngageKeys(Map<dynamic, dynamic> data) async {
     Map<dynamic, dynamic> userInfo = new Map();
 
-    
     userInfo["first_name"] =
         data["first_name"] != null ? data["first_name"] : "";
     userInfo["lastName"] = data["lastName"] != null ? data["lastName"] : "";
@@ -221,13 +273,15 @@ class LobbyState extends State<Lobby>
     userInfo["email_verification"] = verificationStatus["email_verification"];
     Map<String, dynamic> profileData = await _getProfileData();
 
-    if(profileData["email"] != null ){
-      userInfo["email"] = await AnalyticsManager.dosha256Encoding(profileData["email"]); 
+    if (profileData["email"] != null) {
+      userInfo["email"] =
+          await AnalyticsManager.dosha256Encoding(profileData["email"]);
     }
-    if(profileData["mobile"] != null ){
-      String mobile = await AnalyticsManager.dosha256Encoding("+91" + profileData["mobile"].toString());
-      userInfo["mobile"] =mobile;
-    }    
+    if (profileData["mobile"] != null) {
+      String mobile = await AnalyticsManager.dosha256Encoding(
+          "+91" + profileData["mobile"].toString());
+      userInfo["mobile"] = mobile;
+    }
     if (profileData["fname"] != null) {
       userInfo["first_name"] = profileData["fname"];
     }
@@ -361,11 +415,13 @@ class LobbyState extends State<Lobby>
     }
   }
 
-  _launchAddCash({String source}) async {
+  _launchAddCash({String source, String promoCode,double prefilledAmount}) async {
     showLoader(true);
     routeLauncher.launchAddCash(
       context,
       source: source,
+      promoCode: promoCode,
+      prefilledAmount:prefilledAmount,
       onComplete: () {
         showLoader(false);
       },
@@ -565,6 +621,7 @@ class LobbyState extends State<Lobby>
                           child: LobbyWidget(
                             sportType: _mapSportTypes[page],
                             onLeagues: (value) {
+                              deepLinkingPageRouting(context);
                               _leagues = value;
                             },
                             onSportChange: _onSportSelectionChaged,

@@ -45,6 +45,7 @@ class RouteLauncher {
     Function onSuccess,
     Function onFailed,
     String source,
+    String promoCode,
     Function onComplete,
     double prefilledAmount,
   }) async {
@@ -66,6 +67,7 @@ class RouteLauncher {
         FantasyPageRoute(
           pageBuilder: (context) => AddCash(
             depositData: depositData,
+            promoCode:promoCode,
             prefilledAmount: prefilledAmount,
           ),
         ),

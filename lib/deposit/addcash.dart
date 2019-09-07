@@ -33,8 +33,9 @@ class AddCash extends StatefulWidget {
   final String source;
   final Deposit depositData;
   final double prefilledAmount;
+  final String promoCode;
 
-  AddCash({this.depositData, this.source, this.prefilledAmount});
+  AddCash({this.depositData, this.source, this.prefilledAmount,this.promoCode});
 
   @override
   State<StatefulWidget> createState() => AddCashState();
@@ -91,7 +92,7 @@ class AddCashState extends State<AddCash> {
     };
 
     setDepositInfo();
-
+    
     bShowBonusDistribution = widget.depositData.bshowBonusDistribution;
 
     if (widget.prefilledAmount != null && widget.depositData != null) {
