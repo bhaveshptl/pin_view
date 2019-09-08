@@ -91,6 +91,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
     private static final String TECH_PROCESS_CHANNEL="com.algorin.pf.techprocess";
     public static Context applicationContext;
+    private MethodChannel.Result deepLinkingDataObjectResult;
+
 
     MyHelperClass myHeperClass;
     String firebaseToken = "";
@@ -226,20 +228,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
                     Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     bBranchLodead = true;
-                    String dl_page_route = referringParams.optString("dl_page_route", "");
-                    String dl_leagueId = referringParams.optString("dl_leagueId", "");
-                    String dl_ac_promocode = referringParams.optString("dl_ac_promocode", "");
-                    String dl_ac_promoamount = referringParams.optString("dl_ac_promoamount", "");
-                    System.out.print(dl_page_route);
-                    System.out.print(dl_page_route);
-                    if(dl_page_route.length()>2){
-                        deepLinkingDataObject.put("activateDeepLinkingNavigation",true);
-                        deepLinkingDataObject.put("dl_page_route",dl_page_route);
-                        deepLinkingDataObject.put("dl_leagueId",dl_leagueId);
-                        deepLinkingDataObject.put("dl_ac_promocode",dl_ac_promocode);
-                        deepLinkingDataObject.put("dl_ac_promoamount",dl_ac_promoamount);
 
-                    }
                     if (error == null) {
                         initBranchSession(referringParams);
                         Log.i("BRANCH SDK", referringParams.toString());
@@ -248,14 +237,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         initBranchSession(referringParams);
                         Log.i("BRANCH SDK", error.getMessage());
                     }
-                    Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 }
             }, intent.getData(), this);
         } catch (Exception e) {
-            Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            Log.i("BRANCH SDK", e.getMessage());
             initBranchSession(null);
-            Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
     }
 
@@ -289,7 +274,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private Map<String, String> initBranchSession(JSONObject referringParams) {
-        Log.i("BRANCH SDK", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+        JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
+        setDeepLinkingBranchData(referringParams);
+        setDeepLinkingBranchData(installParams);
+        setDeepLinkingBranchData(sessionParams);
+
+
         Map<String, String> object = new HashMap();
         String refCodeFromBranchTrail0 = "";
         String refCodeFromBranchTrail1 = "";
@@ -309,7 +300,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
 
         try {
-            JSONObject installParams = Branch.getInstance().getFirstReferringParams();
             installReferring_link1 = (String) installParams.get("~referring_link");
             Log.i("BRANCH SDK link1", installReferring_link1);
             refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link1, "refCode");
@@ -317,7 +307,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
 
         try {
-            JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
             installReferring_link2 = (String) sessionParams.get("~referring_link");
             Log.i("BRANCH SDK link1", installReferring_link2);
             refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "refCode");
@@ -354,8 +343,27 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         this.setIntent(intent);
     }
 
-    private Map _deepLinkingRoutingHandler(){
-        return deepLinkingDataObject;
+
+    private void setDeepLinkingBranchData(JSONObject referringParams ) {
+        String dl_page_route = referringParams.optString("dl_page_route", "");
+        String dl_leagueId = referringParams.optString("dl_leagueId", "");
+        String dl_ac_promocode = referringParams.optString("dl_ac_promocode", "");
+        String dl_ac_promoamount = referringParams.optString("dl_ac_promoamount", "");
+        System.out.print(dl_page_route);
+        System.out.print(dl_page_route);
+        if (dl_page_route.length() > 2) {
+            deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
+            deepLinkingDataObject.put("dl_page_route", dl_page_route);
+            deepLinkingDataObject.put("dl_leagueId", dl_leagueId);
+            deepLinkingDataObject.put("dl_ac_promocode", dl_ac_promocode);
+            deepLinkingDataObject.put("dl_ac_promoamount", dl_ac_promoamount);
+
+        }
+    }
+
+
+    private void  deepLinkingRoutingHandler(){
+        deepLinkingDataObjectResult.success(deepLinkingDataObject);
     }
 
     protected void initFlutterChannels() {
@@ -575,8 +583,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     Map<String, Object> arguments = methodCall.arguments();
                     onUserInfoRefreshed(arguments);
                 } else if (methodCall.method.equals("_deepLinkingRoutingHandler")) {
-                    Map<String,Object> resultObject =_deepLinkingRoutingHandler();
-                    result.success(resultObject);
+                    deepLinkingDataObjectResult =result;
+                    deepLinkingRoutingHandler();
 
                 } else {
                     result.notImplemented();

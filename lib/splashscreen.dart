@@ -137,14 +137,12 @@ class SplashScreenState extends State<SplashScreen>
 
     if (activateDeepLinkingNavigation) {
       Map<String, dynamic> dNdata = new Map();
-      dNdata["dl_page_route"] =
-          deepLinkingRoutingData["dl_page_route"] != null
-              ? deepLinkingRoutingData["dl_page_route"]
-              : " ";
-      dNdata["dl_leagueId"] =
-          deepLinkingRoutingData["dl_leagueId"] != null
-              ? deepLinkingRoutingData["dl_leagueId"]
-              : " ";
+      dNdata["dl_page_route"] = deepLinkingRoutingData["dl_page_route"] != null
+          ? deepLinkingRoutingData["dl_page_route"]
+          : " ";
+      dNdata["dl_leagueId"] = deepLinkingRoutingData["dl_leagueId"] != null
+          ? deepLinkingRoutingData["dl_leagueId"]
+          : " ";
       dNdata["dl_ac_promocode"] =
           deepLinkingRoutingData["dl_ac_promocode"] != null
               ? deepLinkingRoutingData["dl_ac_promocode"]
@@ -152,7 +150,7 @@ class SplashScreenState extends State<SplashScreen>
       dNdata["dl_ac_promoamount"] =
           deepLinkingRoutingData["dl_ac_promoamount"] != null
               ? deepLinkingRoutingData["dl_ac_promoamount"]
-              : " ";        
+              : " ";
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(
@@ -197,8 +195,9 @@ class SplashScreenState extends State<SplashScreen>
   Future<Map<dynamic, dynamic>> _deepLinkingRoutingHandler() async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      final value =
-          await utils_platform.invokeMethod('_deepLinkingRoutingHandler');
+      final value = await utils_platform
+          .invokeMethod('_deepLinkingRoutingHandler')
+          .timeout(Duration(seconds: 10));
       return value;
     } catch (e) {
       return value;
