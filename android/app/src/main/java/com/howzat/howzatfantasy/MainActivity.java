@@ -1474,6 +1474,46 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
         }
 
+        /*Handling deep linking Data*/
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            Bundle extras = intent.getExtras();
+            try{
+                if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("enableDeepLinking")) {
+                    String enableDeepLinking= extras.getString("enableDeepLinking");
+
+                    if(enableDeepLinking.equals("true")){
+                        if(extras.containsKey("dl_page_route")){
+                            String dl_page_route = extras.getString("dl_page_route");
+                            if(dl_page_route.length()>2){
+                                deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
+                                deepLinkingDataObject.put("dl_page_route", (String) extras.get("dl_page_route"));
+
+                                if(extras.containsKey("dl_leagueId")){
+                                    deepLinkingDataObject.put("dl_leagueId", (String) extras.get("dl_leagueId"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_leagueId", "");
+                                }
+                                if(extras.containsKey("dl_ac_promocode")){
+                                    deepLinkingDataObject.put("dl_ac_promocode", (String) extras.get("dl_ac_promocode"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_ac_promocode", " ");
+                                }
+                                if(extras.containsKey("dl_ac_promoamount")){
+                                    deepLinkingDataObject.put("dl_ac_promoamount", (String) extras.get("dl_ac_promoamount"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_ac_promoamount", " ");
+                                }
+                            }
+
+                        }
+                    }
+                }
+            } catch(Exception e){
+
+            }
+        }
+
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
                 Object value = getIntent().getExtras().get(key);
