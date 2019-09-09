@@ -65,7 +65,7 @@ class LobbyState extends State<Lobby>
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool isIos = false;
   static const utils_platform = const MethodChannel('com.algorin.pf.utils');
-  bool deactivateDeepLinkingNavigation =true;
+  bool deactivateDeepLinkingNavigation = true;
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
@@ -81,9 +81,9 @@ class LobbyState extends State<Lobby>
     }
     if (widget.activateDeepLinkingNavigation != null) {
       if (widget.activateDeepLinkingNavigation) {
-         deactivateDeepLinkingNavigation=false;
+        deactivateDeepLinkingNavigation = false;
       }
-     }
+    }
     _mapSportTypes = sports.mapSports;
     _controller = TabController(vsync: this, length: _mapSportTypes.length);
     _getBanners();
@@ -97,7 +97,7 @@ class LobbyState extends State<Lobby>
         });
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
-    });   
+    });
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
   }
@@ -132,26 +132,29 @@ class LobbyState extends State<Lobby>
     );
   }
 
-
   bool _isNumeric(String str) {
-    if(str == null) {
+    if (str == null) {
       return false;
     }
     return double.tryParse(str) != null;
   }
+
   deepLinkingPageRouting(BuildContext context) async {
-    if (! deactivateDeepLinkingNavigation) {
+    if (!deactivateDeepLinkingNavigation) {
       if (widget.deepLinkingNavigationData != null) {
-        String routePage = widget.deepLinkingNavigationData["dl_page_route"] !=null ? widget.deepLinkingNavigationData["dl_page_route"] :"";
+        String routePage =
+            widget.deepLinkingNavigationData["dl_page_route"] != null
+                ? widget.deepLinkingNavigationData["dl_page_route"]
+                : "";
         switch (routePage) {
           case "earnCash":
-          deactivateDeepLinkingNavigation =true;
+            deactivateDeepLinkingNavigation = true;
             routeLauncher.launchEarnCash(scaffoldKey, onComplete: () {
               showLoader(false);
             });
             break;
           case "addCash":
-          deactivateDeepLinkingNavigation =true;
+            deactivateDeepLinkingNavigation = true;
             String promoCode =
                 widget.deepLinkingNavigationData["dl_ac_promocode"].toString();
             String promoAmountString = widget
@@ -159,14 +162,17 @@ class LobbyState extends State<Lobby>
                 .toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
-                promoAmountDouble=double.parse(promoAmountString);
-                _launchAddCash(source: "bottom", promoCode: promoCode,prefilledAmount:promoAmountDouble);
-            }else{
-               _launchAddCash(source: "bottom", promoCode: promoCode);
+              promoAmountDouble = double.parse(promoAmountString);
+              _launchAddCash(
+                  source: "bottom",
+                  promoCode: promoCode,
+                  prefilledAmount: promoAmountDouble);
+            } else {
+              _launchAddCash(source: "bottom", promoCode: promoCode);
             }
             break;
           case "verification":
-          deactivateDeepLinkingNavigation =true;
+            deactivateDeepLinkingNavigation = true;
             Navigator.of(context).push(
               FantasyPageRoute(
                 pageBuilder: (context) => Verification(),
@@ -174,7 +180,7 @@ class LobbyState extends State<Lobby>
             );
             break;
           case "withdraw":
-          deactivateDeepLinkingNavigation =true;
+            deactivateDeepLinkingNavigation = true;
             routeLauncher.launchWithdraw(scaffoldKey, onComplete: () {
               showLoader(false);
             });
@@ -188,9 +194,45 @@ class LobbyState extends State<Lobby>
                 dl_leagueId = int.parse(leagueString);
               } catch (e) {}
               launchL1ByDeepLinking(context, _leagues, dl_leagueId);
-             deactivateDeepLinkingNavigation =true; 
+              deactivateDeepLinkingNavigation = true;
             }
             break;
+          case "scoringSystem":
+            deactivateDeepLinkingNavigation = true;
+            routeLauncher.launchStaticPage("SCORING", context, onComplete: () {
+              showLoader(false);
+            });
+          break;
+          case "help":
+            deactivateDeepLinkingNavigation = true;
+            routeLauncher.launchStaticPage("HELP", context, onComplete: () {
+              showLoader(false);
+            });
+          break; 
+          case "forum":
+            deactivateDeepLinkingNavigation = true;
+            routeLauncher.launchStaticPage("FORUM", context, onComplete: () {
+              showLoader(false);
+            });
+          break; 
+          case "terms_conditions":
+            deactivateDeepLinkingNavigation = true;
+            routeLauncher.launchStaticPage("T&C", context, onComplete: () {
+              showLoader(false);
+            });
+          break; 
+          case "privacy_policy":
+            deactivateDeepLinkingNavigation = true;
+            routeLauncher.launchStaticPage("PRIVACY", context, onComplete: () {
+              showLoader(false);
+            });
+          break; 
+          case "blog":
+            deactivateDeepLinkingNavigation = true;
+            routeLauncher.launchStaticPage("BLOG", context, onComplete: () {
+              showLoader(false);
+            });
+          break;   
         }
       }
     }
@@ -424,13 +466,14 @@ class LobbyState extends State<Lobby>
     }
   }
 
-  _launchAddCash({String source, String promoCode,double prefilledAmount}) async {
+  _launchAddCash(
+      {String source, String promoCode, double prefilledAmount}) async {
     showLoader(true);
     routeLauncher.launchAddCash(
       context,
       source: source,
       promoCode: promoCode,
-      prefilledAmount:prefilledAmount,
+      prefilledAmount: prefilledAmount,
       onComplete: () {
         showLoader(false);
       },
@@ -630,7 +673,7 @@ class LobbyState extends State<Lobby>
                           child: LobbyWidget(
                             sportType: _mapSportTypes[page],
                             onLeagues: (value) {
-                              if(!deactivateDeepLinkingNavigation){
+                              if (!deactivateDeepLinkingNavigation) {
                                 deepLinkingPageRouting(context);
                               }
                               _leagues = value;

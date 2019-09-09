@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info/package_info.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
-
+import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/modal/deposit.dart';
@@ -420,6 +421,62 @@ class RouteLauncher {
       );
     }
   }
+
+  launchStaticPage(String name,BuildContext context,{Function onComplete}) async {
+    String url = "";
+    String title = "";
+    bool isIos = false;
+     if (onComplete != null) {
+      onComplete();
+    }
+    if (Platform.isIOS) {
+      isIos = true;
+    }
+    switch (name) {
+      case "SCORING":
+        title = "SCORING SYSTEM";
+        if (!isIos) {
+          url = BaseUrl().staticPageUrls["SCORING"] + "#ScoringSystem";
+        } else {
+          url = BaseUrl().staticPageUrls["SCORING"];
+        }
+        break;
+      case "HELP":
+        title = "HELP";
+        url = BaseUrl().staticPageUrls["HOW_TO_PLAY"];
+        break;
+      case "FORUM":
+        title = "FORUM";
+        url = BaseUrl().staticPageUrls["FORUM"];
+        break;
+      case "BLOG":
+        title = "BLOG";
+        url = BaseUrl().staticPageUrls["BLOG"];
+        break;
+      case "T&C":
+        title = "TERMS AND CONDITIONS";
+        url = BaseUrl().staticPageUrls["TERMS"];
+        break;
+      case "PRIVACY":
+        title = "PRIVACY POLICY";
+        url = BaseUrl().staticPageUrls["PRIVACY"];
+        break;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+          url: isIos ? Uri.encodeFull(url) : url,
+          appBar: AppBar(
+            title: Text(
+              title.toUpperCase(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
 
   getEarnCashData(GlobalKey<ScaffoldState> scaffoldKey) async {
     http.Request req = http.Request(

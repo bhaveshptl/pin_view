@@ -77,8 +77,9 @@ class ApiUtil {
   static const SEND_VERIFICATION_MAIL = "/api/verify/activate/mail";
   static const KYC_DOC_LIST = "/api/verify/kyc-doc-list";
   static const UPLOAD_DOC = "/api/verify/upload-doc/";
+  static const UPLOAD_DOC_V2 = "/api/verify/upload-doc-v2/";
   static const USER_BALANCE = "/api/lobby/userbalance";
-
+  
   static const GET_MY_CONTESTS = "/api/lobby/user/mycontests/v2/";
   static const GET_CONTEST_TEAMS = "/api/lobby/contest/";
   static const GET_PRIZESTRUCTURE = "/api/lobby/contest/";
