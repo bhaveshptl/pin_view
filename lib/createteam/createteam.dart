@@ -692,8 +692,8 @@ class CreateTeamState extends State<CreateTeam>
     webengageTeamData["MatchId"] = widget.league.matchId;
     webengageTeamData["LeagueId"] = widget.l1Data.league.id;
     webengageTeamData["SeriesId"] = widget.league.series.id;
-    webengageTeamData["MatchDate"] =
-        widget.l1Data.league.rounds[0].matches[0].startTime;
+    webengageTeamData["MatchDate"] = getReadableDateFromTimeStamp(
+        widget.l1Data.league.rounds[0].matches[0].startTime.toString());
     webengageTeamData["MatchName"] = widget.l1Data.league.name;
     webengageTeamData["SportType"] = _sportType;
     webengageTeamData["Team1"] =

@@ -30,6 +30,7 @@ class ActionUtil {
     L1 l1Data,
     League league,
     Contest contest,
+    int sportsType,
     List<MyTeam> myTeams,
     GlobalKey<ScaffoldState> scaffoldKey,
     Map<String, dynamic> createContestPayload,
@@ -60,31 +61,32 @@ class ActionUtil {
       final result = await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => JoinContest(
-                league: league,
-                l1Data: l1Data,
-                contest: contest,
-                myTeams: myTeams,
+            league: league,
+            l1Data: l1Data,
+            sportsType: sportsType,
+            contest: contest,
+            myTeams: myTeams,
+            createContestPayload: createContestPayload,
+            onError: ((Contest contest, Map<String, dynamic> errorResponse) {
+              final result = onJoinContestError(
+                scaffoldKey.currentContext,
+                contest,
+                errorResponse,
                 createContestPayload: createContestPayload,
-                onError:
-                    ((Contest contest, Map<String, dynamic> errorResponse) {
-                  final result = onJoinContestError(
-                    scaffoldKey.currentContext,
-                    contest,
-                    errorResponse,
-                    createContestPayload: createContestPayload,
-                    onJoin: () {
-                      launchJoinContest(
-                        league: league,
-                        l1Data: l1Data,
-                        contest: contest,
-                        myTeams: myTeams,
-                        scaffoldKey: scaffoldKey,
-                      );
-                    },
-                    userBalance: balance,
+                onJoin: () {
+                  launchJoinContest(
+                    league: league,
+                    l1Data: l1Data,
+                    sportsType: sportsType,
+                    contest: contest,
+                    myTeams: myTeams,
+                    scaffoldKey: scaffoldKey,
                   );
-                }),
-              ),
+                },
+                userBalance: balance,
+              );
+            }),
+          ),
         ),
       );
 
@@ -95,10 +97,10 @@ class ActionUtil {
           Navigator.of(scaffoldKey.currentContext).pushReplacement(
             FantasyPageRoute(
               pageBuilder: (context) => ContestDetail(
-                    l1Data: l1Data,
-                    contest: createdContest,
-                    league: league,
-                  ),
+                l1Data: l1Data,
+                contest: createdContest,
+                league: league,
+              ),
             ),
           );
         } else {
@@ -113,6 +115,7 @@ class ActionUtil {
                 league: league,
                 l1Data: l1Data,
                 contest: contest,
+                sportsType: sportsType,
                 myTeams: myTeams,
                 scaffoldKey: scaffoldKey,
               );
@@ -231,28 +234,27 @@ class ActionUtil {
       final result = await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
           pageBuilder: (context) => JoinPredictionContest(
-                league: league,
-                contest: contest,
-                mySheets: mySheets,
-                prediction: predictionData,
-                onError:
-                    ((Contest contest, Map<String, dynamic> errorResponse) {
-                  final result = onJoinContestError(
-                    scaffoldKey.currentContext,
-                    contest,
-                    errorResponse,
-                    onJoin: () {
-                      launchJoinPrediction(
-                        league: league,
-                        contest: contest,
-                        mySheets: mySheets,
-                        scaffoldKey: scaffoldKey,
-                        predictionData: predictionData,
-                      );
-                    },
+            league: league,
+            contest: contest,
+            mySheets: mySheets,
+            prediction: predictionData,
+            onError: ((Contest contest, Map<String, dynamic> errorResponse) {
+              final result = onJoinContestError(
+                scaffoldKey.currentContext,
+                contest,
+                errorResponse,
+                onJoin: () {
+                  launchJoinPrediction(
+                    league: league,
+                    contest: contest,
+                    mySheets: mySheets,
+                    scaffoldKey: scaffoldKey,
+                    predictionData: predictionData,
                   );
-                }),
-              ),
+                },
+              );
+            }),
+          ),
         ),
       );
 

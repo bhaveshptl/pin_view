@@ -22,6 +22,7 @@ class Contests extends StatefulWidget {
   final L1 l1Data;
   final League league;
   final Function showLoader;
+  final int sportsType;
   final List<MyTeam> myTeams;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<int, List<MyTeam>> mapContestTeams;
@@ -30,6 +31,7 @@ class Contests extends StatefulWidget {
     this.league,
     this.l1Data,
     this.myTeams,
+    this.sportsType,
     this.showLoader,
     this.scaffoldKey,
     this.mapContestTeams,
@@ -346,6 +348,7 @@ class ContestsState extends State<Contests> {
         ActionUtil().launchJoinContest(
           l1Data: _l1Data,
           contest: contest,
+          sportsType:widget.sportsType,
           myTeams: _myTeams,
           league: widget.league,
           scaffoldKey: widget.scaffoldKey,
@@ -367,6 +370,7 @@ class ContestsState extends State<Contests> {
             l1Data: _l1Data,
             contest: contest,
             myTeams: _myTeams,
+            sportsType:widget.sportsType,
             league: widget.league,
             scaffoldKey: widget.scaffoldKey,
           );

@@ -202,37 +202,37 @@ class LobbyState extends State<Lobby>
             routeLauncher.launchStaticPage("SCORING", context, onComplete: () {
               showLoader(false);
             });
-          break;
+            break;
           case "help":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("HELP", context, onComplete: () {
               showLoader(false);
             });
-          break; 
+            break;
           case "forum":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("FORUM", context, onComplete: () {
               showLoader(false);
             });
-          break; 
+            break;
           case "terms_conditions":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("T&C", context, onComplete: () {
               showLoader(false);
             });
-          break; 
+            break;
           case "privacy_policy":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("PRIVACY", context, onComplete: () {
               showLoader(false);
             });
-          break; 
+            break;
           case "blog":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("BLOG", context, onComplete: () {
               showLoader(false);
             });
-          break;   
+            break;
         }
       }
     }
@@ -564,13 +564,30 @@ class LobbyState extends State<Lobby>
                                           banner["CTA"] != "NA") {
                                         showLoader(true);
                                       }
-                                      routeLauncher.launchBannerRoute(
-                                          banner: banner,
-                                          context: context,
-                                          scaffoldKey: scaffoldKey,
-                                          onComplete: () {
-                                            showLoader(false);
-                                          });
+                                      if (banner["CTA"] == "LOBBY1") {
+                                        showLoader(false); 
+                                        if (banner["leagueId"] != null) {
+                                          int dl_leagueId = 0;
+                                          try {
+                                            String leagueString =
+                                                banner["leagueId"].toString();
+                                            dl_leagueId =
+                                                int.parse(leagueString);
+                                          } catch (e) {}
+                                         
+                                          launchL1ByDeepLinking(
+                                              context, _leagues, dl_leagueId);
+                                              
+                                        }
+                                      } else {
+                                        routeLauncher.launchBannerRoute(
+                                            banner: banner,
+                                            context: context,
+                                            scaffoldKey: scaffoldKey,
+                                            onComplete: () {
+                                              showLoader(false);
+                                            });
+                                      }
                                     },
                                     child: Image.network(
                                       banner["banner"],

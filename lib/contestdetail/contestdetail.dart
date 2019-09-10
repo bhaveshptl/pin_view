@@ -485,6 +485,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           l1Data: _l1Data,
           contest: contest,
           myTeams: _myTeams,
+          sportsType: _sportType,
           league: widget.league,
           scaffoldKey: _scaffoldKey,
         );
@@ -505,6 +506,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
             l1Data: _l1Data,
             contest: contest,
             myTeams: _myTeams,
+            sportsType: _sportType,
             league: widget.league,
             scaffoldKey: _scaffoldKey,
           );

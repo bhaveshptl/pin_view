@@ -414,6 +414,7 @@ class JoinedContestsState extends State<JoinedContests>
         l1Data: _l1Data,
         contest: contest,
         myTeams: _myTeams,
+        sportsType: widget.sportsType,
         league: widget.league,
         scaffoldKey: scaffoldKey,
       );
@@ -432,6 +433,7 @@ class JoinedContestsState extends State<JoinedContests>
         ActionUtil().launchJoinContest(
           l1Data: _l1Data,
           contest: contest,
+          sportsType: widget.sportsType,
           myTeams: _myTeams,
           league: widget.league,
           scaffoldKey: scaffoldKey,
