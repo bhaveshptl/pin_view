@@ -349,14 +349,16 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String dl_leagueId = referringParams.optString("dl_leagueId", "");
         String dl_ac_promocode = referringParams.optString("dl_ac_promocode", "");
         String dl_ac_promoamount = referringParams.optString("dl_ac_promoamount", "");
-        System.out.print(dl_page_route);
-        System.out.print(dl_page_route);
+        String dl_sp_pageLocation = referringParams.optString("dl_sp_pageLocation", "");
+        String dl_sp_pageTitle = referringParams.optString("dl_sp_pageTitle", "");
         if (dl_page_route.length() > 2) {
             deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
             deepLinkingDataObject.put("dl_page_route", dl_page_route);
             deepLinkingDataObject.put("dl_leagueId", dl_leagueId);
             deepLinkingDataObject.put("dl_ac_promocode", dl_ac_promocode);
             deepLinkingDataObject.put("dl_ac_promoamount", dl_ac_promoamount);
+            deepLinkingDataObject.put("dl_sp_pageLocation", dl_sp_pageLocation);
+            deepLinkingDataObject.put("dl_sp_pageTitle", dl_sp_pageTitle);
 
         }
     }
@@ -1503,6 +1505,17 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                     deepLinkingDataObject.put("dl_ac_promoamount", (String) extras.get("dl_ac_promoamount"));
                                 }else{
                                     deepLinkingDataObject.put("dl_ac_promoamount", " ");
+                                }
+
+                                if(extras.containsKey("dl_sp_pageLocation")){
+                                    deepLinkingDataObject.put("dl_sp_pageLocation", (String) extras.get("dl_ac_promoamount"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_sp_pageLocation", " ");
+                                }
+                                if(extras.containsKey("dl_sp_pageTitle")){
+                                    deepLinkingDataObject.put("dl_sp_pageTitle", (String) extras.get("dl_ac_promoamount"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_sp_pageTitle", " ");
                                 }
                             }
 

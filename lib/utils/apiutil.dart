@@ -77,7 +77,9 @@ class ApiUtil {
   static const SEND_VERIFICATION_MAIL = "/api/verify/activate/mail";
   static const KYC_DOC_LIST = "/api/verify/kyc-doc-list";
   static const UPLOAD_DOC = "/api/verify/upload-doc/";
-  static const UPLOAD_DOC_V2 = "/api/verify/upload-doc-v2/";
+  static const UPLOAD_DOC_PAN = "/api/verify/upload-pan/";
+  static const UPLOAD_DOC_ADDRESS = "/api/verify/upload-doc-address/";
+  static const GET_ALLOWED_DOC_SIZE_IN_MB="/api/verify/getAllowedDocSizeInMB";
   static const USER_BALANCE = "/api/lobby/userbalance";
   
   static const GET_MY_CONTESTS = "/api/lobby/user/mycontests/v2/";

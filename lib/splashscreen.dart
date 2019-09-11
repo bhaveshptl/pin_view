@@ -151,6 +151,16 @@ class SplashScreenState extends State<SplashScreen>
           deepLinkingRoutingData["dl_ac_promoamount"] != null
               ? deepLinkingRoutingData["dl_ac_promoamount"]
               : " ";
+
+      dNdata["dl_sp_pageLocation"] =
+          deepLinkingRoutingData["dl_sp_pageLocation"] != null
+              ? deepLinkingRoutingData["dl_sp_pageLocation"]
+              : " ";
+
+      dNdata["dl_sp_pageTitle"] =
+          deepLinkingRoutingData["dl_sp_pageTitle"] != null
+              ? deepLinkingRoutingData["dl_sp_pageTitle"]
+              : " ";         
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(
