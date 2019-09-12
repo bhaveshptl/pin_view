@@ -35,7 +35,8 @@ class AddCash extends StatefulWidget {
   final double prefilledAmount;
   final String promoCode;
 
-  AddCash({this.depositData, this.source, this.prefilledAmount,this.promoCode});
+  AddCash(
+      {this.depositData, this.source, this.prefilledAmount, this.promoCode});
 
   @override
   State<StatefulWidget> createState() => AddCashState();
@@ -47,7 +48,7 @@ class AddCashState extends State<AddCash> {
   bool bShowPromoInput = false;
   bool bRepeatTransaction = true;
   bool bWaitForCookieset = true;
-  bool expandPreferredMethod =false;
+  bool expandPreferredMethod = false;
   bool isIos = false;
   TapGestureRecognizer termsGesture = TapGestureRecognizer();
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
@@ -92,7 +93,7 @@ class AddCashState extends State<AddCash> {
     };
 
     setDepositInfo();
-    
+
     bShowBonusDistribution = widget.depositData.bshowBonusDistribution;
 
     if (widget.prefilledAmount != null && widget.depositData != null) {
@@ -249,7 +250,7 @@ class AddCashState extends State<AddCash> {
         if (failedDataInfo["errorMessage"] != null) {
           if (failedDataInfo["errorMessage"].length > 2) {
             ActionUtil().showMsgOnTop(
-                failedDataInfo["errorMessage"].toString(), context);
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact support team!", context);
           } else {
             ActionUtil().showMsgOnTop(
                 "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
@@ -1654,7 +1655,7 @@ class AddCashState extends State<AddCash> {
         FantasyPageRoute(
           pageBuilder: (context) => ChoosePaymentMode(
             amount: amount,
-            expandPreferredMethod:expandPreferredMethod,
+            expandPreferredMethod: expandPreferredMethod,
             paymentMode: paymentMode,
             bonusAmount: widget.depositData.chooseAmountData.isFirstDeposit
                 ? getFirstDepositBonusAmount(amount)
@@ -1697,8 +1698,7 @@ class AddCashState extends State<AddCash> {
     } else {
       return null;
     }
-    
-      }
+  }
 
   paySecurely(int amount) async {
     String querParamString = '';
@@ -1782,58 +1782,43 @@ class AddCashState extends State<AddCash> {
       String cformCardNumber = "";
       String cformExpMonth = "";
       String cformExpYear = "";
-      if (method == "card") {
-        // Map<String, dynamic> cardPaymentFormresult = await openCardForm();
-        // if (cardPaymentFormresult["validData"] = true) {
-        //   cformCVV = cardPaymentFormresult["cformCVV"].toString();
-        //   cformNameOnTheCard =
-        //       cardPaymentFormresult["cformNameOnTheCard"].toString();
-        //   cformCardNumber = cardPaymentFormresult["cformCardNumber"].toString();
-        //   cformExpMonth = cardPaymentFormresult["cformExpMonth"].toString();
-        //   cformExpYear = cardPaymentFormresult["cformExpYear"].toString();
-        // }
-        expandPreferredMethod=true;
-        onProceed();
-        
-      } else {
-  
-        http.Request req = http.Request(
-            "GET",
-            Uri.parse(BaseUrl().apiUrl +
-                ApiUtil.INIT_PAYMENT_TECHPROCESS +
-                querParamString));
-        return HttpManager(http.Client())
-            .sendRequest(req)
-            .then((http.Response res) {
-          Map<String, dynamic> response = json.decode(res.body);        
-          if (res.statusCode >= 200 && res.statusCode <= 299) {
-            _openTechProcessNative({
-              "name": AppConfig.of(context).appName,
-              "email": payload["email"],
-              "phone": payload["phone"],
-              "amount": payload["depositAmount"].toString(),
-              "orderId": response["action"]["value"],
-              "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-                  ? payload["paymentType"].toLowerCase()
-                  : "card",
-              "userId": paymentModeDetails["userId"].toString(),
-              "date": formattedDate,
-              "extra_public_key": "1234-6666-6789-56",
-              "tp_nameOnTheCard": cformNameOnTheCard,
-              "tp_expireYear": cformExpYear,
-              "tp_expireMonth": cformExpMonth,
-              "tp_cvv": cformCVV,
-              "tp_cardNumber": cformCardNumber,
-              "tp_instrumentToken": "",
-              "cardDataCapturingRequired": true
-            });
-          } else {
-            ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-          }
-        }).whenComplete(() {
-          showLoader(false);
-        });
-      }
+
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": payload["depositAmount"].toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            "userId": paymentModeDetails["userId"].toString(),
+            "date": formattedDate,
+            "extra_public_key": "1234-6666-6789-56",
+            "tp_nameOnTheCard": cformNameOnTheCard,
+            "tp_expireYear": cformExpYear,
+            "tp_expireMonth": cformExpMonth,
+            "tp_cvv": cformCVV,
+            "tp_cardNumber": cformCardNumber,
+            "tp_instrumentToken": "",
+            "cardDataCapturingRequired": false
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
     } else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",

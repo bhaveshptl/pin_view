@@ -68,7 +68,7 @@ class RouteLauncher {
         FantasyPageRoute(
           pageBuilder: (context) => AddCash(
             depositData: depositData,
-            promoCode:promoCode,
+            promoCode: promoCode,
             prefilledAmount: prefilledAmount,
           ),
         ),
@@ -422,11 +422,12 @@ class RouteLauncher {
     }
   }
 
-  launchStaticPage(String name,BuildContext context,{Function onComplete}) async {
+  launchStaticPage(String name, BuildContext context,
+      {Function onComplete}) async {
     String url = "";
     String title = "";
     bool isIos = false;
-     if (onComplete != null) {
+    if (onComplete != null) {
       onComplete();
     }
     if (Platform.isIOS) {
@@ -476,7 +477,31 @@ class RouteLauncher {
     );
   }
 
-
+  launchCustomeStaticPage(
+      String pageTitle, String pageLocation, BuildContext context,
+      {Function onComplete}) async {
+    String url = pageLocation;
+    String title = pageTitle;
+    bool isIos = false;
+    if (onComplete != null) {
+      onComplete();
+    }
+    if (Platform.isIOS) {
+      isIos = true;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => WebviewScaffold(
+          url: isIos ? Uri.encodeFull(url) : url,
+          appBar: AppBar(
+            title: Text(
+              title.toUpperCase(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   getEarnCashData(GlobalKey<ScaffoldState> scaffoldKey) async {
     http.Request req = http.Request(

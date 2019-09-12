@@ -31,6 +31,7 @@ class VerificationState extends State<Verification> {
   String mobile;
   File _panImage;
   File _addressImage;
+  File _addressBackCopyImage;
   bool _bIsOTPSent = false;
   bool _bDisableOTP = false;
   bool _bIsMailSent = false;
@@ -42,7 +43,7 @@ class VerificationState extends State<Verification> {
   bool _bIsMobileVerified = false;
   String _mobileVerificationError;
   bool _bShowImageUploadError = false;
-
+  int allowdDocSizeInMB = 10;
   String _docName;
   String _verificationStatus;
   String _panVerificationStatus;
@@ -61,6 +62,7 @@ class VerificationState extends State<Verification> {
     super.initState();
     _getVerificationStatus();
     _setAddressList();
+    setAllowedDocSizeInMB();
   }
 
   _setAddressList() async {
@@ -143,6 +145,27 @@ class VerificationState extends State<Verification> {
     });
   }
 
+  setAllowedDocSizeInMB() {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_ALLOWED_DOC_SIZE_IN_MB,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> response = json.decode(res.body);
+        allowdDocSizeInMB = response["allowedDocSizeInMB"];
+        print("allowdDocSizeInMB>>>>>>>>");
+        print(allowdDocSizeInMB);
+      }
+    }).whenComplete(() {
+      ActionUtil().showLoader(scaffoldKey.currentContext, false);
+    });
+  }
+
   _setDocVerificationStatus() {
     String kycStatus = _panVerificationStatus;
     String addressStatus = _addressVerificationStatus;
@@ -155,7 +178,7 @@ class VerificationState extends State<Verification> {
       } else if (kycStatus == "UNDER_REVIEW" ||
           addressStatus == "UNDER_REVIEW") {
         _verificationStatus = "UNDER_REVIEW";
-      } else if (kycStatus == "DOC_SUBMITTED" ||
+      } else if (kycStatus == "DOC_SUBMITTED" &&
           addressStatus == "DOC_SUBMITTED") {
         _verificationStatus = "DOC_SUBMITTED";
       } else {
@@ -321,88 +344,134 @@ class VerificationState extends State<Verification> {
     });
   }
 
-  _onUploadDocuments() async {
-    print("############INto the up-load dicuments###########");
+  Future getAddressBackCopyImage() async {
+    getImage((File image) {
+      setState(() {
+        _addressBackCopyImage = image;
+        _bShowImageUploadError = false;
+      });
+    });
+  }
 
+
+
+  _onUploadDocuments() async {
     if (_panImage == null || _addressImage == null) {
+      
       setState(() {
         _bShowImageUploadError = true;
       });
     } else {
-      print("Inside cokkie");
       if (cookie == null) {
         Future<dynamic> futureCookie = SharedPrefHelper.internal().getCookie();
         await futureCookie.then((value) {
           cookie = value;
-          print("cokkie#########");
-          print(cookie);
         });
       }
+      /*string to uri */
+      var uriPANUpload = Uri.parse(BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC_PAN);
+      var uriAddressUpload = Uri.parse(BaseUrl().apiUrl +
+          ApiUtil.UPLOAD_DOC_ADDRESS +
+          _selectedAddressDocType);
 
-      // string to uri
-      var uri = Uri.parse(
-          BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
-
-      print("uri");
-      print(uri);
-      // get length for http post
       var panLength = await _panImage.length();
-      print("panLength");
-      print(panLength);
-      // to byte stream
-
       var panStream =
           http.ByteStream(DelegatingStream.typed(_panImage.openRead()));
-      print("panStream");
-      print(panStream);
-      // get length for http post
       var addressLength = await _addressImage.length();
-      print("addressLength");
-      print(addressLength);
-      // to byte stream
       var addressStream =
           http.ByteStream(DelegatingStream.typed(_addressImage.openRead()));
-      print("addressStream");
-      print(addressStream);
-      // new multipart request
-      var request = http.MultipartRequest("POST", uri);
-      print("request");
-      print(request);
 
-      // add multipart form to request
-      request.files.add(http.MultipartFile('pan', panStream, panLength,
+      var addressBackCopyLength;
+      var addressBackCopyStream;
+
+      var httpRequestForPAN = http.MultipartRequest("POST", uriPANUpload);
+      var httpRequestForAddress =
+          http.MultipartRequest("POST", uriAddressUpload);
+
+      /*add multipart form to request*/
+      httpRequestForPAN.files.add(http.MultipartFile(
+          'pan', panStream, panLength,
           filename: basename(_panImage.path),
           contentType: MediaType('image', 'jpg')));
 
-      request.files.add(http.MultipartFile('kyc', addressStream, addressLength,
+      httpRequestForAddress.files.add(http.MultipartFile(
+          'kyc', addressStream, addressLength,
           filename: basename(_addressImage.path),
           contentType: MediaType('image', 'jpg')));
 
-      request.headers["cookie"] = cookie;
-      http.StreamedResponse response = await request.send().then((onValue) {
+      if (_addressBackCopyImage != null) {
+        /* Address back images is optional.So it may be null*/
+        addressBackCopyLength = await _addressBackCopyImage.length();
+        addressBackCopyStream = http.ByteStream(
+            DelegatingStream.typed(_addressBackCopyImage.openRead()));
+        httpRequestForAddress.files.add(http.MultipartFile(
+            'kyc_back_copy', addressBackCopyStream, addressBackCopyLength,
+            filename: basename(_addressBackCopyImage.path),
+            contentType: MediaType('image', 'jpg')));
+      }
+
+      httpRequestForAddress.headers["cookie"] = cookie;
+      httpRequestForPAN.headers["cookie"] = cookie;
+
+      Map<String, dynamic> panResponseBody;
+     
+      http.StreamedResponse panResponse =
+          await httpRequestForPAN.send().then((onValue) {
         return http.Response.fromStream(onValue);
       }).then(
         (http.Response res) {
+          print("PAN response");
           print(res.statusCode);
           if (res.statusCode >= 200 && res.statusCode <= 299) {
-            Map<String, dynamic> response = json.decode(res.body);
-            if (response["err"] != null && response["err"]) {
-              // scaffoldKey.currentState.showSnackBar(
-              //   SnackBar(
-              //     content: Text(response["msg"]),
-              //   ),
-              // );
-              ActionUtil()
-                  .showMsgOnTop(response["msg"], scaffoldKey.currentContext);
+            panResponseBody = json.decode(res.body);
+            if (panResponseBody["err"] != null && panResponseBody["err"]) {
+              ActionUtil().showMsgOnTop(
+                  panResponseBody["msg"], scaffoldKey.currentContext);
             }
             setState(() {
-              _panVerificationStatus = response["pan_verification"];
-              _addressVerificationStatus = response["address_verification"];
+              _panVerificationStatus = panResponseBody["pan_verification"];
+              _addressVerificationStatus =
+                  panResponseBody["address_verification"];
+            });
+            /* After PAN upload success upload the address docs */
+          } else if (res.statusCode == 413) {
+            
+            ActionUtil().showMsgOnTop(
+                "File is too large! Upload file with less than" +
+                    allowdDocSizeInMB.toString() +
+                    "MB",
+                scaffoldKey.currentContext);
+          }
+        },
+      );
+       
+
+      http.StreamedResponse addressResponse =
+          await httpRequestForAddress.send().then((onValue) {
+        return http.Response.fromStream(onValue);
+      }).then(
+        (http.Response res) {
+          print("Address response ");
+          print(res.statusCode);
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            panResponseBody = json.decode(res.body);
+            if (panResponseBody["err"] != null && panResponseBody["err"]) {
+              ActionUtil().showMsgOnTop(
+                  panResponseBody["msg"], scaffoldKey.currentContext);
+            }
+            setState(() {
+              _panVerificationStatus = panResponseBody["pan_verification"];
+              _addressVerificationStatus =
+                  panResponseBody["address_verification"];
               _setDocVerificationStatus();
             });
+            /* After PAN upload success upload the address docs */
+            
           } else if (res.statusCode == 413) {
             ActionUtil().showMsgOnTop(
-                "File is too large! Upload file with less than 10MB",
+                "File is too large! Upload file with less than" +
+                    allowdDocSizeInMB.toString() +
+                    "MB",
                 scaffoldKey.currentContext);
           }
         },
@@ -851,48 +920,140 @@ class VerificationState extends State<Verification> {
                                                   ),
                                                 ],
                                               ),
-                                              Row(
-                                                children: <Widget>[
-                                                  OutlineButton(
-                                                    borderSide: BorderSide(
-                                                        color: Theme.of(context)
-                                                            .primaryColorDark),
-                                                    onPressed: () {
-                                                      getAddressImage();
-                                                    },
-                                                    child: Row(
-                                                      children: <Widget>[
-                                                        Icon(Icons.add),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  left: 8.0),
-                                                          child: Text(
-                                                              _getDocValueFromName(
-                                                                      _selectedAddressDocType)
-                                                                  .toUpperCase()),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  _addressImage == null
-                                                      ? Container()
-                                                      : Expanded(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    left: 16.0),
-                                                            child: Text(
-                                                              basename(
-                                                                  _addressImage
-                                                                      .path),
-                                                              maxLines: 3,
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 4.0, bottom: 4.0),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      flex: 6,
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          OutlineButton(
+                                                            borderSide: BorderSide(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColorDark),
+                                                            onPressed: () {
+                                                              getAddressImage();
+                                                            },
+                                                            child: Row(
+                                                              children: <
+                                                                  Widget>[
+                                                                Icon(Icons.add),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left:
+                                                                          3.0),
+                                                                  child: Text(
+                                                                      "FRONT COPY"),
+                                                                )
+                                                              ],
                                                             ),
                                                           ),
-                                                        )
-                                                ],
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Container(),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 6,
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          OutlineButton(
+                                                            borderSide: BorderSide(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColorDark),
+                                                            onPressed: () {
+                                                              getAddressBackCopyImage();
+                                                            },
+                                                            child: Row(
+                                                              children: <
+                                                                  Widget>[
+                                                                Icon(Icons.add),
+                                                                Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left:
+                                                                          6.0),
+                                                                  child: Text(
+                                                                      "BACK COPY"),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 4.0, bottom: 4.0),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      flex: 6,
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          _addressImage == null
+                                                              ? Container()
+                                                              : Expanded(
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .only(
+                                                                        left:
+                                                                            16.0),
+                                                                    child: Text(
+                                                                      basename(
+                                                                          _addressImage
+                                                                              .path),
+                                                                      maxLines:
+                                                                          2,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 1,
+                                                      child: Container(),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 6,
+                                                      child: Row(
+                                                        children: <Widget>[
+                                                          _addressBackCopyImage ==
+                                                                  null
+                                                              ? Container()
+                                                              : Expanded(
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .only(
+                                                                        left:
+                                                                            16.0),
+                                                                    child: Text(
+                                                                      basename(
+                                                                          _addressBackCopyImage
+                                                                              .path),
+                                                                      maxLines:
+                                                                          3,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                        ],
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                               _bShowImageUploadError
                                                   ? Padding(

@@ -24,6 +24,7 @@ import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/maskedTextController.dart';
+import 'package:playfantasy/utils/MaskedTextInputFormatter.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
@@ -33,14 +34,13 @@ class ChoosePaymentMode extends StatefulWidget {
   final bool expandPreferredMethod;
   final Map<String, dynamic> paymentMode;
 
-  ChoosePaymentMode({
-    this.amount,
-    this.bonusAmount,
-    this.promoCode,
-    this.url,
-    this.paymentMode,
-    this.expandPreferredMethod
-  });
+  ChoosePaymentMode(
+      {this.amount,
+      this.bonusAmount,
+      this.promoCode,
+      this.url,
+      this.paymentMode,
+      this.expandPreferredMethod});
 
   @override
   ChoosePaymentModeState createState() => ChoosePaymentModeState();
@@ -75,10 +75,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   final _formKey = new GlobalKey<FormState>();
   TextEditingController cformNameOnCardController = TextEditingController();
   TextEditingController cformCVVController = TextEditingController();
-  TextEditingController cformCardNumberController =
-      MaskedTextController(mask: '0000 0000 0000 0000 0000 0000');
-  TextEditingController cformExpDateController =
-      MaskedTextController(mask: '00/00');
+  TextEditingController cformCardNumberController = TextEditingController();
+  TextEditingController cformExpDateController = TextEditingController();
   String cformNameOnTheCard = "";
   String cformCVV = "";
   String cformCardNumber = "";
@@ -97,7 +95,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   void initState() {
     super.initState();
     setPaymentModeList();
-    lastPaymentExpanded=widget.expandPreferredMethod;
+    lastPaymentExpanded = widget.expandPreferredMethod;
     cformControllerListener();
     try {
       flutterWebviewPlugin.launch(
@@ -231,7 +229,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         if (failedDataInfo["errorMessage"] != null) {
           if (failedDataInfo["errorMessage"].length > 2) {
             ActionUtil().showMsgOnTop(
-                failedDataInfo["errorMessage"].toString(), context);
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact support team!", context);
           } else {
             ActionUtil().showMsgOnTop(
                 "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
@@ -430,9 +428,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "12"
     ];
     if (value.isEmpty) {
-      return "Please enter Exp Month";
+      return "Enter a valid date";
     } else if (!mnthlst.contains(cformExpMonth)) {
-      return "Please enter valid month";
+      return "Enter  a valid month";
     } else {
       return null;
     }
@@ -440,13 +438,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
   cformControllerListener() {
     cformExpDateController.addListener(() {
-      print(cformExpDateController.text);
       setState(() {
         cformExpDate = cformExpDateController.text;
         cformExpMonth = cformExpDate.split("/")[0];
         cformExpYear = cformExpDate.split("/")[1];
         cformExpYear = "20" + cformExpYear;
-      });
+      }); 
     });
     cformNameOnCardController.addListener(() {
       setState(() {
@@ -516,9 +513,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
   }
 
-  void _toggleCVVVisibility() {
-    
-  }
+  void _toggleCVVVisibility() {}
 
   Form getCardPaymentFormWidget(String paymentType) {
     return Form(
@@ -526,7 +521,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 2.0,bottom: 2.0),
+              padding: EdgeInsets.only(top: 2.0, bottom: 3.0),
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -535,6 +530,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         child: TextFormField(
                             controller: cformCardNumberController,
                             focusNode: cformCardNumberFocusnode,
+                            inputFormatters: [
+                              MaskedTextInputFormatter(
+                                mask: 'xxxx xxxx xxxx xxxx xxxx',
+                                separator: ' ',
+                              ),
+                            ],
                             onFieldSubmitted: (value) {
                               cformCardNumberFocusnode.unfocus();
                               FocusScope.of(context)
@@ -547,7 +548,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                 padding:
                                     const EdgeInsetsDirectional.only(end: 8.0),
                                 child: Image.asset(cformCardImagePath,
-                                    height: 2, width: 1),
+                                    height: 1, width: 1),
                               ),
                               contentPadding: EdgeInsets.all(12.0),
                               border: OutlineInputBorder(
@@ -558,7 +559,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             ),
                             validator: (String value) {
                               if (value.isEmpty) {
-                                return "Please enter the card number";
+                                return "Enter the card number";
                               }
                             },
                             keyboardType: TextInputType.number,
@@ -568,7 +569,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               ),
             ),
             Padding(
-                padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
+                padding: EdgeInsets.only(top: 6.0, bottom: 4.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(
@@ -576,6 +577,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         child: TextFormField(
                           controller: cformExpDateController,
                           focusNode: cformExpDateFocusnode,
+                          inputFormatters: [
+                            MaskedTextInputFormatter(
+                              mask: 'xx/xx',
+                              separator: '/',
+                            ),
+                          ],
                           onFieldSubmitted: (value) {
                             cformExpDateFocusnode.unfocus();
                             FocusScope.of(context)
@@ -583,7 +590,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                           },
                           decoration: const InputDecoration(
                             labelText: 'Expiry Date',
-                             hintText:"MM/YY",
+                            hintText: "MM/YY",
                             counterText: "",
                             contentPadding: EdgeInsets.all(12.0),
                             border: OutlineInputBorder(
@@ -607,6 +614,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                       child: TextFormField(
                           controller: cformCVVController,
                           focusNode: cformCVVFocusnode,
+                          inputFormatters: <TextInputFormatter>[
+                            WhitelistingTextInputFormatter.digitsOnly
+                          ],
                           onFieldSubmitted: (value) {
                             cformCVVFocusnode.unfocus();
                             FocusScope.of(context)
@@ -617,7 +627,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             counterText: "",
                             contentPadding: EdgeInsets.all(12.0),
                             fillColor: Colors.blue,
-                            
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Colors.black38,
@@ -626,7 +635,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                           ),
                           validator: (String value) {
                             if (value.isEmpty) {
-                              return "Please enter a valid CVV";
+                              return "Enter a valid CVV";
                             }
                           },
                           maxLength: 4,
@@ -645,11 +654,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         child: TextFormField(
                           controller: cformNameOnCardController,
                           focusNode: cformNameFocusnode,
+                          maxLength: 32,
                           onFieldSubmitted: (value) {
                             cformCVVFocusnode.unfocus();
                           },
                           decoration: const InputDecoration(
                             labelText: "Card Holder's Name",
+                            counterText: "",
                             contentPadding: EdgeInsets.all(12.0),
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
@@ -659,7 +670,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                           ),
                           validator: (String value) {
                             if (value.isEmpty) {
-                              return "Please enter name on the Card";
+                              return "Enter the  name on the card";
                             } else {
                               return null;
                             }
@@ -726,11 +737,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
-      String cFormPaymentType = type["type"];
-      int cFormPaymentBankIndex = 0;
-      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
-              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
-          ["detailRequired"];
+      /* Check for detailRequired is true any one of bank */
+      bool showCardDetailsUI = false;
+      (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
+          .forEach((bankType) {
+        if (bankType["info"]["detailRequired"]) {
+          showCardDetailsUI = true;
+        }
+      });
 
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
@@ -806,11 +820,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
     widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"]
         .forEach((type) {
-      String cFormPaymentType = type["type"];
-      int cFormPaymentBankIndex = 0;
-      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
-              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
-          ["detailRequired"];
+      /* Check for detailRequired is true any one of bank */
+      bool showCardDetailsUI = false;
+      (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
+          .forEach((bankType) {
+        if (bankType["info"]["detailRequired"]) {
+          showCardDetailsUI = true;
+        }
+      });
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length ==
               1 &&
@@ -889,6 +906,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
               setState(() {
                 lastPaymentExpanded = !lastPaymentExpanded;
+                _selectedItemIndex = -1;
               });
             },
             children: [
@@ -1010,6 +1028,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
               setState(() {
                 lastPaymentExpanded = !lastPaymentExpanded;
+                _selectedItemIndex = -1;
               });
             },
             children: [
@@ -1061,16 +1080,20 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
-      String cFormPaymentType = type["type"];
-      int cFormPaymentBankIndex = 0;
-      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
-              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
-          ["detailRequired"];
+      /* Check for detailRequired is true any one of bank */
+      bool showCardDetailsUI = false;
+      (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
+          .forEach((bankType) {
+        if (bankType["info"]["detailRequired"]) {
+          showCardDetailsUI = true;
+        }
+      });
 
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
                   .length >
               1 &&
-          lastPaymentArray["paymentType"] != type["type"] && !showCardDetailsUI) {
+          lastPaymentArray["paymentType"] != type["type"] &&
+          !showCardDetailsUI) {
         items.add(
           ExpansionPanel(
             isExpanded: _selectedItemIndex == i,
@@ -1174,11 +1197,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
-      String cFormPaymentType = type["type"];
-      int cFormPaymentBankIndex = 0;
-      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
-              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
-          ["detailRequired"];
+      /* Check for detailRequired is true any one of bank */
+      bool showCardDetailsUI = false;
+      (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
+          .forEach((bankType) {
+        if (bankType["info"]["detailRequired"]) {
+          showCardDetailsUI = true;
+        }
+      });
       if (showCardDetailsUI &&
           lastPaymentArray["paymentType"] != type["type"]) {
         items.add(
@@ -1684,19 +1710,22 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 ["userInfo"]["lastPaymentArray"] !=
             null
         ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
-        : {};      
+        : {};
     (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
         .forEach((type) {
-
-       String cFormPaymentType = type["type"];
-      int cFormPaymentBankIndex = 0;
-      bool showCardDetailsUI = widget.paymentMode["choosePayment"]
-              ["paymentInfo"][cFormPaymentType][cFormPaymentBankIndex]["info"]
-          ["detailRequired"];    
+      /* Check for detailRequired is true any one of bank */
+      bool showCardDetailsUI = false;
+      (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
+          .forEach((bankType) {
+        if (bankType["info"]["detailRequired"]) {
+          showCardDetailsUI = true;
+        }
+      });
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
-                  .length >
-              1 &&
-          lastPaymentArray["paymentType"] != type["type"]   || showCardDetailsUI) {
+                      .length >
+                  1 &&
+              lastPaymentArray["paymentType"] != type["type"] ||
+          showCardDetailsUI) {
         paymentModes.add(type);
       }
     });
@@ -2109,6 +2138,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                 : ExpansionPanelList(
                                     expansionCallback:
                                         (int index, bool isExpanded) {
+                                      lastPaymentExpanded = false;
                                       var payModes =
                                           getExpandablePaymentModes();
 

@@ -233,6 +233,16 @@ class LobbyState extends State<Lobby>
               showLoader(false);
             });
             break;
+          case "staticpage":
+            deactivateDeepLinkingNavigation = true;
+            String pageTitle =
+                widget.deepLinkingNavigationData["dl_sp_pageTitle"].toString();
+            String pageLocation =
+                widget.deepLinkingNavigationData["dl_sp_pageLocation"].toString();
+            routeLauncher.launchCustomeStaticPage(pageTitle,pageLocation, context, onComplete: () {
+              showLoader(false);
+            });
+            break;
         }
       }
     }
@@ -565,7 +575,7 @@ class LobbyState extends State<Lobby>
                                         showLoader(true);
                                       }
                                       if (banner["CTA"] == "LOBBY1") {
-                                        showLoader(false); 
+                                        showLoader(false);
                                         if (banner["leagueId"] != null) {
                                           int dl_leagueId = 0;
                                           try {
@@ -574,10 +584,9 @@ class LobbyState extends State<Lobby>
                                             dl_leagueId =
                                                 int.parse(leagueString);
                                           } catch (e) {}
-                                         
+
                                           launchL1ByDeepLinking(
                                               context, _leagues, dl_leagueId);
-                                              
                                         }
                                       } else {
                                         routeLauncher.launchBannerRoute(
