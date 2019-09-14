@@ -186,7 +186,7 @@ class VerificationState extends State<Verification> {
       }
     }
 
-    if (kycStatus == "DOC_SUBMITTED" || addressStatus == "DOC_SUBMITTED") {
+    if (kycStatus == "DOC_SUBMITTED" && addressStatus == "DOC_SUBMITTED") {
       _messageList
           .add(_getMessageWidget(DocVerificationMessages.DOC_SUBMITTED));
     }
@@ -320,9 +320,21 @@ class VerificationState extends State<Verification> {
   Future getImage(Function callback) async {
     var image = await ImagePicker.pickImage(
         source: ImageSource.gallery, maxWidth: 1200);
-
+    bool isDocsValidSize = true;
+    var docLength = await image.length();
+    if ((docLength * 8) >= (allowdDocSizeInMB * 1024 * 1024)) {
+      isDocsValidSize = false;
+    }
     if (image != null) {
-      callback(image);
+      if (isDocsValidSize) {
+        callback(image);
+      } else {
+        ActionUtil().showMsgOnTop(
+            "Doc size should be less than are equal to  " +
+                allowdDocSizeInMB.toString() +
+                "MB",
+            scaffoldKey.currentContext);
+      }
     }
   }
 
@@ -353,11 +365,8 @@ class VerificationState extends State<Verification> {
     });
   }
 
-
-
   _onUploadDocuments() async {
     if (_panImage == null || _addressImage == null) {
-      
       setState(() {
         _bShowImageUploadError = true;
       });
@@ -408,74 +417,69 @@ class VerificationState extends State<Verification> {
             'kyc_back_copy', addressBackCopyStream, addressBackCopyLength,
             filename: basename(_addressBackCopyImage.path),
             contentType: MediaType('image', 'jpg')));
-      }
+      } 
 
       httpRequestForAddress.headers["cookie"] = cookie;
       httpRequestForPAN.headers["cookie"] = cookie;
 
       Map<String, dynamic> panResponseBody;
-     
-      http.StreamedResponse panResponse =
-          await httpRequestForPAN.send().then((onValue) {
-        return http.Response.fromStream(onValue);
-      }).then(
-        (http.Response res) {
-          print("PAN response");
-          print(res.statusCode);
-          if (res.statusCode >= 200 && res.statusCode <= 299) {
-            panResponseBody = json.decode(res.body);
-            if (panResponseBody["err"] != null && panResponseBody["err"]) {
-              ActionUtil().showMsgOnTop(
-                  panResponseBody["msg"], scaffoldKey.currentContext);
-            }
-            setState(() {
-              _panVerificationStatus = panResponseBody["pan_verification"];
-              _addressVerificationStatus =
-                  panResponseBody["address_verification"];
-            });
-            /* After PAN upload success upload the address docs */
-          } else if (res.statusCode == 413) {
-            
-            ActionUtil().showMsgOnTop(
-                "File is too large! Upload file with less than" +
-                    allowdDocSizeInMB.toString() +
-                    "MB",
-                scaffoldKey.currentContext);
-          }
-        },
-      );
-       
 
-      http.StreamedResponse addressResponse =
-          await httpRequestForAddress.send().then((onValue) {
-        return http.Response.fromStream(onValue);
-      }).then(
-        (http.Response res) {
-          print("Address response ");
-          print(res.statusCode);
-          if (res.statusCode >= 200 && res.statusCode <= 299) {
-            panResponseBody = json.decode(res.body);
-            if (panResponseBody["err"] != null && panResponseBody["err"]) {
-              ActionUtil().showMsgOnTop(
-                  panResponseBody["msg"], scaffoldKey.currentContext);
-            }
-            setState(() {
-              _panVerificationStatus = panResponseBody["pan_verification"];
-              _addressVerificationStatus =
-                  panResponseBody["address_verification"];
+      if (_panVerificationStatus != "DOC_SUBMITTED") {
+        http.StreamedResponse panResponse =
+            await httpRequestForPAN.send().then((onValue) {
+          return http.Response.fromStream(onValue);
+        }).then(
+          (http.Response res) {
+            print("PAN response");
+            print(res.statusCode);
+            if (res.statusCode >= 200 && res.statusCode <= 299) {
+              panResponseBody = json.decode(res.body);
+              if (panResponseBody["err"] != null && panResponseBody["err"]) {
+                ActionUtil().showMsgOnTop(
+                    panResponseBody["msg"], scaffoldKey.currentContext);
+              }
+              setState(() {
+                _panVerificationStatus = panResponseBody["pan_verification"];
+                _addressVerificationStatus =
+                    panResponseBody["address_verification"];
+              });
               _setDocVerificationStatus();
-            });
-            /* After PAN upload success upload the address docs */
-            
-          } else if (res.statusCode == 413) {
-            ActionUtil().showMsgOnTop(
-                "File is too large! Upload file with less than" +
-                    allowdDocSizeInMB.toString() +
-                    "MB",
-                scaffoldKey.currentContext);
-          }
-        },
-      );
+              /* After PAN upload success upload the address docs */
+            } else if (res.statusCode == 413) {
+              _setDocVerificationStatus();
+            }
+          },
+        );
+      }
+
+      if (_addressVerificationStatus != "DOC_SUBMITTED") {
+        http.StreamedResponse addressResponse =
+            await httpRequestForAddress.send().then((onValue) {
+          return http.Response.fromStream(onValue);
+        }).then(
+          (http.Response res) {
+            print("Address response ");
+            print(res.statusCode);
+            if (res.statusCode >= 200 && res.statusCode <= 299) {
+              panResponseBody = json.decode(res.body);
+              if (panResponseBody["err"] != null && panResponseBody["err"]) {
+                ActionUtil().showMsgOnTop(
+                    panResponseBody["msg"], scaffoldKey.currentContext);
+              }
+              setState(() {
+                _panVerificationStatus = panResponseBody["pan_verification"];
+                _addressVerificationStatus =
+                    panResponseBody["address_verification"];
+              });
+              _setDocVerificationStatus();
+              /* After PAN upload success upload the address docs */
+
+            } else if (res.statusCode == 413) {
+              _setDocVerificationStatus();
+            }
+          },
+        );
+      }
     }
   }
 

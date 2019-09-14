@@ -83,6 +83,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   String cformExpMonth = "";
   String cformExpYear = "";
   String cformExpDate = "";
+  bool cFormIsValidDateEntered=false;
   String cformCardImagePath = " ";
   bool cformSaveCardDetails = false;
   bool cformObscureCVV = true;
@@ -411,7 +412,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   /** Card Payment UI*/
-  String validateTheExpireDate(String date) {
+  validateTheExpireDate(String date) {
     String value = date.toString();
     var mnthlst = new List(12);
     mnthlst = [
@@ -444,6 +445,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           String patttern = r'[0-9]*$';
           RegExp regExp = new RegExp(patttern);
           if (regExp.hasMatch(userEnteredYear)) {
+            cFormIsValidDateEntered=true;
             return null;
           } else {
             return "Enter a valid year";
@@ -519,7 +521,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       });
       if (cformCardNumber.length > 0) {
         setState(() {
-          cformCardImagePath = "images/bank_card.png";
+          cformCardImagePath =
+              "https://d2cbroser6kssl.cloudfront.net/images/howzat/imgs/othercards.png";
         });
       }
       if (cformCardNumber.length < 1) {
@@ -531,19 +534,22 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       if (cformCardNumber.startsWith("4")) {
         /*Visa Card*/
         setState(() {
-          cformCardImagePath = "images/bank_visa.png";
+          cformCardImagePath =
+              "https://d2cbroser6kssl.cloudfront.net/images/howzat/imgs/visa.png";
         });
       }
       if (cformCardNumber.startsWith("34") ||
           cformCardNumber.startsWith("37")) {
         setState(() {
-          cformCardImagePath = "images/amex.png";
+          cformCardImagePath =
+              "https://d2cbroser6kssl.cloudfront.net/images/howzat/imgs/amex.png";
         });
       }
       for (var c in mastercard) {
         if (cformCardNumber.startsWith(c)) {
           setState(() {
-            cformCardImagePath = "images/bank_mastercad.png";
+            cformCardImagePath =
+                "https://d2cbroser6kssl.cloudfront.net/images/howzat/imgs/mastercad.png";
           });
         }
       }
@@ -551,14 +557,59 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       for (var c in discover) {
         if (cformCardNumber.startsWith(c)) {
           setState(() {
-            cformCardImagePath = "images/bank_discover.png";
+            cformCardImagePath =
+                "https://d2cbroser6kssl.cloudfront.net/images/howzat/imgs/discovery.png";
           });
         }
       }
     });
   }
 
-  void _toggleCVVVisibility() {}
+  
+
+  getCardFormErrorMessages(String value, String fieldType) {
+    bool isValidDateEntered=false;
+    switch (fieldType) {
+      case "card":
+        if (value.isEmpty) {
+          return "Enter a valid card number";
+        } else {
+          return null;
+        }
+        break;
+      case "date":
+        if (cformCardNumber.isEmpty) {
+          return null;
+        } else {
+          return validateTheExpireDate(value);
+        }
+        break;
+      case "cvv":
+        if (cformCardNumber.isEmpty || cformExpDate.isEmpty || !cFormIsValidDateEntered) {
+          return null;
+        } else {
+          if (cformCVV.isEmpty) {
+            return "Enter a valid CVV";
+          } else {
+            return null;
+          }
+        }
+        break;
+      case "name":
+        if (cformCardNumber.isEmpty ||
+            cformExpDate.isEmpty ||
+            cformCVV.isEmpty) {
+          return null;
+        } else {
+          if (cformNameOnTheCard.isEmpty) {
+            return "Enter the  name on the card";
+          } else {
+            return null;
+          }
+        }
+        break;
+    }
+  }
 
   Form getCardPaymentFormWidget(String paymentType) {
     return Form(
@@ -592,7 +643,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                               suffixIcon: Padding(
                                 padding:
                                     const EdgeInsetsDirectional.only(end: 8.0),
-                                child: Image.asset(cformCardImagePath,
+                                child: Image.network(cformCardImagePath,
                                     height: 1, width: 1),
                               ),
                               contentPadding: EdgeInsets.all(12.0),
@@ -603,9 +654,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                               ),
                             ),
                             validator: (String value) {
-                              if (value.isEmpty) {
-                                return "Enter the card number";
-                              }
+                              return getCardFormErrorMessages(value, "card");
                             },
                             keyboardType: TextInputType.number,
                             maxLength: 23)),
@@ -645,7 +694,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             ),
                           ),
                           validator: (String value) {
-                            return validateTheExpireDate(value);
+                            return getCardFormErrorMessages(value, "date");
                           },
                           keyboardType: TextInputType.number,
                           maxLength: 6,
@@ -679,9 +728,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             ),
                           ),
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return "Enter a valid CVV";
-                            }
+                            return getCardFormErrorMessages(value, "cvv");
                           },
                           maxLength: 4,
                           obscureText: cformObscureCVV,
@@ -714,11 +761,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             ),
                           ),
                           validator: (String value) {
-                            if (value.isEmpty) {
-                              return "Enter the  name on the card";
-                            } else {
-                              return null;
-                            }
+                            return getCardFormErrorMessages(value, "name");
                           },
                         )),
                   )
