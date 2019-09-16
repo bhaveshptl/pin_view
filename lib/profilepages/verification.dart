@@ -322,7 +322,7 @@ class VerificationState extends State<Verification> {
         source: ImageSource.gallery, maxWidth: 1200);
     bool isDocsValidSize = true;
     var docLength = await image.length();
-    if ((docLength * 8) >= (allowdDocSizeInMB * 1024 * 1024)) {
+    if ((docLength) >= (allowdDocSizeInMB * 1024 * 1024)) {
       isDocsValidSize = false;
     }
     if (image != null) {
@@ -330,7 +330,7 @@ class VerificationState extends State<Verification> {
         callback(image);
       } else {
         ActionUtil().showMsgOnTop(
-            "Doc size should be less than are equal to  " +
+            "Doc size should be less than " +
                 allowdDocSizeInMB.toString() +
                 "MB",
             scaffoldKey.currentContext);
@@ -430,8 +430,6 @@ class VerificationState extends State<Verification> {
           return http.Response.fromStream(onValue);
         }).then(
           (http.Response res) {
-            print("PAN response");
-            print(res.statusCode);
             if (res.statusCode >= 200 && res.statusCode <= 299) {
               panResponseBody = json.decode(res.body);
               if (panResponseBody["err"] != null && panResponseBody["err"]) {

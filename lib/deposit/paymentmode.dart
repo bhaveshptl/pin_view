@@ -83,7 +83,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   String cformExpMonth = "";
   String cformExpYear = "";
   String cformExpDate = "";
-  bool cFormIsValidDateEntered=false;
+  bool cFormIsValidDateEntered = false;
   String cformCardImagePath = " ";
   bool cformSaveCardDetails = false;
   bool cformObscureCVV = true;
@@ -445,7 +445,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           String patttern = r'[0-9]*$';
           RegExp regExp = new RegExp(patttern);
           if (regExp.hasMatch(userEnteredYear)) {
-            cFormIsValidDateEntered=true;
+            cFormIsValidDateEntered = true;
             return null;
           } else {
             return "Enter a valid year";
@@ -565,10 +565,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
   }
 
-  
-
   getCardFormErrorMessages(String value, String fieldType) {
-    bool isValidDateEntered=false;
+    bool isValidDateEntered = false;
     switch (fieldType) {
       case "card":
         if (value.isEmpty) {
@@ -585,7 +583,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         }
         break;
       case "cvv":
-        if (cformCardNumber.isEmpty || cformExpDate.isEmpty || !cFormIsValidDateEntered) {
+        if (cformCardNumber.isEmpty ||
+            cformExpDate.isEmpty ||
+            !cFormIsValidDateEntered) {
           return null;
         } else {
           if (cformCVV.isEmpty) {
@@ -617,12 +617,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 2.0, bottom: 3.0),
+              padding: EdgeInsets.only(top: 1.5, bottom: 5.0),
               child: Row(
                 children: <Widget>[
                   Expanded(
                     child: Container(
-                        height: 48.0,
+                        height: 54.0,
                         child: TextFormField(
                             controller: cformCardNumberController,
                             focusNode: cformCardNumberFocusnode,
@@ -640,13 +640,14 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                             decoration: InputDecoration(
                               labelText: 'Card Number',
                               counterText: "",
+                              helperText: ' ',
                               suffixIcon: Padding(
                                 padding:
                                     const EdgeInsetsDirectional.only(end: 8.0),
                                 child: Image.network(cformCardImagePath,
                                     height: 1, width: 1),
                               ),
-                              contentPadding: EdgeInsets.all(12.0),
+                              contentPadding: EdgeInsets.all(13.0),
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.black38,
@@ -663,86 +664,92 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               ),
             ),
             Padding(
-                padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
+                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
                 child: Row(
                   children: <Widget>[
                     Expanded(
                         flex: 8,
-                        child: TextFormField(
-                          controller: cformExpDateController,
-                          focusNode: cformExpDateFocusnode,
-                          inputFormatters: [
-                            MaskedTextInputFormatter(
-                              mask: 'xx/xx',
-                              separator: '/',
-                            ),
-                          ],
-                          onFieldSubmitted: (value) {
-                            cformExpDateFocusnode.unfocus();
-                            FocusScope.of(context)
-                                .requestFocus(cformCVVFocusnode);
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'Expiry Date',
-                            hintText: "MM/YY",
-                            counterText: "",
-                            contentPadding: EdgeInsets.all(12.0),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black38,
+                        child: Container(
+                            height: 54.0,
+                            child: TextFormField(
+                              controller: cformExpDateController,
+                              focusNode: cformExpDateFocusnode,
+                              inputFormatters: [
+                                MaskedTextInputFormatter(
+                                  mask: 'xx/xx',
+                                  separator: '/',
+                                ),
+                              ],
+                              onFieldSubmitted: (value) {
+                                cformExpDateFocusnode.unfocus();
+                                FocusScope.of(context)
+                                    .requestFocus(cformCVVFocusnode);
+                              },
+                              decoration: const InputDecoration(
+                                labelText: 'Expiry Date',
+                                hintText: "MM/YY",
+                                helperText: ' ',
+                                counterText: "",
+                                contentPadding: EdgeInsets.all(13.0),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.black38,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          validator: (String value) {
-                            return getCardFormErrorMessages(value, "date");
-                          },
-                          keyboardType: TextInputType.number,
-                          maxLength: 6,
-                        )),
+                              validator: (String value) {
+                                return getCardFormErrorMessages(value, "date");
+                              },
+                              keyboardType: TextInputType.number,
+                              maxLength: 6,
+                            ))),
                     Expanded(
                       flex: 1,
                       child: Container(),
                     ),
                     Expanded(
                       flex: 8,
-                      child: TextFormField(
-                          controller: cformCVVController,
-                          focusNode: cformCVVFocusnode,
-                          inputFormatters: <TextInputFormatter>[
-                            WhitelistingTextInputFormatter.digitsOnly
-                          ],
-                          onFieldSubmitted: (value) {
-                            cformCVVFocusnode.unfocus();
-                            FocusScope.of(context)
-                                .requestFocus(cformNameFocusnode);
-                          },
-                          decoration: const InputDecoration(
-                            labelText: 'CVV',
-                            counterText: "",
-                            contentPadding: EdgeInsets.all(12.0),
-                            fillColor: Colors.blue,
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black38,
+                      child: Container(
+                          height: 54.0,
+                          child: TextFormField(
+                              controller: cformCVVController,
+                              focusNode: cformCVVFocusnode,
+                              inputFormatters: <TextInputFormatter>[
+                                WhitelistingTextInputFormatter.digitsOnly
+                              ],
+                              onFieldSubmitted: (value) {
+                                cformCVVFocusnode.unfocus();
+                                FocusScope.of(context)
+                                    .requestFocus(cformNameFocusnode);
+                              },
+                              decoration: const InputDecoration(
+                                labelText: 'CVV',
+                                counterText: "",
+                                helperText: ' ',
+                                contentPadding: EdgeInsets.all(13.0),
+                                fillColor: Colors.blue,
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.black38,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          validator: (String value) {
-                            return getCardFormErrorMessages(value, "cvv");
-                          },
-                          maxLength: 4,
-                          obscureText: cformObscureCVV,
-                          keyboardType: TextInputType.number),
+                              validator: (String value) {
+                                return getCardFormErrorMessages(value, "cvv");
+                              },
+                              maxLength: 4,
+                              obscureText: cformObscureCVV,
+                              keyboardType: TextInputType.number)),
                     )
                   ],
                 )),
             Padding(
-              padding: EdgeInsets.only(top: 10.0),
+              padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
               child: Row(
                 children: <Widget>[
                   Expanded(
                     child: Container(
-                        height: 48.0,
+                        height: 54.0,
                         child: TextFormField(
                           controller: cformNameOnCardController,
                           focusNode: cformNameFocusnode,
@@ -753,7 +760,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                           decoration: const InputDecoration(
                             labelText: "Card Holder's Name",
                             counterText: "",
-                            contentPadding: EdgeInsets.all(12.0),
+                            helperText: ' ',
+                            contentPadding: EdgeInsets.all(13.0),
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Colors.black38,
