@@ -277,10 +277,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         JSONObject installParams = Branch.getInstance().getFirstReferringParams();
         JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
         setDeepLinkingBranchData(referringParams);
-        setDeepLinkingBranchData(installParams);
         setDeepLinkingBranchData(sessionParams);
-
-
         Map<String, String> object = new HashMap();
         String refCodeFromBranchTrail0 = "";
         String refCodeFromBranchTrail1 = "";
@@ -351,6 +348,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String dl_ac_promoamount = referringParams.optString("dl_ac_promoamount", "");
         String dl_sp_pageLocation = referringParams.optString("dl_sp_pageLocation", "");
         String dl_sp_pageTitle = referringParams.optString("dl_sp_pageTitle", "");
+        String dl_sport_type = referringParams.optString("dl_sport_type", "0");
+
         if (dl_page_route.length() > 2) {
             deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
             deepLinkingDataObject.put("dl_page_route", dl_page_route);
@@ -359,7 +358,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             deepLinkingDataObject.put("dl_ac_promoamount", dl_ac_promoamount);
             deepLinkingDataObject.put("dl_sp_pageLocation", dl_sp_pageLocation);
             deepLinkingDataObject.put("dl_sp_pageTitle", dl_sp_pageTitle);
-
+            deepLinkingDataObject.put("dl_sport_type", dl_sport_type);
         }
     }
 
@@ -1517,6 +1516,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                 }else{
                                     deepLinkingDataObject.put("dl_sp_pageTitle", " ");
                                 }
+
+                                if(extras.containsKey("dl_sport_type")){
+                                    deepLinkingDataObject.put("dl_sport_type", (String) extras.get("dl_sport_type"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_sport_type", "0");
+                                }
+                                
                             }
 
                         }

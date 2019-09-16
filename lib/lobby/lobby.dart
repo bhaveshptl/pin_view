@@ -237,15 +237,45 @@ class LobbyState extends State<Lobby>
             deactivateDeepLinkingNavigation = true;
             String pageTitle =
                 widget.deepLinkingNavigationData["dl_sp_pageTitle"].toString();
-            String pageLocation =
-                widget.deepLinkingNavigationData["dl_sp_pageLocation"].toString();
-            routeLauncher.launchCustomeStaticPage(pageTitle,pageLocation, context, onComplete: () {
+            String pageLocation = widget
+                .deepLinkingNavigationData["dl_sp_pageLocation"]
+                .toString();
+            routeLauncher.launchCustomeStaticPage(
+                pageTitle, pageLocation, context, onComplete: () {
               showLoader(false);
             });
             break;
         }
       }
     }
+  }
+
+  getSportsTypeFromDeepLinkingData(String page) {
+    int sportType = _mapSportTypes[page];
+    try {
+      if (widget.deepLinkingNavigationData != null) {
+        String type = widget.deepLinkingNavigationData["dl_sport_type"] != null
+            ? widget.deepLinkingNavigationData["dl_sport_type"]
+            : 0;
+        int sportTypeFromDeepLinking = int.parse(type);
+        if (!deactivateDeepLinkingNavigation) {
+          if (sportTypeFromDeepLinking == 1) {
+            sportType = 1;
+          }
+          if (sportTypeFromDeepLinking == 2) {
+            sportType = 2;
+          }
+          if (sportTypeFromDeepLinking == 3) {
+            sportType = 3;
+          }
+          if (sportTypeFromDeepLinking == 0) {
+            sportType = _mapSportTypes[page];
+            deactivateDeepLinkingNavigation=true;
+          }
+        }
+      }
+    } catch (e) {}
+    return sportType;
   }
 
   launchL1ByDeepLinking(
@@ -697,7 +727,7 @@ class LobbyState extends State<Lobby>
                       children: <Widget>[
                         Expanded(
                           child: LobbyWidget(
-                            sportType: _mapSportTypes[page],
+                            sportType: getSportsTypeFromDeepLinkingData(page),
                             onLeagues: (value) {
                               if (!deactivateDeepLinkingNavigation) {
                                 deepLinkingPageRouting(context);
