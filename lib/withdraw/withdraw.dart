@@ -37,6 +37,8 @@ class WithdrawState extends State<Withdraw>
     with SingleTickerProviderStateMixin {
   File _panImage;
   File _addressImage;
+  File _addressBackCopyImage;
+  int allowdDocSizeInMB = 10;
   List<dynamic> _addressList = [];
 
   String mobile;
@@ -89,6 +91,7 @@ class WithdrawState extends State<Withdraw>
       vsync: this,
     );
     initFormInputs();
+    setAllowedDocSizeInMB();
   }
 
   updateWithdrawData() {
@@ -166,7 +169,7 @@ class WithdrawState extends State<Withdraw>
       } else if (kycStatus == "UNDER_REVIEW" ||
           addressStatus == "UNDER_REVIEW") {
         _verificationStatus = "UNDER_REVIEW";
-      } else if (kycStatus == "DOC_SUBMITTED" ||
+      } else if (kycStatus == "DOC_SUBMITTED" &&
           addressStatus == "DOC_SUBMITTED") {
         _verificationStatus = "DOC_SUBMITTED";
       } else {
@@ -174,7 +177,7 @@ class WithdrawState extends State<Withdraw>
       }
     }
 
-    if (kycStatus == "DOC_SUBMITTED" || addressStatus == "DOC_SUBMITTED") {
+    if (kycStatus == "DOC_SUBMITTED" && addressStatus == "DOC_SUBMITTED") {
       _messageList
           .add(_getMessageWidget(DocVerificationMessages.DOC_SUBMITTED));
     }
@@ -200,6 +203,27 @@ class WithdrawState extends State<Withdraw>
     if (kycStatus == "VERIFIED" && addressStatus == "VERIFIED") {
       _messageList.add(_getMessageWidget(DocVerificationMessages.VERIFIED));
     }
+  }
+
+  setAllowedDocSizeInMB() {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_ALLOWED_DOC_SIZE_IN_MB,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> response = json.decode(res.body);
+        allowdDocSizeInMB = response["allowedDocSizeInMB"];
+        print("allowdDocSizeInMB>>>>>>>>");
+        print(allowdDocSizeInMB);
+      }
+    }).whenComplete(() {
+      ActionUtil().showLoader(_scaffoldKey.currentContext, false);
+    });
   }
 
   _getMessageWidget(String msg) {
@@ -478,39 +502,116 @@ class WithdrawState extends State<Withdraw>
                             ),
                           ],
                         ),
-                        Row(
-                          children: <Widget>[
-                            OutlineButton(
-                              borderSide: BorderSide(
-                                  color: Theme.of(context).primaryColorDark),
-                              onPressed: () {
-                                getAddressImage();
-                              },
-                              child: Row(
-                                children: <Widget>[
-                                  Icon(Icons.add),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: Text(_getDocValueFromName(
-                                            _selectedAddressDocType)
-                                        .toUpperCase()),
-                                  )
-                                ],
-                              ),
-                            ),
-                            _addressImage == null
-                                ? Container()
-                                : Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 16.0),
-                                      child: Text(
-                                        basename(_addressImage.path),
-                                        maxLines: 3,
+                        Padding(
+                          padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 6,
+                                child: Row(
+                                  children: <Widget>[
+                                    OutlineButton(
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .primaryColorDark),
+                                      onPressed: () {
+                                        getAddressImage();
+                                      },
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(Icons.add),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 3.0),
+                                            child: Text("FRONT COPY"),
+                                          )
+                                        ],
                                       ),
                                     ),
-                                  )
-                          ],
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(),
+                              ),
+                              Expanded(
+                                flex: 6,
+                                child: Row(
+                                  children: <Widget>[
+                                    OutlineButton(
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context)
+                                              .primaryColorDark),
+                                      onPressed: () {
+                                        getAddressBackCopyImage();
+                                      },
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(Icons.add),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 6.0),
+                                            child: Text("BACK COPY"),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 6,
+                                child: Row(
+                                  children: <Widget>[
+                                    _addressImage == null
+                                        ? Container()
+                                        : Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 16.0),
+                                              child: Text(
+                                                basename(_addressImage.path),
+                                                maxLines: 2,
+                                              ),
+                                            ),
+                                          )
+                                  ],
+                                ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(),
+                              ),
+                              Expanded(
+                                flex: 6,
+                                child: Row(
+                                  children: <Widget>[
+                                    _addressBackCopyImage == null
+                                        ? Container()
+                                        : Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 16.0),
+                                              child: Text(
+                                                basename(
+                                                    _addressBackCopyImage.path),
+                                                maxLines: 3,
+                                              ),
+                                            ),
+                                          )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                         _bShowImageUploadError
                             ? Padding(
@@ -598,10 +699,23 @@ class WithdrawState extends State<Withdraw>
   }
 
   Future getImage(Function callback) async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
+    var image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, maxWidth: 1200);
+    bool isDocsValidSize = true;
+    var docLength = await image.length();
+    if ((docLength) >= (allowdDocSizeInMB * 1024 * 1024)) {
+      isDocsValidSize = false;
+    }
     if (image != null) {
-      callback(image);
+      if (isDocsValidSize) {
+        callback(image);
+      } else {
+        ActionUtil().showMsgOnTop(
+            "Doc size should be less than " +
+                allowdDocSizeInMB.toString() +
+                "MB",
+            _scaffoldKey.currentContext);
+      }
     }
   }
 
@@ -623,6 +737,15 @@ class WithdrawState extends State<Withdraw>
     });
   }
 
+  Future getAddressBackCopyImage() async {
+    getImage((File image) {
+      setState(() {
+        _addressBackCopyImage = image;
+        _bShowImageUploadError = false;
+      });
+    });
+  }
+
   _onUploadDocuments() async {
     if (_panImage == null || _addressImage == null) {
       setState(() {
@@ -635,52 +758,123 @@ class WithdrawState extends State<Withdraw>
           cookie = value;
         });
       }
+      /*string to uri */
+      var uriPANUpload = Uri.parse(BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC_PAN);
+      var uriAddressUpload = Uri.parse(BaseUrl().apiUrl +
+          ApiUtil.UPLOAD_DOC_ADDRESS +
+          _selectedAddressDocType);
 
-      // string to uri
-      var uri = Uri.parse(
-          BaseUrl().apiUrl + ApiUtil.UPLOAD_DOC + _selectedAddressDocType);
-
-      // get length for http post
       var panLength = await _panImage.length();
-      // to byte stream
       var panStream =
           http.ByteStream(DelegatingStream.typed(_panImage.openRead()));
-
-      // get length for http post
       var addressLength = await _addressImage.length();
-      // to byte stream
       var addressStream =
           http.ByteStream(DelegatingStream.typed(_addressImage.openRead()));
 
-      // new multipart request
-      var request = http.MultipartRequest("POST", uri);
+      var addressBackCopyLength;
+      var addressBackCopyStream;
 
-      // add multipart form to request
-      request.files.add(http.MultipartFile('pan', panStream, panLength,
+      var httpRequestForPAN = http.MultipartRequest("POST", uriPANUpload);
+      var httpRequestForAddress =
+          http.MultipartRequest("POST", uriAddressUpload);
+
+      /*add multipart form to request*/
+      httpRequestForPAN.files.add(http.MultipartFile(
+          'pan', panStream, panLength,
           filename: basename(_panImage.path),
           contentType: MediaType('image', 'jpg')));
-
-      request.files.add(http.MultipartFile('kyc', addressStream, addressLength,
+         print("<<<<<<Upload doc called 3>>>>>>");
+      httpRequestForAddress.files.add(http.MultipartFile(
+          'kyc', addressStream, addressLength,
           filename: basename(_addressImage.path),
           contentType: MediaType('image', 'jpg')));
 
-      request.headers["cookie"] = cookie;
-      http.StreamedResponse response = await request.send().then((onValue) {
-        return http.Response.fromStream(onValue);
-      }).then(
-        (http.Response res) {
-          if (res.statusCode >= 200 && res.statusCode <= 299) {
-            Map<String, dynamic> response = json.decode(res.body);
-            setState(() {
-              _panVerificationStatus = response["pan_verification"];
-              _addressVerificationStatus = response["address_verification"];
+      if (_addressBackCopyImage != null) {
+        /* Address back images is optional.So it may be null*/
+        addressBackCopyLength = await _addressBackCopyImage.length();
+        addressBackCopyStream = http.ByteStream(
+            DelegatingStream.typed(_addressBackCopyImage.openRead()));
+        httpRequestForAddress.files.add(http.MultipartFile(
+            'kyc_back_copy', addressBackCopyStream, addressBackCopyLength,
+            filename: basename(_addressBackCopyImage.path),
+            contentType: MediaType('image', 'jpg')));
+      }
+
+      httpRequestForAddress.headers["cookie"] = cookie;
+      httpRequestForPAN.headers["cookie"] = cookie;
+
+      Map<String, dynamic> panResponseBody;
+
+      print(_panVerificationStatus+"_panVerificationStatus");
+
+      if (_panVerificationStatus != "DOC_SUBMITTED") {
+        http.StreamedResponse panResponse =
+            await httpRequestForPAN.send().then((onValue) {
+          return http.Response.fromStream(onValue);
+        }).then(
+          (http.Response res) {
+            print("panResponseBody");
+             panResponseBody = json.decode(res.body);
+              print(panResponseBody);
+            if (res.statusCode >= 200 && res.statusCode <= 299) {
+              panResponseBody = json.decode(res.body);
+               
+              if (panResponseBody["err"] != null && panResponseBody["err"]) {
+                ActionUtil().showMsgOnTop(
+                    panResponseBody["msg"], _scaffoldKey.currentContext);
+              }
+              setState(() {
+                _panVerificationStatus = panResponseBody["pan_verification"];
+                _addressVerificationStatus =
+                    panResponseBody["address_verification"];
+              });
               _setDocVerificationStatus();
-            });
-          }
-        },
-      );
+              /* After PAN upload success upload the address docs */
+            } else if (res.statusCode == 413) {
+              print(res.statusCode);
+              _setDocVerificationStatus();
+            }
+          },
+        );
+      }
+
+      print("_addressVerificationStatus "+ _addressVerificationStatus);
+
+      if (_addressVerificationStatus != "DOC_SUBMITTED") {
+        http.StreamedResponse addressResponse =
+            await httpRequestForAddress.send().then((onValue) {
+          return http.Response.fromStream(onValue);
+        }).then(
+          (http.Response res) {
+            print("Address response ");
+             panResponseBody = json.decode(res.body);
+            print(res.statusCode);
+            print(panResponseBody);
+            if (res.statusCode >= 200 && res.statusCode <= 299) {
+              panResponseBody = json.decode(res.body);
+              if (panResponseBody["err"] != null && panResponseBody["err"]) {
+                ActionUtil().showMsgOnTop(
+                    panResponseBody["msg"], _scaffoldKey.currentContext);
+              }
+              setState(() {
+                _panVerificationStatus = panResponseBody["pan_verification"];
+                _addressVerificationStatus =
+                    panResponseBody["address_verification"];
+              });
+              _setDocVerificationStatus();
+              /* After PAN upload success upload the address docs */
+
+            } else if (res.statusCode == 413) {
+              _setDocVerificationStatus();
+            }
+          },
+        );
+      }
     }
   }
+
+
+
 
   _getDocValueFromName(String name) {
     String _addressDocValue = "";
