@@ -1210,11 +1210,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String orderId= (String) arguments.get("orderId");
         String paymentMethod=(String) arguments.get("method");
         String userId=(String) arguments.get("userId");
+        String merchantIdentifier = (String) arguments.get("merchantIdentifier");
         String extra_public_key =(String) arguments.get("extra_public_key");
         boolean cardDataCapturingRequired =(boolean) arguments.get("cardDataCapturingRequired");
         /*Prepare a checkout object*/
         com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
-        checkout.setMerchantIdentifier("T456537");
+        checkout.setMerchantIdentifier(merchantIdentifier);
         checkout.setTransactionIdentifier(orderId);
         checkout.setTransactionReference (orderId);
         checkout.setTransactionType (PaymentActivity.TRANSACTION_TYPE_SALE);

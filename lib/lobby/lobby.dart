@@ -59,6 +59,7 @@ class LobbyState extends State<Lobby>
   List<League> _leagues;
   double userBalance = 0.0;
   TabController _controller;
+  int initialIndexOfMatchTabs = 0;
   List<dynamic> _carousel = [];
   Map<String, int> _mapSportTypes;
   bool bUpdateAppConfirmationShown = false;
@@ -79,16 +80,15 @@ class LobbyState extends State<Lobby>
     if (Platform.isIOS) {
       isIos = true;
     }
-    if (widget.activateDeepLinkingNavigation != null) {
-      if (widget.activateDeepLinkingNavigation) {
-        deactivateDeepLinkingNavigation = false;
-      }
-    }
     _mapSportTypes = sports.mapSports;
-    _controller = TabController(vsync: this, length: _mapSportTypes.length);
+    _sportType = _mapSportTypes[_mapSportTypes.keys.toList()[0]];
+    deepLinkingNavigationManager();
+    _controller = TabController(
+        vsync: this,
+        length: _mapSportTypes.length,
+        initialIndex: initialIndexOfMatchTabs);
     _getBanners();
     // _getSportsType();
-    _sportType = _mapSportTypes[_mapSportTypes.keys.toList()[0]];
     _controller.addListener(() {
       if (!_controller.indexIsChanging) {
         setState(() {
@@ -101,7 +101,7 @@ class LobbyState extends State<Lobby>
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
   }
-
+  
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -139,6 +139,56 @@ class LobbyState extends State<Lobby>
     return double.tryParse(str) != null;
   }
 
+
+  deepLinkingNavigationManager() {
+    if (widget.activateDeepLinkingNavigation != null) {
+      if (widget.activateDeepLinkingNavigation) {
+        deactivateDeepLinkingNavigation = false;
+        try {
+          if (widget.deepLinkingNavigationData != null) {
+            String type =
+                widget.deepLinkingNavigationData["dl_sport_type"] != null
+                    ? widget.deepLinkingNavigationData["dl_sport_type"]
+                    : 0;
+            int sportTypeFromDeepLinking = int.parse(type);
+            if (sportTypeFromDeepLinking == 1) {
+              _sportType = _mapSportTypes["CRICKET"];
+              var i = 0;
+              for (var sport in _mapSportTypes.keys) {
+                if (sport == "CRICKET") {
+                  initialIndexOfMatchTabs = i;
+                  break;
+                }
+                i++;
+              }
+            }
+            if (sportTypeFromDeepLinking == 2) {
+              _sportType = _mapSportTypes["FOOTBALL"];
+              var i = 0;
+              for (var sport in _mapSportTypes.keys) {
+                if (sport == "FOOTBALL") {
+                  initialIndexOfMatchTabs = i;
+                  break;
+                }
+                i++;
+              }
+            }
+            if (sportTypeFromDeepLinking == 3) {
+              _sportType = _mapSportTypes["KABADDI"];
+              var i = 0;
+              for (var sport in _mapSportTypes.keys) {
+                if (sport == "KABADDI") {
+                  initialIndexOfMatchTabs = i;
+                  break;
+                }
+                i++;
+              }
+            }
+          }
+        } catch (e) {}
+      }
+    }
+  }
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
       if (widget.deepLinkingNavigationData != null) {
@@ -248,34 +298,6 @@ class LobbyState extends State<Lobby>
         }
       }
     }
-  }
-
-  getSportsTypeFromDeepLinkingData(String page) {
-    int sportType = _mapSportTypes[page];
-    try {
-      if (widget.deepLinkingNavigationData != null) {
-        String type = widget.deepLinkingNavigationData["dl_sport_type"] != null
-            ? widget.deepLinkingNavigationData["dl_sport_type"]
-            : 0;
-        int sportTypeFromDeepLinking = int.parse(type);
-        if (!deactivateDeepLinkingNavigation) {
-          if (sportTypeFromDeepLinking == 1) {
-            sportType = 1;
-          }
-          if (sportTypeFromDeepLinking == 2) {
-            sportType = 2;
-          }
-          if (sportTypeFromDeepLinking == 3) {
-            sportType = 3;
-          }
-          if (sportTypeFromDeepLinking == 0) {
-            sportType = _mapSportTypes[page];
-            deactivateDeepLinkingNavigation=true;
-          }
-        }
-      }
-    } catch (e) {}
-    return sportType;
   }
 
   launchL1ByDeepLinking(
@@ -727,7 +749,7 @@ class LobbyState extends State<Lobby>
                       children: <Widget>[
                         Expanded(
                           child: LobbyWidget(
-                            sportType: getSportsTypeFromDeepLinkingData(page),
+                            sportType: _mapSportTypes[page],
                             onLeagues: (value) {
                               if (!deactivateDeepLinkingNavigation) {
                                 deepLinkingPageRouting(context);
