@@ -20,19 +20,18 @@ class PlayingStyleTab extends StatelessWidget {
 
   final double teamLogoHeight = 36.0;
 
-  PlayingStyleTab({
-    this.style,
-    this.league,
-    this.l1Data,
-    this.onSort,
-    this.sortedBy,
-    this.allPlayers,
-    this.isAscending,
-    this.mapSportLabel,
-    this.onPlayerSelect,
-    this.selectedPlayers,
-    this.showSquadAnnouncedPlayersStatus
-  });
+  PlayingStyleTab(
+      {this.style,
+      this.league,
+      this.l1Data,
+      this.onSort,
+      this.sortedBy,
+      this.allPlayers,
+      this.isAscending,
+      this.mapSportLabel,
+      this.onPlayerSelect,
+      this.selectedPlayers,
+      this.showSquadAnnouncedPlayersStatus});
 
   int _getPlayerIndex(Player _player) {
     int selectedPlayerIndex = -1;
@@ -54,7 +53,7 @@ class PlayingStyleTab extends StatelessWidget {
 
   bool checkThePlayerPlayingStatus(int playerId) {
     /*To check if the player is playing in the Squad*/
-    print(playerId); 
+    print(playerId);
     List<int> initialSquadList = l1Data.initialSquad;
     print("inside the playting style tab");
     print(initialSquadList);
@@ -333,24 +332,44 @@ class PlayingStyleTab extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              showSquadAnnouncedPlayersStatus ?Padding(
-                                padding: EdgeInsets.only(top: 4.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Text(
-                                      checkThePlayerPlayingStatus(_player.id)
-                                          ? "Playing"
-                                          : " ",
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .subhead
-                                          .copyWith(
-                                            color: Colors.green,
+                              showSquadAnnouncedPlayersStatus
+                                  ? Padding(
+                                      padding: EdgeInsets.only(top: 4.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          RichText(
+                                            text: new TextSpan(
+                                              text: checkThePlayerPlayingStatus(
+                                                      _player.id)
+                                                  ? "•"
+                                                  : null,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .body1
+                                                  .copyWith(
+                                                    color: Colors.green,
+                                                  ),
+                                              children: <TextSpan>[
+                                                new TextSpan(
+                                                  text:
+                                                      checkThePlayerPlayingStatus(
+                                                              _player.id)
+                                                          ? "Playing"
+                                                          : null,
+                                                  style: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .subtitle
+                                                      .copyWith(
+                                                        color: Colors.green,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                    ),
-                                  ],
-                                ),
-                              ):Container(),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
                             ],
                           ),
                         ),
