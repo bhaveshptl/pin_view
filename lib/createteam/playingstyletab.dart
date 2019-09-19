@@ -11,6 +11,7 @@ class PlayingStyleTab extends StatelessWidget {
   final Function onSort;
   final String sortedBy;
   final bool isAscending;
+  final bool showSquadAnnouncedPlayersStatus;
   final PlayingStyle style;
   final List<Player> allPlayers;
   final Function onPlayerSelect;
@@ -30,6 +31,7 @@ class PlayingStyleTab extends StatelessWidget {
     this.mapSportLabel,
     this.onPlayerSelect,
     this.selectedPlayers,
+    this.showSquadAnnouncedPlayersStatus
   });
 
   int _getPlayerIndex(Player _player) {
@@ -48,6 +50,16 @@ class PlayingStyleTab extends StatelessWidget {
 
   _doPlayerSelection(Player _player) {
     onPlayerSelect(style, _player);
+  }
+
+  bool checkThePlayerPlayingStatus(int playerId) {
+    /*To check if the player is playing in the Squad*/
+    print(playerId); 
+    List<int> initialSquadList = l1Data.initialSquad;
+    print("inside the playting style tab");
+    print(initialSquadList);
+    initialSquadList.contains(initialSquadList);
+    return initialSquadList.contains(playerId);
   }
 
   Widget _playerListView(BuildContext context) {
@@ -321,6 +333,24 @@ class PlayingStyleTab extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              showSquadAnnouncedPlayersStatus ?Padding(
+                                padding: EdgeInsets.only(top: 4.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      checkThePlayerPlayingStatus(_player.id)
+                                          ? "Playing"
+                                          : " ",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .subhead
+                                          .copyWith(
+                                            color: Colors.green,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ):Container(),
                             ],
                           ),
                         ),
