@@ -55,9 +55,8 @@ class PlayingStyleTab extends StatelessWidget {
     /*To check if the player is playing in the Squad*/
     print(playerId);
     List<int> initialSquadList = l1Data.initialSquad;
-    print("inside the playting style tab");
-    print(initialSquadList);
-    initialSquadList.contains(initialSquadList);
+   
+    
     return initialSquadList.contains(playerId);
   }
 
