@@ -138,7 +138,7 @@ class LobbyState extends State<Lobby>
     }
     return double.tryParse(str) != null;
   }
-    deepLinkingNavigationManager() {
+  deepLinkingNavigationManager() {
     if (widget.activateDeepLinkingNavigation != null) {
       if (widget.activateDeepLinkingNavigation) {
         deactivateDeepLinkingNavigation = false;
@@ -210,9 +210,8 @@ class LobbyState extends State<Lobby>
                 .deepLinkingNavigationData["dl_ac_promoamount"]
                 .toString();
             String dl_unique_id = "deeplinking";
-            dl_unique_id=widget
-                .deepLinkingNavigationData["dl_unique_id"]
-                .toString();
+            dl_unique_id =
+                widget.deepLinkingNavigationData["dl_unique_id"].toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
               promoAmountDouble = double.parse(promoAmountString);
@@ -261,7 +260,7 @@ class LobbyState extends State<Lobby>
               launchCreateTeamDeepLinking(context, _leagues, dl_leagueId);
               deactivateDeepLinkingNavigation = true;
             }
-            break;  
+            break;
           case "scoringSystem":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("SCORING", context, onComplete: () {
@@ -322,13 +321,11 @@ class LobbyState extends State<Lobby>
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
             FantasyPageRoute(
-              pageBuilder: (context) => LeagueDetail(
-                league,
-                leagues: _leagues,
-                sportType: _sportType,
-                onSportChange: _onSportSelectionChaged,
-                mapSportTypes: _mapSportTypes
-              ),
+              pageBuilder: (context) => LeagueDetail(league,
+                  leagues: _leagues,
+                  sportType: _sportType,
+                  onSportChange: _onSportSelectionChaged,
+                  mapSportTypes: _mapSportTypes),
             ),
           );
         }
@@ -343,14 +340,12 @@ class LobbyState extends State<Lobby>
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
             FantasyPageRoute(
-              pageBuilder: (context) => LeagueDetail(
-                league,
-                leagues: _leagues,
-                sportType: _sportType,
-                onSportChange: _onSportSelectionChaged,
-                mapSportTypes: _mapSportTypes,
-                activateDeepLinkingNavigation:true
-              ),
+              pageBuilder: (context) => LeagueDetail(league,
+                  leagues: _leagues,
+                  sportType: _sportType,
+                  onSportChange: _onSportSelectionChaged,
+                  mapSportTypes: _mapSportTypes,
+                  activateDeepLinkingNavigation: true),
             ),
           );
         }
@@ -677,6 +672,33 @@ class LobbyState extends State<Lobby>
                                           launchL1ByDeepLinking(
                                               context, _leagues, dl_leagueId);
                                         }
+                                      } else if (banner["CTA"] ==
+                                          "CREATETEAM") {
+                                        showLoader(false);
+                                        if (banner["leagueId"] != null) {
+                                          int dl_leagueId = 0;
+                                          try {
+                                            String leagueString =
+                                                banner["leagueId"].toString();
+                                            dl_leagueId =
+                                                int.parse(leagueString);
+                                          } catch (e) {}
+
+                                          launchCreateTeamDeepLinking(
+                                              context, _leagues, dl_leagueId);
+                                        }
+                                      } else if (banner["CTA"] ==
+                                          "STATICPAGE") {
+                                        String pageName = "";
+                                        try {
+                                          pageName =
+                                              banner["pageName"].toString();
+                                          routeLauncher.launchStaticPage(
+                                              pageName, context,
+                                              onComplete: () {
+                                            showLoader(false);
+                                          });
+                                        } catch (e) {}
                                       } else {
                                         routeLauncher.launchBannerRoute(
                                             banner: banner,
