@@ -53,11 +53,12 @@ class PlayingStyleTab extends StatelessWidget {
 
   bool checkThePlayerPlayingStatus(int playerId) {
     /*To check if the player is playing in the Squad*/
-    print(playerId);
-    List<int> initialSquadList = l1Data.initialSquad;
-   
-    
-    return initialSquadList.contains(playerId);
+    if (showSquadAnnouncedPlayersStatus) {
+      List<int> initialSquadList = l1Data.initialSquad;
+      return initialSquadList.contains(playerId);
+    }else{
+      return false;
+    }
   }
 
   Widget _playerListView(BuildContext context) {
@@ -331,42 +332,31 @@ class PlayingStyleTab extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                              showSquadAnnouncedPlayersStatus
+                              checkThePlayerPlayingStatus(_player.id)
                                   ? Padding(
                                       padding: EdgeInsets.only(top: 4.0),
                                       child: Row(
-                                        children: <Widget>[
-                                          RichText(
-                                            text: new TextSpan(
-                                              text: checkThePlayerPlayingStatus(
-                                                      _player.id)
-                                                  ? "•"
-                                                  : null,
-                                              style: Theme.of(context)
-                                                  .primaryTextTheme
-                                                  .body1
-                                                  .copyWith(
-                                                    color: Colors.green,
-                                                  ),
-                                              children: <TextSpan>[
-                                                new TextSpan(
-                                                  text:
-                                                      checkThePlayerPlayingStatus(
-                                                              _player.id)
-                                                          ? "Playing"
-                                                          : null,
-                                                  style: Theme.of(context)
-                                                      .primaryTextTheme
-                                                      .subtitle
-                                                      .copyWith(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: <Widget>[
+                                            Image.asset("images/greendot.png",
+                                                height: 9.0, width: 9.0),
+                                            Padding(
+                                              padding:
+                                                  EdgeInsets.only(left: 4.0),
+                                              child: Text(
+                                                "Playing",
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .body1
+                                                    .copyWith(
                                                         color: Colors.green,
-                                                      ),
-                                                ),
-                                              ],
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12),
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                          ]),
                                     )
                                   : Container(),
                             ],

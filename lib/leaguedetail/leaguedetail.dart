@@ -98,14 +98,7 @@ class LeagueDetailState extends State<LeagueDetail>
     }
   }
 
-  _onWsMsg(data) {
-
-    print("Web socket data in league details");
-    var initialSquade=data["data"]["l1"];
-    initialSquade=initialSquade["initialSquad"];
-    print(initialSquade);
-
-    
+  _onWsMsg(data) { 
     if (data["bReady"] == 1) {
       _getL1Data();
     } else if (data["iType"] == RequestType.GET_ALL_L1 &&
