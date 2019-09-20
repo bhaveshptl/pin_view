@@ -61,6 +61,7 @@ class AddCashState extends State<AddCash> {
   Map<String, dynamic> razorpayPayload;
 
   TextEditingController promoController = TextEditingController();
+  double prefilledAmountInRupees;
   TextEditingController amountController = TextEditingController();
   TextEditingController customAmountController = TextEditingController();
 
@@ -96,14 +97,16 @@ class AddCashState extends State<AddCash> {
 
     bShowBonusDistribution = widget.depositData.bshowBonusDistribution;
 
+    
     if (widget.prefilledAmount != null && widget.depositData != null) {
-      final double amount = widget.prefilledAmount <
+      prefilledAmountInRupees = widget.prefilledAmount <
               widget.depositData.chooseAmountData.minAmount.toDouble()
           ? widget.depositData.chooseAmountData.minAmount.toDouble()
-          : widget.prefilledAmount;
+          : widget.prefilledAmount;   
       widget.depositData.chooseAmountData.minAmount.toDouble();
-      amountController.text = amount.ceil().toString();
-      customAmountController.text = amount.ceil().toString();
+      amountController.text = prefilledAmountInRupees.ceil().toString();
+      customAmountController.text = prefilledAmountInRupees.ceil().toString();
+      amount=prefilledAmountInRupees.round();
     }
 
     _customAmountFocusNode.addListener(() {

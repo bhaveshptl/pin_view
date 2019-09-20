@@ -349,6 +349,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         String dl_sp_pageLocation = referringParams.optString("dl_sp_pageLocation", "");
         String dl_sp_pageTitle = referringParams.optString("dl_sp_pageTitle", "");
         String dl_sport_type = referringParams.optString("dl_sport_type", "0");
+        String dl_unique_id = referringParams.optString("dl_unique_id", " ");
 
         if (dl_page_route.length() > 2) {
             deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
@@ -359,6 +360,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             deepLinkingDataObject.put("dl_sp_pageLocation", dl_sp_pageLocation);
             deepLinkingDataObject.put("dl_sp_pageTitle", dl_sp_pageTitle);
             deepLinkingDataObject.put("dl_sport_type", dl_sport_type);
+            deepLinkingDataObject.put("dl_unique_id", dl_unique_id);
         }
     }
 
@@ -1523,6 +1525,16 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                 }else{
                                     deepLinkingDataObject.put("dl_sport_type", "0");
                                 }
+
+                                if(extras.containsKey("dl_unique_id")){
+                                    deepLinkingDataObject.put("dl_unique_id", (String) extras.get("dl_unique_id"));
+                                }else{
+                                    deepLinkingDataObject.put("dl_unique_id", " ");
+                                }
+
+
+
+                                
                                 
                             }
 

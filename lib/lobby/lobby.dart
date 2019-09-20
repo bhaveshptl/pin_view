@@ -101,7 +101,7 @@ class LobbyState extends State<Lobby>
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
   }
-  
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -138,9 +138,7 @@ class LobbyState extends State<Lobby>
     }
     return double.tryParse(str) != null;
   }
-
-
-  deepLinkingNavigationManager() {
+    deepLinkingNavigationManager() {
     if (widget.activateDeepLinkingNavigation != null) {
       if (widget.activateDeepLinkingNavigation) {
         deactivateDeepLinkingNavigation = false;
@@ -189,6 +187,7 @@ class LobbyState extends State<Lobby>
       }
     }
   }
+
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
       if (widget.deepLinkingNavigationData != null) {
@@ -210,15 +209,19 @@ class LobbyState extends State<Lobby>
             String promoAmountString = widget
                 .deepLinkingNavigationData["dl_ac_promoamount"]
                 .toString();
+            String dl_unique_id = "deeplinking";
+            dl_unique_id=widget
+                .deepLinkingNavigationData["dl_unique_id"]
+                .toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
               promoAmountDouble = double.parse(promoAmountString);
               _launchAddCash(
-                  source: "bottom",
+                  source: dl_unique_id,
                   promoCode: promoCode,
                   prefilledAmount: promoAmountDouble);
             } else {
-              _launchAddCash(source: "bottom", promoCode: promoCode);
+              _launchAddCash(source: dl_unique_id, promoCode: promoCode);
             }
             break;
           case "verification":

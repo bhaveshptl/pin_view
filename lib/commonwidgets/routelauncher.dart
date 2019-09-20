@@ -56,10 +56,17 @@ class RouteLauncher {
     try {
       Event event = Event(name: "addcash");
       event.setFirstDeposit(depositData.chooseAmountData.isFirstDeposit);
+      if(prefilledAmount !=null){
+        event.setDepositAmount(prefilledAmount.round());
+      }
+      if(promoCode !=null){
+        event.setPromoCode(promoCode);
+      }
       addAnalyticsEvent(
         journey: "Deposit",
         source: source,
         event: event,
+        
       );
     } catch (e) {}
 
