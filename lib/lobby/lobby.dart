@@ -250,6 +250,18 @@ class LobbyState extends State<Lobby>
               deactivateDeepLinkingNavigation = true;
             }
             break;
+          case "createteam":
+            if (_leagues != null) {
+              int dl_leagueId = 0;
+              try {
+                String leagueString =
+                    widget.deepLinkingNavigationData["dl_leagueId"].toString();
+                dl_leagueId = int.parse(leagueString);
+              } catch (e) {}
+              launchCreateTeamDeepLinking(context, _leagues, dl_leagueId);
+              deactivateDeepLinkingNavigation = true;
+            }
+            break;  
           case "scoringSystem":
             deactivateDeepLinkingNavigation = true;
             routeLauncher.launchStaticPage("SCORING", context, onComplete: () {
@@ -315,7 +327,29 @@ class LobbyState extends State<Lobby>
                 leagues: _leagues,
                 sportType: _sportType,
                 onSportChange: _onSportSelectionChaged,
+                mapSportTypes: _mapSportTypes
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  launchCreateTeamDeepLinking(
+      BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) {
+    if (_leaguesList != null) {
+      for (var league in _leaguesList) {
+        if (league.leagueId == leagueIdFromDLData) {
+          Navigator.of(context).push(
+            FantasyPageRoute(
+              pageBuilder: (context) => LeagueDetail(
+                league,
+                leagues: _leagues,
+                sportType: _sportType,
+                onSportChange: _onSportSelectionChaged,
                 mapSportTypes: _mapSportTypes,
+                activateDeepLinkingNavigation:true
               ),
             ),
           );

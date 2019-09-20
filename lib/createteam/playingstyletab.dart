@@ -339,8 +339,8 @@ class PlayingStyleTab extends StatelessWidget {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: <Widget>[
-                                            Image.asset("images/greendot.png",
-                                                height: 9.0, width: 9.0),
+                                            Image.asset("images/green-dot.png",
+                                                height: 9.0, width: 9.0 ),
                                             Padding(
                                               padding:
                                                   EdgeInsets.only(left: 4.0),

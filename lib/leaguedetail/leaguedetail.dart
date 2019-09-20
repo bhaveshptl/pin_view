@@ -37,14 +37,15 @@ class LeagueDetail extends StatefulWidget {
   final List<League> leagues;
   final Function onSportChange;
   final Map<String, int> mapSportTypes;
+  final bool activateDeepLinkingNavigation;
+  
 
-  LeagueDetail(
-    this.league, {
-    this.leagues,
-    this.sportType,
-    this.onSportChange,
-    this.mapSportTypes,
-  });
+  LeagueDetail(this.league,
+      {this.leagues,
+      this.sportType,
+      this.onSportChange,
+      this.mapSportTypes,
+      this.activateDeepLinkingNavigation});
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -71,7 +72,7 @@ class LeagueDetailState extends State<LeagueDetail>
   Map<String, List<Contest>> _mapMyContests = {};
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map<String, dynamic> myContestIds = {};
-
+  bool deactivateDeepLinkingNavigation = true;
   TabController tabController;
   int activeTabIndex = 0;
 
@@ -79,6 +80,7 @@ class LeagueDetailState extends State<LeagueDetail>
   initState() {
     super.initState();
     bIsPredictionAvailable = widget.league.prediction == 1;
+    deepLinkingNavigationManager();
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _sportType = widget.sportType;
@@ -98,7 +100,7 @@ class LeagueDetailState extends State<LeagueDetail>
     }
   }
 
-  _onWsMsg(data) { 
+  _onWsMsg(data) {
     if (data["bReady"] == 1) {
       _getL1Data();
     } else if (data["iType"] == RequestType.GET_ALL_L1 &&
@@ -194,6 +196,31 @@ class LeagueDetailState extends State<LeagueDetail>
     }
   }
 
+  deepLinkingNavigationManager() {
+    if (widget.activateDeepLinkingNavigation != null) {
+      if (widget.activateDeepLinkingNavigation) {
+        deactivateDeepLinkingNavigation = false;
+      }
+    }
+  }
+
+  launchCreateTeamByDeepLinking() async {
+    var result;
+    if (!deactivateDeepLinkingNavigation) {
+      if (squadStatus()) {
+        result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: l1Data,
+              mode: TeamCreationMode.CREATE_TEAM,
+            ),
+          ),
+        );
+      }
+    }
+  }
+  
   _applyPredictionUpdate(List<dynamic> updates) {
     Map<String, dynamic> predictionJson = predictionData.toJson();
     updates.forEach((diff) {
@@ -658,10 +685,10 @@ class LeagueDetailState extends State<LeagueDetail>
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => MySheets(
-                league: widget.league,
-                predictionData: predictionData,
-                mySheets: _mySheets,
-              ),
+            league: widget.league,
+            predictionData: predictionData,
+            mySheets: _mySheets,
+          ),
         ),
       );
     } else {
@@ -783,8 +810,8 @@ class LeagueDetailState extends State<LeagueDetail>
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => SearchContest(
-              leagues: widget.leagues,
-            ),
+          leagues: widget.leagues,
+        ),
       ),
     );
   }
@@ -798,10 +825,10 @@ class LeagueDetailState extends State<LeagueDetail>
             result = await Navigator.of(context).push(
               FantasyPageRoute(
                 pageBuilder: (context) => CreateContest(
-                      league: widget.league,
-                      l1data: l1Data,
-                      myTeams: _myTeams,
-                    ),
+                  league: widget.league,
+                  l1data: l1Data,
+                  myTeams: _myTeams,
+                ),
               ),
             );
           }
@@ -815,10 +842,10 @@ class LeagueDetailState extends State<LeagueDetail>
             result = await Navigator.of(context).push(
               FantasyPageRoute(
                 pageBuilder: (context) => MyTeams(
-                      league: widget.league,
-                      l1Data: l1Data,
-                      myTeams: _myTeams,
-                    ),
+                  league: widget.league,
+                  l1Data: l1Data,
+                  myTeams: _myTeams,
+                ),
               ),
             );
           }
@@ -830,11 +857,11 @@ class LeagueDetailState extends State<LeagueDetail>
         Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (BuildContext context) => JoinedContests(
-                  l1Data: l1Data,
-                  myTeams: _myTeams,
-                  league: widget.league,
-                  sportsType: widget.sportType,
-                ),
+              l1Data: l1Data,
+              myTeams: _myTeams,
+              league: widget.league,
+              sportsType: widget.sportType,
+            ),
           ),
         );
         break;
@@ -844,10 +871,10 @@ class LeagueDetailState extends State<LeagueDetail>
             result = await Navigator.of(context).push(
               FantasyPageRoute(
                 pageBuilder: (context) => CreateTeam(
-                      league: widget.league,
-                      l1Data: l1Data,
-                      mode: TeamCreationMode.CREATE_TEAM,
-                    ),
+                  league: widget.league,
+                  l1Data: l1Data,
+                  mode: TeamCreationMode.CREATE_TEAM,
+                ),
               ),
             );
           }
@@ -878,10 +905,10 @@ class LeagueDetailState extends State<LeagueDetail>
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
           pageBuilder: (context) => CreateSheet(
-                league: widget.league,
-                predictionData: predictionData,
-                mode: SheetCreationMode.CREATE_SHEET,
-              ),
+            league: widget.league,
+            predictionData: predictionData,
+            mode: SheetCreationMode.CREATE_SHEET,
+          ),
         ),
       );
       if (result != null) {
@@ -989,7 +1016,7 @@ class LeagueDetailState extends State<LeagueDetail>
                               l1Data: l1Data,
                               myTeams: _myTeams,
                               league: widget.league,
-                              sportsType:_sportType,
+                              sportsType: _sportType,
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
@@ -1018,7 +1045,7 @@ class LeagueDetailState extends State<LeagueDetail>
                               l1Data: l1Data,
                               myTeams: _myTeams,
                               league: widget.league,
-                              sportsType:_sportType,
+                              sportsType: _sportType,
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
