@@ -1535,7 +1535,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 : "card",
             "userId": widget.paymentMode["user_id"].toString(),
             "date": formattedDate,
-            "merchantIdentifier":"T456537",
+            "merchantIdentifier":"L456537",
             "extra_public_key": "1234-6666-6789-56",
             "tp_nameOnTheCard": cformNameOnTheCard,
             "tp_expireYear": cformExpYear,
