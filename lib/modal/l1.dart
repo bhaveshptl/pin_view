@@ -1,13 +1,15 @@
 class L1 {
   final LeagueDetails league;
   List<Contest> contests;
-  L1({this.league, this.contests});
+  List<int> initialSquad;
+  L1({this.league, this.contests,this.initialSquad});
 
   factory L1.fromJson(Map<String, dynamic> json) {
     return L1(
       league: LeagueDetails.fromJson(json['league']),
       contests:
           (json["contests"] as List).map((i) => Contest.fromJson(i)).toList(),
+      initialSquad:(json["initialSquad"] as List).map((i) => (i as int).toInt()).toList()    
     );
   }
 }

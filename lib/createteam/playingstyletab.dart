@@ -11,6 +11,7 @@ class PlayingStyleTab extends StatelessWidget {
   final Function onSort;
   final String sortedBy;
   final bool isAscending;
+  final bool showSquadAnnouncedPlayersStatus;
   final PlayingStyle style;
   final List<Player> allPlayers;
   final Function onPlayerSelect;
@@ -19,18 +20,18 @@ class PlayingStyleTab extends StatelessWidget {
 
   final double teamLogoHeight = 36.0;
 
-  PlayingStyleTab({
-    this.style,
-    this.league,
-    this.l1Data,
-    this.onSort,
-    this.sortedBy,
-    this.allPlayers,
-    this.isAscending,
-    this.mapSportLabel,
-    this.onPlayerSelect,
-    this.selectedPlayers,
-  });
+  PlayingStyleTab(
+      {this.style,
+      this.league,
+      this.l1Data,
+      this.onSort,
+      this.sortedBy,
+      this.allPlayers,
+      this.isAscending,
+      this.mapSportLabel,
+      this.onPlayerSelect,
+      this.selectedPlayers,
+      this.showSquadAnnouncedPlayersStatus});
 
   int _getPlayerIndex(Player _player) {
     int selectedPlayerIndex = -1;
@@ -48,6 +49,15 @@ class PlayingStyleTab extends StatelessWidget {
 
   _doPlayerSelection(Player _player) {
     onPlayerSelect(style, _player);
+  }
+
+  bool checkThePlayerPlayingStatus(int playerId) {
+    /*To check if the player is playing in the Squad*/
+    print(playerId);
+    List<int> initialSquadList = l1Data.initialSquad;
+   
+    
+    return initialSquadList.contains(playerId);
   }
 
   Widget _playerListView(BuildContext context) {
@@ -321,6 +331,44 @@ class PlayingStyleTab extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              showSquadAnnouncedPlayersStatus
+                                  ? Padding(
+                                      padding: EdgeInsets.only(top: 4.0),
+                                      child: Row(
+                                        children: <Widget>[
+                                          RichText(
+                                            text: new TextSpan(
+                                              text: checkThePlayerPlayingStatus(
+                                                      _player.id)
+                                                  ? "•"
+                                                  : null,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .body1
+                                                  .copyWith(
+                                                    color: Colors.green,
+                                                  ),
+                                              children: <TextSpan>[
+                                                new TextSpan(
+                                                  text:
+                                                      checkThePlayerPlayingStatus(
+                                                              _player.id)
+                                                          ? "Playing"
+                                                          : null,
+                                                  style: Theme.of(context)
+                                                      .primaryTextTheme
+                                                      .subtitle
+                                                      .copyWith(
+                                                        color: Colors.green,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(),
                             ],
                           ),
                         ),

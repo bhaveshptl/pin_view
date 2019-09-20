@@ -71,7 +71,9 @@ class CreateTeamState extends State<CreateTeam>
     super.initState();
     _addPlayerTeamId();
     _getSportsType();
-
+    
+     print("initiak squad create teanm ");
+     print(widget.l1Data.initialSquad);
     _selectedPlayers =
         widget.selectedTeam != null ? widget.selectedTeam.players : [];
 
@@ -554,6 +556,10 @@ class CreateTeamState extends State<CreateTeam>
 
   _getTabsBodyBasedOnPlayingStyle() {
     List<PlayingStyleTab> tabsBody = [];
+    bool showSquadAnnouncedPlayersStatus =false;
+    if(widget.l1Data.initialSquad !=null){
+      showSquadAnnouncedPlayersStatus= widget.l1Data.initialSquad.isNotEmpty;
+    }
     for (PlayingStyle style in _fanTeamRules.styles) {
       tabsBody.add(
         PlayingStyleTab(
@@ -567,6 +573,7 @@ class CreateTeamState extends State<CreateTeam>
           onPlayerSelect: _selectPlayer,
           mapSportLabel: sports.playingStyles,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
+          showSquadAnnouncedPlayersStatus:showSquadAnnouncedPlayersStatus
         ),
       );
     }
