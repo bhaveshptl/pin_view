@@ -9,7 +9,7 @@ class L1 {
       league: LeagueDetails.fromJson(json['league']),
       contests:
           (json["contests"] as List).map((i) => Contest.fromJson(i)).toList(),
-      initialSquad:(json["initialSquad"] as List).map((i) => (i as int).toInt()).toList()    
+      initialSquad:json["initialSquad"] !=null  ?(json["initialSquad"] as List).map((i) => (i as int).toInt()).toList():[]    
     );
   }
 }
