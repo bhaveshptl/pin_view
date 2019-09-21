@@ -34,7 +34,7 @@ class CreateTeam extends StatefulWidget {
   final L1 l1Data;
   final League league;
   final MyTeam selectedTeam;
-
+ 
   CreateTeam({this.league, this.l1Data, this.mode, this.selectedTeam});
 
   @override
@@ -62,6 +62,7 @@ class CreateTeamState extends State<CreateTeam>
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
   Map<int, List<Player>> _selectedPlayersByStyleId = {};
+  List<int> initialSquad =[];
 
   int teamAPlayerCount = 0;
   int teamBPlayerCount = 0;
@@ -72,8 +73,10 @@ class CreateTeamState extends State<CreateTeam>
     _addPlayerTeamId();
     _getSportsType();
     
-     print("initiak squad create teanm ");
-     print(widget.l1Data.initialSquad);
+    
+     if(widget.l1Data.initialSquad !=null){
+        initialSquad=widget.l1Data.initialSquad;
+     }
     _selectedPlayers =
         widget.selectedTeam != null ? widget.selectedTeam.players : [];
 
@@ -554,6 +557,13 @@ class CreateTeamState extends State<CreateTeam>
     );
   }
 
+   onPlayerSquadePlayersChanged(List<int> modifiedList){
+    // setState(() {
+    //   initialSquad=modifiedList;
+    // });
+  }
+
+
   _getTabsBodyBasedOnPlayingStyle() {
     List<PlayingStyleTab> tabsBody = [];
     bool showSquadAnnouncedPlayersStatus =false;
@@ -573,7 +583,8 @@ class CreateTeamState extends State<CreateTeam>
           onPlayerSelect: _selectPlayer,
           mapSportLabel: sports.playingStyles,
           selectedPlayers: _selectedPlayersByStyleId[style.id],
-          showSquadAnnouncedPlayersStatus:showSquadAnnouncedPlayersStatus
+          showSquadAnnouncedPlayersStatus:showSquadAnnouncedPlayersStatus,
+          initialSquad:initialSquad
         ),
       );
     }
@@ -673,8 +684,7 @@ class CreateTeamState extends State<CreateTeam>
     webengageTeamData["MatchId"] = widget.league.matchId;
     webengageTeamData["LeagueId"] = widget.l1Data.league.id;
     webengageTeamData["SeriesId"] = widget.league.series.id;
-    webengageTeamData["MatchDate"] =
-        widget.l1Data.league.rounds[0].matches[0].startTime;
+    webengageTeamData["MatchDate"] =getReadableDateFromTimeStamp(widget.l1Data.league.rounds[0].matches[0].startTime.toString());
     webengageTeamData["MatchName"] = widget.l1Data.league.name;
     webengageTeamData["SportType"] = _sportType;
     webengageTeamData["Team1"] =

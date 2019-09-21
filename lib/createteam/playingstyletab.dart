@@ -12,6 +12,7 @@ class PlayingStyleTab extends StatelessWidget {
   final String sortedBy;
   final bool isAscending;
   final bool showSquadAnnouncedPlayersStatus;
+  final List<int> initialSquad;
   final PlayingStyle style;
   final List<Player> allPlayers;
   final Function onPlayerSelect;
@@ -31,7 +32,8 @@ class PlayingStyleTab extends StatelessWidget {
       this.mapSportLabel,
       this.onPlayerSelect,
       this.selectedPlayers,
-      this.showSquadAnnouncedPlayersStatus});
+      this.showSquadAnnouncedPlayersStatus,
+      this.initialSquad});
 
   int _getPlayerIndex(Player _player) {
     int selectedPlayerIndex = -1;
@@ -53,9 +55,9 @@ class PlayingStyleTab extends StatelessWidget {
 
   bool checkThePlayerPlayingStatus(int playerId) {
     /*To check if the player is playing in the Squad*/
+    print("checkThePlayerPlayingStatus called");
     if (showSquadAnnouncedPlayersStatus) {
-      List<int> initialSquadList = l1Data.initialSquad;
-      return initialSquadList.contains(playerId);
+      return initialSquad.contains(playerId);
     }else{
       return false;
     }
