@@ -38,7 +38,6 @@ class LeagueDetail extends StatefulWidget {
   final Function onSportChange;
   final Map<String, int> mapSportTypes;
   final bool activateDeepLinkingNavigation;
-  
 
   LeagueDetail(this.league,
       {this.leagues,
@@ -75,6 +74,7 @@ class LeagueDetailState extends State<LeagueDetail>
   bool deactivateDeepLinkingNavigation = true;
   TabController tabController;
   int activeTabIndex = 0;
+  final CreateTeamState createTeamState = new  CreateTeamState();
 
   @override
   initState() {
@@ -220,7 +220,7 @@ class LeagueDetailState extends State<LeagueDetail>
       }
     }
   }
-  
+
   _applyPredictionUpdate(List<dynamic> updates) {
     Map<String, dynamic> predictionJson = predictionData.toJson();
     updates.forEach((diff) {
@@ -279,6 +279,15 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _applyL1DataUpdate(Map<String, dynamic> _data) {
+    if (_data["initialSquad"] != null) {
+      setState(() {
+        l1Data.initialSquad = _data["initialSquad"] != null
+            ? (_data["initialSquad"] as List)
+                .map((i) => (i as int).toInt())
+                .toList()
+            : [];
+      });
+    }
     if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
       List<Contest> _addedContests =
           (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
