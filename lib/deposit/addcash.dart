@@ -97,16 +97,15 @@ class AddCashState extends State<AddCash> {
 
     bShowBonusDistribution = widget.depositData.bshowBonusDistribution;
 
-    
     if (widget.prefilledAmount != null && widget.depositData != null) {
       prefilledAmountInRupees = widget.prefilledAmount <
               widget.depositData.chooseAmountData.minAmount.toDouble()
           ? widget.depositData.chooseAmountData.minAmount.toDouble()
-          : widget.prefilledAmount;   
+          : widget.prefilledAmount;
       widget.depositData.chooseAmountData.minAmount.toDouble();
       amountController.text = prefilledAmountInRupees.ceil().toString();
       customAmountController.text = prefilledAmountInRupees.ceil().toString();
-      amount=prefilledAmountInRupees.round();
+      amount = prefilledAmountInRupees.round();
     }
 
     _customAmountFocusNode.addListener(() {
@@ -253,7 +252,8 @@ class AddCashState extends State<AddCash> {
         if (failedDataInfo["errorMessage"] != null) {
           if (failedDataInfo["errorMessage"].length > 2) {
             ActionUtil().showMsgOnTop(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact support team!", context);
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact support team!",
+                context);
           } else {
             ActionUtil().showMsgOnTop(
                 "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
@@ -1772,58 +1772,58 @@ class AddCashState extends State<AddCash> {
     } catch (e) {
       print("Error for PROCEED_TO_REPEAT_TRANSACTION event " + e.toString());
     }
-    // if (paymentModeDetails["gateway"] == "TECHPROCESS_SEAMLESS" &&
-    //     paymentModeDetails["isSeamless"]) {
-    //   var dateNow = new DateTime.now();
-    //   var formatter = new DateFormat('dd-MM-yyyy');
-    //   String formattedDate = formatter.format(dateNow);
-    //   String method = (payload["paymentType"] as String).indexOf("CARD") == -1
-    //       ? payload["paymentType"].toLowerCase()
-    //       : "card";
-    //   String cformCVV = "";
-    //   String cformNameOnTheCard = "";
-    //   String cformCardNumber = "";
-    //   String cformExpMonth = "";
-    //   String cformExpYear = "";
+    if (paymentModeDetails["gateway"] == "TECHPROCESS_SEAMLESS" &&
+        paymentModeDetails["isSeamless"]) {
+      var dateNow = new DateTime.now();
+      var formatter = new DateFormat('dd-MM-yyyy');
+      String formattedDate = formatter.format(dateNow);
+      String method = (payload["paymentType"] as String).indexOf("CARD") == -1
+          ? payload["paymentType"].toLowerCase()
+          : "card";
+      String cformCVV = "";
+      String cformNameOnTheCard = "";
+      String cformCardNumber = "";
+      String cformExpMonth = "";
+      String cformExpYear = "";
 
-    //   http.Request req = http.Request(
-    //       "GET",
-    //       Uri.parse(BaseUrl().apiUrl +
-    //           ApiUtil.INIT_PAYMENT_TECHPROCESS +
-    //           querParamString));
-    //   return HttpManager(http.Client())
-    //       .sendRequest(req)
-    //       .then((http.Response res) {
-    //     Map<String, dynamic> response = json.decode(res.body);
-    //     if (res.statusCode >= 200 && res.statusCode <= 299) {
-    //       _openTechProcessNative({
-    //         "name": AppConfig.of(context).appName,
-    //         "email": payload["email"],
-    //         "phone": payload["phone"],
-    //         "amount": payload["depositAmount"].toString(),
-    //         "orderId": response["action"]["value"],
-    //         "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-    //             ? payload["paymentType"].toLowerCase()
-    //             : "card",
-    //         "userId": paymentModeDetails["userId"].toString(),
-    //         "date": formattedDate,
-    //         "merchantIdentifier":"L456537",
-    //         "extra_public_key": "1234-6666-6789-56",
-    //         "tp_nameOnTheCard": cformNameOnTheCard,
-    //         "tp_expireYear": cformExpYear,
-    //         "tp_expireMonth": cformExpMonth,
-    //         "tp_cvv": cformCVV,
-    //         "tp_cardNumber": cformCardNumber,
-    //         "tp_instrumentToken": "",
-    //         "cardDataCapturingRequired": false
-    //       });
-    //     } else {
-    //       ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-    //     }
-    //   }).whenComplete(() {
-    //     showLoader(false);
-    //   });
-     if (paymentModeDetails["isSeamless"]) {
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": payload["depositAmount"].toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            "userId": paymentModeDetails["userId"].toString(),
+            "date": formattedDate,
+            "merchantIdentifier": "L456537",
+            "extra_public_key": "1234-6666-6789-56",
+            "tp_nameOnTheCard": cformNameOnTheCard,
+            "tp_expireYear": cformExpYear,
+            "tp_expireMonth": cformExpMonth,
+            "tp_cvv": cformCVV,
+            "tp_cardNumber": cformCardNumber,
+            "tp_instrumentToken": "",
+            "cardDataCapturingRequired": false
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+    } else if (paymentModeDetails["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
