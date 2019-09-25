@@ -25,6 +25,11 @@ class HttpManager extends http.BaseClient {
     }
 
     return await send(request).then((onValue) {
+      var newCookie = onValue.headers["set-cookie"];
+      if (newCookie != null && newCookie != "") {
+        cookie = newCookie;
+        SharedPrefHelper.internal().saveCookieToStorage(cookie);
+      }
       return http.Response.fromStream(onValue);
     });
   }
