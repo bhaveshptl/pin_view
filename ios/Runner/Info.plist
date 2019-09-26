@@ -37,8 +37,10 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleURLName</key>
-			<string>howzatfantasy</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>howzatfantasy</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
@@ -106,5 +108,7 @@
 	<string>~47b65866</string>
 	<key>branch_key</key>
 	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
+	<key>branch_app_domain</key>
+	<string>11zy.app.link</string>
 </dict>
 </plist>
