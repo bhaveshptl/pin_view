@@ -34,7 +34,7 @@ end
 
 target 'Runner' do
   use_frameworks!
-  pod 'razorpay-pod', '1.1.2'
+  pod 'razorpay-pod',git:'https://github.com/razorpay/razorpay-pod.git', branch: 'swift5.1'
   pod 'Firebase/Messaging'
   pod 'Firebase/Core'
   pod 'Branch'

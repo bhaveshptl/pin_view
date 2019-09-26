@@ -81,6 +81,8 @@ class SplashScreenState extends State<SplashScreen>
     if (!isIos) {
       await _initBranchIoPlugin();
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
+    }else{
+      deepLinkingRoutingData = await _deepLinkingRoutingHandler();
     }
     await setInitData(initData);
     setLoadingPercentage(60.0);
@@ -213,9 +215,17 @@ class SplashScreenState extends State<SplashScreen>
   Future<Map<dynamic, dynamic>> _deepLinkingRoutingHandler() async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      final value = await utils_platform
+      if(isIos){
+        value = await utils_platform
+          .invokeMethod('_deepLinkingRoutingHandler');
+       print("Deep linking value******");
+       print(value);   
+          
+      }else{
+        value = await utils_platform
           .invokeMethod('_deepLinkingRoutingHandler')
           .timeout(Duration(seconds: 10));
+      }
       return value;
     } catch (e) {
       return value;

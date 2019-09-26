@@ -26,16 +26,18 @@ import CoreLocation
     private var SOCIAL_SHARE_CHANNEL:FlutterMethodChannel!;
     private var BROWSER_LAUNCH_CHANNEL:FlutterMethodChannel!;
     private var UTILS_CHANNEL:FlutterMethodChannel!;
-    private var razorpay_result: FlutterResult!
-    private var location_permission_result: FlutterResult!
-    private var device_info_result: FlutterResult!
+    private var razorpay_result: FlutterResult!;
+    private var location_permission_result: FlutterResult!;
+    private var device_info_result: FlutterResult!;
+    private var deepLinkingDataObjectResult: FlutterResult!;
     private var bBranchLodead:Bool = false;
     private var app_launchOptions: [UIApplicationLaunchOptionsKey: Any]?;
     //var window: UIWindow?
-    let gcmMessageIDKey = "gcm.message_id"
-    var weUser: WEGUser!
-    var weAnalytics: WEGAnalytics!
-    let locationManager = CLLocationManager()
+    let gcmMessageIDKey = "gcm.message_id";
+    var weUser: WEGUser!;
+    var weAnalytics: WEGAnalytics!;
+    let locationManager = CLLocationManager();
+    var deepLinkingDataObject:[String: Any]=[:];
     
     
     override func application(
@@ -52,6 +54,7 @@ import CoreLocation
         BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller)
         
         UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller)
+        deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
         /* Init Services*/
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         initPushNotifications(application);
@@ -120,6 +123,75 @@ import CoreLocation
         }
     }
     
+    private func deepLinkingRoutingHandler(result: FlutterResult){
+        result(deepLinkingDataObject);
+    }
+    
+    private func setDeepLinkingBranchData(deepLinkingData data:[String: AnyObject]?){
+          var dl_page_route:String = "";
+                  var dl_leagueId:String = "";
+                  var dl_ac_promocode:String = "";
+                  var dl_ac_promoamount:String = "";
+                  var dl_sp_pageLocation:String = "";
+                  var dl_sp_pageTitle:String = "";
+                  var dl_sport_type:String = "";
+                  var dl_unique_id:String = "";
+                 
+                  deepLinkingDataObject["activateDeepLinkingNavigation"] = false;
+                   /*Check if deep linking page source is present and it is not empty*/
+                  if data != nil {
+                      print("data from deep linking.........");
+                            print(data!);
+                      if(data!["+clicked_branch_link"] != nil){
+                          print("data clicked_branch_link.........");
+                                           print(data!["+clicked_branch_link"]!);
+                           if(data!["+clicked_branch_link"]! as? Int == 1){
+                              if data!["dl_page_route"] as? String  != nil {
+                                  dl_page_route=data!["dl_page_route"]! as? String ?? "";
+                            deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+                              }
+                            if data!["dl_leagueId"] as? String  != nil {
+                                  dl_leagueId=data!["dl_leagueId"]! as? String ?? "";
+                
+                              }
+                            
+                            if data!["dl_ac_promocode"] as? String  != nil {
+                                              dl_ac_promocode=data!["dl_ac_promocode"]! as? String ?? "";
+                            
+                                          }
+                            if data!["dl_sp_pageLocation"] as? String  != nil {
+                                              dl_sp_pageLocation=data!["dl_sp_pageLocation"]! as? String ?? "";
+                            
+                                          }
+                            
+                            if data!["dl_sp_pageTitle"] as? String  != nil {
+                                              dl_sp_pageTitle=data!["dl_sp_pageTitle"]! as? String ?? "";
+                            
+                                          }
+                            
+                            if data!["dl_sport_type"] as? String  != nil {
+                                              dl_sport_type=data!["dl_sport_type"]! as? String ?? "";
+                            
+                                          }
+                           if data!["dl_unique_id"] as? String  != nil {
+                                              dl_unique_id=data!["dl_unique_id"]! as? String ?? "";
+                            
+                                          }
+                      }
+        
+        
+                      }}
+                          
+                          deepLinkingDataObject["dl_page_route"] = dl_page_route;
+                          deepLinkingDataObject["dl_leagueId"] = dl_leagueId;
+                          deepLinkingDataObject["dl_ac_promocode"] = dl_ac_promocode;
+                          deepLinkingDataObject["dl_ac_promoamount"] = dl_ac_promoamount;
+                          deepLinkingDataObject["dl_sp_pageLocation"] = dl_sp_pageLocation;
+                          deepLinkingDataObject["dl_sp_pageTitle"] = dl_sp_pageTitle;
+                          deepLinkingDataObject["dl_sport_type"] = dl_sport_type;
+                          deepLinkingDataObject["dl_unique_id"] = dl_unique_id;           
+    }
+    
     private func getBranchData(result: FlutterResult){
         var object = [String : String]();
         if (app_launchOptions != nil){
@@ -146,6 +218,8 @@ import CoreLocation
         var installReferring_link2:String = "";
         let installParams = Branch.getInstance().getFirstReferringParams();
         let sessionParams = Branch.getInstance().getLatestReferringParams();
+        setDeepLinkingBranchData(deepLinkingData:branchData as? [String: AnyObject]);
+        setDeepLinkingBranchData(deepLinkingData:sessionParams as? [String: AnyObject]);
         
         if branchData != nil {
             if(branchData!["+clicked_branch_link"] != nil){
@@ -509,27 +583,28 @@ import CoreLocation
                 }
             })
         })
-        
+              
         UTILS_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.UTILS_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                if(call.method == "onUserInfoRefreshed"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.onUserInfoRefreshed(data:argue!);
-                    }
-                    result(channelResult);
+          [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "onUserInfoRefreshed"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.onUserInfoRefreshed(data:argue!);
                 }
-                if(call.method == "getLocationLongLat"){
-                    self?.location_permission_result=result;
-                    self?.getLocationLongLat();
-                }
-            })
-        })
+                result(channelResult);
+            }
+            if(call.method == "getLocationLongLat"){
+                self?.location_permission_result=result;
+                self?.getLocationLongLat();
+            }
+            if(call.method == "_deepLinkingRoutingHandler"){
+                self?.deepLinkingRoutingHandler(result: result)
+            }
+        });
+        
     }
-    
+      
     func getLocationLongLat(){
         locationManager.delegate = self
         var currentLocation: CLLocation!

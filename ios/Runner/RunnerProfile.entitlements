@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>aps-environment</key>
+	<string>development</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:11zy.app.link</string>
+		<string>applinks:www.howzat.com</string>
+		<string>applinks:stage.howzat.com</string>
+		<string>applinks:beta.howzat.com</string>
+		<string>webcredentials:11zy.app.link</string>
+		<string>webcredentials:www.howzat.com</string>
+		<string>webcredentials:stage.howzat.com</string>
+		<string>webcredentials:beta.howzat.com</string>
+	</array>
+</dict>
+</plist>
