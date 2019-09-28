@@ -508,7 +508,7 @@ class SignupState extends State<Signup> {
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
     var result = await facebookLogin
-        .logInWithReadPermissions(['email', 'public_profile']);
+        .logIn(['email', 'public_profile']);
 
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:

@@ -456,7 +456,7 @@ class SignInPageState extends State<SignInPage> {
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
     var result = await facebookLogin
-        .logInWithReadPermissions(['email', 'public_profile']);
+        .logIn(['email', 'public_profile']);
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         _sendTokenToAuthenticate(result.accessToken.token, 2);
