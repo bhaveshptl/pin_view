@@ -4,5 +4,17 @@
 <dict>
 	<key>aps-environment</key>
 	<string>development</string>
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>webcredentials:hwzt.in</string>
+        <string>webcredentials:11zy-alternate.app.link</string>
+        <string>applinks:hwzt.in</string>
+        <string>applinks:11zy-alternate.app.link</string>
+        <string>webcredentials:11zy.app.link</string>
+        <string>applinks:11zy.app.link</string>
+        <string>webcredentials:howzat.com</string>
+        <string>webcredentials:www.howzat.com</string>
+        <string>applinks:www.howzat.com</string>
+    </array>
 </dict>
 </plist>

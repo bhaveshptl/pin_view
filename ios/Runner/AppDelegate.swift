@@ -672,9 +672,8 @@ import CoreLocation
                                      details: nil))
     }
     
-    //andData response: [AnyHashable : Any]?
+   
     public func onPaymentSuccess(_ payment_id: String,andData response: [AnyHashable : Any]?){
-        print("<<<<<<<<<<< Payment Success >>>>>>>>>>>>>>>>>>>>>>>>>>>");
         /* Function Usecase : Call on Razorpay Payment success*/
         var dict : Dictionary = Dictionary<AnyHashable,Any>();
         if(response != nil){
@@ -906,6 +905,7 @@ import CoreLocation
     }
     
     private func webEngageEventSigniup(signupData:[String:Any])->String {
+         /* Function Usecase : Web engage Event for Signup*/
         var email = "";
         var phone = "";
         var addedAttributes:[String:Any] = [:];
@@ -929,6 +929,7 @@ import CoreLocation
     }
     
     private func webEngageEventLogin(loginData:[String:Any])->String{
+         /* Function Usecase : Webengage event for login*/
         var email = "";
         var phone = "";
         var first_name = "";
@@ -966,6 +967,7 @@ import CoreLocation
     }
     
     private func webEngageTransactionFailed(data:[String:Any])-> String{
+         /* Function Usecase : Webengage event for add cash transaction failed*/
         var isfirstDepositor:Bool = false;
         var eventName = "FIRST_DEPOSIT_FAILED";
         var addedAttributes:[String:Any] = [:];
@@ -983,6 +985,7 @@ import CoreLocation
     }
     
     private func webEngageTransactionSuccess(data:[String:Any])-> String{
+          /* Function Usecase : Webengage event for add cash transaction success*/
         var isfirstDepositor:Bool = false;
         var eventName = "DEPOSIT_SUCCESS";
         var addedAttributes:[String:Any] = [:];
@@ -994,6 +997,7 @@ import CoreLocation
     }
     
     private func branchLifecycleEventSigniup(registrationID:String,transactionID:String,description:String,data: NSDictionary){
+          /* Function Usecase : Branch event for signup*/
         let event = BranchEvent.standardEvent(.completeRegistration)
         event.transactionID = transactionID;
         event.eventDescription = description;
@@ -1040,7 +1044,7 @@ import CoreLocation
           
         }
         completionHandler(UIBackgroundFetchResult.newData);
-        Branch.getInstance().handlePushNotification(userInfo)
+       
     }
     
     
@@ -1067,7 +1071,7 @@ import CoreLocation
         return true
     }
     
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+   override func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         Branch.getInstance().continue(userActivity)
         return true
     }

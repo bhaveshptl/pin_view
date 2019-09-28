@@ -110,5 +110,12 @@
 	<string>key_live_fcThXLB3cqKAk6wR35qlEoloysgsneDn</string>
 	<key>branch_app_domain</key>
 	<string>11zy.app.link</string>
+    <key>branch_universal_link_domains</key>
+    <array>
+        <string>11zy.app.link</string>
+        <string>hwzt.in</string>
+        <string>11zy-alternate.app.link</string>
+        <string>howzat.com</string>
+    </array>
 </dict>
 </plist>

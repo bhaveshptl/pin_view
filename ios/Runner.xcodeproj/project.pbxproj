@@ -24,6 +24,7 @@
 		BE4B930C229A951C00C4959C /* MyHelperClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4B930B229A951C00C4959C /* MyHelperClass.swift */; };
 		BE51DDD022EF3527005DC3DC /* SplashScreenTablet.png in Resources */ = {isa = PBXBuildFile; fileRef = BE51DDCF22EF3527005DC3DC /* SplashScreenTablet.png */; };
 		BE51DDD222EF3895005DC3DC /* IpadLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE51DDD122EF3895005DC3DC /* IpadLaunchScreen.storyboard */; };
+		BE55F153233F5E8200428318 /* Runner.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = BE3ECC52229B003100CDBF47 /* Runner.entitlements */; };
 		BE8A5090233A52E700D88FD7 /* RunnerProfile.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = BE8A508F233A1DAD00D88FD7 /* RunnerProfile.entitlements */; };
 		BEC5553A22EEC84C00F161C3 /* HowzatLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BEC5553922EEC84C00F161C3 /* HowzatLaunchScreen.storyboard */; };
 		BEF8229A229856890091C6FB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BEF82299229856890091C6FB /* GoogleService-Info.plist */; };
@@ -248,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE55F153233F5E8200428318 /* Runner.entitlements in Resources */,
 				BE8A5090233A52E700D88FD7 /* RunnerProfile.entitlements in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
