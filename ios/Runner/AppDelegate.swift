@@ -8,6 +8,7 @@ import FirebaseInstanceID
 import FirebaseMessaging
 import Firebase
 import CoreLocation
+import FBSDKCoreKit
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocolWithData,CLLocationManagerDelegate {
@@ -43,8 +44,23 @@ import CoreLocation
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?
-        ) -> Bool {
-        /* Flutter Channel Init*/
+    ) -> Bool {
+        initFlutterChannelsAndEvents();
+        deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions);
+        /* Init Services*/
+        initPushNotifications(application);
+        initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
+        initFlutterChannelsService();
+        initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
+        enableLocationServices();
+        /* Flutter App Init*/
+        GeneratedPluginRegistrant.register(with: self)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+    
+    private func initFlutterChannelsAndEvents(){
+        /* Flutter Channel and events  init*/
         controller = window?.rootViewController as? FlutterViewController;
         RAZORPAY_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.razorpay",binaryMessenger: controller)
         BRANCH_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.branch",binaryMessenger: controller)
@@ -52,18 +68,7 @@ import CoreLocation
         WEBENGAGE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.webengage",binaryMessenger: controller)
         SOCIAL_SHARE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.socialshare",binaryMessenger: controller)
         BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller)
-        
         UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller)
-        deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
-        /* Init Services*/
-        initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
-        initPushNotifications(application);
-        initFlutterChannels();
-        initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
-        enableLocationServices();
-        /* Flutter App Init*/
-        GeneratedPluginRegistrant.register(with: self)
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
     private func initPushNotifications(_ application: UIApplication){
@@ -80,7 +85,6 @@ import CoreLocation
                 UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
             application.registerUserNotificationSettings(settings)
         }
-        
         application.registerForRemoteNotifications()
     }
     
@@ -94,15 +98,12 @@ import CoreLocation
             }
         }
         return token;
-        
     }
     
     private func subscribeToFirebaseTopic(topicName:String)->String {
         Messaging.messaging().subscribe(toTopic: topicName) { error in
-            
         }
         return "Subscribed to the firebase topic"+topicName;
-        
     }
     
     private func initWebengage(_ application: UIApplication,didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?){
@@ -128,68 +129,61 @@ import CoreLocation
     }
     
     private func setDeepLinkingBranchData(deepLinkingData data:[String: AnyObject]?){
-          var dl_page_route:String = "";
-                  var dl_leagueId:String = "";
-                  var dl_ac_promocode:String = "";
-                  var dl_ac_promoamount:String = "";
-                  var dl_sp_pageLocation:String = "";
-                  var dl_sp_pageTitle:String = "";
-                  var dl_sport_type:String = "";
-                  var dl_unique_id:String = "";
-                 
-                  deepLinkingDataObject["activateDeepLinkingNavigation"] = false;
-                   /*Check if deep linking page source is present and it is not empty*/
-                  if data != nil {
-                      print("data from deep linking.........");
-                            print(data!);
-                      if(data!["+clicked_branch_link"] != nil){
-                          print("data clicked_branch_link.........");
-                                           print(data!["+clicked_branch_link"]!);
-                           if(data!["+clicked_branch_link"]! as? Int == 1){
-                              if data!["dl_page_route"] as? String  != nil {
-                                  dl_page_route=data!["dl_page_route"]! as? String ?? "";
-                            deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
-                              }
-                            if data!["dl_leagueId"] as? String  != nil {
-                                  dl_leagueId=data!["dl_leagueId"]! as? String ?? "";
-                
-                              }
-                            
-                            if data!["dl_ac_promocode"] as? String  != nil {
-                                              dl_ac_promocode=data!["dl_ac_promocode"]! as? String ?? "";
-                            
-                                          }
-                            if data!["dl_sp_pageLocation"] as? String  != nil {
-                                              dl_sp_pageLocation=data!["dl_sp_pageLocation"]! as? String ?? "";
-                            
-                                          }
-                            
-                            if data!["dl_sp_pageTitle"] as? String  != nil {
-                                              dl_sp_pageTitle=data!["dl_sp_pageTitle"]! as? String ?? "";
-                            
-                                          }
-                            
-                            if data!["dl_sport_type"] as? String  != nil {
-                                              dl_sport_type=data!["dl_sport_type"]! as? String ?? "";
-                            
-                                          }
-                           if data!["dl_unique_id"] as? String  != nil {
-                                              dl_unique_id=data!["dl_unique_id"]! as? String ?? "";
-                            
-                                          }
-                      }
+        var dl_page_route:String = "";
+        var dl_leagueId:String = "";
+        var dl_ac_promocode:String = "";
+        var dl_ac_promoamount:String = "";
+        var dl_sp_pageLocation:String = "";
+        var dl_sp_pageTitle:String = "";
+        var dl_sport_type:String = "";
+        var dl_unique_id:String = "";
         
+        deepLinkingDataObject["activateDeepLinkingNavigation"] = false;
+        /*Check if deep linking page source is present and it is not empty*/
+        if data != nil {
+            print("data from deep linking.........");
+            print(data!);
+            if(data!["+clicked_branch_link"] != nil){
+                print("data clicked_branch_link.........");
+                print(data!["+clicked_branch_link"]!);
+                if(data!["+clicked_branch_link"]! as? Int == 1){
+                    if data!["dl_page_route"] as? String  != nil {
+                        dl_page_route=data!["dl_page_route"]! as? String ?? "";
+                        deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+                    }
+                    if data!["dl_leagueId"] as? String  != nil {
+                        dl_leagueId=data!["dl_leagueId"]! as? String ?? "";
+                    }
+                    if data!["dl_ac_promoamount"] as? String  != nil {
+                        dl_ac_promoamount=data!["dl_ac_promoamount"]! as? String ?? "";
+                    }
+                    if data!["dl_ac_promocode"] as? String  != nil {
+                        dl_ac_promocode=data!["dl_ac_promocode"]! as? String ?? "";
+                    }
+                    if data!["dl_sp_pageLocation"] as? String  != nil {
+                        dl_sp_pageLocation=data!["dl_sp_pageLocation"]! as? String ?? "";
+                    }
+                    if data!["dl_sp_pageTitle"] as? String  != nil {
+                        dl_sp_pageTitle=data!["dl_sp_pageTitle"]! as? String ?? "";
+                    }
+                    
+                    if data!["dl_sport_type"] as? String  != nil {
+                        dl_sport_type=data!["dl_sport_type"]! as? String ?? "";
+                    }
+                    if data!["dl_unique_id"] as? String  != nil {
+                        dl_unique_id=data!["dl_unique_id"]! as? String ?? "";
+                    }
+                }
+            }}
         
-                      }}
-                          
-                          deepLinkingDataObject["dl_page_route"] = dl_page_route;
-                          deepLinkingDataObject["dl_leagueId"] = dl_leagueId;
-                          deepLinkingDataObject["dl_ac_promocode"] = dl_ac_promocode;
-                          deepLinkingDataObject["dl_ac_promoamount"] = dl_ac_promoamount;
-                          deepLinkingDataObject["dl_sp_pageLocation"] = dl_sp_pageLocation;
-                          deepLinkingDataObject["dl_sp_pageTitle"] = dl_sp_pageTitle;
-                          deepLinkingDataObject["dl_sport_type"] = dl_sport_type;
-                          deepLinkingDataObject["dl_unique_id"] = dl_unique_id;           
+        deepLinkingDataObject["dl_page_route"] = dl_page_route;
+        deepLinkingDataObject["dl_leagueId"] = dl_leagueId;
+        deepLinkingDataObject["dl_ac_promocode"] = dl_ac_promocode;
+        deepLinkingDataObject["dl_ac_promoamount"] = dl_ac_promoamount;
+        deepLinkingDataObject["dl_sp_pageLocation"] = dl_sp_pageLocation;
+        deepLinkingDataObject["dl_sp_pageTitle"] = dl_sp_pageTitle;
+        deepLinkingDataObject["dl_sport_type"] = dl_sport_type;
+        deepLinkingDataObject["dl_unique_id"] = dl_unique_id;
     }
     
     private func getBranchData(result: FlutterResult){
@@ -218,7 +212,7 @@ import CoreLocation
         var installReferring_link2:String = "";
         let installParams = Branch.getInstance().getFirstReferringParams();
         let sessionParams = Branch.getInstance().getLatestReferringParams();
-        setDeepLinkingBranchData(deepLinkingData:branchData as? [String: AnyObject]);
+        setDeepLinkingBranchData(deepLinkingData:branchData);
         setDeepLinkingBranchData(deepLinkingData:sessionParams as? [String: AnyObject]);
         
         if branchData != nil {
@@ -257,7 +251,7 @@ import CoreLocation
                         refCodeFromBranchTrail2=sessionParams!["refCode"]! as? String ?? "";
                     }
                     else{
-                        refCodeFromBranchTrail2=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                    refCodeFromBranchTrail2=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
                     }
                 }
             }
@@ -285,307 +279,292 @@ import CoreLocation
         return object;
     }
     
-    private func initFlutterChannels(){
+    private func initFlutterChannelsService(){
         
         RAZORPAY_IO_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.RAZORPAY_IO_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                if(call.method == "initRazorpayNativePlugin"){
-                    result("Razorpay Init done");
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "initRazorpayNativePlugin"){
+                result("Razorpay Init done");
+            }
+            else if(call.method == "_openRazorpayNative"){
+                self?.razorpay_result=result;
+                let razorpayInitArgue = call.arguments as? [String: AnyObject] ;
+                if(razorpayInitArgue != nil){
+                    let product_name = razorpayInitArgue!["name"] as? String ;
+                    let prefill_email = razorpayInitArgue!["email"] as? String;
+                    let prefill_phone = razorpayInitArgue!["phone"] as? String;
+                    let product_amount = razorpayInitArgue!["amount"] as? String;
+                    let product_orderId = razorpayInitArgue!["orderId"] as? String;
+                    let product_method = razorpayInitArgue!["method"] as? String;
+                    let product_image = razorpayInitArgue!["image"] as? String;
+                    self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
                 }
-                else if(call.method == "_openRazorpayNative"){
-                    self?.razorpay_result=result;
-                    let razorpayInitArgue = call.arguments as? [String: AnyObject] ;
-                    if(razorpayInitArgue != nil){
-                        let product_name = razorpayInitArgue!["name"] as? String ;
-                        let prefill_email = razorpayInitArgue!["email"] as? String;
-                        let prefill_phone = razorpayInitArgue!["phone"] as? String;
-                        let product_amount = razorpayInitArgue!["amount"] as? String;
-                        let product_orderId = razorpayInitArgue!["orderId"] as? String;
-                        let product_method = razorpayInitArgue!["method"] as? String;
-                        let product_image = razorpayInitArgue!["image"] as? String;
-                        self?.showPaymentForm(name: product_name!, email:prefill_email!, phone:prefill_phone!, amount:product_amount!,orderId:product_orderId!, method:product_method!,image:product_image!);
-                    }
-                }
-                else{
-                    result(FlutterMethodNotImplemented)
-                }
-            })
+            }
+            else{
+                result(FlutterMethodNotImplemented)
+            }
         });
         
         BROWSER_LAUNCH_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.BROWSER_LAUNCH_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                if(call.method == "launchInBrowser"){
-                    let weburl=call.arguments as? String;
-                    guard let url = URL(string: weburl!) else {
-                        result(FlutterMethodNotImplemented)
-                        return //be safe
-                    }
-                    if #available(iOS 10.0, *) {
-                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                    } else {
-                        UIApplication.shared.openURL(url)
-                    }
-                    result("Broser Opened");
-                }
-                else{
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "launchInBrowser"){
+                let weburl=call.arguments as? String;
+                guard let url = URL(string: weburl!) else {
                     result(FlutterMethodNotImplemented)
+                    return //be safe
                 }
-                
-            })
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
+                result("Broser Opened");
+            }
+            else{
+                result(FlutterMethodNotImplemented)
+            }
         });
         
+    
         WEBENGAGE_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.WEBENGAGE_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                
-                if(call.method=="webEngageEventSigniup"){
-                    let argue = call.arguments as? [String : Any];
-                     var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.webEngageEventSigniup(signupData:argue!);
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method=="webEngageEventSigniup"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.webEngageEventSigniup(signupData:argue!);
+                }
+                result(channelResult);
+            }
+            if(call.method=="webEngageEventLogin"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.webEngageEventLogin(loginData:argue!);
+                }
+                result(channelResult);
+            }
+            if(call.method=="webEngageTransactionFailed"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.webEngageTransactionFailed(data:argue!);
+                }
+                result(channelResult);
+            }
+            if(call.method=="webEngageTransactionSuccess"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.webEngageTransactionSuccess(data:argue!);
+                }
+                result(channelResult);
+            }
+            if(call.method == "webengageTrackUser"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    if(argue != nil ){
+                        channelResult = self!.webengageTrackUser(data:argue!);
                     }
-                    result(channelResult);
                 }
-                if(call.method=="webEngageEventLogin"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.webEngageEventLogin(loginData:argue!);
-                    }
-                    result(channelResult);
+                result(channelResult)
+            }
+            else if (call.method == "webengageCustomAttributeTrackUser"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.webengageCustomAttributeTrackUser(data:argue!);
                 }
-                if(call.method=="webEngageTransactionFailed"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.webEngageTransactionFailed(data:argue!);
-                    }
-                    result(channelResult);
+                result(channelResult);
+            }
+            else if (call.method == "webengageTrackEvent"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.webengageTrackEvent(data:argue!);
                 }
-                if(call.method=="webEngageTransactionSuccess"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.webEngageTransactionSuccess(data:argue!);
-                    }
-                    result(channelResult);
+                result(channelResult);
+            }
+            else if(call.method == "trackEventsWithAttributes"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                if(argue != nil){
+                    channelResult = self!.trackEventsWithAttributes(data:argue!);
                 }
-                if(call.method == "webengageTrackUser"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        if(argue != nil ){
-                     channelResult = self!.webengageTrackUser(data:argue!);
-                        }
-                    }
-                    result(channelResult)
-                }
-                else if (call.method == "webengageCustomAttributeTrackUser"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.webengageCustomAttributeTrackUser(data:argue!);
-                    }
-                    result(channelResult);
-                }
-                else if (call.method == "webengageTrackEvent"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.webengageTrackEvent(data:argue!);
-                    }
-                    result(channelResult);
-                }
-                else if(call.method == "trackEventsWithAttributes"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    if(argue != nil){
-                        channelResult = self!.trackEventsWithAttributes(data:argue!);
-                    }
-                    result(channelResult);
-                }
-                else if(call.method == "webengageAddScreenData"){
-                    let argue = call.arguments as? [String : Any];
-                    var  channelResult:String="";
-                    result(channelResult);
-                }
-                else{
-                    result(FlutterMethodNotImplemented)
-                }
-            })
-        })
+                result(channelResult);
+            }
+            else if(call.method == "webengageAddScreenData"){
+                let argue = call.arguments as? [String : Any];
+                var  channelResult:String="";
+                result(channelResult);
+            }
+            else{
+                result(FlutterMethodNotImplemented)
+            }
+        });
+        
         
         BRANCH_IO_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.BRANCH_IO_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                if(call.method == "_getBranchRefCode"){
-                    let  channelResult:String=self!.refCodeFromBranch;
-                    result(channelResult)
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "_getBranchRefCode"){
+                let  channelResult:String=self!.refCodeFromBranch;
+                result(channelResult)
+            }
+            else if(call.method == "_initBranchIoPlugin"){
+                let  channelResult:String=""
+                if (self!.bBranchLodead) {
+                    var object = [String : String]();
+                    object["installReferring_link"] = self!.installReferring_link;
+                    object["refCodeFromBranch"] = self!.refCodeFromBranch;
+                    result(object);
+                } else {
+                    self!.getBranchData(result:result);
                 }
-                else if(call.method == "_initBranchIoPlugin"){
-                    let  channelResult:String=""
-                    if (self!.bBranchLodead) {
-                        var object = [String : String]();
-                        object["installReferring_link"] = self!.installReferring_link;
-                        object["refCodeFromBranch"] = self!.refCodeFromBranch;
-                        result(object);
-                    } else {
-                        self!.getBranchData(result:result);
-                    }
-                    result(channelResult)
+                result(channelResult)
+            }
+            else if(call.method == "_getInstallReferringLink"){
+                let  channelResult:String=self!.installReferring_link;
+                
+                result(channelResult)
+            }
+                
+            else if(call.method == "trackAndSetBranchUserIdentity"){
+                let  channelResult:String="";
+                Branch.getInstance().setIdentity(call.arguments as? String)
+                result(channelResult);
+            }
+            else if(call.method == "branchLifecycleEventSigniup"){
+                let  channelResult:String="";
+                let argue = call.arguments as? NSDictionary;
+                let data = argue!["data"]! as? [String: Any];
+                
+                let event = BranchEvent.standardEvent(.completeRegistration)
+                event.transactionID = argue!["transactionID"] as? String;
+                event.eventDescription = argue!["description"] as? String;
+                event.customData["registrationID"] = argue!["registrationID"] as? String;
+                event.customData["login_name"] = data!["login_name"]!;
+                event.customData["channelId"] =  data!["channelId"]!;
+                
+                for (key , value) in data! {
+                    //event.customData[key+""] = value;
                 }
-                else if(call.method == "_getInstallReferringLink"){
-                    let  channelResult:String=self!.installReferring_link;
-                    
-                    result(channelResult)
+                event.logEvent();
+                result(channelResult);
+            }
+            else if(call.method == "branchEventTransactionFailed"){
+                let  channelResult:String="";
+                let argue = call.arguments as? NSDictionary;
+                let data = argue!["data"]! as? NSDictionary;
+                var  isfirstDepositor:Bool=false;
+                var eventName:String="FIRST_DEPOSIT_FAILED";
+                isfirstDepositor = argue!["firstDepositor"] as? Bool ?? false;
+                if(!isfirstDepositor){
+                    eventName = "REPEAT_DEPOSIT_FAILED";
                 }
-                    
-                else if(call.method == "trackAndSetBranchUserIdentity"){
-                    let  channelResult:String="";
-                    Branch.getInstance().setIdentity(call.arguments as? String)
-                    result(channelResult);
+                let event = BranchEvent.customEvent(withName:eventName)
+                for (key, value) in data! {
+                    event.customData[key] = value;
                 }
-                else if(call.method == "branchLifecycleEventSigniup"){
-                    let  channelResult:String="";
-                    let argue = call.arguments as? NSDictionary;
-                    let data = argue!["data"]! as? [String: Any];
-                    
-                    let event = BranchEvent.standardEvent(.completeRegistration)
-                    event.transactionID = argue!["transactionID"] as? String;
-                    event.eventDescription = argue!["description"] as? String;
-                    event.customData["registrationID"] = argue!["registrationID"] as? String;
-                    event.customData["login_name"] = data!["login_name"]!;
-                    event.customData["channelId"] =  data!["channelId"]!;
-                    
-                    for (key , value) in data! {
-                        //event.customData[key+""] = value;
-                    }
-                    event.logEvent();
-                    result(channelResult);
+                event.logEvent();
+                result(channelResult)
+            }
+            else if(call.method == "branchEventTransactionSuccess"){
+                let  channelResult:String="";
+                let argue = call.arguments as? NSDictionary;
+                let data = argue!["data"]! as? NSDictionary;
+                var  isfirstDepositor:Bool=false;
+                var eventName:String="FIRST_DEPOSIT_SUCCESS";
+                isfirstDepositor = argue!["firstDepositor"] as? Bool ?? false;
+                if(!isfirstDepositor){
+                    eventName = "REPEAT_DEPOSIT_SUCCESS";
                 }
-                else if(call.method == "branchEventTransactionFailed"){
-                    let  channelResult:String="";
-                    let argue = call.arguments as? NSDictionary;
-                    let data = argue!["data"]! as? NSDictionary;
-                    var  isfirstDepositor:Bool=false;
-                    var eventName:String="FIRST_DEPOSIT_FAILED";
-                    isfirstDepositor = argue!["firstDepositor"] as? Bool ?? false;
-                    if(!isfirstDepositor){
-                        eventName = "REPEAT_DEPOSIT_FAILED";
-                    }
-                    let event = BranchEvent.customEvent(withName:eventName)
-                    for (key, value) in data! {
-                        event.customData[key] = value;
-                    }
-                    event.logEvent();
-                    result(channelResult)
+                let event = BranchEvent.customEvent(withName:eventName)
+                for (key, value) in data! {
+                    event.customData[key] = value;
                 }
-                else if(call.method == "branchEventTransactionSuccess"){
-                    let  channelResult:String="";
-                    let argue = call.arguments as? NSDictionary;
-                    let data = argue!["data"]! as? NSDictionary;
-                    var  isfirstDepositor:Bool=false;
-                    var eventName:String="FIRST_DEPOSIT_SUCCESS";
-                    isfirstDepositor = argue!["firstDepositor"] as? Bool ?? false;
-                    if(!isfirstDepositor){
-                        eventName = "REPEAT_DEPOSIT_SUCCESS";
-                    }
-                    let event = BranchEvent.customEvent(withName:eventName)
-                    for (key, value) in data! {
-                        event.customData[key] = value;
-                    }
-                    event.logEvent();
-                    
-                    result(channelResult)
-                }
-                else if(call.method == "_getGoogleAddId"){
-                    var  channelResult:String="";
-                    channelResult=MyDeviceInfo.identifierForAdvertising();
-                    result(channelResult)
-                }
-                else if(call.method == "_getAndroidDeviceInfo"){
-                    self?.device_info_result=result;
-                    self?.getDeviceInfo(deviceinfoResult: result);
-                }
-                else{
-                    result(FlutterMethodNotImplemented)
-                }
-            })
-        })
+                event.logEvent();
+                
+                result(channelResult)
+            }
+            else if(call.method == "_getGoogleAddId"){
+                var  channelResult:String="";
+                channelResult=MyDeviceInfo.identifierForAdvertising();
+                result(channelResult)
+            }
+            else if(call.method == "_getAndroidDeviceInfo"){
+                self?.device_info_result=result;
+                self?.getDeviceInfo(deviceinfoResult: result);
+            }
+            else{
+                result(FlutterMethodNotImplemented)
+            }
+            
+        });
+        
         
         PF_FCM_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.PF_FCM_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                if(call.method == "_getFirebaseToken"){
-                    var  channelResult:String="";
-                    if(self!.firebaseToken.count>4){
-                        channelResult=self!.firebaseToken;
-                    }
-                    else{
-                        channelResult=self!.getFireBaseToken();
-                    }
-                    result(channelResult)
-                }
-                else if(call.method == "_subscribeToFirebaseTopic"){
-                    let topic=call.arguments as? String;
-                    var  channelResult:String = "";
-                    if(topic != nil){
-                        channelResult=self!.subscribeToFirebaseTopic(topicName:topic!);
-                    }
-                    result(channelResult)
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "_getFirebaseToken"){
+                var  channelResult:String="";
+                if(self!.firebaseToken.count>4){
+                    channelResult=self!.firebaseToken;
                 }
                 else{
-                    result(FlutterMethodNotImplemented)
+                    channelResult=self!.getFireBaseToken();
                 }
-            })
-        })
-
-
+                result(channelResult)
+            }
+            else if(call.method == "_subscribeToFirebaseTopic"){
+                let topic=call.arguments as? String;
+                var  channelResult:String = "";
+                if(topic != nil){
+                    channelResult=self!.subscribeToFirebaseTopic(topicName:topic!);
+                }
+                result(channelResult)
+            }
+            else{
+                result(FlutterMethodNotImplemented)
+            }
+        });
+        
+        
         SOCIAL_SHARE_CHANNEL.setMethodCallHandler({
-            (call: FlutterMethodCall, result:  FlutterResult) -> Void in
-            self.SOCIAL_SHARE_CHANNEL.setMethodCallHandler({
-                [weak self] (call: FlutterMethodCall, result:@escaping FlutterResult) -> Void in
-                if(call.method == "initSocialShareChannel"){
-                    result("Social Share");
-                }
-                if(call.method == "shareViaWhatsApp"){
-                    let isWhatsAppOpened:Bool = SocialShare.shareViaWhatsApp(msg:call.arguments as! String);
-                    if(isWhatsAppOpened){
-                        result("Social Share");
-                    }
-                    else{
-                        result(FlutterError(code: "0",message: "Failed to open WhatsApp",
-                                            details: nil));
-                    }
-                    
-                }
-                if(call.method == "shareText"){
-                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
-                    result("Social Share");
-                }
-                if(call.method == "shareViaFacebook"){
-                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
-                    result("Social Share");
-                }
-                if(call.method == "shareViaGmail"){
-                    SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if(call.method == "initSocialShareChannel"){
+                result("Social Share");
+            }
+            if(call.method == "shareViaWhatsApp"){
+                let isWhatsAppOpened:Bool = SocialShare.shareViaWhatsApp(msg:call.arguments as! String);
+                if(isWhatsAppOpened){
                     result("Social Share");
                 }
                 else{
-                    result(FlutterMethodNotImplemented)
+                    result(FlutterError(code: "0",message: "Failed to open WhatsApp",
+                                        details: nil));
                 }
-            })
-        })
-              
+                
+            }
+            if(call.method == "shareText"){
+                SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                result("Social Share");
+            }
+            if(call.method == "shareViaFacebook"){
+                SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                result("Social Share");
+            }
+            if(call.method == "shareViaGmail"){
+                SocialShare.shareText(viewController:self?.controller,msg:call.arguments as! String);
+                result("Social Share");
+            }
+            else{
+                result(FlutterMethodNotImplemented)
+            }
+        });
+        
+        
         UTILS_CHANNEL.setMethodCallHandler({
-          [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             if(call.method == "onUserInfoRefreshed"){
                 let argue = call.arguments as? [String : Any];
                 var  channelResult:String="";
@@ -603,8 +582,9 @@ import CoreLocation
             }
         });
         
+        
     }
-      
+    
     func getLocationLongLat(){
         locationManager.delegate = self
         var currentLocation: CLLocation!
@@ -617,10 +597,11 @@ import CoreLocation
             response["longitude"] = String(currentLocation.coordinate.longitude);
             response["latitude"] = String(currentLocation.coordinate.latitude);
         }else{
-           response["bAccessGiven"] = "false"; 
+            response["bAccessGiven"] = "false";
         }
         location_permission_result(response);
     }
+    
     func enableLocationServices() {
         locationManager.delegate = self
         switch CLLocationManager.authorizationStatus() {
@@ -662,9 +643,6 @@ import CoreLocation
         razorpay.open(options)
     }
     
-    
-    
-    
     public func onPaymentError(_ code: Int32, description str: String,andData response: [AnyHashable : Any]?){
         /* Function Usecase : Call on Razorpay Payment Failed*/
         razorpay_result(FlutterError(code: "0",
@@ -672,7 +650,7 @@ import CoreLocation
                                      details: nil))
     }
     
-   
+    
     public func onPaymentSuccess(_ payment_id: String,andData response: [AnyHashable : Any]?){
         /* Function Usecase : Call on Razorpay Payment success*/
         var dict : Dictionary = Dictionary<AnyHashable,Any>();
@@ -753,13 +731,13 @@ import CoreLocation
             if(value=="DOC_NOT_SUBMITTED"){
                 weUser.setAttribute("idProofStatus", withValue:0);
             }else if(value=="DOC_SUBMITTED"){
-                 weUser.setAttribute("idProofStatus", withValue:1);
+                weUser.setAttribute("idProofStatus", withValue:1);
             }else if(value=="UNDER_REVIEW"){
-                 weUser.setAttribute("idProofStatus", withValue:2);
+                weUser.setAttribute("idProofStatus", withValue:2);
             }else if(value=="DOC_REJECTED"){
-                 weUser.setAttribute("idProofStatus", withValue:3);
+                weUser.setAttribute("idProofStatus", withValue:3);
             }else if(value=="VERIFIED") {
-                 weUser.setAttribute("idProofStatus", withValue:4);
+                weUser.setAttribute("idProofStatus", withValue:4);
             }
             
         }
@@ -788,11 +766,11 @@ import CoreLocation
         if(data["email_verification"] != nil){
             let value:Bool = data["email_verification"] as! Bool;
             if(value){
-                 weUser.setAttribute("emailVerified", withValue:true);
+                weUser.setAttribute("emailVerified", withValue:true);
             }else{
-                 weUser.setAttribute("emailVerified", withValue:false);
+                weUser.setAttribute("emailVerified", withValue:false);
             }
-           
+            
         }
         if(data["dob"] != nil){
             let value:String = data["dob"] as! String;
@@ -824,7 +802,7 @@ import CoreLocation
             trackType = data["trackingType"] as! String;
         }
         if(data["value"] != nil){
-           value = data["value"] as! String;
+            value = data["value"] as! String;
         }
         switch trackType{
         case "login":
@@ -905,7 +883,7 @@ import CoreLocation
     }
     
     private func webEngageEventSigniup(signupData:[String:Any])->String {
-         /* Function Usecase : Web engage Event for Signup*/
+        /* Function Usecase : Web engage Event for Signup*/
         var email = "";
         var phone = "";
         var addedAttributes:[String:Any] = [:];
@@ -920,7 +898,7 @@ import CoreLocation
         }
         weAnalytics.trackEvent(withName: "COMPLETE_REGISTRATION", andValue:addedAttributes);
         if(email.count>3){
-             weUser.setHashedEmail(email);
+            weUser.setHashedEmail(email);
         }
         if(phone.count>3){
             weUser.setHashedPhone(phone);
@@ -929,7 +907,7 @@ import CoreLocation
     }
     
     private func webEngageEventLogin(loginData:[String:Any])->String{
-         /* Function Usecase : Webengage event for login*/
+        /* Function Usecase : Webengage event for login*/
         var email = "";
         var phone = "";
         var first_name = "";
@@ -948,7 +926,7 @@ import CoreLocation
             first_name = loginData["first_name"] as! String;
         }
         if(loginData["last_name"] != nil){
-           last_name = loginData["last_name"]! as! String ;
+            last_name = loginData["last_name"]! as! String ;
         }
         weAnalytics.trackEvent(withName: "COMPLETE_LOGIN", andValue:addedAttributes);
         if(email.count>3){
@@ -958,16 +936,16 @@ import CoreLocation
             weUser.setHashedPhone(phone);
         }
         if(loginData["first_name"] != nil){
-             weUser.setFirstName(first_name);
+            weUser.setFirstName(first_name);
         }
         if(loginData["last_name"] != nil){
-             weUser.setLastName(last_name);
+            weUser.setLastName(last_name);
         }
-         return "Web engage Login  Event added";
+        return "Web engage Login  Event added";
     }
     
     private func webEngageTransactionFailed(data:[String:Any])-> String{
-         /* Function Usecase : Webengage event for add cash transaction failed*/
+        /* Function Usecase : Webengage event for add cash transaction failed*/
         var isfirstDepositor:Bool = false;
         var eventName = "FIRST_DEPOSIT_FAILED";
         var addedAttributes:[String:Any] = [:];
@@ -985,7 +963,7 @@ import CoreLocation
     }
     
     private func webEngageTransactionSuccess(data:[String:Any])-> String{
-          /* Function Usecase : Webengage event for add cash transaction success*/
+        /* Function Usecase : Webengage event for add cash transaction success*/
         var isfirstDepositor:Bool = false;
         var eventName = "DEPOSIT_SUCCESS";
         var addedAttributes:[String:Any] = [:];
@@ -997,7 +975,7 @@ import CoreLocation
     }
     
     private func branchLifecycleEventSigniup(registrationID:String,transactionID:String,description:String,data: NSDictionary){
-          /* Function Usecase : Branch event for signup*/
+        /* Function Usecase : Branch event for signup*/
         let event = BranchEvent.standardEvent(.completeRegistration)
         event.transactionID = transactionID;
         event.eventDescription = description;
@@ -1041,16 +1019,15 @@ import CoreLocation
     override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
                               fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         if let messageID = userInfo[gcmMessageIDKey] {
-          
+            
         }
         completionHandler(UIBackgroundFetchResult.newData);
-       
+        
     }
     
     
-    
     override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        
+
     }
     
     
@@ -1067,11 +1044,11 @@ import CoreLocation
     
     
     override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        Branch.getInstance().application(app, open: url, options: options)
+        Branch.getInstance().application(app, open: url, options: options);
         return true
     }
     
-   override func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+    override func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         Branch.getInstance().continue(userActivity)
         return true
     }
@@ -1108,11 +1085,11 @@ extension AppDelegate : MessagingDelegate {
         let dataDict:[String: String] = ["token": fcmToken]
         NotificationCenter.default.post(name: Notification.Name("FCMToken"), object: nil, userInfo: dataDict)
         Messaging.messaging().subscribe(toTopic: "news") { error in
-           
+            
         }
         
         Messaging.messaging().subscribe(toTopic: "ios_news") { error in
-           
+            
         }
         
     }
