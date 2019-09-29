@@ -1,31 +1,35 @@
 PODS:
   - android_intent (0.0.1):
     - Flutter
-  - Bolts (1.9.0):
-    - Bolts/AppLinks (= 1.9.0)
-    - Bolts/Tasks (= 1.9.0)
-  - Bolts/AppLinks (1.9.0):
-    - Bolts/Tasks
-  - Bolts/Tasks (1.9.0)
-  - Branch (0.27.0):
-    - Branch/Core (= 0.27.0)
-  - Branch/Core (0.27.0)
+  - Branch (0.29.0):
+    - Branch/Core (= 0.29.0)
+  - Branch/Core (0.29.0)
+  - cipher2 (0.0.1):
+    - CryptoSwift (~> 0.13.1)
+    - Flutter
+  - CryptoSwift (0.13.1)
   - device_info (0.0.1):
     - Flutter
-  - FBSDKCoreKit (4.39.1):
-    - Bolts (~> 1.9)
-  - FBSDKLoginKit (4.39.1):
-    - FBSDKCoreKit
-  - Firebase/Analytics (6.0.0):
+  - FBSDKCoreKit (5.6.0):
+    - FBSDKCoreKit/Basics (= 5.6.0)
+    - FBSDKCoreKit/Core (= 5.6.0)
+  - FBSDKCoreKit/Basics (5.6.0)
+  - FBSDKCoreKit/Core (5.6.0):
+    - FBSDKCoreKit/Basics
+  - FBSDKLoginKit (5.6.0):
+    - FBSDKLoginKit/Login (= 5.6.0)
+  - FBSDKLoginKit/Login (5.6.0):
+    - FBSDKCoreKit (~> 5.0)
+  - Firebase/Analytics (6.9.0):
     - Firebase/Core
-  - Firebase/Core (6.0.0):
+  - Firebase/Core (6.9.0):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (= 6.0.0)
-  - Firebase/CoreOnly (6.0.0):
-    - FirebaseCore (= 6.0.0)
-  - Firebase/Messaging (6.0.0):
+    - FirebaseAnalytics (= 6.1.2)
+  - Firebase/CoreOnly (6.9.0):
+    - FirebaseCore (= 6.3.0)
+  - Firebase/Messaging (6.9.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 4.0.0)
+    - FirebaseMessaging (~> 4.1.4)
   - firebase_analytics (0.0.1):
     - Firebase/Analytics (~> 6.0)
     - Firebase/Core
@@ -33,38 +37,46 @@ PODS:
   - firebase_core (0.0.1):
     - Firebase/Core
     - Flutter
-  - FirebaseAnalytics (6.0.0):
-    - FirebaseCore (~> 6.0)
-    - FirebaseInstanceID (~> 4.0)
-    - GoogleAppMeasurement (= 6.0.0)
+  - FirebaseAnalytics (6.1.2):
+    - FirebaseCore (~> 6.3)
+    - FirebaseInstanceID (~> 4.2)
+    - GoogleAppMeasurement (= 6.1.2)
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (~> 0.3)
-  - FirebaseAnalyticsInterop (1.2.0)
-  - FirebaseCore (6.0.0):
-    - GoogleUtilities/Environment (~> 6.0)
-    - GoogleUtilities/Logger (~> 6.0)
-  - FirebaseInstanceID (4.0.0):
+  - FirebaseAnalyticsInterop (1.4.0)
+  - FirebaseCore (6.3.0):
+    - FirebaseCoreDiagnostics (~> 1.0)
+    - FirebaseCoreDiagnosticsInterop (~> 1.0)
+    - GoogleUtilities/Environment (~> 6.2)
+    - GoogleUtilities/Logger (~> 6.2)
+  - FirebaseCoreDiagnostics (1.1.0):
+    - FirebaseCoreDiagnosticsInterop (~> 1.0)
+    - GoogleDataTransportCCTSupport (~> 1.0)
+    - GoogleUtilities/Environment (~> 6.2)
+    - GoogleUtilities/Logger (~> 6.2)
+  - FirebaseCoreDiagnosticsInterop (1.0.0)
+  - FirebaseInstanceID (4.2.5):
     - FirebaseCore (~> 6.0)
     - GoogleUtilities/Environment (~> 6.0)
     - GoogleUtilities/UserDefaults (~> 6.0)
-  - FirebaseMessaging (4.0.0):
-    - FirebaseAnalyticsInterop (~> 1.1)
-    - FirebaseCore (~> 6.0)
-    - FirebaseInstanceID (~> 4.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
-    - GoogleUtilities/Environment (~> 6.0)
-    - GoogleUtilities/Reachability (~> 6.0)
-    - GoogleUtilities/UserDefaults (~> 6.0)
+  - FirebaseMessaging (4.1.5):
+    - FirebaseAnalyticsInterop (~> 1.3)
+    - FirebaseCore (~> 6.2)
+    - FirebaseInstanceID (~> 4.1)
+    - GoogleUtilities/AppDelegateSwizzler (~> 6.2)
+    - GoogleUtilities/Environment (~> 6.2)
+    - GoogleUtilities/Reachability (~> 6.2)
+    - GoogleUtilities/UserDefaults (~> 6.2)
     - Protobuf (~> 3.1)
   - Flutter (1.0.0)
   - flutter_downloader (0.0.1):
     - Flutter
   - flutter_facebook_login (0.0.1):
-    - FBSDKCoreKit (= 4.39.1)
-    - FBSDKLoginKit (= 4.39.1)
+    - FBSDKCoreKit (~> 5.5)
+    - FBSDKLoginKit (~> 5.5)
     - Flutter
   - flutter_webview_plugin (0.0.1):
     - Flutter
@@ -74,12 +86,16 @@ PODS:
   - google_sign_in (0.0.1):
     - Flutter
     - GoogleSignIn (~> 4.0)
-  - GoogleAppMeasurement (6.0.0):
+  - GoogleAppMeasurement (6.1.2):
     - GoogleUtilities/AppDelegateSwizzler (~> 6.0)
     - GoogleUtilities/MethodSwizzler (~> 6.0)
     - GoogleUtilities/Network (~> 6.0)
     - "GoogleUtilities/NSData+zlib (~> 6.0)"
     - nanopb (~> 0.3)
+  - GoogleDataTransport (2.0.0)
+  - GoogleDataTransportCCTSupport (1.1.0):
+    - GoogleDataTransport (~> 2.0)
+    - nanopb
   - GoogleSignIn (4.4.0):
     - "GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)"
     - "GoogleToolboxForMac/NSString+URLArguments (~> 2.1)"
@@ -92,23 +108,23 @@ PODS:
     - GoogleToolboxForMac/Defines (= 2.2.1)
     - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.1)"
   - "GoogleToolboxForMac/NSString+URLArguments (2.2.1)"
-  - GoogleUtilities/AppDelegateSwizzler (6.1.0):
+  - GoogleUtilities/AppDelegateSwizzler (6.3.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (6.1.0)
-  - GoogleUtilities/Logger (6.1.0):
+  - GoogleUtilities/Environment (6.3.0)
+  - GoogleUtilities/Logger (6.3.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (6.1.0):
+  - GoogleUtilities/MethodSwizzler (6.3.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (6.1.0):
+  - GoogleUtilities/Network (6.3.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (6.1.0)"
-  - GoogleUtilities/Reachability (6.1.0):
+  - "GoogleUtilities/NSData+zlib (6.3.0)"
+  - GoogleUtilities/Reachability (6.3.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (6.1.0):
+  - GoogleUtilities/UserDefaults (6.3.0):
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.2.2)
   - image_picker (0.0.1):
@@ -126,28 +142,29 @@ PODS:
     - Flutter
   - permission (0.0.1):
     - Flutter
-  - Protobuf (3.7.0)
+  - Protobuf (3.9.2)
   - razorpay-pod (1.1.2)
   - shared_preferences (0.0.1):
     - Flutter
   - sqflite (0.0.1):
     - Flutter
     - FMDB (~> 2.7.2)
-  - WebEngage (4.6.0):
-    - WebEngage/Xcode10 (= 4.6.0)
-  - WebEngage/Xcode10 (4.6.0)
+  - WebEngage (4.9.7):
+    - WebEngage/Xcode10 (= 4.9.7)
+  - WebEngage/Xcode10 (4.9.7)
   - webview_flutter (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - android_intent (from `.symlinks/plugins/android_intent/ios`)
   - Branch
+  - cipher2 (from `.symlinks/plugins/cipher2/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
   - Firebase/Core
   - Firebase/Messaging
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
-  - Flutter (from `.symlinks/flutter/ios-release`)
+  - Flutter (from `.symlinks/flutter/ios`)
   - flutter_downloader (from `.symlinks/plugins/flutter_downloader/ios`)
   - flutter_facebook_login (from `.symlinks/plugins/flutter_facebook_login/ios`)
   - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
@@ -157,7 +174,7 @@ DEPENDENCIES:
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission (from `.symlinks/plugins/permission/ios`)
-  - razorpay-pod (= 1.1.2)
+  - razorpay-pod (from `https://github.com/razorpay/razorpay-pod.git`, branch `swift5.1`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - WebEngage
@@ -165,30 +182,35 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - Bolts
     - Branch
+    - CryptoSwift
     - FBSDKCoreKit
     - FBSDKLoginKit
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
     - FirebaseCore
+    - FirebaseCoreDiagnostics
+    - FirebaseCoreDiagnosticsInterop
     - FirebaseInstanceID
     - FirebaseMessaging
     - FMDB
     - GoogleAppMeasurement
+    - GoogleDataTransport
+    - GoogleDataTransportCCTSupport
     - GoogleSignIn
     - GoogleToolboxForMac
     - GoogleUtilities
     - GTMSessionFetcher
     - nanopb
     - Protobuf
-    - razorpay-pod
     - WebEngage
 
 EXTERNAL SOURCES:
   android_intent:
     :path: ".symlinks/plugins/android_intent/ios"
+  cipher2:
+    :path: ".symlinks/plugins/cipher2/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
   firebase_analytics:
@@ -196,7 +218,7 @@ EXTERNAL SOURCES:
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios-release"
+    :path: ".symlinks/flutter/ios"
   flutter_downloader:
     :path: ".symlinks/plugins/flutter_downloader/ios"
   flutter_facebook_login:
@@ -215,6 +237,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider/ios"
   permission:
     :path: ".symlinks/plugins/permission/ios"
+  razorpay-pod:
+    :branch: swift5.1
+    :git: https://github.com/razorpay/razorpay-pod.git
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
@@ -222,31 +247,41 @@ EXTERNAL SOURCES:
   webview_flutter:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
+CHECKOUT OPTIONS:
+  razorpay-pod:
+    :commit: 99fdf070a1b02385654d5da6fac2b80c3c732a57
+    :git: https://github.com/razorpay/razorpay-pod.git
+
 SPEC CHECKSUMS:
   android_intent: 73316069cd1f6aac919df1c6e640cad190fd5e8b
-  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Branch: e4f2a9c361ebdc960c823d16014c187bf19b508c
+  Branch: 6e7421e1f3c0adebdf80008a40a74969b2603cf8
+  cipher2: 215b8aa78b783cf5a17eb7b72fda55d025dbeefc
+  CryptoSwift: ff68c35a53e03177d31aaa2c1e8b3e010aeed6cb
   device_info: 3ebad48f726348f69abd802f3334a8d1ed795fbd
-  FBSDKCoreKit: f442aa96179cc9b382bb4abeb7e340a47cca8f91
-  FBSDKLoginKit: c3079d9a4db27c492287b1eed7a4272b28cf8a59
-  Firebase: fa80b9d987ca014a1ba9357496ef2a0178b28b12
+  FBSDKCoreKit: d6655a343868d4bb5c29a60859bab07c3be14a0b
+  FBSDKLoginKit: c5a623de88a6b0cda35b35582921f6cec2efcc36
+  Firebase: 2d750c54cda57d5a6ae31212cfe5cc813c6be7e4
   firebase_analytics: b0d7c086f5a50042153fd0441dafef51bde36cd0
   firebase_core: 44f31f51532812598f0f9f4af0caa705b9edfc19
-  FirebaseAnalytics: 1743c5f4de3687d0745709dfdc4b1dea1484f44c
-  FirebaseAnalyticsInterop: efbe45c8385ec626e29f9525e5ebd38520dfb6c1
-  FirebaseCore: e38f025287b413255a53acc1945d048a112047f7
-  FirebaseInstanceID: 0e0348a3c00a734fa376a070f5ad4533ad975cb5
-  FirebaseMessaging: c796d50864dc822a3c06c9c1c1444b37732b795b
+  FirebaseAnalytics: 5d9ccbf46ed25d3ec9304d263f85bddf1e93e2d2
+  FirebaseAnalyticsInterop: d48b6ab67bcf016a05e55b71fc39c61c0cb6b7f3
+  FirebaseCore: 8b2765c445d40db7137989b7146a3aa3f91b5529
+  FirebaseCoreDiagnostics: be4f7a09d02ab305f18de59a470412caddb64c2a
+  FirebaseCoreDiagnosticsInterop: 6829da2b8d1fc795ff1bd99df751d3788035d2cb
+  FirebaseInstanceID: 550df9be1f99f751d8fcde3ac342a1e21a0e6c42
+  FirebaseMessaging: b22b949cc45c14da01e60404dd7bffc78956380c
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
   flutter_downloader: 058b9c41564a90500f67f3e432e3524613a7fd83
-  flutter_facebook_login: be61e24a4b7d621515353c6b4583d1981bdaa3d6
+  flutter_facebook_login: cfb5659f686b1c575ef205c6b6fd20db9679d3c4
   flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   google_sign_in: 27e70a98b529f0b076d4b19f231b81da28b1750b
-  GoogleAppMeasurement: 7f028ea162b72c8f326daec74afc95d94f7a47d6
+  GoogleAppMeasurement: 0ae90be1cc4dad40f4a27fc767ef59fa032ec87b
+  GoogleDataTransport: c8617c00e4f3eb9418e42ac0e8ac5241a9d555dd
+  GoogleDataTransportCCTSupport: 9f352523e8785a71f6754f51eeff09f49ec19268
   GoogleSignIn: 7ff245e1a7b26d379099d3243a562f5747e23d39
   GoogleToolboxForMac: b3553629623a3b1bff17f555e736cd5a6d95ad55
-  GoogleUtilities: 84df567c76ca84f67b7bb40e769fdd4acc746a10
+  GoogleUtilities: 9c2c544202301110b29f7974a82e77fdcf12bf51
   GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
   location_permissions: 67cfaff583afbb027a9f9248196f4b79c40f3cdc
@@ -254,13 +289,13 @@ SPEC CHECKSUMS:
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
   permission: 51e2d3a8ef3490da0537667d7f1a6a1c5ba8ec47
-  Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
+  Protobuf: 67fb42ba613def994e61854de2b3164f13790cc4
   razorpay-pod: bd7b4bfedd59002e7c30d96dd71fe31e740f2bcf
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
   sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a
-  WebEngage: 122738dc25a70f81fb811f8449ad26495cf13f4b
+  WebEngage: 2aec067ea2a8c15f5966581cca5bf766d44ef367
   webview_flutter: 1aa7604e6cdb451a9b7ed2c37d5454c0b440246b
 
-PODFILE CHECKSUM: a3cdbe57900acfdcc1ec1f0e37b7ba00abfc31de
+PODFILE CHECKSUM: fef99f6e39ca905cbd258a91331eb8d7e3c14d17
 
 COCOAPODS: 1.6.1
