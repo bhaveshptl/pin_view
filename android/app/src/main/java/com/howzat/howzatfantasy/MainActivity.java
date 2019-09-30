@@ -104,7 +104,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private User weUser;
     Function callback;
     boolean bBranchLodead = false;
-    private String indusosPostResult;
     private boolean bActivateIndiusOSAttribution=false;
     Map<String, Object> deepLinkingDataObject;
 
@@ -195,8 +194,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private void initIndusOSBranchAttribution(){
         if (!getSharedPreferences("branch", 0).getBoolean("branchTrackUrlHit", false)) {
-            IndusOSAttribution runner = new IndusOSAttribution();
-            runner.execute();
+            //IndusOSAttribution runner = new IndusOSAttribution();
+            indusOSTask.execute();
         }else {
             initBranchPlugin();
         }
@@ -220,28 +219,25 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     }
 
+    /**************************** BRANCH IO RELATED CODE ************************************************/
+
     private void initBranchPlugin() {
-        final Intent intent = getIntent();
-        try {
-            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
-                @Override
-                public void onInitFinished(JSONObject referringParams, BranchError error) {
-                    Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    bBranchLodead = true;
-
-                    if (error == null) {
-                        initBranchSession(referringParams);
-                        Log.i("BRANCH SDK", referringParams.toString());
-
-                    } else {
-                        initBranchSession(referringParams);
-                        Log.i("BRANCH SDK", error.getMessage());
+            final Intent intent = getIntent();
+            try {
+                Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+                    @Override
+                    public void onInitFinished(JSONObject referringParams, BranchError error) {
+                        bBranchLodead = true;
+                        if (error == null) {
+                            initBranchSession(referringParams);
+                        } else {
+                            initBranchSession(referringParams);
+                        }
                     }
-                }
-            }, intent.getData(), this);
-        } catch (Exception e) {
-            initBranchSession(null);
-        }
+                }, intent.getData(), this);
+            } catch (Exception e) {
+                initBranchSession(null);
+            }
     }
 
     private void getBranchData(MethodChannel.Result result) {
@@ -250,26 +246,18 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
                 @Override
                 public void onInitFinished(JSONObject referringParams, BranchError error) {
-                    Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     Map<String, String> object;
                     if (error == null) {
                         object = initBranchSession(referringParams);
-                        Log.i("BRANCH SDK", referringParams.toString());
                     } else {
                         object = initBranchSession(referringParams);
-                        Log.i("BRANCH SDK", error.getMessage());
                     }
                     result.success(object);
-                    Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 }
             }, intent.getData(), this);
         } catch (Exception e) {
-            Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-            Log.i("BRANCH SDK", e.getMessage());
-
             Map<String, String> object = initBranchSession(null);
             result.success(object);
-            Log.i("BRANCH SDK", "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
         }
     }
 
@@ -290,7 +278,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
             if (referringParams != null) {
                 installReferring_link0 = (String) referringParams.get("~referring_link");
-                Log.i("BRANCH SDK link1", installReferring_link0);
                 refCodeFromBranchTrail0 = myHeperClass.getQueryParmValueFromUrl(installReferring_link0, "refCode");
             }
         } catch (Exception e) {
@@ -298,14 +285,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         try {
             installReferring_link1 = (String) installParams.get("~referring_link");
-            Log.i("BRANCH SDK link1", installReferring_link1);
             refCodeFromBranchTrail1 = myHeperClass.getQueryParmValueFromUrl(installReferring_link1, "refCode");
         } catch (Exception e) {
         }
 
         try {
             installReferring_link2 = (String) sessionParams.get("~referring_link");
-            Log.i("BRANCH SDK link1", installReferring_link2);
             refCodeFromBranchTrail2 = myHeperClass.getQueryParmValueFromUrl(installReferring_link2, "refCode");
         } catch (Exception e) {
         }
@@ -320,24 +305,155 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         if (installReferring_link0 != null && installReferring_link0 != "") {
             installReferring_link = installReferring_link0;
-            Log.i("BRANCH SDK link0", installReferring_link0);
         } else if (installReferring_link1 != null && installReferring_link1 != "") {
             installReferring_link = installReferring_link1;
-            Log.i("BRANCH SDK link1", installReferring_link1);
         } else if (installReferring_link2 != null && installReferring_link2 != "") {
             installReferring_link = installReferring_link2;
-            Log.i("BRANCH SDK link2", installReferring_link2);
         }
 
         object.put("installReferring_link", installReferring_link);
         object.put("refCodeFromBranch", refCodeFromBranch);
-        Log.i("BRANCH SDK", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         return object;
     }
 
     @Override
     public void onNewIntent(Intent intent) {
         this.setIntent(intent);
+    }
+
+    /* Bracnch Io related code */
+    public String getRefCodeUsingBranch() {
+        return refCodeFromBranch;
+    }
+
+    private Map<String, String> getBranchQueryParms() {
+        myHeperClass = new MyHelperClass();
+        Map<String, String> branchQueryParms = new HashMap<String, String>();
+        JSONObject installParams = Branch.getInstance().getFirstReferringParams();
+        String installReferring_link = "";
+        String installAndroid_link = "";
+
+        try {
+            installReferring_link = (String) installParams.get("~referring_link");
+            branchQueryParms.put("installReferring_link", installReferring_link);
+
+        } catch (Exception e) {
+
+        }
+        try {
+            installAndroid_link = (String) installParams.get("$android_url");
+            branchQueryParms.put("installAndroid_link", installAndroid_link);
+        } catch (Exception e) {
+
+        }
+        return branchQueryParms;
+    }
+
+    public String getInstallReferringLink() {
+        return installReferring_link;
+    }
+
+    private void trackAndSetBranchUserIdentity(String userId) {
+        Branch.getInstance().setIdentity(userId);
+    }
+
+    private void branchUserLogout() {
+        Branch.getInstance().logout();
+    }
+
+    private void setBranchUniversalObject(Map<String, Object> arguments) {
+        BranchUniversalObject buo = new BranchUniversalObject()
+                .setCanonicalIdentifier((String) arguments.get("canonicalIdentifier"))
+                .setTitle((String) arguments.get("title"))
+                .setContentDescription((String) arguments.get("contentDescription"))
+                .setContentImageUrl((String) arguments.get("contentImageUrl"));
+
+        buo.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
+        buo.setLocalIndexMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
+
+        buo.setContentMetadata(new ContentMetadata().addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
+                .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
+
+                .setContentSchema(BranchContentSchema.COMMERCE_PRODUCT)).addKeyWord("keyword1").addKeyWord("keyword2");
+    }
+
+    private String branchLifecycleEventSigniup(Map<String, Object> arguments) {
+        BranchEvent be = new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
+                .setTransactionID("" + arguments.get("transactionID")).setDescription("HOWZAT SIGN UP");
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+
+            be.addCustomDataProperty((String) entry.getKey(), "" + entry.getValue());
+        }
+        be.logEvent(MainActivity.this);
+        return "Sign Up Track event added";
+
+    }
+
+    private String branchEventTransactionFailed(Map<String, Object> arguments) {
+
+        boolean isfirstDepositor = false;
+        String eventName = "FIRST_DEPOSIT_FAILED";
+        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
+        if (!isfirstDepositor) {
+            eventName = "REPEAT_DEPOSIT_FAILED";
+        }
+
+        BranchEvent be = new BranchEvent(eventName).setTransactionID("" + arguments.get("txnId"))
+                .setDescription(("HOWZAT DEPOSIT FAILED"));
+        be.addCustomDataProperty("txnTime", "" + arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", "" + arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", "" + arguments.get("appPage"));
+
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            be.addCustomDataProperty(entry.getKey(), "" + entry.getValue());
+        }
+        be.logEvent(MainActivity.this);
+
+        return " Add Cash Failed Event added";
+
+    }
+
+    private String branchEventTransactionSuccess(Map<String, Object> arguments) {
+        boolean isfirstDepositor = false;
+        String eventName = "FIRST_DEPOSIT_SUCCESS";
+        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
+        if (!isfirstDepositor) {
+            eventName = "REPEAT_DEPOSIT_SUCCESS";
+        }
+
+        BranchEvent be = new BranchEvent(eventName).setTransactionID("" + arguments.get("txnId"))
+                .setDescription("HOWZAT DEPOSIT FAILED");
+        be.addCustomDataProperty("txnTime", "" + arguments.get("txnTime"));
+        be.addCustomDataProperty("txnDate", "" + arguments.get("txnDate"));
+        be.addCustomDataProperty("appPage", "" + arguments.get("appPage"));
+
+        HashMap<String, Object> data = new HashMap();
+        data = (HashMap) arguments.get("data");
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+
+            be.addCustomDataProperty(entry.getKey(), "" + entry.getValue());
+        }
+
+        be.logEvent(MainActivity.this);
+
+        return " Add Cash Success Event added";
+
+    }
+
+    private String branchEventInitPurchase(Map<String, Object> arguments) {
+        new BranchEvent(BRANCH_STANDARD_EVENT.INITIATE_PURCHASE)
+                .setTransactionID((String) arguments.get("transactionID"))
+                .setDescription((String) arguments.get("description")).addCustomDataProperty("registrationID", "12345")
+                .logEvent(MainActivity.this);
+
+        return "";
     }
 
 
@@ -375,31 +491,40 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     @Override
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_getBranchRefCode")) {
-                            String pfRefCode = (String) getRefCodeUsingBranch();
+                            String pfRefCode = " ";
+                            if(!bActivateIndiusOSAttribution) {
+                                pfRefCode = (String) getRefCodeUsingBranch();
+                            }
                             result.success(pfRefCode);
                         }
                         if (methodCall.method.equals("_initBranchIoPlugin")) {
-                            if (bBranchLodead) {
-                                Map<String, String> object = new HashMap();
-                                String pfRefCode = (String) getRefCodeUsingBranch();
-                                String installReferring_link = (String) getInstallReferringLink();
-                                object.put("installReferring_link", installReferring_link);
-                                object.put("refCodeFromBranch", pfRefCode);
+                            Map<String, String> object = new HashMap();
+                            if(!bActivateIndiusOSAttribution) {
+                                if (bBranchLodead) {
+                                    String pfRefCode = (String) getRefCodeUsingBranch();
+                                    String installReferring_link = (String) getInstallReferringLink();
+                                    object.put("installReferring_link", installReferring_link);
+                                    object.put("refCodeFromBranch", pfRefCode);
 
+                                    result.success(object.toString());
+                                } else {
+                                    getBranchData(result);
+                                }
+
+                            }else {
+                                object.put("installReferring_link", "");
+                                object.put("refCodeFromBranch", "");
                                 result.success(object.toString());
-                            } else {
-                                getBranchData(result);
                             }
+                        }
+                        if (methodCall.method.equals("_getInstallReferringLink")) {
+                            String installReferring_link = " ";
+                            if(!bActivateIndiusOSAttribution) {
+                                installReferring_link = (String) getInstallReferringLink();
+                            }
+                            result.success(installReferring_link);
+                        }
 
-                        }
-                        if (methodCall.method.equals("_getInstallReferringLink")) {
-                            String installReferring_link = (String) getInstallReferringLink();
-                            result.success(installReferring_link);
-                        }
-                        if (methodCall.method.equals("_getInstallReferringLink")) {
-                            String installReferring_link = (String) getInstallReferringLink();
-                            result.success(installReferring_link);
-                        }
                         if (methodCall.method.equals("trackAndSetBranchUserIdentity")) {
                             String userId = methodCall.arguments();
                             trackAndSetBranchUserIdentity(userId);
@@ -912,141 +1037,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     }
 
-    /* Bracnch Io related code */
-    public String getRefCodeUsingBranch() {
-        return refCodeFromBranch;
-    }
-
-    private Map<String, String> getBranchQueryParms() {
-        myHeperClass = new MyHelperClass();
-        Map<String, String> branchQueryParms = new HashMap<String, String>();
-        JSONObject installParams = Branch.getInstance().getFirstReferringParams();
-        String installReferring_link = "";
-        String installAndroid_link = "";
-
-        try {
-            installReferring_link = (String) installParams.get("~referring_link");
-            branchQueryParms.put("installReferring_link", installReferring_link);
-
-        } catch (Exception e) {
-
-        }
-        try {
-            installAndroid_link = (String) installParams.get("$android_url");
-            branchQueryParms.put("installAndroid_link", installAndroid_link);
-        } catch (Exception e) {
-
-        }
-        return branchQueryParms;
-    }
-
-    public String getInstallReferringLink() {
-        Log.i("BRANCH SDK link2", installReferring_link);
-        return installReferring_link;
-    }
-
-    private void trackAndSetBranchUserIdentity(String userId) {
-        Branch.getInstance().setIdentity(userId);
-    }
-
-    private void branchUserLogout() {
-        Branch.getInstance().logout();
-    }
-
-    private void setBranchUniversalObject(Map<String, Object> arguments) {
-        BranchUniversalObject buo = new BranchUniversalObject()
-                .setCanonicalIdentifier((String) arguments.get("canonicalIdentifier"))
-                .setTitle((String) arguments.get("title"))
-                .setContentDescription((String) arguments.get("contentDescription"))
-                .setContentImageUrl((String) arguments.get("contentImageUrl"));
-
-        buo.setContentIndexingMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
-        buo.setLocalIndexMode(BranchUniversalObject.CONTENT_INDEX_MODE.PUBLIC);
-
-        buo.setContentMetadata(new ContentMetadata().addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
-                .addCustomMetadata("custom_metadata_key1", "custom_metadata_val1")
-
-                .setContentSchema(BranchContentSchema.COMMERCE_PRODUCT)).addKeyWord("keyword1").addKeyWord("keyword2");
-    }
-
-    private String branchLifecycleEventSigniup(Map<String, Object> arguments) {
-        BranchEvent be = new BranchEvent(BRANCH_STANDARD_EVENT.COMPLETE_REGISTRATION)
-                .setTransactionID("" + arguments.get("transactionID")).setDescription("HOWZAT SIGN UP");
-        HashMap<String, Object> data = new HashMap();
-        data = (HashMap) arguments.get("data");
-
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-
-            be.addCustomDataProperty((String) entry.getKey(), "" + entry.getValue());
-        }
-        be.logEvent(MainActivity.this);
-        return "Sign Up Track event added";
-
-    }
-
-    private String branchEventTransactionFailed(Map<String, Object> arguments) {
-
-        boolean isfirstDepositor = false;
-        String eventName = "FIRST_DEPOSIT_FAILED";
-        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
-        if (!isfirstDepositor) {
-            eventName = "REPEAT_DEPOSIT_FAILED";
-        }
-
-        BranchEvent be = new BranchEvent(eventName).setTransactionID("" + arguments.get("txnId"))
-                .setDescription(("HOWZAT DEPOSIT FAILED"));
-        be.addCustomDataProperty("txnTime", "" + arguments.get("txnTime"));
-        be.addCustomDataProperty("txnDate", "" + arguments.get("txnDate"));
-        be.addCustomDataProperty("appPage", "" + arguments.get("appPage"));
-
-        HashMap<String, Object> data = new HashMap();
-        data = (HashMap) arguments.get("data");
-
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-            be.addCustomDataProperty(entry.getKey(), "" + entry.getValue());
-        }
-        be.logEvent(MainActivity.this);
-
-        return " Add Cash Failed Event added";
-
-    }
-
-    private String branchEventTransactionSuccess(Map<String, Object> arguments) {
-        boolean isfirstDepositor = false;
-        String eventName = "FIRST_DEPOSIT_SUCCESS";
-        isfirstDepositor = Boolean.parseBoolean("" + arguments.get("firstDepositor"));
-        if (!isfirstDepositor) {
-            eventName = "REPEAT_DEPOSIT_SUCCESS";
-        }
-
-        BranchEvent be = new BranchEvent(eventName).setTransactionID("" + arguments.get("txnId"))
-                .setDescription("HOWZAT DEPOSIT FAILED");
-        be.addCustomDataProperty("txnTime", "" + arguments.get("txnTime"));
-        be.addCustomDataProperty("txnDate", "" + arguments.get("txnDate"));
-        be.addCustomDataProperty("appPage", "" + arguments.get("appPage"));
-
-        HashMap<String, Object> data = new HashMap();
-        data = (HashMap) arguments.get("data");
-
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-
-            be.addCustomDataProperty(entry.getKey(), "" + entry.getValue());
-        }
-
-        be.logEvent(MainActivity.this);
-
-        return " Add Cash Success Event added";
-
-    }
-
-    private String branchEventInitPurchase(Map<String, Object> arguments) {
-        new BranchEvent(BRANCH_STANDARD_EVENT.INITIATE_PURCHASE)
-                .setTransactionID((String) arguments.get("transactionID"))
-                .setDescription((String) arguments.get("description")).addCustomDataProperty("registrationID", "12345")
-                .logEvent(MainActivity.this);
-
-        return "";
-    }
 
     public void startPayment(Map<String, Object> arguments) {
         /*
@@ -1775,8 +1765,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    private class IndusOSAttribution extends AsyncTask<Void, Void, String> {
-        String branch_tracking_url_indusos="https://11zy.app.link/howzat_indus?%243p=a_indus_os&%24aaid={aaid}";
+     AsyncTask<Void, Void, String>  indusOSTask = new AsyncTask<Void, Void, String>() {
         @Override
         protected String doInBackground(Void... params) {
             String retVal = "false";
@@ -1785,7 +1774,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 advertId = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext).getId();
 
             } catch (IOException |GooglePlayServicesNotAvailableException |GooglePlayServicesRepairableException e) {}
-            String BRANCH_TRACK_URL = branch_tracking_url_indusos;
+            String BRANCH_TRACK_URL = "https://11zy.app.link/howzat_indus?%243p=a_indus_os&%24aaid={aaid}";
 
             String track_url = BRANCH_TRACK_URL.replace("{aaid}",advertId) + "&%24s2s=true";
             HttpURLConnection urlConnection = null;
@@ -1813,13 +1802,12 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         @Override
         protected void onPostExecute(String response) {
             if("true".equalsIgnoreCase(response)){
-                indusosPostResult=response;
                 SharedPreferences sharedPreferences = getSharedPreferences("branch", 0);
                 sharedPreferences.edit().putBoolean("branchTrackUrlHit", true).apply();
                 initBranchPlugin();
             }
         }
-    }
+    };
 
 
 }
