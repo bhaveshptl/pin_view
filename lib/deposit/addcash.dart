@@ -213,6 +213,9 @@ class AddCashState extends State<AddCash> {
       }
     } catch (e) {
       showLoader(false);
+      ActionUtil().showMsgOnTop(
+                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
+                context);
     }
     return "";
   }
