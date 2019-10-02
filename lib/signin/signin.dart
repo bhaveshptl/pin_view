@@ -407,8 +407,8 @@ class SignInPageState extends State<SignInPage> {
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
-        AuthResult(res, _scaffoldKey).processResult(() {});
         onLoginAuthenticate(json.decode(res.body));
+        AuthResult(res, _scaffoldKey).processResult(() {});
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         // setState(() {
@@ -560,10 +560,10 @@ class SignInPageState extends State<SignInPage> {
     )
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
+        onLoginAuthenticate(json.decode(res.body));
         AuthResult(res, _scaffoldKey).processResult(
           () {},
         );
-        onLoginAuthenticate(json.decode(res.body));
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         // setState(() {
@@ -603,6 +603,7 @@ class SignInPageState extends State<SignInPage> {
   onLoginAuthenticate(Map<String, dynamic> loginData) async {
     await webEngageUserLogin(loginData["user_id"].toString(), loginData);
     await trackAndSetBranchUserIdentity(loginData["user_id"].toString());
+    await webEngageEventLogin(loginData);
   }
 
   Future<String> webEngageUserLogin(
@@ -614,10 +615,6 @@ class SignInPageState extends State<SignInPage> {
     try {
       result =
           await webengage_platform.invokeMethod('webengageTrackUser', data);
-
-      print(">>>>>>>>>>>>>>>>>>>>>>>>>web engage login>>>>>>>>>>>>>>>>>>>>");
-      print(result);
-      webEngageEventLogin(loginData);
     } catch (e) {
       print(e);
     }

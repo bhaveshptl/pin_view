@@ -176,14 +176,14 @@ import FBSDKCoreKit
                 }else{
                     if(data!["+non_branch_link"] != nil){
                         
-                        var str = data!["+non_branch_link"]! as? String ;
+                        let str = data!["+non_branch_link"]! as? String ;
                         let url = URL(string: str!)
                         let queryParms = getQueryParametersDict(from: url!);
-                         print(queryParms)
+                        print(queryParms)
                         
                         if queryParms["dl_page_route"] as? String  != nil {
                             dl_page_route=queryParms["dl_page_route"]! as? String ?? "";
-                        deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+                            deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
                         }
                         if queryParms["dl_leagueId"] as? String  != nil {
                             dl_leagueId=queryParms["dl_leagueId"]! as? String ?? "";
@@ -225,15 +225,15 @@ import FBSDKCoreKit
     }
     
     private func getQueryParametersDict(from url: URL) -> [String: String] {
-    let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
-    var queryParams = [String: String]()
-    for queryItem: URLQueryItem in (urlComponents?.queryItems)! {
-    if queryItem.value == nil {
-    continue
-    }
-    queryParams[queryItem.name] = queryItem.value
-    }
-    return queryParams
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        var queryParams = [String: String]()
+        for queryItem: URLQueryItem in (urlComponents?.queryItems)! {
+            if queryItem.value == nil {
+                continue
+            }
+            queryParams[queryItem.name] = queryItem.value
+        }
+        return queryParams
     }
     
     private func getBranchData(result: FlutterResult){
@@ -301,7 +301,7 @@ import FBSDKCoreKit
                         refCodeFromBranchTrail2=sessionParams!["refCode"]! as? String ?? "";
                     }
                     else{
-                    refCodeFromBranchTrail2=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
+                        refCodeFromBranchTrail2=MyHelperClass.getQueryStringParameter(url: installReferring_link2, param: "refCode") ?? "";
                     }
                 }
             }
@@ -375,7 +375,7 @@ import FBSDKCoreKit
             }
         });
         
-    
+        
         WEBENGAGE_CHANNEL.setMethodCallHandler({
             [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
             if(call.method=="webEngageEventSigniup"){
@@ -633,6 +633,75 @@ import FBSDKCoreKit
         });
         
         
+    }
+    
+    
+    func WEGHandleDeeplink(_ deeplink: String, userData data: [AnyHashable: Any]) {
+    
+        var dl_page_route:String = "";
+        var dl_leagueId:String = "";
+        var dl_ac_promocode:String = "";
+        var dl_ac_promoamount:String = "";
+        var dl_sp_pageLocation:String = "";
+        var dl_sp_pageTitle:String = "";
+        var dl_sport_type:String = "";
+        var dl_unique_id:String = "";
+        
+        let url = URL(string: deeplink)
+        let queryParms = getQueryParametersDict(from: url!);
+        
+        if queryParms["dl_r"] as? String  != nil {
+           
+            if(queryParms["dl_r"]!=="false"){
+                
+                let weburl = deeplink;
+                guard let url = URL(string: weburl) else {
+                   
+                    return //be safe
+                }
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
+                
+            }
+        }
+        
+        if queryParms["dl_page_route"] as? String  != nil {
+            dl_page_route=queryParms["dl_page_route"]! as? String ?? "";
+            deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+        }
+        if queryParms["dl_leagueId"] as? String  != nil {
+            dl_leagueId=queryParms["dl_leagueId"]! as? String ?? "";
+        }
+        if queryParms["dl_ac_promoamount"] as? String  != nil {
+            dl_ac_promoamount=queryParms["dl_ac_promoamount"]! as? String ?? "";
+        }
+        if queryParms["dl_ac_promocode"] as? String  != nil {
+            dl_ac_promocode=queryParms["dl_ac_promocode"]! as? String ?? "";
+        }
+        if queryParms["dl_sp_pageLocation"] as? String  != nil {
+            dl_sp_pageLocation=queryParms["dl_sp_pageLocation"]! as? String ?? "";
+        }
+        if queryParms["dl_sp_pageTitle"] as? String  != nil {
+            dl_sp_pageTitle=queryParms["dl_sp_pageTitle"]! as? String ?? "";
+        }
+        
+        if queryParms["dl_sport_type"] as? String  != nil {
+            dl_sport_type=queryParms["dl_sport_type"]! as? String ?? "";
+        }
+        if queryParms["dl_unique_id"] as? String  != nil {
+            dl_unique_id=queryParms["dl_unique_id"]! as? String ?? "";
+        }
+        deepLinkingDataObject["dl_page_route"] = dl_page_route;
+        deepLinkingDataObject["dl_leagueId"] = dl_leagueId;
+        deepLinkingDataObject["dl_ac_promocode"] = dl_ac_promocode;
+        deepLinkingDataObject["dl_ac_promoamount"] = dl_ac_promoamount;
+        deepLinkingDataObject["dl_sp_pageLocation"] = dl_sp_pageLocation;
+        deepLinkingDataObject["dl_sp_pageTitle"] = dl_sp_pageTitle;
+        deepLinkingDataObject["dl_sport_type"] = dl_sport_type;
+        deepLinkingDataObject["dl_unique_id"] = dl_unique_id;
     }
     
     func getLocationLongLat(){
@@ -1077,7 +1146,7 @@ import FBSDKCoreKit
     
     
     override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-
+        
     }
     
     
