@@ -82,6 +82,10 @@ class Event {
     this.v4 = amount.toInt();
   }
 
+  setIsOpening(bool bOpen) {
+    this.v5 = bOpen ? 0 : 1;
+  } 
+
   setPaymentRepeatChecked(bool isChecked) {
     this.v5 = isChecked ? 1 : 0;
   }
@@ -104,6 +108,18 @@ class Event {
 
   setPromoCode(String promoCode) {
     this.s1 = promoCode;
+  }
+
+  setInstantCash(String instantCash) {
+    this.s2 = instantCash;
+  }
+
+  setBonusCash(String bonus) {
+    this.s3 = bonus;
+  }
+
+  setLockedBonusCash(String lockedBonus) {
+    this.s4 = lockedBonus;
   }
 
   setOrderId(String orderId) {

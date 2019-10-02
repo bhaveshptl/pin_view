@@ -167,6 +167,10 @@ class AppDrawerState extends State<AppDrawer> {
         title = "PRIVACY POLICY";
         url = BaseUrl().staticPageUrls["PRIVACY"];
         break;
+      case "PROMOS_OFFERS":
+        title = "PROMOS & OFFERS";
+        url = BaseUrl().staticPageUrls["PROMOS_OFFERS"];
+        break;
     }
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -606,6 +610,26 @@ class AppDrawerState extends State<AppDrawer> {
               },
             ),
           ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: verticalPadding),
+            child: ListTile(
+              leading: Image.asset(
+                "images/promotiontag.png",
+                width: 30.0,
+              ),
+              title: Text(
+                'Promos & Offers',
+                style: Theme.of(context).primaryTextTheme.title.copyWith(
+                      color: Colors.black,
+                    ),
+              ),
+              onTap: () {
+                _launchStaticPage("PROMOS_OFFERS");
+              },
+            ),
+          ),
+
           Divider(
             color: Colors.grey.shade400,
             height: 1.0,

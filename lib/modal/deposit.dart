@@ -31,17 +31,21 @@ class ChooseAmountData {
   int depositLimit;
   bool isFirstDeposit;
   List<int> amountTiles;
+  List<int> hotTiles;
   List<dynamic> bonusArray;
   List<dynamic> lastPaymentArray;
+  int addCashPromoAb;
 
   ChooseAmountData({
     this.balance,
     this.minAmount,
     this.bonusArray,
     this.amountTiles,
+    this.hotTiles,
     this.depositLimit,
     this.isFirstDeposit,
     this.lastPaymentArray,
+    this.addCashPromoAb,
   });
 
   factory ChooseAmountData.fromJson(Map<String, dynamic> json) {
@@ -49,12 +53,15 @@ class ChooseAmountData {
       minAmount: json["minAmount"],
       bonusArray: json["bonusArray"],
       depositLimit: json["depositLimit"],
+      addCashPromoAb: json["addCashPromoAb"],
       balance: Balance.fromJson(json["balance"]),
       lastPaymentArray: json["lastPaymentArray"],
       isFirstDeposit:
           json["isFirstDeposit"] == null ? false : json["isFirstDeposit"],
       amountTiles:
           (json["amountTiles"] as List).map((i) => (i as int).toInt()).toList(),
+      hotTiles:
+          (json["hotTiles"] as List).map((i) => (i as int).toInt()).toList(),
     );
   }
 }

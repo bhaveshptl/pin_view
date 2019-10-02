@@ -268,6 +268,14 @@ class ActionUtil {
 
   showMsgOnTop(String msg, BuildContext context) {
     flushbar = Flushbar(
+      boxShadows: [
+        BoxShadow(
+          blurRadius: 15.0,
+          spreadRadius: 15.0,
+          color: Colors.black12,
+        )
+      ],
+      flushbarStyle: FlushbarStyle.FLOATING,
       messageText: Row(
         children: <Widget>[
           Expanded(
@@ -281,7 +289,7 @@ class ActionUtil {
           InkWell(
             child: Icon(
               Icons.close,
-              color: Colors.grey.shade600,
+              color: Colors.black,
             ),
             onTap: () {
               flushbar.dismiss(true);
@@ -289,7 +297,7 @@ class ActionUtil {
           ),
         ],
       ),
-      aroundPadding: EdgeInsets.all(8.0),
+      //aroundPadding: EdgeInsets.all(8.0),
       backgroundColor: Colors.white,
       duration: Duration(seconds: 3),
       flushbarPosition: FlushbarPosition.TOP,
