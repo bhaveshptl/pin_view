@@ -46,7 +46,7 @@ import FBSDKCoreKit
         didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?
     ) -> Bool {
         initFlutterChannelsAndEvents();
-        deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+        deepLinkingDataObject["activateDeepLinkingNavigation"] = false;
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions);
         /* Init Services*/
         initPushNotifications(application);
@@ -175,39 +175,9 @@ import FBSDKCoreKit
                     }
                 }else{
                     if(data!["+non_branch_link"] != nil){
-                        
-                        let str = data!["+non_branch_link"]! as? String ;
-                        let url = URL(string: str!)
-                        let queryParms = getQueryParametersDict(from: url!);
-                        print(queryParms)
-                        
-                        if queryParms["dl_page_route"] as? String  != nil {
-                            dl_page_route=queryParms["dl_page_route"]! as? String ?? "";
-                            deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
-                        }
-                        if queryParms["dl_leagueId"] as? String  != nil {
-                            dl_leagueId=queryParms["dl_leagueId"]! as? String ?? "";
-                        }
-                        if queryParms["dl_ac_promoamount"] as? String  != nil {
-                            dl_ac_promoamount=queryParms["dl_ac_promoamount"]! as? String ?? "";
-                        }
-                        if queryParms["dl_ac_promocode"] as? String  != nil {
-                            dl_ac_promocode=queryParms["dl_ac_promocode"]! as? String ?? "";
-                        }
-                        if queryParms["dl_sp_pageLocation"] as? String  != nil {
-                            dl_sp_pageLocation=queryParms["dl_sp_pageLocation"]! as? String ?? "";
-                        }
-                        if queryParms["dl_sp_pageTitle"] as? String  != nil {
-                            dl_sp_pageTitle=queryParms["dl_sp_pageTitle"]! as? String ?? "";
-                        }
-                        
-                        if queryParms["dl_sport_type"] as? String  != nil {
-                            dl_sport_type=queryParms["dl_sport_type"]! as? String ?? "";
-                        }
-                        if queryParms["dl_unique_id"] as? String  != nil {
-                            dl_unique_id=queryParms["dl_unique_id"]! as? String ?? "";
-                        }
-                        
+                        //let str = data!["+non_branch_link"]! as? String ;
+                        //let url = URL(string: str!)
+                        //let queryParms = getQueryParametersDict(from: url!);
                     }
                 }
             }}
@@ -220,8 +190,6 @@ import FBSDKCoreKit
         deepLinkingDataObject["dl_sp_pageTitle"] = dl_sp_pageTitle;
         deepLinkingDataObject["dl_sport_type"] = dl_sport_type;
         deepLinkingDataObject["dl_unique_id"] = dl_unique_id;
-        
-        print(deepLinkingDataObject);
     }
     
     private func getQueryParametersDict(from url: URL) -> [String: String] {
