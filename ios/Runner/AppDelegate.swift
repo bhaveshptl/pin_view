@@ -125,6 +125,63 @@ import FBSDKCoreKit
     }
     
     private func deepLinkingRoutingHandler(result: FlutterResult){
+        
+        if(deepLinkingDataObject["deepLinkingURL"] != nil){
+            let  deepLinkingURLString = deepLinkingDataObject["deepLinkingURL"]! as? String ;
+            
+            if(deepLinkingURLString!.count>5){
+                let deepLinkingURL = URL(string: deepLinkingURLString!);
+                let deepLinkingURLParms = getQueryParametersDict(from: deepLinkingURL!);
+                var dl_page_route:String = "";
+                var dl_leagueId:String = "";
+                var dl_ac_promocode:String = "";
+                var dl_ac_promoamount:String = "";
+                var dl_sp_pageLocation:String = "";
+                var dl_sp_pageTitle:String = "";
+                var dl_sport_type:String = "";
+                var dl_unique_id:String = "";
+                
+                if deepLinkingURLParms["dl_page_route"] as? String  != nil {
+                    dl_page_route = deepLinkingURLParms["dl_page_route"]! as? String ?? "";
+                    deepLinkingDataObject["activateDeepLinkingNavigation"] = true;
+                }
+                if deepLinkingURLParms["dl_leagueId"] as? String  != nil {
+                    dl_leagueId=deepLinkingURLParms["dl_leagueId"]! as? String ?? "";
+                }
+                if deepLinkingURLParms["dl_ac_promoamount"] as? String  != nil {
+                    dl_ac_promoamount=deepLinkingURLParms["dl_ac_promoamount"]! as? String ?? "";
+                }
+                if deepLinkingURLParms["dl_ac_promocode"] as? String  != nil {
+                    dl_ac_promocode=deepLinkingURLParms["dl_ac_promocode"]! as? String ?? "";
+                }
+                if deepLinkingURLParms["dl_sp_pageLocation"] as? String  != nil {
+                    dl_sp_pageLocation=deepLinkingURLParms["dl_sp_pageLocation"]! as? String ?? "";
+                }
+                if deepLinkingURLParms["dl_sp_pageTitle"] as? String  != nil {
+                    dl_sp_pageTitle=deepLinkingURLParms["dl_sp_pageTitle"]! as? String ?? "";
+                }
+                
+                if deepLinkingURLParms["dl_sport_type"] as? String  != nil {
+                    dl_sport_type=deepLinkingURLParms["dl_sport_type"]! as? String ?? "";
+                }
+                if deepLinkingURLParms["dl_unique_id"] as? String  != nil {
+                    dl_unique_id=deepLinkingURLParms["dl_unique_id"]! as? String ?? "";
+                }
+                
+                deepLinkingDataObject["dl_page_route"] = dl_page_route;
+                deepLinkingDataObject["dl_leagueId"] = dl_leagueId;
+                deepLinkingDataObject["dl_ac_promocode"] = dl_ac_promocode;
+                deepLinkingDataObject["dl_ac_promoamount"] = dl_ac_promoamount;
+                deepLinkingDataObject["dl_sp_pageLocation"] = dl_sp_pageLocation;
+                deepLinkingDataObject["dl_sp_pageTitle"] = dl_sp_pageTitle;
+                deepLinkingDataObject["dl_sport_type"] = dl_sport_type;
+                deepLinkingDataObject["dl_unique_id"] = dl_unique_id;
+                
+                
+            }
+        }
+        
+        
         result(deepLinkingDataObject);
     }
     
@@ -175,9 +232,8 @@ import FBSDKCoreKit
                     }
                 }else{
                     if(data!["+non_branch_link"] != nil){
-                        //let str = data!["+non_branch_link"]! as? String ;
-                        //let url = URL(string: str!)
-                        //let queryParms = getQueryParametersDict(from: url!);
+                        let str = data!["+non_branch_link"]! as? String ?? "";
+                        deepLinkingDataObject["deepLinkingURL"] = str;
                     }
                 }
             }}
@@ -1120,4 +1176,5 @@ extension AppDelegate : MessagingDelegate {
         print("Received data message: \(remoteMessage.appData)")
     }
 }
+
 

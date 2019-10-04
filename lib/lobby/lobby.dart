@@ -67,6 +67,7 @@ class LobbyState extends State<Lobby>
   bool isIos = false;
   static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   bool deactivateDeepLinkingNavigation = true;
+  Map<String, dynamic> deepLinkingNavigationData = new Map();
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
@@ -82,7 +83,8 @@ class LobbyState extends State<Lobby>
     }
     _mapSportTypes = sports.mapSports;
     _sportType = _mapSportTypes[_mapSportTypes.keys.toList()[0]];
-    deepLinkingNavigationManager();
+     
+     deepLinkingNavigationManager();
     _controller = TabController(
         vsync: this,
         length: _mapSportTypes.length,
@@ -100,7 +102,12 @@ class LobbyState extends State<Lobby>
     });
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
-  }
+  
+     
+}
+
+
+
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -117,6 +124,8 @@ class LobbyState extends State<Lobby>
     }
     super.didChangeDependencies();
   }
+
+  
 
   _showUpdatingAppDialog(String url) {
     showDialog(
@@ -142,11 +151,12 @@ class LobbyState extends State<Lobby>
     if (widget.activateDeepLinkingNavigation != null) {
       if (widget.activateDeepLinkingNavigation) {
         deactivateDeepLinkingNavigation = false;
+        deepLinkingNavigationData=widget.deepLinkingNavigationData;
         try {
-          if (widget.deepLinkingNavigationData != null) {
+          if (deepLinkingNavigationData != null) {
             String type =
-                widget.deepLinkingNavigationData["dl_sport_type"] != null
-                    ? widget.deepLinkingNavigationData["dl_sport_type"]
+                deepLinkingNavigationData["dl_sport_type"] != null
+                    ? deepLinkingNavigationData["dl_sport_type"]
                     : 0;
             int sportTypeFromDeepLinking = int.parse(type);
             if (sportTypeFromDeepLinking == 1) {
@@ -190,10 +200,10 @@ class LobbyState extends State<Lobby>
 
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
-      if (widget.deepLinkingNavigationData != null) {
+      if (deepLinkingNavigationData != null) {
         String routePage =
-            widget.deepLinkingNavigationData["dl_page_route"] != null
-                ? widget.deepLinkingNavigationData["dl_page_route"]
+            deepLinkingNavigationData["dl_page_route"] != null
+                ? deepLinkingNavigationData["dl_page_route"]
                 : "";
         switch (routePage) {
           case "earnCash":
@@ -205,13 +215,13 @@ class LobbyState extends State<Lobby>
           case "addCash":
             deactivateDeepLinkingNavigation = true;
             String promoCode =
-                widget.deepLinkingNavigationData["dl_ac_promocode"].toString();
+                deepLinkingNavigationData["dl_ac_promocode"].toString();
             String promoAmountString = widget
                 .deepLinkingNavigationData["dl_ac_promoamount"]
                 .toString();
             String dl_unique_id = "deeplinking";
             dl_unique_id =
-                widget.deepLinkingNavigationData["dl_unique_id"].toString();
+                deepLinkingNavigationData["dl_unique_id"].toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
               promoAmountDouble = double.parse(promoAmountString);
@@ -242,7 +252,7 @@ class LobbyState extends State<Lobby>
               int dl_leagueId = 0;
               try {
                 String leagueString =
-                    widget.deepLinkingNavigationData["dl_leagueId"].toString();
+                    deepLinkingNavigationData["dl_leagueId"].toString();
                 dl_leagueId = int.parse(leagueString);
               } catch (e) {}
               launchL1ByDeepLinking(context, _leagues, dl_leagueId);
@@ -300,7 +310,7 @@ class LobbyState extends State<Lobby>
           case "staticpage":
             deactivateDeepLinkingNavigation = true;
             String pageTitle =
-                widget.deepLinkingNavigationData["dl_sp_pageTitle"].toString();
+                deepLinkingNavigationData["dl_sp_pageTitle"].toString();
             String pageLocation = widget
                 .deepLinkingNavigationData["dl_sp_pageLocation"]
                 .toString();
