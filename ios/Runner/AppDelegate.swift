@@ -48,12 +48,14 @@ import FBSDKCoreKit
         initFlutterChannelsAndEvents();
         deepLinkingDataObject["activateDeepLinkingNavigation"] = false;
         ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions);
+        
         /* Init Services*/
         initPushNotifications(application);
         initBranchPlugin(didFinishLaunchingWithOptions:launchOptions);
         initFlutterChannelsService();
         initWebengage(application,didFinishLaunchingWithOptions:launchOptions);
         enableLocationServices();
+        
         /* Flutter App Init*/
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -198,8 +200,7 @@ import FBSDKCoreKit
         deepLinkingDataObject["activateDeepLinkingNavigation"] = false;
         /*Check if deep linking page source is present and it is not empty*/
         if data != nil {
-            print("data from deep linking.........");
-            print(data!);
+           
             if(data!["+clicked_branch_link"] != nil){
                 print("data clicked_branch_link.........");
                 print(data!["+clicked_branch_link"]!);
@@ -233,7 +234,10 @@ import FBSDKCoreKit
                 }else{
                     if(data!["+non_branch_link"] != nil){
                         let str = data!["+non_branch_link"]! as? String ?? "";
-                        deepLinkingDataObject["deepLinkingURL"] = str;
+                        let validURL = MyHelperClass.isValidUrl(urlString:str);
+                        if(validURL){
+                            deepLinkingDataObject["deepLinkingURL"] = str;
+                        }
                     }
                 }
             }}
