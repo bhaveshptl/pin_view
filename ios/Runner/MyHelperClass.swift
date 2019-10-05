@@ -19,5 +19,19 @@ class MyHelperClass{
         return false
     }
     
+    static func getQueryParametersDict(from url: URL) -> [String: String] {
+           var dict = [String:String]()
+           if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+             if let queryItems = components.queryItems {
+               for item in queryItems {
+                 dict[item.name] = item.value!
+               }
+             }
+             return dict
+           } else {
+             return [:]
+           }
+    }
+    
     
 }

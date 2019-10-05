@@ -253,15 +253,17 @@ import FBSDKCoreKit
     }
     
     private func getQueryParametersDict(from url: URL) -> [String: String] {
-        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)
-        var queryParams = [String: String]()
-        for queryItem: URLQueryItem in (urlComponents?.queryItems)! {
-            if queryItem.value == nil {
-                continue
-            }
-            queryParams[queryItem.name] = queryItem.value
-        }
-        return queryParams
+       var dict = [String:String]()
+       if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+           if let queryItems = components.queryItems {
+               for item in queryItems {
+                   dict[item.name] = item.value!
+               }
+           }
+           return dict
+       } else {
+           return [:]
+       }
     }
     
     private func getBranchData(result: FlutterResult){
@@ -1135,6 +1137,39 @@ import FBSDKCoreKit
         }
         return true
     }
+}
+
+extension AppDelegate: WEGAppDelegate {
+    
+    func wegHandleDeeplink(_ deeplink: String!, userData data: [AnyHashable: Any]!) {
+        if let urlFromWE = deeplink{
+            let validURL = MyHelperClass.isValidUrl(urlString:urlFromWE);
+            if(validURL){
+                let deepLinkingURL = URL(string: urlFromWE);
+                let deepLinkingURLParms = getQueryParametersDict(from: deepLinkingURL!);
+                if(deepLinkingURLParms["enableDeepLinking"] != nil){
+                    if(deepLinkingURLParms["enableDeepLinking"]! == "true"){
+                        deepLinkingDataObject["deepLinkingURL"] = urlFromWE;
+                    }
+                }else{
+                    let weburl = urlFromWE;
+                    guard let url = URL(string: weburl) else {
+                        return //be safe
+                    }
+                    if #available(iOS 10.0, *) {
+                        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    } else {
+                        UIApplication.shared.openURL(url)
+                    }
+                }
+            }
+        }
+    }
+    
+    func didReceiveAnonymousID(_ anonymousID: String!, for reason: WEGReason) {
+       
+    }
+
 }
 
 
