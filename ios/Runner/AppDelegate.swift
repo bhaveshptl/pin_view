@@ -64,13 +64,13 @@ import FBSDKCoreKit
     private func initFlutterChannelsAndEvents(){
         /* Flutter Channel and events  init*/
         controller = window?.rootViewController as? FlutterViewController;
-        RAZORPAY_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.razorpay",binaryMessenger: controller)
-        BRANCH_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.branch",binaryMessenger: controller)
-        PF_FCM_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.fcm",binaryMessenger: controller)
-        WEBENGAGE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.webengage",binaryMessenger: controller)
-        SOCIAL_SHARE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.socialshare",binaryMessenger: controller)
-        BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller)
-        UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller)
+        RAZORPAY_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.razorpay",binaryMessenger: controller.binaryMessenger)
+        BRANCH_IO_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.branch",binaryMessenger: controller.binaryMessenger)
+        PF_FCM_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.fcm",binaryMessenger: controller.binaryMessenger)
+        WEBENGAGE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.webengage",binaryMessenger: controller.binaryMessenger)
+        SOCIAL_SHARE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.socialshare",binaryMessenger: controller.binaryMessenger)
+        BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller.binaryMessenger)
+        UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller.binaryMessenger)
     }
     
     private func initPushNotifications(_ application: UIApplication){
