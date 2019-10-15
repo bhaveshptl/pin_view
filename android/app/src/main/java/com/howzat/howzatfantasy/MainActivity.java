@@ -1256,6 +1256,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
                         PaymentActivity.PAYMENT_METHOD_CARDS);
             }
+        }else if(paymentMethod.equals("upi")){
+            authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
+                    PaymentActivity.PAYMENT_METHOD_UPI);
         }
         else{
             authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,

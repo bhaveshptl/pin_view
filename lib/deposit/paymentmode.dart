@@ -25,6 +25,7 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/maskedTextController.dart';
 import 'package:playfantasy/utils/MaskedTextInputFormatter.dart';
+import 'cardpayment.dart';
 
 class ChoosePaymentMode extends StatefulWidget {
   final int amount;
@@ -842,7 +843,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
           .forEach((bankType) {
         if (bankType["info"]["detailRequired"]) {
-         //showCardDetailsUI = true;
+          showCardDetailsUI = true;
         }
       });
 
@@ -925,7 +926,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
           .forEach((bankType) {
         if (bankType["info"]["detailRequired"]) {
-         // showCardDetailsUI = true;
+          showCardDetailsUI = true;
         }
       });
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
@@ -1187,7 +1188,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
           .forEach((bankType) {
         if (bankType["info"]["detailRequired"]) {
-         // showCardDetailsUI = true;
+          showCardDetailsUI = true;
         }
       });
 
@@ -1304,7 +1305,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
           .forEach((bankType) {
         if (bankType["info"]["detailRequired"]) {
-          //showCardDetailsUI = true;
+           showCardDetailsUI = true;
         }
       });
       if (showCardDetailsUI &&
@@ -1512,51 +1513,51 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       index++;
     });
 
-    showLoader(true);
-  //   if (paymentModeDetails["info"]["gateway"] == "TECHPROCESS_SEAMLESS" &&
-  //       paymentModeDetails["info"]["isSeamless"]) {
-  //     var dateNow = new DateTime.now();
-  //     var formatter = new DateFormat('dd-MM-yyyy');
-  //     String formattedDate = formatter.format(dateNow);
-  //     http.Request req = http.Request(
-  //         "GET",
-  //         Uri.parse(BaseUrl().apiUrl +
-  //             ApiUtil.INIT_PAYMENT_TECHPROCESS +
-  //             querParamString));
-  //     return HttpManager(http.Client())
-  //         .sendRequest(req)
-  //         .then((http.Response res) {
-  //       Map<String, dynamic> response = json.decode(res.body);
-  //       if (res.statusCode >= 200 && res.statusCode <= 299) {
-  //         _openTechProcessNative({
-  //           "name": AppConfig.of(context).appName,
-  //           "email": payload["email"],
-  //           "phone": payload["phone"],
-  //           "amount": payload["depositAmount"].toString(),
-  //           "orderId": response["action"]["value"],
-  //           "method": (payload["paymentType"] as String).indexOf("CARD") == -1
-  //               ? payload["paymentType"].toLowerCase()
-  //               : "card",
-  //           "userId": widget.paymentMode["user_id"].toString(),
-  //           "date": formattedDate,
-  //           "merchantIdentifier":"L456537",
-  //           "extra_public_key": "1234-6666-6789-56",
-  //           "tp_nameOnTheCard": cformNameOnTheCard,
-  //           "tp_expireYear": cformExpYear,
-  //           "tp_expireMonth": cformExpMonth,
-  //           "tp_cvv": cformCVV,
-  //           "tp_cardNumber": cformCardNumber,
-  //           "tp_instrumentToken": "",
-  //           "cardDataCapturingRequired": true
-  //         });
-  //       } else {
-  //         ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
-  //       }
-  //     }).whenComplete(() {
-  //       showLoader(false);
-  //     });
-  //  }
-    if (paymentModeDetails["info"]["isSeamless"]) {
+    showLoader(true); 
+    if (paymentModeDetails["info"]["gateway"] == "TECHPROCESS_SEAMLESS" &&
+        paymentModeDetails["info"]["isSeamless"]) {
+      var dateNow = new DateTime.now();
+      var formatter = new DateFormat('dd-MM-yyyy');
+      String formattedDate = formatter.format(dateNow);
+      http.Request req = http.Request(
+          "GET",
+          Uri.parse(BaseUrl().apiUrl +
+              ApiUtil.INIT_PAYMENT_TECHPROCESS +
+              querParamString));
+      return HttpManager(http.Client())
+          .sendRequest(req)
+          .then((http.Response res) {
+        Map<String, dynamic> response = json.decode(res.body);
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          _openTechProcessNative({
+            "name": AppConfig.of(context).appName,
+            "email": payload["email"],
+            "phone": payload["phone"],
+            "amount": payload["depositAmount"].toString(),
+            "orderId": response["action"]["value"],
+            "method": (payload["paymentType"] as String).indexOf("CARD") == -1
+                ? payload["paymentType"].toLowerCase()
+                : "card",
+            "userId": widget.paymentMode["user_id"].toString(),
+            "date": formattedDate,
+            "merchantIdentifier":"L456537",
+            "extra_public_key": "1234-6666-6789-56",
+            "tp_nameOnTheCard": cformNameOnTheCard,
+            "tp_expireYear": cformExpYear,
+            "tp_expireMonth": cformExpMonth,
+            "tp_cvv": cformCVV,
+            "tp_cardNumber": cformCardNumber,
+            "tp_instrumentToken": "",
+            "cardDataCapturingRequired": true
+          });
+        } else {
+          ActionUtil().showMsgOnTop("Opps!! Try again later.", context);
+        }
+      }).whenComplete(() {
+        showLoader(false);
+      });
+   }
+    else if (paymentModeDetails["info"]["isSeamless"]) {
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
@@ -1822,7 +1823,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
           .forEach((bankType) {
         if (bankType["info"]["detailRequired"]) {
-          //showCardDetailsUI = true;
+           showCardDetailsUI = true;
         }
       });
       if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]

@@ -1160,7 +1160,7 @@ class DocVerificationMessages {
 
 class PanVerificationMessages {
   static String UNDER_REVIEW =
-      "- PAN verification is declined. Please send your PAN on support@howzat.com.";
+      "- PAN card has been declined. Please send your clear and valid image of your PAN at support@howzat.com.";
   static String DOC_REJECTED =
       "- Your PAN verification request has been rejected. Please contact customer support for more details.";
   static String VERIFIED = "- Your PAN has been verified successfully.";
@@ -1168,7 +1168,7 @@ class PanVerificationMessages {
 
 class AddressVerificationMessages {
   static String UNDER_REVIEW =
-      "- Address verification is declined. Please send your complete address proof on support@howzat.com.";
+      "- Address proof has been  declined. Please send your complete address proof(front/back copy) at support@howzat.com.";
   static String DOC_REJECTED =
       "- Your address verification request has been rejected. Please contact customer support for more details.";
   static String VERIFIED = "- Your address has been verified successfully.";
