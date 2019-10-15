@@ -417,7 +417,7 @@ class VerificationState extends State<Verification> {
             'kyc_back_copy', addressBackCopyStream, addressBackCopyLength,
             filename: basename(_addressBackCopyImage.path),
             contentType: MediaType('image', 'jpg')));
-      } 
+      }
 
       httpRequestForAddress.headers["cookie"] = cookie;
       httpRequestForPAN.headers["cookie"] = cookie;
