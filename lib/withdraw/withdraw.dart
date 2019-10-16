@@ -1038,12 +1038,13 @@ class WithdrawState extends State<Withdraw>
           updateWithdrawData();
           String result = await showDialog(
             context: context,
+            barrierDismissible: false,
             builder: (context) => WithdrawSuccess(
                 withdrawResponse: json.decode(res.body),
                 withdrawType: withdrawType),
           );
 
-          if (result != null) {
+          if (result != null) {            
             openWithdrawHistory(context);
           }
         } else {
@@ -1154,7 +1155,7 @@ class WithdrawState extends State<Withdraw>
                                     controller: paytmAmountController,
                                     labelText: "Enter Amount(" +
                                         strings.rupee +
-                                        (_withdrawData.minWithdraw
+                                        (_withdrawData.paytmMinWithdraw
                                             .toStringAsFixed(0)) +
                                         "Min)",
                                     keyboardType: TextInputType.number,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
@@ -70,55 +71,61 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
 
   @override
   Widget build(BuildContext context) {
-    return ScaffoldPage(
-      appBar: AppBar(
-        title: Text(
-          "Recent withdrawals".toUpperCase(),
+    return WillPopScope(
+      onWillPop: (){
+        Navigator.of(context).popUntil((r) => r.isFirst);
+        return Future.value(true);
+      },
+      child: ScaffoldPage(
+        appBar: AppBar(
+          title: Text(
+            "Recent withdrawals".toUpperCase(),
+          ),
         ),
-      ),
-      body: ListView(
-        children: recents.map((recentWithdraw) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: ListTile(
-              onTap: () {},
-              leading: CircleAvatar(
-                maxRadius: 28.0,
-                backgroundColor: Colors.blue.shade100,
-                child: Text(
-                  strings.rupee + recentWithdraw["amount"].toString(),
-                  style: TextStyle(
-                    color: Colors.blue.shade900.withOpacity(0.6),
-                    // fontWeight: FontWeight.bold,
-                    // fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize,
+        body: ListView(
+          children: recents.map((recentWithdraw) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: ListTile(
+                onTap: () {},
+                leading: CircleAvatar(
+                  maxRadius: 28.0,
+                  backgroundColor: Colors.blue.shade100,
+                  child: Text(
+                    strings.rupee + recentWithdraw["amount"].toString(),
+                    style: TextStyle(
+                      color: Colors.blue.shade900.withOpacity(0.6),
+                      // fontWeight: FontWeight.bold,
+                      // fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize,
+                    ),
                   ),
                 ),
-              ),
-              title: Text(recentWithdraw["status"]),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(recentWithdraw["createdDate"]),
-                  Text("#" + recentWithdraw["id"].toString()),
-                ],
-              ),
-              trailing: recentWithdraw["status"] == "REQUESTED"
-                  ? RaisedButton(
-                      onPressed: () {
-                        onCancelTransaction(recentWithdraw);
-                      },
-                      child: Text(
-                        strings.get("CANCEL").toUpperCase(),
+                title: Text(recentWithdraw["status"]),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(recentWithdraw["createdDate"]),
+                    Text("#" + recentWithdraw["id"].toString()),
+                  ],
+                ),
+                trailing: recentWithdraw["status"] == "REQUESTED"
+                    ? RaisedButton(
+                        onPressed: () {
+                          onCancelTransaction(recentWithdraw);
+                        },
+                        child: Text(
+                          strings.get("CANCEL").toUpperCase(),
+                        ),
+                        textColor: Colors.white70,
+                        color: Theme.of(context).primaryColorDark,
+                      )
+                    : Container(
+                        width: 0.0,
                       ),
-                      textColor: Colors.white70,
-                      color: Theme.of(context).primaryColorDark,
-                    )
-                  : Container(
-                      width: 0.0,
-                    ),
-            ),
-          );
-        }).toList(),
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

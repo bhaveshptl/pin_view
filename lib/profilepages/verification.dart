@@ -835,7 +835,7 @@ class VerificationState extends State<Verification> {
                                 (_verificationStatus == "VERIFIED" ||
                                         _verificationStatus ==
                                             "DOC_SUBMITTED" ||
-                                        _verificationStatus == "UNDER_REVIEW")
+                                        _verificationStatus == "UNDER_REVIEW"||  _verificationStatus == "DOC_REJECTED")
                                     ? Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(

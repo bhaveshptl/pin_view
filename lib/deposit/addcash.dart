@@ -263,7 +263,7 @@ class AddCashState extends State<AddCash> {
         break;
 
       case 'onTechProcessPaymentSuccess':
-        onTechProcessSuccessResponse(methodCall.arguments);
+        onTechProcessSuccessResponse(methodCall.arguments);     
         break;
       default:
     }
@@ -1805,8 +1805,8 @@ class AddCashState extends State<AddCash> {
                 : "card",
             "userId": paymentModeDetails["userId"].toString(),
             "date": formattedDate,
-            "merchantIdentifier": "L456537",
-            "extra_public_key": "1234-6666-6789-56",
+            "merchantIdentifier": response["merchantIdentifier"],
+            "extra_public_key": response["tpExtraPublicKey"],
             "tp_nameOnTheCard": cformNameOnTheCard,
             "tp_expireYear": cformExpYear,
             "tp_expireMonth": cformExpMonth,
