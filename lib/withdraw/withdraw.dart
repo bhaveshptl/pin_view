@@ -1155,7 +1155,7 @@ class WithdrawState extends State<Withdraw>
                                     labelText: "Enter Amount(" +
                                         strings.rupee +
                                         (_withdrawData.minWithdraw
-                                            .toStringAsFixed(2)) +
+                                            .toStringAsFixed(0)) +
                                         "Min)",
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
@@ -1425,7 +1425,7 @@ class WithdrawState extends State<Withdraw>
                                         labelText: "Enter Amount(" +
                                             strings.rupee +
                                             (_withdrawData.minWithdraw
-                                                .toStringAsFixed(2)) +
+                                                .toStringAsFixed(0)) +
                                             "Min)",
                                         keyboardType: TextInputType.number,
                                         validator: (value) {

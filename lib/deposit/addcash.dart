@@ -213,9 +213,6 @@ class AddCashState extends State<AddCash> {
       }
     } catch (e) {
       showLoader(false);
-      ActionUtil().showMsgOnTop(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-                context);
     }
     return "";
   }
@@ -266,7 +263,7 @@ class AddCashState extends State<AddCash> {
         break;
 
       case 'onTechProcessPaymentSuccess':
-        onTechProcessSuccessResponse(json.decode(methodCall.arguments));
+        onTechProcessSuccessResponse(methodCall.arguments);
         break;
       default:
     }
@@ -344,13 +341,11 @@ class AddCashState extends State<AddCash> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
-    print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
-    print(payload);
+  onTechProcessSuccessResponse(String payload) {
     showLoader(false);
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
-    req.body = json.encode(payload);
+    req.body = payload;
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
