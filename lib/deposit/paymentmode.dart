@@ -194,10 +194,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       }
     } catch (e) {
       showLoader(false);
-      ActionUtil().showMsgOnTop(
-                "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-                context);
-
     }
     return "";
   }
