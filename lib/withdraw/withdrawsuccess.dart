@@ -3,11 +3,18 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 
 class WithdrawSuccess extends StatelessWidget {
   final Map<String, dynamic> withdrawResponse;
+  final int  withdrawType;
 
-  WithdrawSuccess({this.withdrawResponse});
+  WithdrawSuccess({this.withdrawResponse,this.withdrawType});
 
   @override
   Widget build(BuildContext context) {
+    String  successMessage =  "It will be processed after successful verification.";
+    if(withdrawType==4){
+      successMessage ="It will be processed within 12 to 24 hours to PAYTM account after successful verification";
+    }else if(withdrawType==1){
+       successMessage = "It will be processed within 24 to 48 hours to your BANK account after successful verification";
+    }
     return SimpleDialog(
       children: <Widget>[
         Padding(
@@ -38,7 +45,7 @@ class WithdrawSuccess extends StatelessWidget {
                           children: [
                             TextSpan(
                               text:
-                                  "Your withdrawal has been received with withdrawal ID ",
+                              "Your withdrawal has been received with withdrawal ID ",
                               style: Theme.of(context)
                                   .primaryTextTheme
                                   .caption
@@ -69,7 +76,7 @@ class WithdrawSuccess extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       child: Text(
-                        "It will be processed after successful verification.",
+                        successMessage,
                         style:
                             Theme.of(context).primaryTextTheme.subhead.copyWith(
                                   color: Colors.black,
@@ -97,7 +104,7 @@ class WithdrawSuccess extends StatelessWidget {
                                   ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                           Navigator.of(context).pop("On withdraw success");
                         },
                       ),
                     )

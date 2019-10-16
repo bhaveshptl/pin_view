@@ -241,7 +241,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         }
         break;
       case 'onTechProcessPaymentSuccess':
-        onTechProcessSuccessResponse(json.decode(methodCall.arguments));
+        onTechProcessSuccessResponse(methodCall.arguments);
         break;
       default:
     }
@@ -315,13 +315,13 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     });
   }
 
-  onTechProcessSuccessResponse(Map<dynamic, dynamic> payload) {
+  onTechProcessSuccessResponse(String payload) {
     print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
     print(payload);
     showLoader(false);
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
-    req.body = json.encode(payload);
+    req.body = payload;
     return HttpManager(http.Client())
         .sendRequest(req)
         .then((http.Response res) {
@@ -1536,8 +1536,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 : "card",
             "userId": widget.paymentMode["user_id"].toString(),
             "date": formattedDate,
-            "merchantIdentifier":"L456537",
-            "extra_public_key": "1234-6666-6789-56",
+            "merchantIdentifier":response["merchantIdentifier"],
+            "extra_public_key": response["tpExtraPublicKey"],
             "tp_nameOnTheCard": cformNameOnTheCard,
             "tp_expireYear": cformExpYear,
             "tp_expireMonth": cformExpMonth,

@@ -783,7 +783,7 @@ class WithdrawState extends State<Withdraw>
           'pan', panStream, panLength,
           filename: basename(_panImage.path),
           contentType: MediaType('image', 'jpg')));
-         print("<<<<<<Upload doc called 3>>>>>>");
+      print("<<<<<<Upload doc called 3>>>>>>");
       httpRequestForAddress.files.add(http.MultipartFile(
           'kyc', addressStream, addressLength,
           filename: basename(_addressImage.path),
@@ -805,8 +805,6 @@ class WithdrawState extends State<Withdraw>
 
       Map<String, dynamic> panResponseBody;
 
-      print(_panVerificationStatus+"_panVerificationStatus");
-
       if (_panVerificationStatus != "DOC_SUBMITTED") {
         http.StreamedResponse panResponse =
             await httpRequestForPAN.send().then((onValue) {
@@ -814,11 +812,11 @@ class WithdrawState extends State<Withdraw>
         }).then(
           (http.Response res) {
             print("panResponseBody");
-             panResponseBody = json.decode(res.body);
-              print(panResponseBody);
+            panResponseBody = json.decode(res.body);
+            print(panResponseBody);
             if (res.statusCode >= 200 && res.statusCode <= 299) {
               panResponseBody = json.decode(res.body);
-               
+
               if (panResponseBody["err"] != null && panResponseBody["err"]) {
                 ActionUtil().showMsgOnTop(
                     panResponseBody["msg"], _scaffoldKey.currentContext);
@@ -838,7 +836,7 @@ class WithdrawState extends State<Withdraw>
         );
       }
 
-      print("_addressVerificationStatus "+ _addressVerificationStatus);
+      print("_addressVerificationStatus " + _addressVerificationStatus);
 
       if (_addressVerificationStatus != "DOC_SUBMITTED") {
         http.StreamedResponse addressResponse =
@@ -847,7 +845,7 @@ class WithdrawState extends State<Withdraw>
         }).then(
           (http.Response res) {
             print("Address response ");
-             panResponseBody = json.decode(res.body);
+            panResponseBody = json.decode(res.body);
             print(res.statusCode);
             print(panResponseBody);
             if (res.statusCode >= 200 && res.statusCode <= 299) {
@@ -872,9 +870,6 @@ class WithdrawState extends State<Withdraw>
       }
     }
   }
-
-
-
 
   _getDocValueFromName(String name) {
     String _addressDocValue = "";
@@ -1041,12 +1036,16 @@ class WithdrawState extends State<Withdraw>
       (http.Response res) async {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           updateWithdrawData();
-          await showDialog(
+          String result = await showDialog(
             context: context,
             builder: (context) => WithdrawSuccess(
-              withdrawResponse: json.decode(res.body),
-            ),
+                withdrawResponse: json.decode(res.body),
+                withdrawType: withdrawType),
           );
+
+          if (result != null) {
+            openWithdrawHistory(context);
+          }
         } else {
           Map<String, dynamic> response = json.decode(res.body);
           if (response["error"] != null) {
@@ -1153,7 +1152,11 @@ class WithdrawState extends State<Withdraw>
                                 Expanded(
                                   child: SimpleTextBox(
                                     controller: paytmAmountController,
-                                    labelText: "Amount",
+                                    labelText: "Enter Amount(" +
+                                        strings.rupee +
+                                        (_withdrawData.minWithdraw
+                                            .toStringAsFixed(2)) +
+                                        "Min)",
                                     keyboardType: TextInputType.number,
                                     validator: (value) {
                                       if (value.isEmpty) {
@@ -1419,7 +1422,11 @@ class WithdrawState extends State<Withdraw>
                                     Expanded(
                                       child: SimpleTextBox(
                                         controller: amountController,
-                                        labelText: "Amount",
+                                        labelText: "Enter Amount(" +
+                                            strings.rupee +
+                                            (_withdrawData.minWithdraw
+                                                .toStringAsFixed(2)) +
+                                            "Min)",
                                         keyboardType: TextInputType.number,
                                         validator: (value) {
                                           if (value.isEmpty) {
