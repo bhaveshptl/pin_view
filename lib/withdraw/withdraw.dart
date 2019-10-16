@@ -1445,9 +1445,9 @@ class WithdrawState extends State<Withdraw>
                                                     .withdrawableAmount) {
                                               return "You can not withdraw more than " +
                                                   _withdrawData
-                                                      .withdrawableAmount
-                                                      .toString() +
-                                                  ")";
+                                                      .withdrawableAmount.toStringAsFixed(2)
+                                                      .toString(); 
+                
                                             } else if (amount >
                                                 _withdrawData.maxWithdraw) {
                                               return "You can not withdraw more than " +
