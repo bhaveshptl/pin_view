@@ -1,8 +1,5 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
-import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
@@ -71,6 +68,10 @@ class _PromoStateInput extends State<PromoInput> {
     event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
 
     AnalyticsManager().addEvent(event);
+
+    promoController.addListener(() {
+      setState(() {});
+    });
   }
 
   getBonusAmountForPromo(promoCode) {
@@ -438,244 +439,24 @@ class _PromoStateInput extends State<PromoInput> {
     return _date.day.toString() + mapMonths[_date.month];
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return AlertDialog(
-  //     shape: RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.circular(4.0),
-  //     ),
-  //     titlePadding: EdgeInsets.symmetric(horizontal: 0.0),
-  //     title: Container(
-  //       width: MediaQuery.of(context).size.width,
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.end,
-  //         children: <Widget>[
-  //           Stack(
-  //             alignment: Alignment.centerRight,
-  //             children: <Widget>[
-  //               Row(
-  //                 children: <Widget>[
-  //                   Expanded(
-  //                     child: Text(
-  //                       "Apply Promocode",
-  //                       style:
-  //                           Theme.of(context).primaryTextTheme.title.copyWith(
-  //                                 color: Colors.black,
-  //                                 fontWeight: FontWeight.w700,
-  //                               ),
-  //                       textAlign: TextAlign.center,
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //               InkWell(
-  //                 child: Padding(
-  //                   padding: EdgeInsets.all(8.0),
-  //                   child: Icon(
-  //                     Icons.close,
-  //                   ),
-  //                 ),
-  //                 onTap: () {
-  //                   Navigator.of(context).pop();
-  //                 },
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //     contentPadding: EdgeInsets.all(0.0),
-  //     content: SingleChildScrollView(
-  //       child: Padding(
-  //         padding: EdgeInsets.all(16.0),
-  //         child: Column(
-  //           children: widget.promoCodes.map((promoCode) {
-  //             bool bPromoSelected = selectedPromo == null ||
-  //                 selectedPromo["promoCode"] != promoCode["promoCode"];
-  //             return Padding(
-  //               padding: EdgeInsets.symmetric(vertical: 8.0),
-  //               child: InkWell(
-  //                 onTap: () {
-  //                   onSelectPromo(promoCode);
-  //                 },
-  //                 child: DottedBorder(
-  //                   padding: EdgeInsets.fromLTRB(0.0, 8.0, 8.0, 8.0),
-  //                   color:
-  //                       !bPromoSelected ? Colors.green : Colors.grey.shade300,
-  //                   child: Column(
-  //                     children: <Widget>[
-  //                       Row(
-  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                         children: <Widget>[
-  //                           Row(
-  //                             mainAxisAlignment: MainAxisAlignment.start,
-  //                             children: <Widget>[
-  //                               Container(
-  //                                 height: 40.0,
-  //                                 width: 32.0,
-  //                                 child: FlatButton(
-  //                                   onPressed: () {
-  //                                     onSelectPromo(promoCode);
-  //                                   },
-  //                                   padding: EdgeInsets.all(0.0),
-  //                                   child: Container(
-  //                                     decoration: BoxDecoration(
-  //                                       shape: BoxShape.circle,
-  //                                       border: Border.all(
-  //                                         color: (selectedPromo == null ||
-  //                                                 selectedPromo["promoCode"] !=
-  //                                                     promoCode["promoCode"])
-  //                                             ? Colors.grey.shade300
-  //                                             : Color.fromRGBO(70, 165, 12, 1),
-  //                                         width: 1.0,
-  //                                       ),
-  //                                     ),
-  //                                     padding: EdgeInsets.all(2.0),
-  //                                     child: bPromoSelected
-  //                                         ? CircleAvatar(
-  //                                             radius: 6.0,
-  //                                             backgroundColor:
-  //                                                 Colors.grey.shade300,
-  //                                           )
-  //                                         : CircleAvatar(
-  //                                             radius: 6.0,
-  //                                             backgroundColor: Colors.white,
-  //                                             child: CircleAvatar(
-  //                                               radius: 6.0,
-  //                                               backgroundColor: Color.fromRGBO(
-  //                                                   70, 165, 12, 1),
-  //                                             ),
-  //                                           ),
-  //                                   ),
-  //                                 ),
-  //                               ),
-  //                               Column(
-  //                                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                                 children: <Widget>[
-  //                                   Text(
-  //                                     promoCode["promoCode"],
-  //                                     style: TextStyle(
-  //                                       color: bPromoSelected
-  //                                           ? Colors.black
-  //                                           : Color.fromRGBO(70, 165, 12, 1),
-  //                                       fontWeight: FontWeight.bold,
-  //                                     ),
-  //                                   ),
-  //                                   Padding(
-  //                                     padding: EdgeInsets.only(top: 4.0),
-  //                                     child: Row(
-  //                                       mainAxisAlignment:
-  //                                           MainAxisAlignment.start,
-  //                                       children: <Widget>[
-  //                                         Text(
-  //                                           "Valid till ${getPromoExpiry(promoCode)}",
-  //                                           style: TextStyle(
-  //                                             color: bPromoSelected
-  //                                                 ? Colors.black
-  //                                                 : Color.fromRGBO(
-  //                                                     70, 165, 12, 1),
-  //                                             fontSize: Theme.of(context)
-  //                                                 .primaryTextTheme
-  //                                                 .caption
-  //                                                 .fontSize,
-  //                                           ),
-  //                                         ),
-  //                                       ],
-  //                                     ),
-  //                                   ),
-  //                                 ],
-  //                               )
-  //                             ],
-  //                           ),
-  //                           bShowBonusDistribution
-  //                               ? Icon(
-  //                                   bPromoSelected
-  //                                       ? Icons.expand_more
-  //                                       : Icons.expand_less,
-  //                                   color: !bPromoSelected
-  //                                       ? Colors.green
-  //                                       : Colors.black,
-  //                                 )
-  //                               : Container(),
-  //                         ],
-  //                       ),
-  //                       bShowBonusDistribution &&
-  //                               selectedPromo != null &&
-  //                               selectedPromo["promoCode"] ==
-  //                                   promoCode["promoCode"]
-  //                           ? getBonusDistribution()
-  //                           : Container()
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //             );
-  //           }).toList(),
-  //         ),
-  //       ),
-  //     ),
-  //     actions: <Widget>[
-  //       Row(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         mainAxisSize: MainAxisSize.max,
-  //         children: <Widget>[
-  //           Container(
-  //             height: 40.0,
-  //             width: MediaQuery.of(context).size.width - 96.0,
-  //             child: ColorButton(
-  //               child: Text(
-  //                 "APPLY",
-  //                 style: Theme.of(context).primaryTextTheme.title.copyWith(
-  //                       color: Colors.white,
-  //                     ),
-  //               ),
-  //               onPressed: selectedPromo == null
-  //                   ? null
-  //                   : () {
-  //                       Event event = Event(name: "apply_promo_code");
-  //                       event.setDepositAmount(widget.amount);
-  //                       event.setFirstDeposit(widget.isFirstDeposit);
-  //                       event.setPromoCode(selectedPromo == null
-  //                           ? ""
-  //                           : selectedPromo["promoCode"]);
-
-  //                       AnalyticsManager().addEvent(event);
-  //                       Navigator.of(context).pop(selectedPromo);
-  //                     },
-  //             ),
-  //           )
-  //         ],
-  //       )
-  //     ],
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Container(
+        width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.all(8),
         color: Colors.grey.shade300,
         child:
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text("Promos & Offers".toUpperCase(),),
-              
-              InkWell(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.close,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-
-          ],
-        ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text("Promos & Offers".toUpperCase(),),
+                getRemoveButton(),
+              ],
+            ),
+          ),
       ),
       titlePadding: EdgeInsets.all(0),
       titleTextStyle: TextStyle(
@@ -684,15 +465,14 @@ class _PromoStateInput extends State<PromoInput> {
         fontWeight: FontWeight.bold,
       ),
       elevation: 3.0,
-      content: getPromoUI(),
+      content: getPromoUIV3(),
       contentPadding: EdgeInsets.all(4),
       actions: <Widget>[],
 
     );
   }
 
-  getPromoUI() {
-    
+  getPromoUIV3() {
     List<Widget> rows = [];
     List<Widget> promoTiles = [];
     int i = 0;
@@ -701,33 +481,33 @@ class _PromoStateInput extends State<PromoInput> {
     row = getEnterPromoTextRow();
     rows.add(row);
 
-    // widget.promoCodes.forEach((promoCode) {
-    //   promoTiles.add(getPromoCodeTile(promoCode, i));
+    widget.promoCodes.forEach((promoCode) {
+      promoTiles.add(getPromoCodeTileV3(promoCode));
 
-    //   if(i % 2 == 1) {
+      if(i % 2 == 1) {
         
-    //     row = new Row(
-    //       children : promoTiles,
-    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //     );
+        row = new Row(
+          children : promoTiles,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        );
 
-    //     rows.add(row);
-    //     promoTiles = [];
-    //   }
+        rows.add(row);
+        promoTiles = [];
+      }
 
-    //   i++;
-    // });
+      i++;
+    });
 
-    // if(i % 2 == 1) {
+    if(i % 2 == 1) {
 
-    //   promoTiles.add(Container(width: 50,));
+      promoTiles.add(Expanded(child: Container(),));
 
-    //   row = new Row(
-    //     children : promoTiles,
-    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //   );
-    //   rows.add(row);
-    // }
+      row = new Row(
+        children : promoTiles,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      );
+      rows.add(row);
+    }
 
     row = getMoreInfoRow();
     rows.add(row);
@@ -737,7 +517,11 @@ class _PromoStateInput extends State<PromoInput> {
       child: Column(children: rows),
     );
 
-    return scrollView;
+    return Container(
+      //height: MediaQuery.of(context).size.height - 200,
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height - 200,),
+      child: scrollView
+    );
   }
 
   showLoader(bool bShow) {
@@ -785,150 +569,140 @@ class _PromoStateInput extends State<PromoInput> {
           ),
         ),
 
-        FlatButton(
-          child:  Text("Apply".toUpperCase()),
-          onPressed: () {
-              Navigator.of(context).pop(promoController.text);
-          },
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 8),
+          child: FlatButton(
+            textColor: Colors.white,
+            disabledTextColor: Colors.grey.shade500,
+            color: Colors.green,
+            disabledColor: Colors.grey.shade100,
+            child:  Text("Apply".toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold),),
+            onPressed: promoController.text != "" 
+            ? () {
+                Navigator.of(context).pop(promoController.text);
+            }
+            : null,
+          ),
         ),
       ],
     );
   }
 
-  getPromoCodeTile(promoCode, promoPos) {
-
-    bool bPromoSelected = selectedPromo != null &&
-      selectedPromo["promoCode"] == promoCode["promoCode"];
+  getPromoCodeTileV3(promoCode) {
    
-    return Container(
-        child: FlatButton(
-          padding: EdgeInsets.all(2),
-          child: Card(
-            elevation: 3.0,
-            child: Padding(
-              padding: EdgeInsets.all(8),
-              child: 
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
+    return Expanded(
+        //width: 150,
+        child: Card(
+          elevation: 3.0,
+          margin: EdgeInsets.all(8),
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: 
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text(promoCode["promoCode"], 
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Text(promoCode["promoCode"], 
                           textAlign: TextAlign.left,
                           style: TextStyle(
-                            color: bPromoSelected ? Colors.green : Colors.grey.shade700,
+                            color: Colors.grey.shade700,
                             fontWeight: FontWeight.bold,
                             fontSize: Theme.of(context)
                                 .primaryTextTheme
-                                .subhead
+                                .title
                                 .fontSize
                           ), 
                         ),
-                      ],
-                    ),
-
-                    Text("(" + promoCode["percentage"].toString() + "% Extra)", 
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        color: bPromoSelected ? Colors.green : Colors.grey.shade700,
-                        fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
-                        fontSize: Theme.of(context)
-                            .primaryTextTheme
-                            .subhead
-                            .fontSize
-                      ), 
-                    ),
-
-                    //Divider(height: 3, color: Colors.grey.shade900),
-                    Container(
-                      height: 10,
-                      width: 120, 
-                      decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: Colors.grey.shade300, ))
                       ),
-                    ),
-                    
-                    Row(
-                      children: <Widget>[
+                    ],
+                  ),
 
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
+                  Text(promoCode["percentage"].toString() + "% Extra", 
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontStyle: FontStyle.italic,
+                      fontSize: Theme.of(context)
+                          .primaryTextTheme
+                          .subhead
+                          .fontSize
+                    ), 
+                  ),
 
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: EdgeInsets.all(4), 
-                                child: Text("Min Deposit " + strings.rupee + promoCode["minimum"].toString(),
-                                  style: TextStyle(color: bPromoSelected ? Colors.green : Colors.grey.shade700),
-                                  textAlign: TextAlign.start,
-                                )
-                              ), 
-                            ),
-                            
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: EdgeInsets.all(4), 
-                                child: Text("Max Benefits " + strings.rupee + promoCode["maximum"].toString(),
-                                  style: TextStyle(color: bPromoSelected ? Colors.green : Colors.grey.shade700),
-                                  textAlign: TextAlign.start,
-                                )
-                              )
-                            ),
-                          ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.all(4), 
+                      child: Text("Min Deposit " + strings.rupee + promoCode["minimum"].toString(),
+                        style: TextStyle(color: Colors.grey.shade700),
+                        textAlign: TextAlign.start,
+                      )
+                    ), 
+                  ),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: InkWell(
+                      
+                      
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.green), 
+                          borderRadius: BorderRadius.circular(2.0),
                         ),
-                        
-                        Container(
-                          margin: EdgeInsets.only(left: 6),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: (selectedPromo == null ||
-                                      selectedPromo["promoCode"] !=
-                                          promoCode["promoCode"])
-                                  ? Colors.grey.shade300
-                                  : Color.fromRGBO(70, 165, 12, 1),
-                              width: 1.0,
-                            ),
+
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Text("Apply Now",
+                            style: TextStyle(color: Colors.green),
+                            textAlign: TextAlign.start,
                           ),
-                          padding: EdgeInsets.all(2),
-                          child: !bPromoSelected
-                            ? CircleAvatar(
-                                radius: 6.0,
-                                backgroundColor:
-                                    Colors.grey.shade300,
-                              )
-                            : CircleAvatar(
-                                radius: 6.0,
-                                backgroundColor: Colors.white,
-                                child: CircleAvatar(
-                                  radius: 6.0,
-                                  backgroundColor: Color.fromRGBO(
-                                      70, 165, 12, 1),
-                                ),
-                              ),
                         ),
-                      ],
-                    )
-                    
-                  ],
-                )
-                
-            ),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pop(promoCode["promoCode"]);
+                      },
+                    ), 
+                  ),
+
+                ],
+              )
+              
           ),
-          onPressed: () {
-            //onSelectPromo(promoCode);
-            Navigator.of(context).pop(promoCode["promoCode"]);
-          },
         )
       );
-
   }
 
+
+  Widget getRemoveButton() {
+
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pop();
+      },
+      child: Container(
+         decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            width: 1.0,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(Icons.close, 
+            size: Theme.of(context).primaryTextTheme.subhead.fontSize,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
 
 }
 

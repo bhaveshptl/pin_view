@@ -53,11 +53,23 @@ class RouteLauncher {
 
     Deposit depositData = await getDepositInfo(context);
 
-    List<dynamic> promoCodes = await routeLauncher
-          .getPromoCodes(depositData.chooseAmountData.isFirstDeposit);
-      promoCodes.sort((a, b) {
-        return a["minimum"] - b["minimum"];
-      });
+    List<dynamic> promoCodes = await routeLauncher.getPromoCodes(depositData.chooseAmountData.isFirstDeposit);
+
+    promoCodes.sort((a, b) {
+      return a["minimum"] - b["minimum"];
+    });
+
+    promoCodes.removeWhere((promocode) {
+      // int epoch = new DateTime.now().millisecondsSinceEpoch;
+      return (
+        /*int.parse(promocode["startDate"].toString()) > epoch || int.parse(promocode["endDate"].toString()) < epoch || */
+        !promocode["public"] || 
+        !(
+          (depositData.chooseAmountData.isFirstDeposit && promocode["firstPayment"])
+          || (!depositData.chooseAmountData.isFirstDeposit && !promocode["firstPayment"])
+        )
+      );
+    });
 
     showLoader(context, false);
 

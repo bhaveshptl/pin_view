@@ -10,6 +10,7 @@ class SimpleTextBox extends StatelessWidget {
   final bool obscureText;
   final Widget prefixIcon;
   final Widget suffixIcon;
+  final Color color;
   final Color borderColor;
   final double borderWidth;
   final FocusNode focusNode;
@@ -33,6 +34,7 @@ class SimpleTextBox extends StatelessWidget {
     this.validator,
     this.prefixIcon,
     this.suffixIcon,
+    this.color,
     this.controller,
     this.labelStyle,
     this.borderColor,
@@ -93,7 +95,7 @@ class SimpleTextBox extends StatelessWidget {
         prefixIcon: prefixIcon,
         labelStyle: labelStyle,
         errorBorder: errorBorder,
-        fillColor: Colors.white70,
+        fillColor: color != null ? color : Colors.white70,
         focusedBorder: focusedBorder,
         enabledBorder: enabledBorder,
         contentPadding: contentPadding == null

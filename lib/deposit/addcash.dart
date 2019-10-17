@@ -57,12 +57,11 @@ class AddCashState extends State<AddCash> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   dynamic selectedPromo;
-  int selectedTileindex = 0;
-  int twoTileUIMinWidth = 360;
-  int selectedOfferIndex = 0;
-  bool bAnimateAmountBorder = false;
+  int selectedTileindex = -1;
+  int twoTileUIMinWidth = 0;
+  bool bAnimateAmountBackground = false;
   bool bDonotAutoSelectOffer = false;
-  Timer borderAnimationTimer;
+  Timer bgAnimationTimer;
   bool bShowBonusDistribution = false;
 
   Map<String, dynamic> razorpayPayload;
@@ -130,13 +129,17 @@ class AddCashState extends State<AddCash> {
       int customAmount = int.parse(customAmountController.text == ""
           ? "0"
           : customAmountController.text);
+      
+      amount = customAmount;
+      setState(() {});
 
-      int offerIndex = getMaximumDiscountOfferIndex(customAmount);
+      // if(!bDonotAutoSelectOffer) {
+      //   int offerIndex = getMaximumDiscountOfferIndex(customAmount);
 
-      setState(() {
-        amount = customAmount;
-        selectedOfferIndex = offerIndex;
-      });
+      //   setState(() {
+      //     selectedPromo = widget.promoCodes[offerIndex];
+      //   });
+      // }
     });
 
     razorpay_platform.setMethodCallHandler(myUtilsHandler);
@@ -382,7 +385,7 @@ class AddCashState extends State<AddCash> {
     customAmountController.text =
         widget.depositData.chooseAmountData.lastPaymentArray == null ||
                 widget.depositData.chooseAmountData.lastPaymentArray.length == 0
-            ? ""
+            ? widget.depositData.chooseAmountData.amountTiles[0].toString()
             : (widget.depositData.chooseAmountData.lastPaymentArray[0]
                     ["amount"])
                 .toString();
@@ -406,7 +409,7 @@ class AddCashState extends State<AddCash> {
               ),
             ),
           ],
-        );
+        );  
       }
       else {
         return Column(
@@ -448,26 +451,147 @@ class AddCashState extends State<AddCash> {
           child: Column(
             children: MediaQuery.of(context).size.width < twoTileUIMinWidth
             ? getNewAmountTilesLowWidth() 
-            : getNewAmountTiles(),
+            : getAmountTilesV3(),
           ),
           // child: getNewAmountTiles(),
         ),
       ),
 
-      getPromoHeader(),
+      getPromoHeaderV3(),
 
-      widget.promoCodes.length > 0 
-      ? getPromoUIWrapper()
-      : Container(),
+      // widget.promoCodes.length > 0 
+      // ? getPromoUIWrapper()
+      // : Container(),
+
+      getSelectedPromoUI(),
+    
     ];
+  }
+
+  getSelectedPromoUI() {
+
+    if(selectedPromo == null) 
+      return Container();
+
+    int uExtraCash = customAmountController.text == "" ? 0 : getExtraCashAmount(double.parse(customAmountController.text));
+    int uBonus = customAmountController.text == "" ? 0 : getBonusAmount(double.parse(customAmountController.text));
+    int uLocked = customAmountController.text == "" ? 0 : getLockedAmount(double.parse(customAmountController.text));
+
+    return Container(
+      margin: EdgeInsets.all(12),
+      child: DottedBorder(
+        padding: EdgeInsets.all(0),
+        strokeWidth: 3,
+        gap: 4,
+        color: Colors.green,
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(color: Colors.white),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Column(
+                
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    child: Text(selectedPromo["promoCode"],
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    child: Text("Applied",
+                      style: TextStyle(
+                        color: Colors.green
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+
+              getPromoBreakupUI(uExtraCash, "EXTRA CASH"),
+              getPromoBreakupUI(uBonus, "BONUS"),
+              getPromoBreakupUI(uLocked, "LOCKED"),
+
+              getRemoveButton(),
+
+            ],
+          )
+        ,),
+      ),
+    );
+  }
+
+  Widget getRemoveButton() {
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          selectedPromo = null;
+        });
+      },
+      child: Container(
+         decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            width: 1.0,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Icon(Icons.close, 
+            size: Theme.of(context).primaryTextTheme.subhead.fontSize,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getPromoBreakupUI(int breakupAmount, String breakupName) {
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 4),
+          child: Text(
+            strings.rupee + breakupAmount.toString(),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+
+        Container(
+          child: Text("extra cash".toUpperCase(),
+            style: TextStyle(
+              fontSize: Theme.of(context).primaryTextTheme.overline.fontSize,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   getPromoUIWrapper() {
     
+    Widget promoUI;
     if(MediaQuery.of(context).size.width < twoTileUIMinWidth)
-      return getPromoUILowWidth();
+      promoUI = getPromoUILowWidth();
     else
-      return getPromoUI();
+      promoUI = getPromoUI();
+
+    bDonotAutoSelectOffer = false;
+
+    return promoUI;
   }
 
   getAmountTiles() {
@@ -713,8 +837,8 @@ class AddCashState extends State<AddCash> {
 
         getAmountTextBox(),
 
-        selectedOfferIndex >= 0 && selectedOfferIndex < widget.promoCodes.length && false
-        ? getPromoDiscountBreakupUI()
+        selectedPromo != null && customAmountController.text != "" && false
+        ? getPromoDiscountBreakupUI(double.parse(customAmountController.text))
         : Container(), 
 
       ],
@@ -734,8 +858,6 @@ class AddCashState extends State<AddCash> {
       row = getLastPaymentOptionRow();
       tiles.add(row);
     }
-
-    bDonotAutoSelectOffer = false;
     
     return tiles;
   }
@@ -754,6 +876,76 @@ class AddCashState extends State<AddCash> {
         break;
     }
     return bShowBreakupTile;
+  }
+
+  getAmountTilesV3() {
+    List<Widget> tiles = [];
+    List<Widget> rows = [];
+    Row row;
+    int i = 0;
+
+    bool bShowBreakupTile = getShowBreakupTile();
+    
+    if(customAmountController.text == "") {
+      selectedTileindex = -1;
+    } else if(selectedTileindex >= 0 && selectedTileindex < widget.depositData.chooseAmountData.amountTiles.length
+     && widget.depositData.chooseAmountData.amountTiles[selectedTileindex] != int.parse(customAmountController.text))
+      selectedTileindex = -1;
+
+    int hotAmount = widget.depositData.chooseAmountData.hotTiles.length > 0 
+    ? widget.depositData.chooseAmountData.hotTiles[0] 
+    : -1;
+    
+    //[100, 200, 500, 1000].forEach((choosenAmount) {
+    widget.depositData.chooseAmountData.amountTiles.forEach((choosenAmount) {
+      
+      int curTileIndex = i;
+      tiles.add(getDepositTileV3(curTileIndex, choosenAmount, hotAmount));
+      
+      if(i % 2 == 1) {
+        
+        row = new Row(
+          children : tiles,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween
+        );
+
+        rows.add(row);
+        tiles = [];
+      }
+
+      i++;
+
+    });
+
+    if(i % 2 == 1) {
+
+      tiles.add(Container(width: 50,)); 
+
+      row = new Row(
+        children : tiles,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      );
+      rows.add(row);
+    }
+
+    row = new Row(
+      children: [
+        Expanded(
+          child : getAmountTextBox(),
+        )
+      ]
+    );
+
+    rows.add(row);
+
+    if(widget.depositData.chooseAmountData.lastPaymentArray != null && 
+      widget.depositData.chooseAmountData.lastPaymentArray.length > 0)
+    {
+      row = getLastPaymentOptionRow();
+      rows.add(row);
+    }
+
+    return rows;
   }
 
   getNewAmountTiles() {
@@ -811,8 +1003,8 @@ class AddCashState extends State<AddCash> {
 
         getAmountTextBox(),
 
-        selectedOfferIndex >= 0 && selectedOfferIndex < widget.promoCodes.length && bShowBreakupTile
-        ? getPromoDiscountBreakupUI()
+        selectedPromo != null && customAmountController.text != "" && bShowBreakupTile
+        ? getPromoDiscountBreakupUI(double.parse(customAmountController.text))
         : Container(), 
 
       ],
@@ -833,9 +1025,77 @@ class AddCashState extends State<AddCash> {
       rows.add(row);
     }
 
-    bDonotAutoSelectOffer = false;
-    
     return rows;
+  }
+
+  getDepositTileV3(curTileIndex, choosenAmount, hotAmount) {
+    
+    int customAmount = customAmountController.text == "" ? 0 : int.parse(customAmountController.text);
+
+    return Container(
+      child: Container(
+        child: Stack(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width / 2 - 50,
+              height: MediaQuery.of(context).size.width / 2 - 100,
+              child: Card(
+                color: selectedTileindex == curTileIndex || customAmount == choosenAmount ? Colors.green : Colors.grey.shade100,
+                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: FlatButton( 
+                  
+                  child: Text(strings.rupee + choosenAmount.toString(), 
+                    style: TextStyle(
+                      fontSize: Theme.of(context).primaryTextTheme.headline.fontSize,
+                      color: selectedTileindex == curTileIndex || customAmount == choosenAmount ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  onPressed: () {
+                    int selectedAmount = widget.depositData.chooseAmountData
+                      .amountTiles[curTileIndex];
+
+                    selectedTileindex = curTileIndex;
+                    amount = selectedAmount;
+
+                    customAmountController.text = selectedAmount.toString();
+                    double curamount = double.parse(customAmountController.text);
+
+                    Event event = Event(name: "deposit_tile");
+                    event.setDepositAmount(selectedAmount);
+                    event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
+                    event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
+                    event.setInstantCash(selectedPromo == null ? "0" :  getExtraCashAmount(curamount).toString());
+                    event.setBonusCash(selectedPromo == null ? "0" :  getBonusAmount(curamount).toString());
+                    event.setLockedBonusCash(selectedPromo == null ? "0" :  getLockedAmount(curamount).toString());
+                    
+                    addAnalyticsEvent(event: event);
+
+                    setState(() {
+                      
+                    });
+                  },
+                ),
+              ),
+            ),
+
+            hotAmount == choosenAmount
+            ? Container(
+              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              child: Image.asset(
+                "images/hot.png",
+                height: 30.0,
+                fit: BoxFit.fitHeight,
+              )
+            )
+            : Container(),
+          ]
+        ),
+      ),
+    );
   }
 
   getDepositTile(curTileIndex, choosenAmount, hotAmount) {
@@ -855,14 +1115,15 @@ class AddCashState extends State<AddCash> {
               .amountTiles[curTileIndex];
 
             customAmountController.text = selectedAmount.toString();
+            double curamount = double.parse(customAmountController.text);
 
             Event event = Event(name: "deposit_tile");
             event.setDepositAmount(selectedAmount);
             event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
             event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
-            event.setInstantCash(selectedPromo == null ? 0 :  getExtraCashAmount().toString());
-            event.setBonusCash(selectedPromo == null ? 0 :  getBonusAmount().toString());
-            event.setLockedBonusCash(selectedPromo == null ? 0 :  getLockedAmount().toString());
+            event.setInstantCash(selectedPromo == null ? 0 :  getExtraCashAmount(curamount).toString());
+            event.setBonusCash(selectedPromo == null ? 0 :  getBonusAmount(curamount).toString());
+            event.setLockedBonusCash(selectedPromo == null ? 0 :  getLockedAmount(curamount).toString());
             
             addAnalyticsEvent(event: event);
 
@@ -883,7 +1144,7 @@ class AddCashState extends State<AddCash> {
                     height: 60,
                     child: 
                     Padding(
-                      padding: EdgeInsets.only(top: 18.0, left: 16.0, right: 16.0),
+                      padding: EdgeInsets.only(top: 18.0, left: 13.0, right: 13.0),
                       child:
                         Text(strings.rupee + choosenAmount.toString(), 
                           textAlign: TextAlign.center,
@@ -1000,19 +1261,19 @@ class AddCashState extends State<AddCash> {
     );
   }
 
-  getExtraCashAmount() {
-    int maxDiscount = widget.promoCodes[selectedOfferIndex]["maximum"];
+  int getExtraCashAmount(double curamount) {
+    int maxDiscount = selectedPromo["maximum"];
 
     int uMaxExtra = (
       maxDiscount
-      * (widget.promoCodes[selectedOfferIndex]["instantCashPercentage"])
+      * (selectedPromo["instantCashPercentage"])
       ~/ 100.0
     ).toInt();
 
     int uExtra = (
-      double.parse(customAmountController.text) 
-      * (widget.promoCodes[selectedOfferIndex]["percentage"])
-      * (widget.promoCodes[selectedOfferIndex]["instantCashPercentage"])
+      curamount
+      * (selectedPromo["percentage"])
+      * (selectedPromo["instantCashPercentage"])
       ~/ 10000.0
     ).toInt();
 
@@ -1021,19 +1282,19 @@ class AddCashState extends State<AddCash> {
     return uExtra;
   }
 
-  getBonusAmount() {
-    int maxDiscount = widget.promoCodes[selectedOfferIndex]["maximum"];
+  getBonusAmount(double curamount) {
+    int maxDiscount = selectedPromo["maximum"];
 
     int uMaxBonus = (
       maxDiscount
-      * (widget.promoCodes[selectedOfferIndex]["playablePercentage"])
+      * (selectedPromo["playablePercentage"])
       ~/ 100.0
     ).toInt();
 
     int uBonus = (
-      double.parse(customAmountController.text) 
-      * (widget.promoCodes[selectedOfferIndex]["percentage"])
-      * (widget.promoCodes[selectedOfferIndex]["playablePercentage"])
+      curamount
+      * (selectedPromo["percentage"])
+      * (selectedPromo["playablePercentage"])
       ~/ 10000.0
     ).toInt();
 
@@ -1042,19 +1303,19 @@ class AddCashState extends State<AddCash> {
     return uBonus;
   }
 
-  getLockedAmount() {
-    int maxDiscount = widget.promoCodes[selectedOfferIndex]["maximum"];
+  getLockedAmount(double curamount) {
+    int maxDiscount = selectedPromo["maximum"];
 
     int uMaxLocked = (
       maxDiscount
-      * (widget.promoCodes[selectedOfferIndex]["nonPlayablePercentage"])
+      * (selectedPromo["nonPlayablePercentage"])
       ~/ 100.0
     ).toInt();
 
     int uLocked = (
-      double.parse(customAmountController.text) 
-      * (widget.promoCodes[selectedOfferIndex]["percentage"])
-      * (widget.promoCodes[selectedOfferIndex]["nonPlayablePercentage"])
+      curamount
+      * (selectedPromo["percentage"])
+      * (selectedPromo["nonPlayablePercentage"])
       ~/ 10000.0
     ).toInt();
 
@@ -1063,11 +1324,11 @@ class AddCashState extends State<AddCash> {
     return uLocked;
   }
 
-  getPromoDiscountBreakupUI() {
+  getPromoDiscountBreakupUI(double curamount) {
 
-    int uExtra  = getExtraCashAmount();
-    int uBonus  = getBonusAmount();
-    int uLocked = getLockedAmount();
+    int uExtra  = getExtraCashAmount(curamount);
+    int uBonus  = getBonusAmount(curamount);
+    int uLocked = getLockedAmount(curamount);
     
     return Row(
       children: <Widget>[
@@ -1136,16 +1397,26 @@ class AddCashState extends State<AddCash> {
     
     int offerIndex = -1;
     double discountAmount = 0;
+    double instantCash = 0;
+    double playableCash = 0;
     int i = 0;
     widget.promoCodes.forEach((promoCode) {
       
       if(choosenAmount >= promoCode["minimum"] ) {
-          double curDiscount = choosenAmount * promoCode["percentage"] / 100.0; 
+          double curDiscount = choosenAmount * promoCode["percentage"] / 100.0;
+          double curInstantCash = curDiscount * promoCode["instantCashPercentage"] / 100.0; 
+          double curPlayableCash = curDiscount * promoCode["playablePercentage"] / 100.0; 
           curDiscount = (curDiscount > promoCode["maximum"].toDouble() ? promoCode["maximum"].toDouble() : curDiscount);
-          if(discountAmount < curDiscount) {
+
+          if(
+            discountAmount < curDiscount ||
+            (discountAmount == curDiscount && instantCash < curInstantCash) || 
+            (discountAmount == curDiscount && instantCash == curInstantCash && playableCash < curPlayableCash)
+          ) {
+            instantCash = curInstantCash;
             discountAmount = curDiscount;
             offerIndex = i;
-          }
+          } 
       }
 
       i++;
@@ -1161,8 +1432,9 @@ class AddCashState extends State<AddCash> {
       
     int offerIndex = getMaximumDiscountOfferIndex(choosenAmount);
     
-    if(selectedTileindex == curTileIndex && !bDonotAutoSelectOffer)
-      selectedOfferIndex = offerIndex;
+    // if(selectedTileindex == curTileIndex && !bDonotAutoSelectOffer) {
+    //   selectedPromo = widget.promoCodes[offerIndex];
+    // }
     
     return 
     [
@@ -1183,42 +1455,39 @@ class AddCashState extends State<AddCash> {
 
   getAmountTextBox() {
 
-    if(bAnimateAmountBorder) {
-        if(borderAnimationTimer != null && borderAnimationTimer.isActive) {
-          borderAnimationTimer.cancel();
+    if(bAnimateAmountBackground) {
+        if(bgAnimationTimer != null && bgAnimationTimer.isActive) {
+          bgAnimationTimer.cancel();
         }
-        borderAnimationTimer = new Timer(Duration(milliseconds: 500), () {
+        bgAnimationTimer = new Timer(Duration(milliseconds: 1000), () {
+            bDonotAutoSelectOffer = true;
             setState(() {});
         });
     }
 
-    bool bLocalAnimateAmountBorder = bAnimateAmountBorder;
-    bAnimateAmountBorder = false;
+    bool bLocalAnimateAmountBG = bAnimateAmountBackground;
+    bAnimateAmountBackground = false;
 
     return 
-    Container(width: 100, height: 40,
+    Container(width: 100, height: 60,
       margin: EdgeInsets.only(bottom: 7, top: 7), 
       child: Row(
         children: <Widget>[
 
-          // Text(strings.rupee,
-          //   style: TextStyle(
-          //     fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
-          //   ),
-          // ),
-
           Expanded(
             child: SimpleTextBox(
               style: TextStyle(
-                fontSize: Theme.of(context).primaryTextTheme.headline.fontSize,
+                fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
                 color: Colors.grey.shade900,
               ),
               labelText: "Amount",
+              hintText: "Enter amount (min deposit " + strings.rupee + "10)",
               labelStyle: TextStyle(
-                fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
+                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize,
               ),
-              borderWidth: bLocalAnimateAmountBorder ? 2 : 1,
-              borderColor: bLocalAnimateAmountBorder ? Colors.green : Colors.grey.shade500,
+              color: bLocalAnimateAmountBG ? Colors.green.shade100 : null,
+              borderWidth: 1,
+              borderColor: Colors.grey.shade500,
               focusedBorderColor: Colors.green,
               focusNode: _customAmountFocusNode,
               controller: customAmountController,
@@ -1232,6 +1501,54 @@ class AddCashState extends State<AddCash> {
         ],
       )
       
+    );
+  }
+
+  getPromoHeaderV3() {
+    return Container(
+      child: Row(
+        
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Text("Promos & Offers", 
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
+              ),
+            ),
+          ),
+
+
+          Container(
+            margin: EdgeInsets.only(right: 20, top: 0, left: 0, bottom: 0),
+            child: FlatButton(
+              child:  Text(selectedPromo == null ? "Have a promocode?" : "Change promocode",
+                style: TextStyle(
+                  color: Colors.green, 
+                  fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              padding: EdgeInsets.all(0),
+              onPressed: () {
+                  Event event = Event(name: "enter_code_button");
+                  event.setDepositAmount(customAmountController.text == "" ? 0 : int.parse(customAmountController.text));
+                  event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
+                  event.setIsOpening(true);
+                  addAnalyticsEvent(event: event);
+                  
+                  launchPromoSelector();
+              },
+            ),
+          ),
+
+        ],
+      ),
+      width: double.infinity,
+      color: Colors.white,
     );
   }
 
@@ -1305,6 +1622,7 @@ class AddCashState extends State<AddCash> {
     Row row;
   
     widget.promoCodes.forEach((promoCode) {
+
       promoTiles.add(getPromoCodeTile(promoCode, i));
 
       if(i % 2 == 1) {
@@ -1338,8 +1656,9 @@ class AddCashState extends State<AddCash> {
     Expanded(
       child: SingleChildScrollView(
         child: Container(
-            margin: EdgeInsets.all(4),
-            child: Column(children: rows
+          margin: EdgeInsets.all(4),
+          child: Column(
+            children: rows
           )
         ),
       ),
@@ -1368,7 +1687,7 @@ class AddCashState extends State<AddCash> {
 
                         Text(promoCode["promoCode"], 
                           style: TextStyle(
-                            color: selectedOfferIndex == promoPos ? Colors.green : Colors.grey.shade700,
+                            color: selectedPromo["promoCode"] == promoCode["promoCode"] ? Colors.green : Colors.grey.shade700,
                             fontWeight: FontWeight.bold,
                             fontSize: isIos
                             ? Theme.of(context)
@@ -1384,7 +1703,7 @@ class AddCashState extends State<AddCash> {
 
                         Text(" (" + promoCode["percentage"].toString() + "% Extra)", 
                           style: TextStyle(
-                            color: selectedOfferIndex == promoPos ? Colors.green : Colors.grey.shade700,
+                            color: selectedPromo["promoCode"] == promoCode["promoCode"] ? Colors.green : Colors.grey.shade700,
                             fontWeight: FontWeight.bold,
                             fontStyle: FontStyle.italic,
                             fontSize: isIos
@@ -1417,7 +1736,7 @@ class AddCashState extends State<AddCash> {
                             Padding(
                               padding: EdgeInsets.all(4), 
                               child: Text("Min Deposit " + strings.rupee + promoCode["minimum"].toString(),
-                                style: TextStyle(color: selectedOfferIndex == promoPos ? Colors.green : Colors.grey.shade700),
+                                style: TextStyle(color: selectedPromo["promoCode"] == promoCode["promoCode"] ? Colors.green : Colors.grey.shade700),
                                 textAlign: TextAlign.start,
                               )
                             ),
@@ -1425,7 +1744,7 @@ class AddCashState extends State<AddCash> {
                             Padding(
                               padding: EdgeInsets.all(4), 
                               child: Text("Max Benefits " + strings.rupee + promoCode["maximum"].toString(),
-                                style: TextStyle(color: selectedOfferIndex == promoPos ? Colors.green : Colors.grey.shade700),
+                                style: TextStyle(color: selectedPromo["promoCode"] == promoCode["promoCode"] ? Colors.green : Colors.grey.shade700),
                                 textAlign: TextAlign.start,
                               )
                             ),
@@ -1437,12 +1756,12 @@ class AddCashState extends State<AddCash> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: (selectedOfferIndex == promoPos ? Colors.green : Colors.grey.shade300),
+                              color: (selectedPromo["promoCode"] == promoCode["promoCode"] ? Colors.green : Colors.grey.shade300),
                               width: 1.0,
                             ),
                           ),
                           padding: EdgeInsets.all(2.0),
-                          child: selectedOfferIndex == promoPos
+                          child: selectedPromo["promoCode"] == promoCode["promoCode"]
                             ? CircleAvatar(
                               radius: 6.0,
                               backgroundColor: Colors.white,
@@ -1468,9 +1787,9 @@ class AddCashState extends State<AddCash> {
           ),
           onPressed: () {
 
-            if(selectedOfferIndex == promoPos) {
+            if(selectedPromo["promoCode"] == promoCode["promoCode"]) {
               selectedTileindex = -1;
-              selectedOfferIndex = -1;
+              
               bDonotAutoSelectOffer = true;
               selectedPromo = null;
 
@@ -1482,18 +1801,20 @@ class AddCashState extends State<AddCash> {
               addAnalyticsEvent(event: event);
             }
             else {
+              bDonotAutoSelectOffer = true;
               customAmountController.text = promoCode["minimum"].toString();
-              selectedOfferIndex = promoPos;
               selectedPromo = promoCode;
-              bAnimateAmountBorder = true;
+              bAnimateAmountBackground = true;
+              
+              double curamount = double.parse(customAmountController.text);
 
               Event event = new Event(name: "select_promo_code", source: "add_cash");
               event.setDepositAmount(customAmountController.text == null ? 0 : int.parse(customAmountController.text));
               event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
               event.setPromoCode(promoCode["promoCode"]);
-              event.setInstantCash(selectedPromo == null ? 0 :  getExtraCashAmount().toString());
-              event.setBonusCash(selectedPromo == null ? 0 :  getBonusAmount().toString());
-              event.setLockedBonusCash(selectedPromo == null ? 0 :  getLockedAmount().toString());
+              event.setInstantCash(selectedPromo == null ? 0 :  getExtraCashAmount(curamount).toString());
+              event.setBonusCash(selectedPromo == null ? 0 :  getBonusAmount(curamount).toString());
+              event.setLockedBonusCash(selectedPromo == null ? 0 :  getLockedAmount(curamount).toString());
               
               addAnalyticsEvent(event: event);
             }
@@ -1606,6 +1927,20 @@ class AddCashState extends State<AddCash> {
   }
 
   launchPromoSelector() async {
+
+    List<dynamic> promoCodes = [];
+
+    widget.promoCodes.forEach((promo) {
+        if(promo["minimum"] >= amount)
+          promoCodes.add(promo);
+    });
+
+    if(promoCodes.length == 0) {
+      int index = getMaximumDiscountOfferIndex(amount);
+      if(index > -1) 
+        promoCodes.add(widget.promoCodes[index]);
+    }
+
     if (bShowBonusDistribution) {
       showLoader(true);
       
@@ -1619,7 +1954,7 @@ class AddCashState extends State<AddCash> {
               PromoInput(
                 amount: amount,
                 isFirstDeposit: widget.depositData.chooseAmountData.isFirstDeposit,
-                promoCodes: widget.promoCodes,
+                promoCodes: promoCodes,
                 selectedPromo: selectedPromo,
               ),
             ]
@@ -1638,8 +1973,21 @@ class AddCashState extends State<AddCash> {
           return;
         }
 
+        dynamic currentPromo = null;
+        widget.promoCodes.forEach((promo) {
+          if(promo["promoCode"] == result) {
+            currentPromo = promo;
+          }
+        });
+
+        int validationAmount = amount;
+
+        if(currentPromo != null && currentPromo["minimum"] > amount) {
+          validationAmount =  currentPromo["minimum"];
+        }
+
         showLoader(true);
-        final promoResult = await validatePromo(amount, result);
+        final promoResult = await validatePromo(validationAmount, result);
         showLoader(false);
 
         if (promoResult != null) {
@@ -1657,27 +2005,40 @@ class AddCashState extends State<AddCash> {
             
           } else {
 
-            int i = 0;
+            if(currentPromo != null && currentPromo["minimum"] > amount) {
+              amount = currentPromo["minimum"];
+              customAmountController.text = currentPromo["minimum"].toString();
+              bAnimateAmountBackground = true;
+            }
+
+            bool bFound = false;
             widget.promoCodes.forEach((promo) {
                 if(promo["promoCode"] == result) {
                   selectedPromo = promo;
-                  selectedOfferIndex = i;
+                  bFound = true;
                 }
                   
-                i++;
             });
+
+            if(bFound == false) {
+              widget.promoCodes.insert(0, paymentMode["details"]);
+              selectedPromo = paymentMode["details"];
+            }
+            
 
             setState(() {});
             
             selectedPromo = paymentMode["details"];
+            double curamount = double.parse(customAmountController.text);
+
             Event event = Event(name: "apply_promo_sucess");
             event.setDepositAmount(amount);
             event.setFirstDeposit(widget.depositData.chooseAmountData.isFirstDeposit);
             event.setPromoCode(selectedPromo != null ? selectedPromo["promoCode"] : "");
             event.setErrorMessage(paymentMode["message"]);
-            event.setInstantCash(selectedPromo == null ? 0 :  getExtraCashAmount().toString());
-            event.setBonusCash(selectedPromo == null ? 0 :  getBonusAmount().toString());
-            event.setLockedBonusCash(selectedPromo == null ? 0 :  getLockedAmount().toString());
+            event.setInstantCash(selectedPromo == null ? 0 :  getExtraCashAmount(curamount).toString());
+            event.setBonusCash(selectedPromo == null ? 0 :  getBonusAmount(curamount).toString());
+            event.setLockedBonusCash(selectedPromo == null ? 0 :  getLockedAmount(curamount).toString());
 
             AnalyticsManager().addEvent(event);
             ActionUtil().showMsgOnTop(paymentMode["message"], context);
