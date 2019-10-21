@@ -444,6 +444,7 @@ class _PromoStateInput extends State<PromoInput> {
     return AlertDialog(
       title: Container(
         width: MediaQuery.of(context).size.width,
+        //width: 200,
         padding: EdgeInsets.all(8),
         color: Colors.grey.shade300,
         child:
@@ -465,8 +466,9 @@ class _PromoStateInput extends State<PromoInput> {
         fontWeight: FontWeight.bold,
       ),
       elevation: 3.0,
-      content: getPromoUIV3(),
-      contentPadding: EdgeInsets.all(4),
+      content: getPromoUIV4(),
+      //content: Container(width: 200, child: getPromoUIV4()),
+      contentPadding: EdgeInsets.all(8),
       actions: <Widget>[],
 
     );
@@ -515,6 +517,37 @@ class _PromoStateInput extends State<PromoInput> {
     Widget scrollView = SingleChildScrollView(
       padding: EdgeInsets.all(0),
       child: Column(children: rows),
+    );
+
+    return Container(
+      //height: MediaQuery.of(context).size.height - 200,
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height - 200,),
+      child: scrollView
+    );
+  }
+
+  getPromoUIV4() {
+    List<Widget> rows = [];
+    
+    rows.add(getEnterPromoTextRow());
+
+    widget.promoCodes.forEach((promoCode) {
+      Row row = Row(
+        mainAxisSize: MainAxisSize.max, 
+        children: <Widget>[
+          getPromoCodeTileV4(promoCode)
+        ],
+      );
+      rows.add(row);
+    });
+
+    rows.add(getMoreInfoRow());
+
+    Widget scrollView = SingleChildScrollView(
+      padding: EdgeInsets.all(0),
+      child: Column(
+        children: rows,
+      ),
     );
 
     return Container(
@@ -595,61 +628,62 @@ class _PromoStateInput extends State<PromoInput> {
         child: Card(
           elevation: 3.0,
           margin: EdgeInsets.all(8),
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop(promoCode["promoCode"]);
+            },
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: 
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Text(promoCode["promoCode"], 
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontWeight: FontWeight.bold,
-                            fontSize: Theme.of(context)
-                                .primaryTextTheme
-                                .title
-                                .fontSize
-                          ), 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(promoCode["promoCode"], 
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: Theme.of(context)
+                                  .primaryTextTheme
+                                  .title
+                                  .fontSize
+                            ), 
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
 
-                  Text(promoCode["percentage"].toString() + "% Extra", 
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontStyle: FontStyle.italic,
-                      fontSize: Theme.of(context)
-                          .primaryTextTheme
-                          .subhead
-                          .fontSize
-                    ), 
-                  ),
+                    Text(promoCode["percentage"].toString() + "% Extra", 
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontStyle: FontStyle.italic,
+                        fontSize: Theme.of(context)
+                            .primaryTextTheme
+                            .subhead
+                            .fontSize
+                      ), 
+                    ),
 
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: EdgeInsets.all(4), 
-                      child: Text("Min Deposit " + strings.rupee + promoCode["minimum"].toString(),
-                        style: TextStyle(color: Colors.grey.shade700),
-                        textAlign: TextAlign.start,
-                      )
-                    ), 
-                  ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: EdgeInsets.all(4), 
+                        child: Text("Min Deposit " + strings.rupee + promoCode["minimum"].toString(),
+                          style: TextStyle(color: Colors.grey.shade700),
+                          textAlign: TextAlign.start,
+                        )
+                      ), 
+                    ),
 
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: InkWell(
-                      
-                      
+                    Align(
+                      alignment: Alignment.centerRight,
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.green), 
@@ -663,19 +697,110 @@ class _PromoStateInput extends State<PromoInput> {
                             textAlign: TextAlign.start,
                           ),
                         ),
-                      ),
-                      onTap: () {
-                        Navigator.of(context).pop(promoCode["promoCode"]);
-                      },
-                    ), 
-                  ),
+                      ), 
+                    ),
 
-                ],
-              )
-              
+                  ],
+                )
+                
+            ),
           ),
         )
       );
+  }
+
+  getPromoCodeTileV4(promoCode) {
+   
+    return Expanded(
+      child: Container(
+          height: 110,
+          child: Card(
+            elevation: 3.0,
+            margin: EdgeInsets.all(12),
+            child: InkWell(
+              onTap: () {
+                Navigator.of(context).pop(promoCode["promoCode"]);
+              },
+              child: Container(
+                width: 200,
+                padding: EdgeInsets.all(8),
+                child: 
+
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 7, 
+                        child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Text(promoCode["promoCode"], 
+                                  style: TextStyle(
+                                    color: Colors.grey.shade700,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: Theme.of(context)
+                                        .primaryTextTheme
+                                        .title
+                                        .fontSize
+                                  ), 
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          
+                          Container(
+                            margin: EdgeInsets.only(top: 4),
+                            child: Text(promoCode["percentage"].toString() + "% Extra", 
+                              style: TextStyle(
+                                color: Colors.grey.shade700,
+                                fontStyle: FontStyle.italic,
+                                fontSize: Theme.of(context)
+                                    .primaryTextTheme
+                                    .subhead
+                                    .fontSize
+                              ), 
+                            ),
+                          ),
+
+                          Container(
+                            margin: EdgeInsets.only(top: 4),
+                            child: Text("Min Deposit " + strings.rupee + promoCode["minimum"].toString(),
+                              style: TextStyle(color: Colors.grey.shade700),
+                            ),
+                          ),
+
+                        ],
+                      ),),
+                      
+                      Expanded(
+                        flex: 4, 
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                            color: Colors.green,
+                            child: Text("APPLY", 
+                              style: TextStyle(
+                                fontSize: Theme.of(context).primaryTextTheme.subhead.fontSize,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                  
+              ),
+            ),
+          )
+        ),
+    );
   }
 
 

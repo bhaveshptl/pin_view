@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -59,18 +60,23 @@ class RouteLauncher {
       return a["minimum"] - b["minimum"];
     });
 
-    promoCodes.removeWhere((promocode) {
-      // int epoch = new DateTime.now().millisecondsSinceEpoch;
-      return (
-        /*int.parse(promocode["startDate"].toString()) > epoch || int.parse(promocode["endDate"].toString()) < epoch || */
-        !promocode["public"] || 
-        !(
+    List<dynamic> filteredPromo = [];
+    promoCodes.forEach((promocode) {
+
+      if(promocode["public"]) {
+
+        if(
           (depositData.chooseAmountData.isFirstDeposit && promocode["firstPayment"])
           || (!depositData.chooseAmountData.isFirstDeposit && !promocode["firstPayment"])
-        )
-      );
-    });
+        ) {
+          filteredPromo.add(promocode);
+        }
 
+      }
+
+    });    
+
+    
     showLoader(context, false);
 
     try {
@@ -95,7 +101,7 @@ class RouteLauncher {
         FantasyPageRoute(
           pageBuilder: (context) => AddCash(
             depositData: depositData,
-            promoCodes: promoCodes,
+            promoCodes: filteredPromo,
             promoCode: promoCode,
             prefilledAmount: prefilledAmount,
           ),

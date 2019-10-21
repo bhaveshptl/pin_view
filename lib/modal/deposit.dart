@@ -32,6 +32,7 @@ class ChooseAmountData {
   bool isFirstDeposit;
   List<int> amountTiles;
   List<int> hotTiles;
+  List<int> bestTiles;
   List<dynamic> bonusArray;
   List<dynamic> lastPaymentArray;
   int addCashPromoAb;
@@ -42,6 +43,7 @@ class ChooseAmountData {
     this.bonusArray,
     this.amountTiles,
     this.hotTiles,
+    this.bestTiles,
     this.depositLimit,
     this.isFirstDeposit,
     this.lastPaymentArray,
@@ -62,6 +64,10 @@ class ChooseAmountData {
           (json["amountTiles"] as List).map((i) => (i as int).toInt()).toList(),
       hotTiles:
           (json["hotTiles"] as List).map((i) => (i as int).toInt()).toList(),
+      bestTiles: 
+          json["bestTiles"] == null 
+          ? []
+          : (json["bestTiles"] as List).map((i) => (i as int).toInt()).toList(),
     );
   }
 }
