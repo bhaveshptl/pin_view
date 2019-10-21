@@ -149,12 +149,12 @@ class AddCashState extends State<AddCash> {
         });
       }
 
-      if(getAutoApplyPromo() && !bDonotAutoSelectOffer) {
-        int offerIndex = getMaximumDiscountOfferIndex(amount);
-        if(offerIndex > -1)
-          selectedPromo = widget.promoCodes[getMaximumDiscountOfferIndex(amount)];
-        else 
-          selectedPromo = null;
+      int offerIndex = getMaximumDiscountOfferIndex(amount);
+      if(offerIndex == -1) {
+        selectedPromo = null;
+      }
+      else if(getAutoApplyPromo() && !bDonotAutoSelectOffer) {
+        selectedPromo = widget.promoCodes[getMaximumDiscountOfferIndex(amount)];
       }
       bDonotAutoSelectOffer = false;
 
@@ -1057,7 +1057,10 @@ class AddCashState extends State<AddCash> {
 
     int customAmount = customAmountController.text == "" ? 0 : int.parse(customAmountController.text);
     int offerIndex = getMaximumDiscountOfferIndex(choosenAmount);
-    int percentage = widget.promoCodes[offerIndex]["percentage"];
+    int percentage = -1;
+    
+    if(offerIndex > -1)
+      percentage = widget.promoCodes[offerIndex]["percentage"];
 
     return Container(
       child: Container(
@@ -1068,7 +1071,7 @@ class AddCashState extends State<AddCash> {
               height: MediaQuery.of(context).size.width / 2 - 100,
               child: Card(
                 color: selectedTileindex == curTileIndex ? Colors.green : Colors.grey.shade100,
-                margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                margin: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                 elevation: 3,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5.0),
@@ -1085,7 +1088,8 @@ class AddCashState extends State<AddCash> {
                         ),
                       ),
 
-                      Padding(
+                      percentage > -1
+                      ? Padding(
                         padding: const EdgeInsets.only(top:2.0),
                         child: getAutoApplyPromo()
                         ? Text("+" + percentage.toString() + "% extra", 
@@ -1096,6 +1100,7 @@ class AddCashState extends State<AddCash> {
                         )
                         : Container(),
                       )
+                      : Container(),
                     ],
                   ),
                   onPressed: () {
@@ -1106,8 +1111,11 @@ class AddCashState extends State<AddCash> {
                     amount = selectedAmount;
 
                     int offerIndex = getMaximumDiscountOfferIndex(amount);
-                    if(offerIndex > -1) {
+                    if(offerIndex > -1 && getAutoApplyPromo()) {
                       selectedPromo = widget.promoCodes[offerIndex];
+                    }
+                    else {
+                      selectedPromo = null;
                     }
 
                     customAmountController.text = selectedAmount.toString();
@@ -1133,10 +1141,10 @@ class AddCashState extends State<AddCash> {
 
             hotAmount == choosenAmount
             ? Container(
-              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 10),
               child: Image.asset(
                 "images/hot.png",
-                height: 30.0,
+                height: 45.0,
                 fit: BoxFit.fitHeight,
               )
             )
@@ -1144,10 +1152,10 @@ class AddCashState extends State<AddCash> {
 
             bestAmount == choosenAmount
             ? Container(
-              margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 10),
               child: Image.asset(
-                "images/hot.png",
-                height: 30.0,
+                "images/best.png",
+                height: 45.0,
                 fit: BoxFit.fitHeight,
               )
             )
@@ -3419,8 +3427,8 @@ class AddCashState extends State<AddCash> {
           "Payments".toUpperCase(),
         ),
       ),
-      body: createChooseAmountUI(),
-      //body: Container(width: 360, height: 220, child: createChooseAmountUI(),),
+      //body: createChooseAmountUI(),
+      body: Container(width: 320, height: 620, child: createChooseAmountUI(),),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
