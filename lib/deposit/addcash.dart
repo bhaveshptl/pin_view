@@ -3427,8 +3427,8 @@ class AddCashState extends State<AddCash> {
           "Payments".toUpperCase(),
         ),
       ),
-      //body: createChooseAmountUI(),
-      body: Container(width: 320, height: 620, child: createChooseAmountUI(),),
+      body: createChooseAmountUI(),
+      //body: Container(width: 320, height: 620, child: createChooseAmountUI(),),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
