@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -50,7 +51,32 @@ class RouteLauncher {
     Function onComplete,
     double prefilledAmount,
   }) async {
+
     Deposit depositData = await getDepositInfo(context);
+
+    List<dynamic> promoCodes = await routeLauncher.getPromoCodes(depositData.chooseAmountData.isFirstDeposit);
+
+    promoCodes.sort((a, b) {
+      return a["minimum"] - b["minimum"];
+    });
+
+    List<dynamic> filteredPromo = [];
+    promoCodes.forEach((promocode) {
+
+      if(promocode["public"]) {
+
+        if(
+          (depositData.chooseAmountData.isFirstDeposit && promocode["firstPayment"])
+          || (!depositData.chooseAmountData.isFirstDeposit && !promocode["firstPayment"])
+        ) {
+          filteredPromo.add(promocode);
+        }
+
+      }
+
+    });    
+
+    
     showLoader(context, false);
 
     try {
@@ -75,6 +101,7 @@ class RouteLauncher {
         FantasyPageRoute(
           pageBuilder: (context) => AddCash(
             depositData: depositData,
+            promoCodes: filteredPromo,
             promoCode: promoCode,
             prefilledAmount: prefilledAmount,
           ),
@@ -468,6 +495,10 @@ class RouteLauncher {
       case "PRIVACY":
         title = "PRIVACY POLICY";
         url = BaseUrl().staticPageUrls["PRIVACY"];
+        break;
+      case "PROMOS_OFFERS": 
+        title = "PROMOS & OFFERS";
+        url = BaseUrl().staticPageUrls["PROMOS_OFFERS"];
         break;
     }
     Navigator.of(context).push(
