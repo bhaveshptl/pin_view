@@ -2,6 +2,7 @@ class Deposit {
   String bannerImage;
   bool bAllowRepeatDeposit;
   bool bshowBonusDistribution;
+  bool bShowLockedAmount;
   Map<String, dynamic> refreshData;
   ChooseAmountData chooseAmountData;
 
@@ -11,6 +12,7 @@ class Deposit {
     this.chooseAmountData,
     this.bAllowRepeatDeposit,
     this.bshowBonusDistribution,
+    this.bShowLockedAmount = false,
   });
 
   factory Deposit.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,8 @@ class Deposit {
       chooseAmountData: ChooseAmountData.fromJson(json["chooseAmountData"]),
       bAllowRepeatDeposit:
           json["repeatAllowed"] == null ? false : json["repeatAllowed"],
+      bShowLockedAmount: 
+          json["bShowLockedAmount"] == null ? false : json["bShowLockedAmount"],
     );
   }
 }

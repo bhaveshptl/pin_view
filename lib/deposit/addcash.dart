@@ -90,8 +90,10 @@ class AddCashState extends State<AddCash> {
 
   @override
   void initState() {
+    
     super.initState();
     initWebview();
+
     if (!widget.depositData.bAllowRepeatDeposit ||
         widget.depositData.chooseAmountData.lastPaymentArray == null ||
         widget.depositData.chooseAmountData.lastPaymentArray.length == 0) {
@@ -103,7 +105,10 @@ class AddCashState extends State<AddCash> {
 
     if(widget.depositData.chooseAmountData.isFirstDeposit) {
       bAutoApplyPromo = true;
+    }
 
+    if(widget.depositData.bShowLockedAmount) {
+      bShowLockedBonus = true;
     }
 
     setDepositInfo();
@@ -508,11 +513,12 @@ class AddCashState extends State<AddCash> {
       )
     );
 
-    promoUIRowChildren.add(getPromoBreakupUI(uExtraCash, "EXTRA CASH"));
-    promoUIRowChildren.add(getPromoBreakupUI(uBonus, "BONUS"));
+    if(uExtraCash > 0) promoUIRowChildren.add(getPromoBreakupUI(uExtraCash, "EXTRA CASH"));
+    if(uBonus > 0) promoUIRowChildren.add(getPromoBreakupUI(uBonus, "BONUS"));
 
     if(bShowLockedBonus)
-      promoUIRowChildren.add(getPromoBreakupUI(uLocked, "LOCKED"));
+      if(uLocked > 0)
+        promoUIRowChildren.add(getPromoBreakupUI(uLocked, "LOCKED"));
 
     promoUIRowChildren.add(getRemoveButton());
 
@@ -1141,7 +1147,7 @@ class AddCashState extends State<AddCash> {
 
             hotAmount == choosenAmount
             ? Container(
-              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 9),
               child: Image.asset(
                 "images/hot.png",
                 height: 45.0,
@@ -1152,7 +1158,7 @@ class AddCashState extends State<AddCash> {
 
             bestAmount == choosenAmount
             ? Container(
-              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 10),
+              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 9),
               child: Image.asset(
                 "images/best.png",
                 height: 45.0,
