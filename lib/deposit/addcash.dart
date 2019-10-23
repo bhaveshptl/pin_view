@@ -103,7 +103,13 @@ class AddCashState extends State<AddCash> {
 
     if(widget.depositData.chooseAmountData.isFirstDeposit) {
       bAutoApplyPromo = true;
+    }
 
+    if(widget.promoCode != null && widget.promoCode.length > 0) {
+      widget.promoCodes.forEach((promo) {
+        if(promo["promoCode"] == widget.promoCode)
+          selectedPromo = promo;
+      });
     }
 
     setDepositInfo();

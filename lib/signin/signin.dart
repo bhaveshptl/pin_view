@@ -751,7 +751,8 @@ class SignInPageState extends State<SignInPage> {
                                       padding: EdgeInsets.only(bottom: 16.0),
                                       child: SimpleTextBox(
                                         onSaved: (val) => _authName = val,
-                                        labelText: "Email or mobile*",
+                                        labelText: strings.get("EMAIL_OR_MOBILE") +
+                                                "*",
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings

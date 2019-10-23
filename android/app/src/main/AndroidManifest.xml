@@ -62,7 +62,15 @@
                 <data
                     android:host="www.howzat.com"
                     android:scheme="https"
-                    android:pathPrefix="/"/>
+                    android:pathPrefix="/landing"/>
+                <data
+                    android:host="11zy.app.link"
+                    android:scheme="https"
+                    android:pathPrefix="/"/> 
+                 <data 
+                    android:host="hwzt.in"
+                    android:scheme="https"
+                    android:pathPrefix="/"/>        
             </intent-filter>
 
         </activity>
