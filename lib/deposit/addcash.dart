@@ -546,7 +546,8 @@ class AddCashState extends State<AddCash> {
     return InkWell(
       onTap: () {
         bDonotAutoSelectOffer = true;
-        selectedTileindex = -1;
+        if(getAutoApplyPromo())
+          selectedTileindex = -1;
         selectedPromo = null;
         setState(() {});
       },
@@ -1147,7 +1148,7 @@ class AddCashState extends State<AddCash> {
 
             hotAmount == choosenAmount
             ? Container(
-              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 9),
+              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 8.5),
               child: Image.asset(
                 "images/hot.png",
                 height: 45.0,
@@ -1158,7 +1159,7 @@ class AddCashState extends State<AddCash> {
 
             bestAmount == choosenAmount
             ? Container(
-              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 9),
+              margin: EdgeInsets.symmetric(horizontal: 2, vertical: 8.5),
               child: Image.asset(
                 "images/best.png",
                 height: 45.0,
