@@ -42,6 +42,17 @@ class MyAccountState extends State<MyAccount> {
     );
   }
 
+  getAbsoluteAmount(double amount) {
+    String amountInString = amount.toStringAsFixed(2);
+    try {
+      var decimalAmount = amountInString.split('.');
+      if(decimalAmount[1]=="00"){
+        amountInString = amount.toStringAsFixed(0);
+      }
+    } catch (e) {}
+    return amountInString;
+  }
+
   showLoader(bool bShow) {
     AppConfig.of(scaffoldKey.currentContext)
         .store
@@ -79,8 +90,7 @@ class MyAccountState extends State<MyAccount> {
               children: <Widget>[
                 Text(
                   strings.rupee +
-                      " " +
-                      accountDetails.totalBalance.toStringAsFixed(2),
+                      getAbsoluteAmount(accountDetails.totalBalance),
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).primaryTextTheme.display2.fontSize,
@@ -89,8 +99,9 @@ class MyAccountState extends State<MyAccount> {
               ],
             ),
           ),
-          Padding(
+          Container(
             padding: EdgeInsets.all(16.0),
+            color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -106,8 +117,7 @@ class MyAccountState extends State<MyAccount> {
                     ),
                     Text(
                       strings.rupee +
-                          " " +
-                          accountDetails.depositAmount.toStringAsFixed(2),
+                          getAbsoluteAmount(accountDetails.depositAmount),
                       style: TextStyle(
                           fontSize: Theme.of(context)
                               .primaryTextTheme
@@ -140,7 +150,8 @@ class MyAccountState extends State<MyAccount> {
                         ),
                       ),
                       onTap: () {
-                        _launchAddCash(source: "my_account", promoCode: "");
+                        _launchAddCash(
+                            source: "transaction_history", promoCode: "");
                       },
                     ),
                   ],
@@ -157,8 +168,7 @@ class MyAccountState extends State<MyAccount> {
                     ),
                     Text(
                       strings.rupee +
-                          " " +
-                          accountDetails.winningAmount.toStringAsFixed(2),
+                          getAbsoluteAmount(accountDetails.winningAmount),
                       style: TextStyle(
                           fontSize: Theme.of(context)
                               .primaryTextTheme
@@ -170,7 +180,7 @@ class MyAccountState extends State<MyAccount> {
                       child: Container(
                         padding: EdgeInsets.all(12),
                         margin: EdgeInsets.all(8),
-                        color: Colors.green,
+                        color: Color.fromRGBO(245, 131, 18, 1),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -205,74 +215,72 @@ class MyAccountState extends State<MyAccount> {
                   children: <Widget>[
                     Column(
                       children: <Widget>[
-                        Row(children: <Widget>[
-                          Column(
-                            crossAxisAlignment:
-                                accountDetails.unreleasedBonus >= 0
-                                    ? CrossAxisAlignment.center
-                                    : CrossAxisAlignment.end,
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              Text(
-                                "Bonus",
-                                style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .body1
-                                      .fontSize,
-                                ),
-                              ),
-                              Text(
-                                strings.rupee +
-                                    " " +
-                                    accountDetails.bonusAmount
-                                        .toStringAsFixed(2),
-                                style: TextStyle(
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .subhead
-                                      .fontSize,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          accountDetails.unreleasedBonus >= 0
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Text(
-                                      "Locked",
-                                      style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .body1
-                                            .fontSize,
-                                      ),
+                              Column(
+                                crossAxisAlignment:
+                                    accountDetails.unreleasedBonus >= 0
+                                        ? CrossAxisAlignment.center
+                                        : CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Text(
+                                    "Bonus",
+                                    style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body1
+                                          .fontSize,
                                     ),
-                                    Text(
-                                      strings.rupee +
-                                          " " +
-                                          accountDetails.unreleasedBonus
-                                              .toStringAsFixed(2),
-                                      style: TextStyle(
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .subhead
-                                            .fontSize,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  ),
+                                  Text(
+                                    strings.rupee +
+                                        getAbsoluteAmount(accountDetails.bonusAmount),
+                                    style: TextStyle(
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .subhead
+                                          .fontSize,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ],
-                                )
-                              : Container(),
-                        ]),
+                                  ),
+                                ],
+                              ),
+                              accountDetails.unreleasedBonus >= 0
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: <Widget>[
+                                        Text(
+                                          "Locked",
+                                          style: TextStyle(
+                                            fontSize: Theme.of(context)
+                                                .primaryTextTheme
+                                                .body1
+                                                .fontSize,
+                                          ),
+                                        ),
+                                        Text(
+                                          strings.rupee+getAbsoluteAmount(accountDetails.unreleasedBonus),
+                                          style: TextStyle(
+                                            fontSize: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .fontSize,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container(),
+                            ]),
                       ],
                     ),
                     InkWell(
                       child: Container(
                         padding: EdgeInsets.all(12),
                         margin: EdgeInsets.all(8),
-                        color: Colors.green,
+                        color: Color.fromRGBO(40, 74, 171, 1),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -315,8 +323,7 @@ class MyAccountState extends State<MyAccount> {
                 Text(
                   "TRANSACTION HISTORY",
                   style: TextStyle(
-                    fontSize:
-                        Theme.of(context).primaryTextTheme.title.fontSize,
+                    fontSize: Theme.of(context).primaryTextTheme.title.fontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
