@@ -10,6 +10,12 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class WithdrawHistory extends StatefulWidget {
+  final bool onBackPressedNavigateToLobby;
+  WithdrawHistory(
+    {
+        this.onBackPressedNavigateToLobby
+    }
+  );
   @override
   WithdrawHistoryState createState() => WithdrawHistoryState();
 }
@@ -73,8 +79,12 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: (){
-        Navigator.of(context).popUntil((r) => r.isFirst);
-        return Future.value(true);
+        if(widget.onBackPressedNavigateToLobby){
+          Navigator.of(context).popUntil((r) => r.isFirst);
+          return Future.value(true);
+        }else{
+           Navigator.of(context).pop();  
+        }
       },
       child: ScaffoldPage(
         appBar: AppBar(

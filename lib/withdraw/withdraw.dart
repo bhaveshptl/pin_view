@@ -1045,7 +1045,7 @@ class WithdrawState extends State<Withdraw>
           );
 
           if (result != null) {            
-            openWithdrawHistory(context);
+            openWithdrawHistory(context,true);
           }
         } else {
           Map<String, dynamic> response = json.decode(res.body);
@@ -1065,10 +1065,10 @@ class WithdrawState extends State<Withdraw>
     });
   }
 
-  openWithdrawHistory(BuildContext context) {
+  openWithdrawHistory(BuildContext context,bool onBackPressedNavigateToLobby) {
     return Navigator.of(context).push(
       FantasyPageRoute(
-        pageBuilder: (context) => WithdrawHistory(),
+        pageBuilder: (context) => WithdrawHistory(onBackPressedNavigateToLobby:onBackPressedNavigateToLobby),
         fullscreenDialog: true,
       ),
     );
@@ -1645,7 +1645,7 @@ class WithdrawState extends State<Withdraw>
               size: Theme.of(context).primaryTextTheme.display1.fontSize,
             ),
             onPressed: () async {
-              await openWithdrawHistory(context);
+              await openWithdrawHistory(context,false);
               updateWithdrawData();
             },
           )
