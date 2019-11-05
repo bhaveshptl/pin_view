@@ -34,6 +34,9 @@ class ContactUsState extends State<ContactUs> {
   String selectedCategorie;
   String selectedSubCategory;
   String selectedCategorieIndex;
+  int descriptionMinChar = 15;
+  String descriptionMinCharError =
+      "Description minimum length should be 15 character";
 
   @override
   void initState() {
@@ -73,6 +76,14 @@ class ContactUsState extends State<ContactUs> {
               child: new Text(data["id"]),
               value: i.toString(),
             ));
+          }
+          print("descriptionMinChar");
+          print(response['descriptionMinChar']);
+          if (response['descriptionMinChar'] != null) {
+            descriptionMinChar = response['descriptionMinChar'];
+          }
+          if (response['descriptionMinCharError'] != null) {
+            descriptionMinCharError = response['descriptionMinCharError'];
           }
         } else if (res.statusCode == 401) {
           Map<String, dynamic> response = json.decode(res.body);
@@ -149,6 +160,29 @@ class ContactUsState extends State<ContactUs> {
     );
   }
 
+  void _showAlertDialog(msg) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Alert"),
+          content: new Text(msg),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   _showMessage(String message) {
     ActionUtil().showMsgOnTop(message, context);
     // _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -185,13 +219,13 @@ class ContactUsState extends State<ContactUs> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: url,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
+          url: url,
+          appBar: AppBar(
+            title: Text(
+              title.toUpperCase(),
             ),
+          ),
+        ),
       ),
     );
   }
@@ -302,12 +336,16 @@ class ContactUsState extends State<ContactUs> {
                         Expanded(
                           child: TextFormField(
                             controller: _description,
+                            minLines: 1,
                             decoration: InputDecoration(
                               labelText: "Description",
                             ),
                             validator: (value) {
                               if (value.isEmpty) {
                                 return "Please explain your issue!";
+                              }
+                              if (value.length < descriptionMinChar) {
+                                return descriptionMinCharError;
                               }
                             },
                             keyboardType: TextInputType.text,
@@ -327,7 +365,11 @@ class ContactUsState extends State<ContactUs> {
                     child: RaisedButton(
                       onPressed: () {
                         if (_formKey.currentState.validate()) {
-                          submitForm();
+                          if (selectedCategorieIndex != null) {
+                            submitForm();
+                          } else {
+                            _showAlertDialog("Please select the category");
+                          }
                         }
                       },
                       color: Theme.of(context).primaryColorDark,
