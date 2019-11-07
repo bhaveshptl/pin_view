@@ -33,8 +33,14 @@ class JoinedContests extends StatefulWidget {
   final League league;
   final int sportsType;
   final List<MyTeam> myTeams;
+  final Function onContestTeamsUpdated;
 
-  JoinedContests({this.league, this.sportsType, this.myTeams, this.l1Data});
+  JoinedContests(
+      {this.league,
+      this.sportsType,
+      this.myTeams,
+      this.l1Data,
+      this.onContestTeamsUpdated});
 
   @override
   JoinedContestsState createState() => JoinedContestsState();
@@ -313,8 +319,9 @@ class JoinedContestsState extends State<JoinedContests>
     }
   }
 
-  _onContestClick(Contest contest, League league) {
-    Navigator.of(context).push(
+  _onContestClick(Contest contest, League league) async {
+    /*IN joined contests ,on clicking contest this method is fired*/
+    final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ContestDetail(
           contest: contest,
@@ -326,6 +333,12 @@ class JoinedContestsState extends State<JoinedContests>
         ),
       ),
     );
+    /* These methods are called to update unique teams*/
+    await widget.onContestTeamsUpdated();
+    _getMyContests();
+    _createL1WSObject();
+    _getL1Data();
+    /* End of  unique teams update*/
   }
 
   _onPredictionClick(Contest contest, League league) {
@@ -411,13 +424,13 @@ class JoinedContestsState extends State<JoinedContests>
     List<dynamic> teams = await getMyContestTeams(contest);
     if (teams != null && teams.length > 0) {
       ActionUtil().launchJoinContest(
-        l1Data: _l1Data,
-        contest: contest,
-        myTeams: _myTeams,
-        sportsType: widget.sportsType,
-        league: widget.league,
-        scaffoldKey: scaffoldKey,
-      );
+          l1Data: _l1Data,
+          contest: contest,
+          myTeams: _myTeams,
+          sportsType: widget.sportsType,
+          league: widget.league,
+          scaffoldKey: scaffoldKey,
+          launchPageSource: "l2");
     } else {
       var result = await Navigator.of(context).push(
         FantasyPageRoute(
@@ -431,13 +444,13 @@ class JoinedContestsState extends State<JoinedContests>
 
       if (result != null) {
         ActionUtil().launchJoinContest(
-          l1Data: _l1Data,
-          contest: contest,
-          sportsType: widget.sportsType,
-          myTeams: _myTeams,
-          league: widget.league,
-          scaffoldKey: scaffoldKey,
-        );
+            l1Data: _l1Data,
+            contest: contest,
+            sportsType: widget.sportsType,
+            myTeams: _myTeams,
+            league: widget.league,
+            scaffoldKey: scaffoldKey,
+            launchPageSource: "l2");
       }
     }
   }

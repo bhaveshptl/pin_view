@@ -462,7 +462,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     if (s == null) {
       return false;
     }
-    return double.parse(s, (e) => null) != null;
+    return double.parse(s) != null;
   }
 
   cformControllerListener() {
@@ -824,7 +824,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   getPaymentModeWidgetButtons() {
-    /* This is for Other payment methods */
+    /* This is for Other payment methods(Non expandable) */
     List<Widget> items = [];
     int i = 0;
     Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
@@ -907,6 +907,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   getLastPaymentWidget() {
+    /*This is for last payment method-Both expandable and non expandable*/
     List<Widget> items = [];
     int i = 0;
     Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
@@ -1170,6 +1171,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   getPaymentModeWidgetList() {
+    /*This is for expandable payment modes */
     List<ExpansionPanel> items = [];
     int i = 0;
     Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]

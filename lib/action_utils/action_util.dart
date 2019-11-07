@@ -6,8 +6,10 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/contestdetail/contestdetail.dart';
+import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/joincontest/joincontest.dart';
 import 'package:playfantasy/joincontest/joincontestconfirmation.dart';
+import 'package:playfantasy/joincontest/joincontestsuccess.dart';
 import 'package:playfantasy/leaguedetail/prediction/joinpredictioncontest.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -26,15 +28,15 @@ class ActionUtil {
 
   Flushbar flushbar;
 
-  launchJoinContest({
-    L1 l1Data,
-    League league,
-    Contest contest,
-    int sportsType,
-    List<MyTeam> myTeams,
-    GlobalKey<ScaffoldState> scaffoldKey,
-    Map<String, dynamic> createContestPayload,
-  }) async {
+  launchJoinContest(
+      {L1 l1Data,
+      League league,
+      Contest contest,
+      int sportsType,
+      List<MyTeam> myTeams,
+      GlobalKey<ScaffoldState> scaffoldKey,
+      Map<String, dynamic> createContestPayload,
+      String launchPageSource}) async {
     showLoader(scaffoldKey.currentContext, true);
     final balance = await routeLauncher.getUserBalance(
       leagueId: league.leagueId,
@@ -123,7 +125,43 @@ class ActionUtil {
           );
         }
       } else if (result != null) {
-        showMsgOnTop(result, scaffoldKey.currentContext);
+        if (launchPageSource != null) {
+          onContestJoinSuccess(result.toString(), scaffoldKey.currentContext,
+              l1Data, league, launchPageSource);
+        } else {
+          onContestJoinSuccess(result.toString(), scaffoldKey.currentContext,
+              l1Data, league, "");
+        }
+      }
+    }
+  }
+
+  onContestJoinSuccess(String message, BuildContext context, L1 l1Data,
+      League league, String launchPageSource) async {
+    Map<String, dynamic> result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return JoinContestSuccess(
+            successMessage: message, launchPageSource: launchPageSource);
+      },
+    );
+
+    if (result != null) {
+      if (result["userOption"] == "joinContest") {
+        Navigator.of(context).pop();
+      } else if (result["userOption"] == "createTeam") {
+        final result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateTeam(
+              league: league,
+              l1Data: l1Data,
+            ),
+          ),
+        );
+
+        if(result !=null){
+           ActionUtil().showMsgOnTop(result.toString(), context);
+        }
       }
     }
   }

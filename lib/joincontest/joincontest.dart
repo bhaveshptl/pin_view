@@ -19,6 +19,7 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'joincontestsuccess.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;
@@ -129,7 +130,8 @@ class JoinContestState extends State<JoinContest> {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["error"] == false) {
               webEngageJoinContestEvent();
-              Navigator.of(context).pop(response["message"]);
+              /* On contest joined successfully */
+             Navigator.of(context).pop(response["message"]);
             } else if (response["error"] == true) {
               Navigator.of(context).pop(response["message"]);
             }
@@ -228,12 +230,14 @@ class JoinContestState extends State<JoinContest> {
     Map<dynamic, dynamic> eventdata = new Map();
     Map<String, dynamic> webengageTeamData = new Map();
     webengageTeamData["TeamId"] = _teamToJoin.id;
-    webengageTeamData["SportType"] = widget.sportsType !=null ? widget.sportsType :0;
+    webengageTeamData["SportType"] =
+        widget.sportsType != null ? widget.sportsType : 0;
     webengageTeamData["MatchId"] = widget.league.matchId;
     webengageTeamData["ContestId"] = widget.contest.id;
     webengageTeamData["LeagueId"] = widget.l1Data.league.id;
     webengageTeamData["SeriesId"] = widget.league.series.id;
-    webengageTeamData["MatchDate"] =getReadableDateFromTimeStamp(widget.l1Data.league.rounds[0].matches[0].startTime.toString());
+    webengageTeamData["MatchDate"] = getReadableDateFromTimeStamp(
+        widget.l1Data.league.rounds[0].matches[0].startTime.toString());
     webengageTeamData["MatchName"] = widget.l1Data.league.name;
     webengageTeamData["EntryFee"] = widget.contest.entryFee;
     webengageTeamData["PrizeType"] = widget.contest.prizeType;
@@ -283,9 +287,9 @@ class JoinContestState extends State<JoinContest> {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => CreateTeam(
-              league: widget.league,
-              l1Data: widget.l1Data,
-            ),
+          league: widget.league,
+          l1Data: widget.l1Data,
+        ),
       ),
     );
 
@@ -491,17 +495,15 @@ class JoinContestState extends State<JoinContest> {
                                                       pageBuilder: (BuildContext
                                                               context) =>
                                                           TeamPreview(
-                                                            myTeam: team,
-                                                            league:
-                                                                widget.league,
-                                                            l1Data:
-                                                                widget.l1Data,
-                                                            allowEditTeam: true,
-                                                            fanTeamRules: widget
-                                                                .l1Data
-                                                                .league
-                                                                .fanTeamRules,
-                                                          ),
+                                                        myTeam: team,
+                                                        league: widget.league,
+                                                        l1Data: widget.l1Data,
+                                                        allowEditTeam: true,
+                                                        fanTeamRules: widget
+                                                            .l1Data
+                                                            .league
+                                                            .fanTeamRules,
+                                                      ),
                                                     ),
                                                   );
                                                 },
@@ -631,7 +633,7 @@ class JoinContestState extends State<JoinContest> {
             ),
       bottomNavigationBar: Container(
         height: 64.0,
-        padding:isIos?EdgeInsets.only(bottom: 7.5):null,
+        padding: isIos ? EdgeInsets.only(bottom: 7.5) : null,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -658,7 +660,7 @@ class JoinContestState extends State<JoinContest> {
                     "Create Team".toUpperCase(),
                     style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                           color: Colors.white,
-                          fontWeight:isIos?FontWeight.w600:FontWeight.w800,
+                          fontWeight: isIos ? FontWeight.w600 : FontWeight.w800,
                         ),
                   ),
                 ),
@@ -682,7 +684,7 @@ class JoinContestState extends State<JoinContest> {
                     "Join now".toUpperCase(),
                     style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                           color: Colors.white,
-                          fontWeight: isIos?FontWeight.w600:FontWeight.w800,
+                          fontWeight: isIos ? FontWeight.w600 : FontWeight.w800,
                         ),
                   ),
                 ),

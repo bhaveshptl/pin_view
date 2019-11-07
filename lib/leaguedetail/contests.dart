@@ -26,6 +26,7 @@ class Contests extends StatefulWidget {
   final List<MyTeam> myTeams;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<int, List<MyTeam>> mapContestTeams;
+  final  Function  onContestTeamsUpdated;
 
   Contests({
     this.league,
@@ -35,6 +36,7 @@ class Contests extends StatefulWidget {
     this.showLoader,
     this.scaffoldKey,
     this.mapContestTeams,
+    this.onContestTeamsUpdated
   });
 
   @override
@@ -315,8 +317,8 @@ class ContestsState extends State<Contests> {
     });
   }
 
-  _onContestClick(Contest contest, League league) {
-    Navigator.of(context).push(
+  _onContestClick(Contest contest, League league) async {
+    final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ContestDetail(
               contest: contest,
@@ -329,6 +331,10 @@ class ContestsState extends State<Contests> {
             ),
       ),
     );
+     /* These methods are called to update unique teams*/
+    await widget.onContestTeamsUpdated();
+    await getMyContestTeams(contest);
+    /* End of  unique teams update*/
   }
 
   squadStatus() {
@@ -352,6 +358,7 @@ class ContestsState extends State<Contests> {
           myTeams: _myTeams,
           league: widget.league,
           scaffoldKey: widget.scaffoldKey,
+          launchPageSource:"l1"
         );
       } else {
         var result = await Navigator.of(context).push(
@@ -373,6 +380,7 @@ class ContestsState extends State<Contests> {
             sportsType:widget.sportsType,
             league: widget.league,
             scaffoldKey: widget.scaffoldKey,
+            launchPageSource:"l1"
           );
         }
       }
@@ -387,7 +395,7 @@ class ContestsState extends State<Contests> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
-          if (response[contest.id.toString()] != null) {
+          if (response[contest.id.toString()] != null) {        
             List<dynamic> contestMyTeams =
                 (response[contest.id.toString()] as List);
             return getUniqueTeams(contestMyTeams);
@@ -402,7 +410,7 @@ class ContestsState extends State<Contests> {
       ActionUtil().showLoader(context, false);
     });
   }
-
+  
   getUniqueTeams(List<dynamic> contestMyTeams) {
     List<MyTeam> myUniqueTeams = [];
     for (MyTeam team in _myTeams) {

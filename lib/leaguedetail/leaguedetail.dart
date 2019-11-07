@@ -600,6 +600,10 @@ class LeagueDetailState extends State<LeagueDetail>
     });
   }
 
+  onContestTeamsUpdated() async {
+    await _getMyContests();
+  }
+
   _getMyContestMyTeams(Map<String, List<Contest>> _mapMyContests) async {
     List<int> _contestIds = [];
     List<Contest> _contests = _mapMyContests[widget.league.leagueId.toString()];
@@ -863,16 +867,19 @@ class LeagueDetailState extends State<LeagueDetail>
         }
         break;
       case 2:
-        Navigator.of(context).push(
+         final result = await  Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (BuildContext context) => JoinedContests(
               l1Data: l1Data,
               myTeams: _myTeams,
               league: widget.league,
               sportsType: widget.sportType,
+              onContestTeamsUpdated:onContestTeamsUpdated
             ),
           ),
         );
+
+        await _getMyContests();
         break;
       case 3:
         if (activeTabIndex == 0) {
@@ -1058,6 +1065,7 @@ class LeagueDetailState extends State<LeagueDetail>
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
+                              onContestTeamsUpdated:onContestTeamsUpdated
                             ),
                     ],
                   ),

@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import 'package:playfantasy/contestdetail/switchcontestteams.dart';
+import 'package:playfantasy/contestdetail/switchteam.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -34,18 +36,19 @@ const TABLE_COLUMN_PADDING = 28;
 class ContestDetail extends StatefulWidget {
   final League league;
   final Contest contest;
+  final int sportsType;
   final List<MyTeam> mapContestTeams;
 
   final L1 l1Data;
   final List<MyTeam> myTeams;
 
-  ContestDetail({
-    this.league,
-    this.l1Data,
-    this.contest,
-    this.myTeams,
-    this.mapContestTeams,
-  });
+  ContestDetail(
+      {this.league,
+      this.l1Data,
+      this.contest,
+      this.myTeams,
+      this.mapContestTeams,
+      this.sportsType});
 
   @override
   State<StatefulWidget> createState() => ContestDetailState();
@@ -488,6 +491,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           sportsType: _sportType,
           league: widget.league,
           scaffoldKey: _scaffoldKey,
+          launchPageSource:"l2"
         );
       } else {
         var result = await Navigator.of(context).push(
@@ -509,6 +513,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
             sportsType: _sportType,
             league: widget.league,
             scaffoldKey: _scaffoldKey,
+            launchPageSource:"l2"
           );
         }
       }
@@ -714,6 +719,34 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     return value;
   }
 
+  onSwitchTeamPressed(MyTeam myTeam) async {
+    final result = await Navigator.of(context).push(
+      FantasyPageRoute(
+        pageBuilder: (BuildContext context) => SwitchMyContestTeams(
+          l1Data: widget.l1Data,
+          oldTeam: myTeam,
+          contest: widget.contest,
+          league: widget.league,
+          sportsType: widget.sportsType,
+          myTeams: widget.myTeams,
+          contestMyTeams: widget.mapContestTeams,
+        ),
+      ),
+    );
+    if (result != null) {
+      Map swichTeamResult = json.decode(result);
+      if (!swichTeamResult["error"]) {
+        ActionUtil().showMsgOnTop(swichTeamResult["msg"], context);
+       // initAllTeams();
+        _getContestMyTeams();
+      } else {
+        ActionUtil().showMsgOnTop(swichTeamResult["msg"], context);
+        //initAllTeams();
+        _getContestMyTeams();
+      }
+    }
+  }
+
   _getContestTeams(int offset, int limit) async {
     bIsAllTeamsRequestInProgress = true;
     http.Request req = http.Request(
@@ -824,6 +857,11 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     super.dispose();
   }
 
+  Future<bool> _onWillPop() async {
+    Navigator.of(context).pop(false);
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final formatCurrency = NumberFormat.currency(
@@ -832,353 +870,443 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
       decimalDigits: 0,
     );
 
-    return ScaffoldPage(
-      scaffoldKey: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(
-          strings.get("CONTEST_DETAILS").toUpperCase(),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.share,
-                  color: Colors.white,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 4.0),
-                  child: Text(
-                    "Share".toUpperCase(),
-                    style: Theme.of(context)
-                        .primaryTextTheme
-                        .button
-                        .copyWith(color: Colors.white),
-                  ),
-                ),
-              ],
+    return new WillPopScope(
+        onWillPop: _onWillPop,
+        child: new ScaffoldPage(
+          scaffoldKey: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(
+              strings.get("CONTEST_DETAILS").toUpperCase(),
             ),
-            onPressed: () {
-              _shareContestDialog(context);
-            },
-          )
-        ],
-        elevation: 0.0,
-      ),
-      body: NestedScrollView(
-        controller: controller,
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverPadding(
-              padding: new EdgeInsets.all(0.0),
-              sliver: new SliverList(
-                delegate: new SliverChildListDelegate(
-                  [
-                    LeagueTitle(
-                      league: widget.league,
+            actions: <Widget>[
+              FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.share,
+                      color: Colors.white,
                     ),
-                    ContestDetailsCard(
-                      league: widget.league,
-                      contest: widget.contest,
-                      contestTeams: _mapContestTeams,
-                      onJoinContest: (Contest contest) {
-                        _onJoinContest(contest);
-                      },
-                      onPrizeStructure: () {
-                        _showPrizeStructure(context);
-                      },
-                      onShareContest: () {
-                        _shareContestDialog(context);
-                      },
-                    ),
-                    Container(
-                      height: 40.0,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 1.0,
-                            spreadRadius: 1.0,
-                            offset: Offset(0, -2),
-                            color: Colors.grey.shade300,
-                          )
-                        ],
-                        color: Colors.grey.shade200,
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              widget.contest.joined.toString() +
-                                  " Teams".toUpperCase(),
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .body1
-                                  .copyWith(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                            ),
-                          ),
-                          widget.league.status == LeagueStatus.COMPLETED
-                              ? Container(
-                                  width: 60.0,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "POINTS",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .body1
-                                        .copyWith(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                  ),
-                                )
-                              : Container(),
-                          Container(
-                            width: 80.0,
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "Rank".toUpperCase(),
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .body1
-                                  .copyWith(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                            ),
-                          ),
-                        ],
+                    Padding(
+                      padding: EdgeInsets.only(left: 4.0),
+                      child: Text(
+                        "Share".toUpperCase(),
+                        style: Theme.of(context)
+                            .primaryTextTheme
+                            .button
+                            .copyWith(color: Colors.white),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ];
-        },
-        body: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  int myTeamsCount = _mapContestTeams.length;
-                  bool bIsMyTeam = index < _mapContestTeams.length;
-                  MyTeam team = !bIsMyTeam
-                      ? _allTeams[index - myTeamsCount]
-                      : _mapContestTeams[index];
-                  if (!bIsMyTeam && myTeamsId.indexOf(team.id) != -1) {
-                    return Container();
-                  }
-                  return FlatButton(
-                    padding: EdgeInsets.all(0.0),
-                    onPressed: ((widget.league.status ==
-                                    LeagueStatus.UPCOMING &&
-                                bIsMyTeam) ||
-                            (widget.league.status == LeagueStatus.LIVE ||
-                                widget.league.status == LeagueStatus.COMPLETED))
-                        ? () async {
-                            MyTeam myTeam;
-                            showLoader(true);
-                            myTeam = await routeLauncher.getTeamPlayers(
-                                contestId: widget.contest.id, teamId: team.id);
-                            if (bIsMyTeam) {
-                              _myTeams.forEach((curTeam) {
-                                if (team.id == curTeam.id) {
-                                  myTeam.players.forEach((Player player) {
-                                    curTeam.players.forEach((Player curPlayer) {
-                                      if (player.id == curPlayer.id) {
-                                        player.playingStyleId =
-                                            curPlayer.playingStyleId;
-                                      }
-                                    });
-                                  });
-                                }
-                              });
-                            }
-                            showLoader(false);
-                            Navigator.of(context).push(
-                              FantasyPageRoute(
-                                pageBuilder: (BuildContext context) =>
-                                    TeamPreview(
-                                  myTeam: myTeam,
-                                  league: widget.league,
-                                  l1Data: _l1Data,
-                                  allowEditTeam: bIsMyTeam,
-                                  fanTeamRules: _l1Data.league.fanTeamRules,
+                onPressed: () {
+                  _shareContestDialog(context);
+                },
+              )
+            ],
+            elevation: 0.0,
+          ),
+          body: NestedScrollView(
+            controller: controller,
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverPadding(
+                  padding: new EdgeInsets.all(0.0),
+                  sliver: new SliverList(
+                    delegate: new SliverChildListDelegate(
+                      [
+                        LeagueTitle(
+                          league: widget.league,
+                        ),
+                        ContestDetailsCard(
+                          league: widget.league,
+                          contest: widget.contest,
+                          contestTeams: _mapContestTeams,
+                          onJoinContest: (Contest contest) {
+                            _onJoinContest(contest);
+                          },
+                          onPrizeStructure: () {
+                            _showPrizeStructure(context);
+                          },
+                          onShareContest: () {
+                            _shareContestDialog(context);
+                          },
+                        ),
+                        Container(
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 1.0,
+                                spreadRadius: 1.0,
+                                offset: Offset(0, -2),
+                                color: Colors.grey.shade300,
+                              )
+                            ],
+                            color: Colors.grey.shade200,
+                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  widget.contest.joined.toString() +
+                                      " Teams".toUpperCase(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w900,
+                                      ),
                                 ),
                               ),
-                            );
-                          }
-                        : null,
-                    child: Container(
-                      color: bIsMyTeam ? Colors.orange.shade50 : Colors.white,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.grey.shade100,
-                              width: 1.0,
-                            ),
-                          ),
-                        ),
-                        padding: EdgeInsets.fromLTRB(8.0, 4.0, 16.0, 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              child: Row(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: CircleAvatar(
-                                      radius: 24.0,
-                                      child: Image.asset(
-                                        "images/person-icon.png",
-                                      ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        team.name,
+                              widget.league.status == LeagueStatus.COMPLETED
+                                  ? Container(
+                                      width: 60.0,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "POINTS",
                                         style: Theme.of(context)
                                             .primaryTextTheme
-                                            .subhead
+                                            .body1
                                             .copyWith(
-                                              color: Colors.black87,
+                                              color: Colors.black,
                                               fontWeight: FontWeight.w900,
                                             ),
                                       ),
-                                      widget.league.status ==
-                                              LeagueStatus.COMPLETED
-                                          ? Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 8.0),
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Text(
-                                                    bIsMyTeam
-                                                        ? "YOU WON "
-                                                        : "WON ",
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .subhead
-                                                        .copyWith(
-                                                          color: Color.fromRGBO(
-                                                              70, 165, 12, 1),
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
+                                    )
+                                  : Container(),
+                              Container(
+                                width: 80.0,
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  "Rank".toUpperCase(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .body1
+                                      .copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ];
+            },
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Expanded(
+                  child: ListView.builder(
+                    itemBuilder: (context, index) {
+                      int myTeamsCount = _mapContestTeams.length;
+                      bool bIsMyTeam = index < _mapContestTeams.length;
+                      MyTeam team = !bIsMyTeam
+                          ? _allTeams[index - myTeamsCount]
+                          : _mapContestTeams[index];
+                      if (!bIsMyTeam && myTeamsId.indexOf(team.id) != -1) {
+                        return Container();
+                      }
+                      return FlatButton(
+                        padding: EdgeInsets.all(0.0),
+                        onPressed: ((widget.league.status ==
+                                        LeagueStatus.UPCOMING &&
+                                    bIsMyTeam) ||
+                                (widget.league.status == LeagueStatus.LIVE ||
+                                    widget.league.status ==
+                                        LeagueStatus.COMPLETED))
+                            ? () async {
+                                MyTeam myTeam;
+                                showLoader(true);
+                                myTeam = await routeLauncher.getTeamPlayers(
+                                    contestId: widget.contest.id,
+                                    teamId: team.id);
+                                if (bIsMyTeam) {
+                                  _myTeams.forEach((curTeam) {
+                                    if (team.id == curTeam.id) {
+                                      myTeam.players.forEach((Player player) {
+                                        curTeam.players
+                                            .forEach((Player curPlayer) {
+                                          if (player.id == curPlayer.id) {
+                                            player.playingStyleId =
+                                                curPlayer.playingStyleId;
+                                          }
+                                        });
+                                      });
+                                    }
+                                  });
+                                }
+                                showLoader(false);
+                                Navigator.of(context).push(
+                                  FantasyPageRoute(
+                                    pageBuilder: (BuildContext context) =>
+                                        TeamPreview(
+                                      myTeam: myTeam,
+                                      league: widget.league,
+                                      l1Data: _l1Data,
+                                      allowEditTeam: bIsMyTeam,
+                                      fanTeamRules: _l1Data.league.fanTeamRules,
+                                    ),
+                                  ),
+                                );
+                              }
+                            : null,
+                        child: Container(
+                          color:
+                              bIsMyTeam ? Colors.orange.shade50 : Colors.white,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Colors.grey.shade100,
+                                  width: 1.0,
+                                ),
+                              ),
+                            ),
+                            padding: EdgeInsets.fromLTRB(8.0, 4.0, 16.0, 4.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Expanded(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: CircleAvatar(
+                                          radius: 24.0,
+                                          child: Image.asset(
+                                            "images/person-icon.png",
+                                          ),
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            team.name,
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .subhead
+                                                .copyWith(
+                                                  color: Colors.black87,
+                                                  fontWeight: FontWeight.w900,
+                                                ),
+                                          ),
+                                          widget.league.status ==
+                                                  LeagueStatus.COMPLETED
+                                              ? Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 8.0),
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Text(
+                                                        bIsMyTeam
+                                                            ? "YOU WON "
+                                                            : "WON ",
+                                                        style: Theme.of(context)
+                                                            .primaryTextTheme
+                                                            .subhead
+                                                            .copyWith(
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      70,
+                                                                      165,
+                                                                      12,
+                                                                      1),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                      ),
+                                                      Padding(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    2.0),
+                                                        child: widget.contest
+                                                                    .prizeType ==
+                                                                1
+                                                            ? Image.asset(
+                                                                strings.chips,
+                                                                width: 12.0,
+                                                                height: 12.0,
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              )
+                                                            : Container(),
+                                                      ),
+                                                      Text(
+                                                        formatCurrency
+                                                            .format(team.prize),
+                                                        style: Theme.of(context)
+                                                            .primaryTextTheme
+                                                            .subhead
+                                                            .copyWith(
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      70,
+                                                                      165,
+                                                                      12,
+                                                                      1),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                      )
+                                                    ],
                                                   ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 2.0),
-                                                    child: widget.contest
-                                                                .prizeType ==
-                                                            1
-                                                        ? Image.asset(
-                                                            strings.chips,
-                                                            width: 12.0,
-                                                            height: 12.0,
-                                                            fit: BoxFit.contain,
-                                                          )
-                                                        : Container(),
+                                                )
+                                              : Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 8.0),
+                                                  child: Row(
+                                                    children: <Widget>[
+                                                      Text(
+                                                        team.score.toString(),
+                                                        style: Theme.of(context)
+                                                            .primaryTextTheme
+                                                            .subhead
+                                                            .copyWith(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                      ),
+                                                      Text(
+                                                        " Points",
+                                                        style: Theme.of(context)
+                                                            .primaryTextTheme
+                                                            .body2
+                                                            .copyWith(
+                                                              color: Colors
+                                                                  .black45,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                  Text(
-                                                    formatCurrency
-                                                        .format(team.prize),
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .subhead
-                                                        .copyWith(
-                                                          color: Color.fromRGBO(
-                                                              70, 165, 12, 1),
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                  )
-                                                ],
-                                              ),
-                                            )
-                                          : Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 8.0),
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Text(
-                                                    team.score.toString(),
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .subhead
-                                                        .copyWith(
-                                                          color: Colors.black,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                  ),
-                                                  Text(
-                                                    " Points",
-                                                    style: Theme.of(context)
-                                                        .primaryTextTheme
-                                                        .body2
-                                                        .copyWith(
-                                                          color: Colors.black45,
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                        ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+                                                ),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                widget.league.status == LeagueStatus.COMPLETED
+                                    ? Container(
+                                        width: 60.0,
+                                        child: Text(
+                                          team.score.toString(),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )
+                                    : Container(),
+                                Container(
+                                  alignment: Alignment.centerRight,
+                                  width: 80.0,
+                                  child: (bIsMyTeam) &&
+                                          (widget.league.status ==
+                                              LeagueStatus.UPCOMING)
+                                      ? Container(
+                                          child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Expanded(
+                                                    child: FlatButton(
+                                                        child: new Text(
+                                                            'SWITCH',
+                                                            textAlign:
+                                                                TextAlign.left),
+                                                        color: Colors.orange,
+                                                        textColor: Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                new BorderRadius
+                                                                        .circular(
+                                                                    4.0),
+                                                            side: BorderSide(
+                                                                color: Colors
+                                                                    .orange)),
+                                                        onPressed: () async {
+                                                          MyTeam myTeam;
+                                                          showLoader(true);
+                                                          myTeam = await routeLauncher
+                                                              .getTeamPlayers(
+                                                                  contestId:
+                                                                      widget
+                                                                          .contest
+                                                                          .id,
+                                                                  teamId:
+                                                                      team.id);
+                                                          if (bIsMyTeam) {
+                                                            _myTeams.forEach(
+                                                                (curTeam) {
+                                                              if (team.id ==
+                                                                  curTeam.id) {
+                                                                myTeam.players
+                                                                    .forEach((Player
+                                                                        player) {
+                                                                  curTeam
+                                                                      .players
+                                                                      .forEach(
+                                                                          (Player
+                                                                              curPlayer) {
+                                                                    if (player
+                                                                            .id ==
+                                                                        curPlayer
+                                                                            .id) {
+                                                                      player.playingStyleId =
+                                                                          curPlayer
+                                                                              .playingStyleId;
+                                                                    }
+                                                                  });
+                                                                });
+                                                              }
+                                                            });
+                                                          }
+                                                          showLoader(false);
+                                                          onSwitchTeamPressed(
+                                                              myTeam);
+                                                        }))
+                                              ]),
+                                        )
+                                      : Text(
+                                          team.rank == null || team.rank == 0
+                                              ? "-"
+                                              : "#" + team.rank.toString(),
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .copyWith(
+                                                color: Colors.black,
+                                              ),
+                                        ),
+                                ),
+                              ],
                             ),
-                            widget.league.status == LeagueStatus.COMPLETED
-                                ? Container(
-                                    width: 60.0,
-                                    child: Text(
-                                      team.score.toString(),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
-                                : Container(),
-                            Container(
-                              alignment: Alignment.centerRight,
-                              width: 80.0,
-                              child: Text(
-                                team.rank == null || team.rank == 0
-                                    ? "-"
-                                    : "#" + team.rank.toString(),
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .title
-                                    .copyWith(
-                                      color: Colors.black,
-                                    ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                },
-                itemCount: _allTeams.length + _mapContestTeams.length,
-              ),
+                      );
+                    },
+                    itemCount: _allTeams.length + _mapContestTeams.length,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }

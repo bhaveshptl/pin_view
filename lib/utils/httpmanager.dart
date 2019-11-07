@@ -5,6 +5,8 @@ class HttpManager extends http.BaseClient {
   static String cookie;
   static String channelId;
   final http.Client _inner;
+  static String  appVersion;
+  static bool isIos;
 
   HttpManager(this._inner);
 
@@ -12,6 +14,9 @@ class HttpManager extends http.BaseClient {
     request.headers["cookie"] = cookie;
     request.headers['channelId'] = channelId;
     request.headers['Content-type'] = 'application/json';
+    request.headers['appVersion'] = appVersion;
+    request.headers['isIos'] = isIos.toString();
+
 
     return _inner.send(request);
   }

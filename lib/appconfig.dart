@@ -13,6 +13,8 @@ class AppConfig extends InheritedWidget {
     @required this.showBackground,
     @required this.privateAttributionName,
     @required Duration carouselSlideTime,
+    @required this.appVersion,
+    @required this.isIos,
   }) : super(child: child);
 
   final Store store;
@@ -23,6 +25,8 @@ class AppConfig extends InheritedWidget {
   final bool disableBranchIOAttribution;
   final String privateAttributionName;
   final Duration carouselSlideTime = Duration(seconds: 5);
+  final String appVersion;
+  final bool isIos;
 
   static AppConfig of(BuildContext context) {
     return context.inheritFromWidgetOfExactType(AppConfig);

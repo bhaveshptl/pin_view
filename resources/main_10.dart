@@ -2,12 +2,13 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-
+import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/splashscreen.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/redux/reducers/loader.dart';
 import 'package:playfantasy/redux/models/loader_model.dart';
+import 'package:package_info/package_info.dart';
 
 disableDeviceRotation() {
   SystemChrome.setPreferredOrientations([
@@ -23,6 +24,10 @@ void main() async {
   String channelId = "10";
   const apiBaseUrl = "https://stage.howzat.com";
   String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
+
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  String appVersion = packageInfo.version.toString();
+  bool isIos = Platform.isIOS;
 
   disableDeviceRotation();
 
@@ -40,6 +45,8 @@ void main() async {
     disableBranchIOAttribution: false,
     privateAttributionName: "",
     apiBaseUrl: apiBaseUrl,
+    appVersion:appVersion,
+    isIos:isIos,
     carouselSlideTime: Duration(seconds: 10),
     child: StoreProvider(
       store: store,

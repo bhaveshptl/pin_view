@@ -160,6 +160,7 @@ class CreateContestState extends State<CreateContest> {
         myTeams: widget.myTeams,
         scaffoldKey: _scaffoldKey,
         createContestPayload: payload,
+        launchPageSource:"l2"
       );
 
       // final result = await showDialog(

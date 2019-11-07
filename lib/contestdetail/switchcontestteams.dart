@@ -155,9 +155,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
           : widget.l1Data.league.rounds[0].matches[0].id,
       "channelId": AppConfig.of(context).channelId,
     };
-
-   
-
+    
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SWITCH_CONTEST_TEAM));
     req.body = json.encode(payload);
@@ -179,10 +177,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
                 "newTeam": _teamToJoin.id,
               }),
             );
-           
-            
           } else if (response["error"] == true) {
-            ActionUtil().showMsgOnTop(response["message"], context);
             Navigator.of(context).pop(
               json.encode({
                 "error": true,
@@ -595,7 +590,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
                 padding: EdgeInsets.only(left: 8.0, right: 40.0),
                 child: ColorButton(
                   color: _myUniqueTeams.length == 0 ? Colors.black : null,
-                  onPressed: _teamToJoin == null || _myUniqueTeams.length == 1
+                  onPressed: _teamToJoin == null || _myUniqueTeams.length == 0
                       ? null
                       : () {
                           if (widget.contest != null) {

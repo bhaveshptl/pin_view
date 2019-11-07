@@ -3,7 +3,8 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 
 class JoinContestSuccess extends StatefulWidget {
   final String successMessage;
-  JoinContestSuccess({this.successMessage});
+  final String launchPageSource;
+  JoinContestSuccess({this.successMessage,this.launchPageSource});
   @override
   JoinContestSuccessState createState() => JoinContestSuccessState();
 }
@@ -16,24 +17,26 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
     super.initState();
   }
 
-  onJoinAnotherContestPressed() async {
+  onGoToLobbyPressed() async {
     Map<String, dynamic> data = new Map();
     data["userOption"] = "joinContest";
-    print(data);
-    Navigator.of(context).pop(data);
+    if(widget.launchPageSource=="l1"){
+       Navigator.pop(context);
+    }else{
+       Navigator.of(context).pop(data);
+    }
+    
   }
 
   onCreateTeamPressed() async {
     Map<String, dynamic> data = new Map();
     data["userOption"] = "createTeam";
-    print(data);
     Navigator.of(context).pop(data);
   }
 
   onClosePopup() {
     Map<String, dynamic> data = new Map();
-    data["userOption"] = "joinContest";
-    print(data);
+    data["userOption"] = "onClosePressed";
     Navigator.of(context).pop(data);
   }
 
@@ -46,25 +49,7 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
       elevation: 0.0,
       title: Row(
         mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              //width: MediaQuery.of(context).size.width,
-              alignment: Alignment.topRight,
-              child: InkWell(
-                child: Padding(
-                  padding: EdgeInsets.all(0.0),
-                  child: Icon(
-                    Icons.close,
-                  ),
-                ),
-                onTap: () {
-                  onClosePopup();
-                },
-              ),
-            ),
-          ),
-        ],
+        children: <Widget>[],
       ),
       contentPadding: EdgeInsets.all(0.0),
       content: Container(
@@ -83,9 +68,9 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
                     widget.successMessage,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).primaryTextTheme.title.copyWith(
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
-                        ),
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black,
+                        fontSize: 27),
                   )),
                 ],
               ),
@@ -93,55 +78,60 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ColorButton(
-                    onPressed: () {
-                      onCreateTeamPressed();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 20.0),
-                      child: Text(
-                        "Create a new team".toUpperCase(),
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .title
-                            .copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 10.0, left: 10.0, right: 10.0, bottom: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ColorButton(
-                    onPressed: () {
-                      onJoinAnotherContestPressed();
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 12.0, horizontal: 20.0),
-                      child: Text(
-                        "Join another contest".toUpperCase(),
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .title
-                            .copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  )
-                ],
-              ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          ColorButton(
+                            onPressed: () {
+                              onCreateTeamPressed();
+                            },
+                            color: Colors.orange,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 2.0, horizontal: 2.0),
+                              child: Text(
+                                "Create a new team".toUpperCase(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .subhead
+                                    .copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 13),
+                              ),
+                            ),
+                          )
+                        ]),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                            padding: EdgeInsets.only(
+                                left: 15),
+                            child: ColorButton(
+                              onPressed: () {
+                                onGoToLobbyPressed();
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 0.5, horizontal: 0.5),
+                                child: Text(
+                                  "Lobby".toUpperCase(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 13),
+                                ),
+                              ),
+                            ))
+                      ],
+                    )
+                  ]),
             ),
           ],
         ),
