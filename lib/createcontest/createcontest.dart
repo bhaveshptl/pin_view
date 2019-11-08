@@ -30,8 +30,10 @@ class CreateContest extends StatefulWidget {
   final L1 l1data;
   final League league;
   final List<MyTeam> myTeams;
+  final sportsType;
 
-  CreateContest({this.league, this.l1data, this.myTeams});
+
+  CreateContest({this.league, this.l1data, this.myTeams, this.sportsType});
 
   @override
   State<StatefulWidget> createState() => CreateContestState();
@@ -160,6 +162,7 @@ class CreateContestState extends State<CreateContest> {
         myTeams: widget.myTeams,
         scaffoldKey: _scaffoldKey,
         createContestPayload: payload,
+        sportsType:widget.sportsType,
         launchPageSource:"l2"
       );
 

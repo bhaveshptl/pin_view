@@ -840,6 +840,7 @@ class LeagueDetailState extends State<LeagueDetail>
                 pageBuilder: (context) => CreateContest(
                   league: widget.league,
                   l1data: l1Data,
+                  sportsType: widget.sportType,
                   myTeams: _myTeams,
                 ),
               ),

@@ -70,7 +70,7 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
                     style: Theme.of(context).primaryTextTheme.title.copyWith(
                         fontWeight: FontWeight.w400,
                         color: Colors.black,
-                        fontSize: 27),
+                        fontSize: 22),
                   )),
                 ],
               ),

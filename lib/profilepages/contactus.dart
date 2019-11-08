@@ -34,9 +34,9 @@ class ContactUsState extends State<ContactUs> {
   String selectedCategorie;
   String selectedSubCategory;
   String selectedCategorieIndex;
-  int descriptionMinChar = 15;
+  int descriptionMinChar = 10;
   String descriptionMinCharError =
-      "Description minimum length should be 15 character";
+      "Description minimum length should be 10 character";
 
   @override
   void initState() {
@@ -344,9 +344,9 @@ class ContactUsState extends State<ContactUs> {
                               if (value.isEmpty) {
                                 return "Please explain your issue!";
                               }
-                              if (value.length < descriptionMinChar) {
+                              if (value.length < descriptionMinChar ) {
                                 return descriptionMinCharError;
-                              }
+                              }                          
                             },
                             keyboardType: TextInputType.text,
                           ),

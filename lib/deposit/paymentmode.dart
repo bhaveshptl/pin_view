@@ -1160,7 +1160,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 body: Padding(
                     padding:
                         EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
-                    child: getCardPaymentFormWidget(type["type"])),
+                    child: lastPaymentExpanded ?getCardPaymentFormWidget(type["type"]):Container()),
               ),
             ],
           ),
@@ -1336,7 +1336,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             },
             body: Padding(
               padding: EdgeInsets.only(left: 16.0, bottom: 16.0, right: 16.0),
-              child: getCardPaymentFormWidget(type["type"]),
+              child:_selectedItemIndex == i? getCardPaymentFormWidget(type["type"]):Container(),
             ),
           ),
         );

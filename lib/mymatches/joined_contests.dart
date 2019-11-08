@@ -321,24 +321,33 @@ class JoinedContestsState extends State<JoinedContests>
 
   _onContestClick(Contest contest, League league) async {
     /*IN joined contests ,on clicking contest this method is fired*/
+    await updateContestData();
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ContestDetail(
           contest: contest,
           league: league,
           l1Data: _l1Data,
+          sportsType: widget.sportsType,
           myTeams: _myTeams,
           mapContestTeams:
               _mapContestTeams != null ? _mapContestTeams[contest.id] : null,
         ),
       ),
     );
-    /* These methods are called to update unique teams*/
-    await widget.onContestTeamsUpdated();
-    _getMyContests();
-    _createL1WSObject();
-    _getL1Data();
-    /* End of  unique teams update*/
+    updateContestData();
+   // await widget.onContestTeamsUpdated();
+  }
+
+  updateContestData() async {
+     /* These methods are called to update unique teams*/
+    await _getMyContests();
+    await _createL1WSObject();
+    await _getL1Data();
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
+    _l1Data = widget.l1Data;
+    _myTeams = widget.myTeams;
   }
 
   _onPredictionClick(Contest contest, League league) {

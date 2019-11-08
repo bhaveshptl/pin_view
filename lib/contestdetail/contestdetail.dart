@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:playfantasy/contestdetail/switchcontestteams.dart';
-import 'package:playfantasy/contestdetail/switchteam.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -485,14 +484,13 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
       if (teams != null && teams.length > 0) {
         bShowJoinContest = false;
         ActionUtil().launchJoinContest(
-          l1Data: _l1Data,
-          contest: contest,
-          myTeams: _myTeams,
-          sportsType: _sportType,
-          league: widget.league,
-          scaffoldKey: _scaffoldKey,
-          launchPageSource:"l2"
-        );
+            l1Data: _l1Data,
+            contest: contest,
+            myTeams: _myTeams,
+            sportsType: _sportType,
+            league: widget.league,
+            scaffoldKey: _scaffoldKey,
+            launchPageSource: "l2");
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
@@ -507,14 +505,13 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         if (result != null) {
           bShowJoinContest = false;
           ActionUtil().launchJoinContest(
-            l1Data: _l1Data,
-            contest: contest,
-            myTeams: _myTeams,
-            sportsType: _sportType,
-            league: widget.league,
-            scaffoldKey: _scaffoldKey,
-            launchPageSource:"l2"
-          );
+              l1Data: _l1Data,
+              contest: contest,
+              myTeams: _myTeams,
+              sportsType: _sportType,
+              league: widget.league,
+              scaffoldKey: _scaffoldKey,
+              launchPageSource: "l2");
         }
       }
     }
@@ -737,7 +734,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
       Map swichTeamResult = json.decode(result);
       if (!swichTeamResult["error"]) {
         ActionUtil().showMsgOnTop(swichTeamResult["msg"], context);
-       // initAllTeams();
+        // initAllTeams();
         _getContestMyTeams();
       } else {
         ActionUtil().showMsgOnTop(swichTeamResult["msg"], context);
@@ -1218,18 +1215,26 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                   width: 80.0,
                                   child: (bIsMyTeam) &&
                                           (widget.league.status ==
-                                              LeagueStatus.UPCOMING)
+                                              LeagueStatus.UPCOMING) &&
+                                          widget.l1Data != null
                                       ? Container(
                                           child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.end,
                                               children: [
-                                                Expanded(
+                                                Container(
+                                                    height: 30,
+                                                    width: 69,
                                                     child: FlatButton(
+                                                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                         child: new Text(
-                                                            'SWITCH',
-                                                            textAlign:
-                                                                TextAlign.left),
+                                                          'SWITCH',
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                            fontSize: 11.0,
+                                                          ),
+                                                        ),
                                                         color: Colors.orange,
                                                         textColor: Colors.white,
                                                         shape: RoundedRectangleBorder(
