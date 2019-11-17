@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/createteam/createteam.dart';
-
+import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -27,6 +27,7 @@ class Contests extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<int, List<MyTeam>> mapContestTeams;
   final  Function  onContestTeamsUpdated;
+  final Account accountDetails;
 
   Contests({
     this.league,
@@ -36,7 +37,8 @@ class Contests extends StatefulWidget {
     this.showLoader,
     this.scaffoldKey,
     this.mapContestTeams,
-    this.onContestTeamsUpdated
+    this.onContestTeamsUpdated,
+    this.accountDetails
   });
 
   @override
@@ -53,32 +55,49 @@ class ContestsState extends State<Contests> {
   bool bShowJoinContest = false;
   bool bWaitingForTeamCreation = false;
   StreamSubscription _streamSubscription;
-
+  int contestsCountOfBrands = 1;
+  int maxContestForEachBrand = 3;
+  bool showMoreContest = false;
+  String showMoreContestBrandName = "";
+  
   @override
   void initState() {
-    super.initState();
+    super.initState();  
     _l1Data = widget.l1Data;
-    _myTeams = widget.myTeams;
+    _myTeams = widget.myTeams; 
     setContestsByCategory(widget.l1Data.contests);
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
-  setContestsByCategory(List<Contest> contests) {
+  
+  setContestsByCategory(List<Contest> contests) async {
+    int userBalance =0;
+    if(widget.accountDetails !=null){
+           userBalance= (widget.accountDetails.totalBalance*100).toInt();
+    }
     contests.sort(
       (Contest a, Contest b) {
         if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
+        if(a.brandPriority){
+          return -1;
+        }
+        else if(b.brandPriority){
+          return 1;
+        }
+        else{
           return (a.prizeDetails[0]["totalPrizeAmount"] ==
                   b.prizeDetails[0]["totalPrizeAmount"]
               ? ((a.entryFee - b.entryFee) * 100).toInt()
               : ((b.prizeDetails[0]["totalPrizeAmount"] -
                           a.prizeDetails[0]["totalPrizeAmount"]) *
                       100)
-                  .toInt());
+                  .toInt());}
         } else {
           return (a.brand["info"] as String)
               .compareTo(b.brand["info"] as String);
         }
+        
       },
     );
 
@@ -318,17 +337,17 @@ class ContestsState extends State<Contests> {
   }
 
   _onContestClick(Contest contest, League league) async {
-    final result = await Navigator.of(context).push(
+   final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ContestDetail(
-              contest: contest,
-              league: league,
-              l1Data: _l1Data,
-              myTeams: _myTeams,
-              mapContestTeams: widget.mapContestTeams != null
-                  ? widget.mapContestTeams[contest.id]
-                  : null,
-            ),
+          contest: contest,
+          league: league,
+          l1Data: _l1Data,
+          myTeams: _myTeams,
+          mapContestTeams: widget.mapContestTeams != null
+              ? widget.mapContestTeams[contest.id]
+              : null,
+        ),
       ),
     );
      /* These methods are called to update unique teams*/
@@ -354,20 +373,20 @@ class ContestsState extends State<Contests> {
         ActionUtil().launchJoinContest(
           l1Data: _l1Data,
           contest: contest,
-          sportsType:widget.sportsType,
+          sportsType: widget.sportsType,
           myTeams: _myTeams,
           league: widget.league,
           scaffoldKey: widget.scaffoldKey,
-          launchPageSource:"l1"
+           launchPageSource:"l1"
         );
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateTeam(
-                  league: widget.league,
-                  l1Data: widget.l1Data,
-                  mode: TeamCreationMode.CREATE_TEAM,
-                ),
+              league: widget.league,
+              l1Data: widget.l1Data,
+              mode: TeamCreationMode.CREATE_TEAM,
+            ),
           ),
         );
 
@@ -377,10 +396,10 @@ class ContestsState extends State<Contests> {
             l1Data: _l1Data,
             contest: contest,
             myTeams: _myTeams,
-            sportsType:widget.sportsType,
+            sportsType: widget.sportsType,
             league: widget.league,
             scaffoldKey: widget.scaffoldKey,
-            launchPageSource:"l1"
+             launchPageSource:"l1"
           );
         }
       }
@@ -395,7 +414,7 @@ class ContestsState extends State<Contests> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
-          if (response[contest.id.toString()] != null) {        
+          if (response[contest.id.toString()] != null) {
             List<dynamic> contestMyTeams =
                 (response[contest.id.toString()] as List);
             return getUniqueTeams(contestMyTeams);
@@ -410,7 +429,7 @@ class ContestsState extends State<Contests> {
       ActionUtil().showLoader(context, false);
     });
   }
-  
+
   getUniqueTeams(List<dynamic> contestMyTeams) {
     List<MyTeam> myUniqueTeams = [];
     for (MyTeam team in _myTeams) {
@@ -470,6 +489,29 @@ class ContestsState extends State<Contests> {
     // widget.scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(msg)));
   }
 
+  Container getContestCards(int index, bool bShowBrandInfo) {
+    return Container(
+      child: Padding(
+        padding: EdgeInsets.only(top: 4.0, right: 16.0, left: 16.0),
+        child: ContestCard(
+          radius: BorderRadius.circular(
+            5.0,
+          ),
+          l1Data: widget.l1Data,
+          league: widget.league,
+          onJoin: onJoinContest,
+          onClick: _onContestClick,
+          contest: _contests[index],
+          bShowBrandInfo: bShowBrandInfo,
+          onPrizeStructure: _showPrizeStructure,
+          myJoinedTeams: widget.mapContestTeams != null
+              ? widget.mapContestTeams[_contests[index].id]
+              : null,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -492,30 +534,48 @@ class ContestsState extends State<Contests> {
           : ListView.builder(
               itemCount: _contests.length,
               padding: EdgeInsets.only(bottom: 16.0),
-              itemBuilder: (context, index) {
+              itemBuilder: (context, index) {            
                 bool bShowBrandInfo = index > 0
                     ? !((_contests[index - 1]).brand["info"] ==
                         _contests[index].brand["info"])
                     : true;
 
-                return Padding(
-                  padding: EdgeInsets.only(top: 4.0, right: 16.0, left: 16.0),
-                  child: ContestCard(
-                    radius: BorderRadius.circular(
-                      5.0,
-                    ),
-                    l1Data: widget.l1Data,
-                    league: widget.league,
-                    onJoin: onJoinContest,
-                    onClick: _onContestClick,
-                    contest: _contests[index],
-                    bShowBrandInfo: bShowBrandInfo,
-                    onPrizeStructure: _showPrizeStructure,
-                    myJoinedTeams: widget.mapContestTeams != null
-                        ? widget.mapContestTeams[_contests[index].id]
-                        : null,
-                  ),
-                );
+                /*When bShowBrandInfo is true at some index, then new brand starts */
+                if (bShowBrandInfo) {
+                  contestsCountOfBrands = 1;
+                } else {
+                  contestsCountOfBrands++;
+                }
+                if ((contestsCountOfBrands > maxContestForEachBrand)) {
+                  return showMoreContestBrandName==_contests[index].brand["info"]
+                      ? getContestCards(index, bShowBrandInfo)
+                      : contestsCountOfBrands - maxContestForEachBrand == 1
+                          ? Container(
+                              padding: EdgeInsets.only(right: 20),
+                              width: MediaQuery.of(context).size.width,
+                              child: InkWell(
+                                child: Text(
+                                  "View "+contestsCountOfBrands.toString()+" more",
+                                  textAlign: TextAlign.end,
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .title
+                                      .copyWith(
+                                        color: Theme.of(context).primaryColor,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                   showMoreContestBrandName = _contests[index].brand["info"];
+                                  });
+                                },
+                              ))
+                          : Container();
+                } else {
+                  return getContestCards(index, bShowBrandInfo);
+                }
               },
             ),
     );

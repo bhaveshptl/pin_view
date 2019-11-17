@@ -11,6 +11,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
+import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/profilepages/verification.dart';
@@ -325,7 +326,10 @@ class LobbyState extends State<Lobby>
   }
 
   launchL1ByDeepLinking(
-      BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) {
+      BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) async{
+        Map<String, dynamic> accountData = await getUserAccountsData();
+    Account accountDetails = Account();
+    accountDetails = Account.fromJson(accountData);
     if (_leaguesList != null) {
       for (var league in _leaguesList) {
         if (league.leagueId == leagueIdFromDLData) {
@@ -335,13 +339,37 @@ class LobbyState extends State<Lobby>
                   leagues: _leagues,
                   sportType: _sportType,
                   onSportChange: _onSportSelectionChaged,
-                  mapSportTypes: _mapSportTypes),
+                  mapSportTypes: _mapSportTypes,
+                  accountDetails:accountDetails),
             ),
           );
         }
       }
     }
   }
+
+  getUserAccountsData() async{
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_ACCOUNT_DETAILS,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+           
+             return json.decode(res.body);
+           
+        } else if (res.statusCode >= 400 &&
+            res.statusCode <= 499 
+            ) {
+              return null;
+                  }
+      },
+    );
+  }
+
 
   launchCreateTeamDeepLinking(
       BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/modal/account.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -38,13 +39,15 @@ class LeagueDetail extends StatefulWidget {
   final Function onSportChange;
   final Map<String, int> mapSportTypes;
   final bool activateDeepLinkingNavigation;
-
+  final Account accountDetails;
+  
   LeagueDetail(this.league,
       {this.leagues,
       this.sportType,
       this.onSportChange,
       this.mapSportTypes,
-      this.activateDeepLinkingNavigation});
+      this.activateDeepLinkingNavigation,
+      this.accountDetails});
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -75,7 +78,7 @@ class LeagueDetailState extends State<LeagueDetail>
   TabController tabController;
   int activeTabIndex = 0;
   final CreateTeamState createTeamState = new  CreateTeamState();
-
+  
   @override
   initState() {
     super.initState();
@@ -1066,7 +1069,8 @@ class LeagueDetailState extends State<LeagueDetail>
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
-                              onContestTeamsUpdated:onContestTeamsUpdated
+                              onContestTeamsUpdated:onContestTeamsUpdated,
+                              accountDetails:widget.accountDetails
                             ),
                     ],
                   ),

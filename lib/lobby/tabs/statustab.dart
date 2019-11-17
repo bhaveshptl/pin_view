@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:playfantasy/modal/account.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
+import 'dart:convert';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -33,9 +37,13 @@ class StatusTab extends StatelessWidget {
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
   }
 
-  onLeagueSelect(BuildContext context, League league) {
+  onLeagueSelect(BuildContext context, League league) async {
     showLoader(true, context);
-    Navigator.of(context).push(
+    Map<String, dynamic> accountData = await getUserAccountsData();
+    Account accountDetails = Account();
+    accountDetails = Account.fromJson(accountData);
+    if(accountData !=null){
+      Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => LeagueDetail(
               league,
@@ -43,10 +51,35 @@ class StatusTab extends StatelessWidget {
               sportType: sportType,
               onSportChange: onSportChange,
               mapSportTypes: mapSportTypes,
+              accountDetails: accountDetails,
             ),
       ),
     );
+    } 
   }
+
+  getUserAccountsData() async{
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_ACCOUNT_DETAILS,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+           
+             return json.decode(res.body);
+           
+        } else if (res.statusCode >= 400 &&
+            res.statusCode <= 499 
+            ) {
+              return null;
+                  }
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
