@@ -328,6 +328,7 @@ class Contest {
   bool multiplier;
   int winningsMultiplier;
   int topPrecent;
+  bool brandPriority;
   Contest({
     this.id,
     this.name,
@@ -361,6 +362,7 @@ class Contest {
     this.topPrecent,
     this.winningsMultiplier,
     this.multiplier = false,
+    this.brandPriority
   });
 
   copyFrom(Contest contest) {
@@ -396,6 +398,7 @@ class Contest {
     this.winningsMultiplier = contest.winningsMultiplier;
     this.topPrecent = contest.topPrecent;
     this.multiplier = contest.multiplier;
+    this.brandPriority=contest.brandPriority;
   }
 
   factory Contest.fromJson(Map<String, dynamic> json) {
@@ -439,6 +442,7 @@ class Contest {
       multiplier: json["multiplier"] == null ? false : json["multiplier"],
       topPrecent: json["topPrecent"],
       winningsMultiplier: json["winningsMultiplier"],
+      brandPriority:json["brandPriority"]
     );
   }
 
@@ -472,6 +476,7 @@ class Contest {
         "recommended": this.recommended,
         "deleted": this.deleted,
         "hideBonusInfo": this.hideBonusInfo,
+        "brandPriority":this.brandPriority
       };
 }
 

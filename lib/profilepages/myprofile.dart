@@ -38,11 +38,15 @@ class MyProfileState extends State<MyProfile> {
   TextEditingController _pincodeController = TextEditingController();
   TextEditingController _landmarkController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String _panVerificationStatus;
+  String _addressVerificationStatus;
+  String _verificationStatus;
 
   @override
   void initState() {
     super.initState();
     _getProfileData();
+     _getVerificationStatus();
   }
 
   _getProfileData() async {
@@ -56,6 +60,7 @@ class MyProfileState extends State<MyProfile> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
+
           setState(() {
             _userProfile = Profile.fromJson(response);
             _cityController.text = _userProfile.city;
@@ -66,7 +71,7 @@ class MyProfileState extends State<MyProfile> {
             _streetController.text = _userProfile.address1;
             _landmarkController.text = _userProfile.address2;
             _pincodeController.text = _userProfile.pincode == null
-                ? ""
+                ? "" 
                 : _userProfile.pincode.toString();
             _gender = _userProfile.gender == null
                 ? -1
@@ -80,6 +85,28 @@ class MyProfileState extends State<MyProfile> {
       },
     ).whenComplete(() {
       ActionUtil().showLoader(context, false);
+    });
+  }
+
+  _getVerificationStatus() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.VERIFICATION_STATUS,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> response = json.decode(res.body);
+        setState(() {
+                    _panVerificationStatus = response["pan_verification"];
+          _addressVerificationStatus = response["address_verification"];
+                  });
+      }
+    }).whenComplete(() {
+       ActionUtil().showLoader(context, false);
     });
   }
 
@@ -112,6 +139,31 @@ class MyProfileState extends State<MyProfile> {
     if (result != null) {
       _showMessage(result);
     }
+  }
+
+  allowMyProfileFieldEdit(String fieldNmae){
+    String kycStatus = _panVerificationStatus;
+    String addressStatus = _addressVerificationStatus;
+    if (kycStatus == addressStatus) {
+      _verificationStatus = kycStatus;
+    } else {
+      if (kycStatus == "DOC_REJECTED" || addressStatus == "DOC_REJECTED") {
+        _verificationStatus = "DOC_REJECTED";
+      } else if (kycStatus == "UNDER_REVIEW" ||
+          addressStatus == "UNDER_REVIEW") {
+        _verificationStatus = "UNDER_REVIEW";
+      } else if (kycStatus == "DOC_SUBMITTED" &&
+          addressStatus == "DOC_SUBMITTED") {
+        _verificationStatus = "DOC_SUBMITTED";
+      } else {
+        _verificationStatus = "DOC_NOT_SUBMITTED";
+      }
+    }
+    if(_verificationStatus == "DOC_NOT_SUBMITTED"){
+      return true;
+    }else{
+      return false;
+    }    
   }
 
   _showChangeTeamNameDialog() {
@@ -816,7 +868,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.fname == null ||
-                                  _userProfile.fname == ""
+                                  _userProfile.fname == "" || allowMyProfileFieldEdit("firstName")
                               ? () {
                                   _showChangeValueDialog(
                                     _fNameController,
@@ -876,7 +928,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.lname == null ||
-                                  _userProfile.lname == ""
+                                  _userProfile.lname == "" ||allowMyProfileFieldEdit("firstName")
                               ? () {
                                   _showChangeValueDialog(
                                     _lNameController,
