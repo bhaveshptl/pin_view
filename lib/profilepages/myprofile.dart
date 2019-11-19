@@ -159,10 +159,10 @@ class MyProfileState extends State<MyProfile> {
         _verificationStatus = "DOC_NOT_SUBMITTED";
       }
     }
-    if(_verificationStatus == "DOC_NOT_SUBMITTED"){
-      return true;
-    }else{
+    if(_verificationStatus == "VERIFIED" || _verificationStatus == "DOC_REJECTED" || _verificationStatus == "UNDER_REVIEW"){
       return false;
+    }else{
+      return true;
     }    
   }
 
@@ -988,7 +988,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.gender == null ||
-                                  _userProfile.gender == ""
+                                  _userProfile.gender == "" || allowMyProfileFieldEdit("gender")
                               ? () {
                                   showSelectionGenderPopup();
                                 }
@@ -1044,7 +1044,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: () {
-                            if (_userProfile.dob == null) {
+                            if (_userProfile.dob == null || allowMyProfileFieldEdit("dob")) {
                               _selectDate(context);
                             } else {
                               _showMessage(
@@ -1291,7 +1291,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.address1 == null ||
-                                  _userProfile.address1 == ""
+                                  _userProfile.address1 == "" || allowMyProfileFieldEdit("area")
                               ? () {
                                   _showChangeValueDialog(
                                     _streetController,
@@ -1318,7 +1318,7 @@ class MyProfileState extends State<MyProfile> {
                                   children: <Widget>[
                                     Text(
                                       _streetController.text == null ||
-                                              _streetController.text == ""
+                                              _streetController.text == "" 
                                           ? "None"
                                           : _streetController.text,
                                       style: TextStyle(
@@ -1351,7 +1351,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.address2 == null ||
-                                  _userProfile.address2 == ""
+                                  _userProfile.address2 == "" || allowMyProfileFieldEdit("landmark")
                               ? () {
                                   _showChangeValueDialog(
                                     _landmarkController,
@@ -1411,7 +1411,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.pincode == null ||
-                                  _userProfile.pincode == 0
+                                  _userProfile.pincode == 0 || allowMyProfileFieldEdit("pincode")
                               ? () {
                                   _showChangeValueDialog(
                                     _pincodeController,
@@ -1473,7 +1473,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.city == null ||
-                                  _userProfile.city == ""
+                                  _userProfile.city == "" || allowMyProfileFieldEdit("city")
                               ? () {
                                   _showChangeValueDialog(
                                     _cityController,
@@ -1533,7 +1533,7 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: _userProfile.state == null ||
-                                  _userProfile.state == ""
+                                  _userProfile.state == "" || allowMyProfileFieldEdit("state")
                               ? () {
                                   _showStateSelection();
                                 }
