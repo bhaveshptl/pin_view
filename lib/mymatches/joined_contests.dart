@@ -71,7 +71,7 @@ class JoinedContestsState extends State<JoinedContests>
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _l1Data = widget.l1Data;
-    _myTeams = widget.myTeams;
+      _myTeams = widget.myTeams;
     initTabController();
     super.initState();
   }
@@ -336,18 +336,12 @@ class JoinedContestsState extends State<JoinedContests>
       ),
     );
     updateContestData();
-   // await widget.onContestTeamsUpdated();
+    // await widget.onContestTeamsUpdated();
   }
 
   updateContestData() async {
-     /* These methods are called to update unique teams*/
+    /* These methods are called to update unique teams*/
     await _getMyContests();
-    await _createL1WSObject();
-    await _getL1Data();
-    _streamSubscription =
-        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
-    _l1Data = widget.l1Data;
-    _myTeams = widget.myTeams;
   }
 
   _onPredictionClick(Contest contest, League league) {
