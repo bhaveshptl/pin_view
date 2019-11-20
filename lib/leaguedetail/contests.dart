@@ -26,20 +26,19 @@ class Contests extends StatefulWidget {
   final List<MyTeam> myTeams;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final Map<int, List<MyTeam>> mapContestTeams;
-  final  Function  onContestTeamsUpdated;
+  final Function onContestTeamsUpdated;
   final Account accountDetails;
 
-  Contests({
-    this.league,
-    this.l1Data,
-    this.myTeams,
-    this.sportsType,
-    this.showLoader,
-    this.scaffoldKey,
-    this.mapContestTeams,
-    this.onContestTeamsUpdated,
-    this.accountDetails
-  });
+  Contests(
+      {this.league,
+      this.l1Data,
+      this.myTeams,
+      this.sportsType,
+      this.showLoader,
+      this.scaffoldKey,
+      this.mapContestTeams,
+      this.onContestTeamsUpdated,
+      this.accountDetails});
 
   @override
   State<StatefulWidget> createState() => ContestsState();
@@ -59,52 +58,123 @@ class ContestsState extends State<Contests> {
   int maxContestForEachBrand = 3;
   bool showMoreContest = false;
   String showMoreContestBrandName = "";
-  
+
   @override
   void initState() {
-    super.initState();  
+    super.initState();
     _l1Data = widget.l1Data;
-    _myTeams = widget.myTeams; 
+    _myTeams = widget.myTeams;
     setContestsByCategory(widget.l1Data.contests);
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
-  
   setContestsByCategory(List<Contest> contests) async {
-    int userBalance =0;
-    if(widget.accountDetails !=null){
-           userBalance= (widget.accountDetails.totalBalance*100).toInt();
-    }
     contests.sort(
       (Contest a, Contest b) {
         if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
-        if(a.brandPriority){
-          return -1;
-        }
-        else if(b.brandPriority){
-          return 1;
-        }
-        else{
-          return (a.prizeDetails[0]["totalPrizeAmount"] ==
-                  b.prizeDetails[0]["totalPrizeAmount"]
-              ? ((a.entryFee - b.entryFee) * 100).toInt()
-              : ((b.prizeDetails[0]["totalPrizeAmount"] -
-                          a.prizeDetails[0]["totalPrizeAmount"]) *
-                      100)
-                  .toInt());}
+          if (a.brandPriority) {
+            return -1;
+          } else if (b.brandPriority) {
+            return 1;
+          } else {
+            return (a.prizeDetails[0]["totalPrizeAmount"] ==
+                    b.prizeDetails[0]["totalPrizeAmount"]
+                ? ((a.entryFee - b.entryFee) * 100).toInt()
+                : ((b.prizeDetails[0]["totalPrizeAmount"] -
+                            a.prizeDetails[0]["totalPrizeAmount"]) *
+                        100)
+                    .toInt());
+          }
         } else {
           return (a.brand["info"] as String)
               .compareTo(b.brand["info"] as String);
         }
-        
       },
     );
 
+    int loopIndex = 0;
+    List<Contest> brandContests = [];
+    List<Contest> sortedContests = [];
+    int userBalance = 0;
+    if (widget.accountDetails != null) {
+      userBalance = (widget.accountDetails.totalBalance * 100).toInt();
+    }
+    contests.forEach((Contest contest) {
+      bool bShowBrandInfo = (loopIndex + 1 < contests.length)
+          ? !((contests[loopIndex + 1]).brand["info"] ==
+              contests[loopIndex].brand["info"])
+          : true;
+      if (bShowBrandInfo) {
+        brandContests.add(contest);
+        var brandContestsLength = brandContests.length;
+        var entryFeeList = new List(brandContestsLength);
+        int upperNBDIndex = 0;
+        int loweNBDIndex = 0;
+        int upperEntryFee = -1;
+        int lowerEntryFee = -1;
+        int upperNBDContestId = 0;
+        int lowerNBDContestId = 0;
+
+        for (var i = 0; i < brandContestsLength; i++) {
+          entryFeeList[i] = brandContests[i].entryFee;
+          int entryFee = (brandContests[i].entryFee * 100).toInt();
+          if (entryFee >= userBalance &&
+              (entryFee < upperEntryFee || upperEntryFee == -1)) {
+            upperEntryFee = entryFee;
+            upperNBDIndex = i;
+            upperNBDContestId = brandContests[i].id;
+          }
+          if (entryFee < userBalance &&
+              (entryFee > lowerEntryFee || lowerEntryFee == -1)) {
+            lowerEntryFee = entryFee;
+            loweNBDIndex = i;
+            lowerNBDContestId = brandContests[i].id;
+          }
+        }
+        brandContests.sort(
+          (Contest a, Contest b) {
+            if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
+              if (a.brandPriority) {
+                return -1;
+              } else if (b.brandPriority) {
+                return 1;
+              } else if (a.id == upperNBDContestId) {
+                return -1;
+              } else if (b.id == upperNBDContestId) {
+                return 1;
+              } else if (a.id == lowerNBDContestId) {
+                return -1;
+              } else if (b.id == lowerNBDContestId) {
+                return -1;
+              } else {
+                return (a.prizeDetails[0]["totalPrizeAmount"] ==
+                        b.prizeDetails[0]["totalPrizeAmount"]
+                    ? ((a.entryFee - b.entryFee) * 100).toInt()
+                    : ((b.prizeDetails[0]["totalPrizeAmount"] -
+                                a.prizeDetails[0]["totalPrizeAmount"]) *
+                            100)
+                        .toInt());
+              }
+            } else {
+              return (a.brand["info"] as String)
+                  .compareTo(b.brand["info"] as String);
+            }
+          },
+        );
+        sortedContests.addAll(brandContests);
+        brandContests = [];
+      } else {
+        brandContests.add(contest);
+      }
+      loopIndex++;
+    });
+
+   
     List<Contest> cashRecomendedContests = [];
     List<Contest> cashNonRecomendedContests = [];
     List<Contest> practiseContests = [];
-    contests.forEach((Contest contest) {
+    sortedContests.forEach((Contest contest) {
       if (contest.prizeType == 1) {
         practiseContests.add(contest);
       } else if (contest.recommended) {
@@ -337,7 +407,7 @@ class ContestsState extends State<Contests> {
   }
 
   _onContestClick(Contest contest, League league) async {
-   final result = await Navigator.of(context).push(
+    final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => ContestDetail(
           contest: contest,
@@ -350,7 +420,7 @@ class ContestsState extends State<Contests> {
         ),
       ),
     );
-     /* These methods are called to update unique teams*/
+    /* These methods are called to update unique teams*/
     await widget.onContestTeamsUpdated();
     await getMyContestTeams(contest);
     /* End of  unique teams update*/
@@ -371,14 +441,13 @@ class ContestsState extends State<Contests> {
       if (teams != null && teams.length > 0) {
         bShowJoinContest = false;
         ActionUtil().launchJoinContest(
-          l1Data: _l1Data,
-          contest: contest,
-          sportsType: widget.sportsType,
-          myTeams: _myTeams,
-          league: widget.league,
-          scaffoldKey: widget.scaffoldKey,
-           launchPageSource:"l1"
-        );
+            l1Data: _l1Data,
+            contest: contest,
+            sportsType: widget.sportsType,
+            myTeams: _myTeams,
+            league: widget.league,
+            scaffoldKey: widget.scaffoldKey,
+            launchPageSource: "l1");
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
@@ -393,14 +462,13 @@ class ContestsState extends State<Contests> {
         if (result != null) {
           bShowJoinContest = false;
           ActionUtil().launchJoinContest(
-            l1Data: _l1Data,
-            contest: contest,
-            myTeams: _myTeams,
-            sportsType: widget.sportsType,
-            league: widget.league,
-            scaffoldKey: widget.scaffoldKey,
-             launchPageSource:"l1"
-          );
+              l1Data: _l1Data,
+              contest: contest,
+              myTeams: _myTeams,
+              sportsType: widget.sportsType,
+              league: widget.league,
+              scaffoldKey: widget.scaffoldKey,
+              launchPageSource: "l1");
         }
       }
     }
@@ -534,7 +602,7 @@ class ContestsState extends State<Contests> {
           : ListView.builder(
               itemCount: _contests.length,
               padding: EdgeInsets.only(bottom: 16.0),
-              itemBuilder: (context, index) {            
+              itemBuilder: (context, index) {
                 bool bShowBrandInfo = index > 0
                     ? !((_contests[index - 1]).brand["info"] ==
                         _contests[index].brand["info"])
@@ -547,7 +615,8 @@ class ContestsState extends State<Contests> {
                   contestsCountOfBrands++;
                 }
                 if ((contestsCountOfBrands > maxContestForEachBrand)) {
-                  return showMoreContestBrandName==_contests[index].brand["info"]
+                  return showMoreContestBrandName ==
+                          _contests[index].brand["info"]
                       ? getContestCards(index, bShowBrandInfo)
                       : contestsCountOfBrands - maxContestForEachBrand == 1
                           ? Container(
@@ -555,7 +624,9 @@ class ContestsState extends State<Contests> {
                               width: MediaQuery.of(context).size.width,
                               child: InkWell(
                                 child: Text(
-                                  "View "+contestsCountOfBrands.toString()+" more",
+                                  "View " +
+                                      contestsCountOfBrands.toString() +
+                                      " more",
                                   textAlign: TextAlign.end,
                                   style: Theme.of(context)
                                       .primaryTextTheme
@@ -568,7 +639,8 @@ class ContestsState extends State<Contests> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                   showMoreContestBrandName = _contests[index].brand["info"];
+                                    showMoreContestBrandName =
+                                        _contests[index].brand["info"];
                                   });
                                 },
                               ))

@@ -720,7 +720,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (BuildContext context) => SwitchMyContestTeams(
-          l1Data: widget.l1Data,
+          l1Data: _l1Data,
           oldTeam: myTeam,
           contest: widget.contest,
           league: widget.league,
@@ -1216,7 +1216,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                   child: (bIsMyTeam) &&
                                           (widget.league.status ==
                                               LeagueStatus.UPCOMING) &&
-                                          widget.l1Data != null
+                                          _l1Data != null
                                       ? Container(
                                           child: Row(
                                               mainAxisAlignment:
