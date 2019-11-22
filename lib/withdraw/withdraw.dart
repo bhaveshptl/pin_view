@@ -173,7 +173,11 @@ class WithdrawState extends State<Withdraw>
           addressStatus == "DOC_SUBMITTED") {
         _verificationStatus = "DOC_SUBMITTED";
       } else {
-        _verificationStatus = "DOC_NOT_SUBMITTED";
+       if(kycStatus=="VERIFIED" && addressStatus == "DOC_SUBMITTED"){
+          _verificationStatus = "UNDER_REVIEW";
+        }else{
+          _verificationStatus = "DOC_NOT_SUBMITTED";
+        } 
       }
     }
 

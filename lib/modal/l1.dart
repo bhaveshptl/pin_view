@@ -2,15 +2,18 @@ class L1 {
   final LeagueDetails league;
   List<Contest> contests;
   List<int> initialSquad;
-  L1({this.league, this.contests,this.initialSquad});
+  L1({this.league, this.contests, this.initialSquad});
 
   factory L1.fromJson(Map<String, dynamic> json) {
     return L1(
-      league: LeagueDetails.fromJson(json['league']),
-      contests:
-          (json["contests"] as List).map((i) => Contest.fromJson(i)).toList(),
-      initialSquad:json["initialSquad"] !=null  ?(json["initialSquad"] as List).map((i) => (i as int).toInt()).toList():[]    
-    );
+        league: LeagueDetails.fromJson(json['league']),
+        contests:
+            (json["contests"] as List).map((i) => Contest.fromJson(i)).toList(),
+        initialSquad: json["initialSquad"] != null
+            ? (json["initialSquad"] as List)
+                .map((i) => (i as int).toInt())
+                .toList()
+            : []);
   }
 }
 
@@ -329,41 +332,46 @@ class Contest {
   int winningsMultiplier;
   int topPrecent;
   bool brandPriority;
-  Contest({
-    this.id,
-    this.name,
-    this.templateId,
-    this.size,
-    this.prizeType,
-    this.entryFee,
-    this.minUsers,
-    this.serviceFee,
-    this.teamsAllowed,
-    this.leagueId,
-    this.releaseTime,
-    this.regStartTime,
-    this.startTime,
-    this.endTime,
-    this.status,
-    this.visibilityId,
-    this.visibilityInfo,
-    this.contestJoinCode,
-    this.joined,
-    this.realTeamId,
-    this.prizeDetails,
-    this.brand,
-    this.milestones,
-    this.inningsId,
-    this.bonusAllowed,
-    this.guaranteed,
-    this.recommended,
-    this.deleted,
-    this.hideBonusInfo,
-    this.topPrecent,
-    this.winningsMultiplier,
-    this.multiplier = false,
-    this.brandPriority
-  });
+  bool showMore;
+  bool bisFirstContestOfBrand;
+  bool bisLastContestOfBrand;
+  Contest(
+      {this.id,
+      this.name,
+      this.templateId,
+      this.size,
+      this.prizeType,
+      this.entryFee,
+      this.minUsers,
+      this.serviceFee,
+      this.teamsAllowed,
+      this.leagueId,
+      this.releaseTime,
+      this.regStartTime,
+      this.startTime,
+      this.endTime,
+      this.status,
+      this.visibilityId,
+      this.visibilityInfo,
+      this.contestJoinCode,
+      this.joined,
+      this.realTeamId,
+      this.prizeDetails,
+      this.brand,
+      this.milestones,
+      this.inningsId,
+      this.bonusAllowed,
+      this.guaranteed,
+      this.recommended,
+      this.deleted,
+      this.hideBonusInfo,
+      this.topPrecent,
+      this.winningsMultiplier,
+      this.multiplier = false,
+      this.brandPriority = false,
+      this.showMore = false,
+      this.bisFirstContestOfBrand = false,
+      this.bisLastContestOfBrand=false});
 
   copyFrom(Contest contest) {
     this.id = contest.id;
@@ -398,52 +406,52 @@ class Contest {
     this.winningsMultiplier = contest.winningsMultiplier;
     this.topPrecent = contest.topPrecent;
     this.multiplier = contest.multiplier;
-    this.brandPriority=contest.brandPriority;
+    this.brandPriority = contest.brandPriority;
   }
 
   factory Contest.fromJson(Map<String, dynamic> json) {
     return Contest(
-      id: json["id"],
-      name: json["name"],
-      templateId: json["templateId"],
-      size: json["size"] == null
-          ? (json["maxEntries"] != null ? json["maxEntries"] : 0)
-          : json["size"],
-      prizeType: json["prizeType"],
-      entryFee: json["entryFee"],
-      minUsers: json["minUsers"],
-      serviceFee:
-          (json["serviceFee"] == null ? 0 : json["serviceFee"]).toDouble(),
-      teamsAllowed: json["teamsAllowed"] == null
-          ? (json["sheetsAllowed"] == null ? 1 : json["sheetsAllowed"])
-          : json["teamsAllowed"],
-      leagueId: json["leagueId"],
-      releaseTime: json["releaseTime"],
-      regStartTime: json["regStartTime"],
-      startTime: json["startTime"],
-      endTime: json["endTime"],
-      status: json["status"],
-      realTeamId: json["realTeamId"],
-      visibilityId: json["visibilityId"],
-      visibilityInfo: json["visibilityInfo"],
-      contestJoinCode: json["contestJoinCode"],
-      joined: json["joined"] == null && json["joinedTeamCount"] != null
-          ? json["joinedTeamCount"]
-          : json["joined"],
-      prizeDetails: json["prizeDetails"],
-      brand: json["brand"],
-      milestones: json["milestones"],
-      inningsId: json["inningsId"],
-      bonusAllowed: json["bonusAllowed"],
-      guaranteed: json["guaranteed"],
-      recommended: json["recommended"],
-      deleted: json["deleted"],
-      hideBonusInfo: json["hideBonusInfo"],
-      multiplier: json["multiplier"] == null ? false : json["multiplier"],
-      topPrecent: json["topPrecent"],
-      winningsMultiplier: json["winningsMultiplier"],
-      brandPriority:json["brandPriority"]
-    );
+        id: json["id"],
+        name: json["name"],
+        templateId: json["templateId"],
+        size: json["size"] == null
+            ? (json["maxEntries"] != null ? json["maxEntries"] : 0)
+            : json["size"],
+        prizeType: json["prizeType"],
+        entryFee: json["entryFee"],
+        minUsers: json["minUsers"],
+        serviceFee:
+            (json["serviceFee"] == null ? 0 : json["serviceFee"]).toDouble(),
+        teamsAllowed: json["teamsAllowed"] == null
+            ? (json["sheetsAllowed"] == null ? 1 : json["sheetsAllowed"])
+            : json["teamsAllowed"],
+        leagueId: json["leagueId"],
+        releaseTime: json["releaseTime"],
+        regStartTime: json["regStartTime"],
+        startTime: json["startTime"],
+        endTime: json["endTime"],
+        status: json["status"],
+        realTeamId: json["realTeamId"],
+        visibilityId: json["visibilityId"],
+        visibilityInfo: json["visibilityInfo"],
+        contestJoinCode: json["contestJoinCode"],
+        joined: json["joined"] == null && json["joinedTeamCount"] != null
+            ? json["joinedTeamCount"]
+            : json["joined"],
+        prizeDetails: json["prizeDetails"],
+        brand: json["brand"],
+        milestones: json["milestones"],
+        inningsId: json["inningsId"],
+        bonusAllowed: json["bonusAllowed"],
+        guaranteed: json["guaranteed"],
+        recommended: json["recommended"],
+        deleted: json["deleted"],
+        hideBonusInfo: json["hideBonusInfo"],
+        multiplier: json["multiplier"] == null ? false : json["multiplier"],
+        topPrecent: json["topPrecent"],
+        winningsMultiplier: json["winningsMultiplier"],
+        brandPriority: json["brandPriority"]
+        );
   }
 
   Map<String, dynamic> toJson() => {
@@ -476,7 +484,7 @@ class Contest {
         "recommended": this.recommended,
         "deleted": this.deleted,
         "hideBonusInfo": this.hideBonusInfo,
-        "brandPriority":this.brandPriority
+        "brandPriority": this.brandPriority
       };
 }
 

@@ -158,8 +158,6 @@ class VerificationState extends State<Verification> {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> response = json.decode(res.body);
         allowdDocSizeInMB = response["allowedDocSizeInMB"];
-        print("allowdDocSizeInMB>>>>>>>>");
-        print(allowdDocSizeInMB);
       }
     }).whenComplete(() {
       ActionUtil().showLoader(scaffoldKey.currentContext, false);
@@ -182,7 +180,11 @@ class VerificationState extends State<Verification> {
           addressStatus == "DOC_SUBMITTED") {
         _verificationStatus = "DOC_SUBMITTED";
       } else {
-        _verificationStatus = "DOC_NOT_SUBMITTED";
+        if(kycStatus=="VERIFIED" && addressStatus == "DOC_SUBMITTED"){
+          _verificationStatus = "UNDER_REVIEW";
+        }else{
+          _verificationStatus = "DOC_NOT_SUBMITTED";
+        } 
       }
     }
 
