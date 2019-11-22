@@ -118,8 +118,10 @@ class ContestsState extends State<Contests> {
         var entryFeeList = new List(brandContestsLength);
         int upperEntryFee = -1;
         int lowerEntryFee = -1;
+        int lowerButOneEntryFee = -1;
         int upperNBDContestId = 0;
         int lowerNBDContestId = 0;
+        int lowerButOneNBDContestId=0;
 
         for (var i = 0; i < brandContestsLength; i++) {
           entryFeeList[i] = brandContests[i].entryFee;
@@ -133,8 +135,15 @@ class ContestsState extends State<Contests> {
               (entryFee > lowerEntryFee || lowerEntryFee == -1)) {
             lowerEntryFee = entryFee;
             lowerNBDContestId = brandContests[i].id;
+            lowerButOneEntryFee = entryFee;
+            
+          }
+          if(entryFee<lowerEntryFee && entryFee>lowerButOneEntryFee){
+            lowerButOneEntryFee = entryFee;
+            lowerButOneNBDContestId = brandContests[i].id;
           }
         }
+         
         brandContests.sort(
           (Contest a, Contest b) {
             if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
@@ -149,6 +158,10 @@ class ContestsState extends State<Contests> {
               } else if (a.id == lowerNBDContestId) {
                 return -1;
               } else if (b.id == lowerNBDContestId) {
+                return 1;
+              }else if (a.id == lowerButOneNBDContestId) {
+                return -1;
+              } else if (b.id == lowerButOneNBDContestId) {
                 return 1;
               } else {
                 return (a.prizeDetails[0]["totalPrizeAmount"] ==
