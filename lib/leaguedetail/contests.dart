@@ -59,12 +59,12 @@ class ContestsState extends State<Contests> {
   String showMoreContestBrandName = "";
   bool showMoreContestsButton = false;
   Map moreContestBrandsShowMap;
-
-
+  Map sortedContestsListMap;
 
   @override
   void initState() {
     super.initState();
+    sortedContestsListMap = new Map<String, List<Contest>>();
     _l1Data = widget.l1Data;
     _myTeams = widget.myTeams;
     setContestsByCategory(widget.l1Data.contests);
@@ -113,7 +113,6 @@ class ContestsState extends State<Contests> {
       if (bShowBrandInfo) {
         brandContests.add(contest);
         moreContestBrandsShowMap[contests[loopIndex].brand["info"]] = false;
-
         var brandContestsLength = brandContests.length;
         var entryFeeList = new List(brandContestsLength);
         int upperEntryFee = -1;
@@ -121,7 +120,7 @@ class ContestsState extends State<Contests> {
         int lowerButOneEntryFee = -1;
         int upperNBDContestId = 0;
         int lowerNBDContestId = 0;
-        int lowerButOneNBDContestId=0;
+        int lowerButOneNBDContestId = 0;
 
         for (var i = 0; i < brandContestsLength; i++) {
           entryFeeList[i] = brandContests[i].entryFee;
@@ -136,14 +135,13 @@ class ContestsState extends State<Contests> {
             lowerEntryFee = entryFee;
             lowerNBDContestId = brandContests[i].id;
             lowerButOneEntryFee = entryFee;
-            
           }
-          if(entryFee<lowerEntryFee && entryFee>lowerButOneEntryFee){
+          if (entryFee < lowerEntryFee && entryFee > lowerButOneEntryFee) {
             lowerButOneEntryFee = entryFee;
             lowerButOneNBDContestId = brandContests[i].id;
           }
         }
-         
+
         brandContests.sort(
           (Contest a, Contest b) {
             if ((a.brand["info"] as String) == (b.brand["info"] as String)) {
@@ -159,7 +157,7 @@ class ContestsState extends State<Contests> {
                 return -1;
               } else if (b.id == lowerNBDContestId) {
                 return 1;
-              }else if (a.id == lowerButOneNBDContestId) {
+              } else if (a.id == lowerButOneNBDContestId) {
                 return -1;
               } else if (b.id == lowerButOneNBDContestId) {
                 return 1;
@@ -191,21 +189,6 @@ class ContestsState extends State<Contests> {
       loopIndex++;
     });
 
-    int loopIndex2 = 0;
-    sortedContests.forEach((Contest contest) {
-      print("C=" +
-          loopIndex2.toString() +
-          "--" +
-          contests[loopIndex2].brand["info"] +
-          " ---" +
-          "----" +
-          contest.entryFee.toString());
-
-      //contest.bisFirstContestOfBrand.toString()
-
-      loopIndex2++;
-    });
-
     List<Contest> cashRecomendedContests = [];
     List<Contest> cashNonRecomendedContests = [];
     List<Contest> practiseContests = [];
@@ -218,7 +201,6 @@ class ContestsState extends State<Contests> {
         cashNonRecomendedContests.add(contest);
       }
     });
-
     _contests = [];
     _contests.addAll(cashRecomendedContests);
     _contests.addAll(cashNonRecomendedContests);
@@ -615,6 +597,99 @@ class ContestsState extends State<Contests> {
     );
   }
 
+  _buildMainContent() {
+    return CustomScrollView(
+      slivers: <Widget>[
+        SliverList(
+          delegate: SliverChildListDelegate([
+            Column(
+              children: getBrandContestsWidgetList(),
+            )
+          ]),
+        )
+      ],
+    );
+  }
+
+  getBrandContestsWidgetList() {
+   List<Widget> list = [];
+   list.add(getContestsListWidget(_contests));
+    return list;
+  }
+
+  getContestsListWidget(List<Contest> brandContestList) {
+    return Container(
+      child: ListView.builder(
+        itemCount: brandContestList.length,
+        padding: EdgeInsets.only(bottom: 16.0),
+        shrinkWrap: true, 
+        physics: ClampingScrollPhysics(),
+        itemBuilder: (context, index) {
+          /*When bShowBrandInfo is true at some index, then new brand starts */
+          bool bShowBrandInfo = index > 0
+              ? !((brandContestList[index - 1]).brand["info"] ==
+                  brandContestList[index].brand["info"])
+              : true;
+          if (brandContestList[index].bisFirstContestOfBrand) {
+            showMoreContestsButton = false;
+            contestsCountOfBrands = 1;
+          } else {
+            contestsCountOfBrands++;
+          }
+          if (brandContestList[index].showMore) {
+            showMoreContestsButton = true;
+          }
+          return Column(
+            children: <Widget>[
+              !showMoreContestsButton
+                  ? getContestCards(index, bShowBrandInfo)
+                  : Container(),
+              showMoreContestsButton &&
+                      showMoreContestBrandName == _contests[index].brand["info"]
+                  ? getContestCards(index, bShowBrandInfo)
+                  : Container(),
+              _contests[index].bisLastContestOfBrand && showMoreContestsButton
+                  ? Container(
+                      padding: EdgeInsets.only(right: 20),
+                      width: MediaQuery.of(context).size.width,
+                      child: InkWell(
+                        child: Text(
+                          showMoreContestBrandName !=
+                                  _contests[index].brand["info"]
+                              ? "View " +
+                                  (contestsCountOfBrands -
+                                          maxContestForEachBrand)
+                                      .toString() +
+                                  " more"
+                              : "View Less ",
+                          textAlign: TextAlign.end,
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            if (showMoreContestBrandName !=
+                                _contests[index].brand["info"]) {
+                              showMoreContestBrandName =
+                                  _contests[index].brand["info"];
+                            } else {
+                              showMoreContestBrandName = " ";
+                            }
+                          });
+                        },
+                      ))
+                  : Container()
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -634,78 +709,7 @@ class ContestsState extends State<Contests> {
                 ),
               ),
             )
-          : ListView.builder(
-              itemCount: _contests.length,
-              padding: EdgeInsets.only(bottom: 16.0),
-              itemBuilder: (context, index) {
-                /*When bShowBrandInfo is true at some index, then new brand starts */
-                bool bShowBrandInfo = index > 0
-                    ? !((_contests[index - 1]).brand["info"] ==
-                        _contests[index].brand["info"])
-                    : true;
-
-                if (_contests[index].bisFirstContestOfBrand) {
-                  showMoreContestsButton = false;
-                  contestsCountOfBrands = 1;
-                } else {
-                  contestsCountOfBrands++;
-                }
-                if (_contests[index].showMore) {
-                  showMoreContestsButton = true;
-                }
-
-                return Column(
-                  children: <Widget>[
-                    !showMoreContestsButton
-                        ? getContestCards(index, bShowBrandInfo)
-                        : Container(),
-                    showMoreContestsButton &&
-                            showMoreContestBrandName ==
-                                _contests[index].brand["info"]
-                        ? getContestCards(index, bShowBrandInfo)
-                        : Container(),
-                    _contests[index].bisLastContestOfBrand &&
-                            showMoreContestsButton
-                        ? Container(
-                            padding: EdgeInsets.only(right: 20),
-                            width: MediaQuery.of(context).size.width,
-                            child: InkWell(
-                              child: Text(
-                                showMoreContestBrandName !=
-                                        _contests[index].brand["info"]
-                                    ? "View " +
-                                        (contestsCountOfBrands -
-                                                maxContestForEachBrand)
-                                            .toString() +
-                                        " more"
-                                    : "View Less ",
-                                textAlign: TextAlign.end,
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .title
-                                    .copyWith(
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.w500,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                              ),
-                              onTap: () {
-                                setState(() {
-                                  if (showMoreContestBrandName !=
-                                      _contests[index].brand["info"]) {
-                                    showMoreContestBrandName =
-                                        _contests[index].brand["info"];
-                                  } else {
-                                    showMoreContestBrandName = " ";
-                                  }
-                                });
-                              },
-                            ))
-                        : Container()
-                  ],
-                );
-              },
-            ),
+          : _buildMainContent(),
     );
   }
 

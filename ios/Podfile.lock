@@ -181,7 +181,7 @@ DEPENDENCIES:
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - Branch
     - CryptoSwift
     - FBSDKCoreKit
@@ -298,4 +298,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: fef99f6e39ca905cbd258a91331eb8d7e3c14d17
 
-COCOAPODS: 1.6.1
+COCOAPODS: 1.8.4
