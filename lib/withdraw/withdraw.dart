@@ -175,9 +175,10 @@ class WithdrawState extends State<Withdraw>
       } else {
        if(kycStatus=="VERIFIED" && addressStatus == "DOC_SUBMITTED"){
           _verificationStatus = "UNDER_REVIEW";
-        }else{
+        }else if(kycStatus=="DOC_SUBMITTED" && addressStatus == "VERIFIED"){
+          }else{
           _verificationStatus = "DOC_NOT_SUBMITTED";
-        } 
+        }
       }
     }
 

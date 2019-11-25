@@ -28,7 +28,6 @@ public class BranchClass  extends FlutterApplication {
                 .setWebEngageKey("~47b65866")
                 .setPushSmallIcon(R.drawable.notification_icon_small)
                 .setPushAccentColor(Color.parseColor("#d32518"))
-                .setDebugMode(true)
                 .build();
         registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, config));
         FlutterApplication flutterApplication = new FlutterApplication();

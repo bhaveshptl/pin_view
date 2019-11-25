@@ -180,11 +180,13 @@ class VerificationState extends State<Verification> {
           addressStatus == "DOC_SUBMITTED") {
         _verificationStatus = "DOC_SUBMITTED";
       } else {
-        if(kycStatus=="VERIFIED" && addressStatus == "DOC_SUBMITTED"){
+        if (kycStatus == "VERIFIED" && addressStatus == "DOC_SUBMITTED") {
           _verificationStatus = "UNDER_REVIEW";
-        }else{
+        } else if (kycStatus == "DOC_SUBMITTED" &&
+            addressStatus == "VERIFIED") {
+        } else {
           _verificationStatus = "DOC_NOT_SUBMITTED";
-        } 
+        }
       }
     }
 
@@ -837,7 +839,8 @@ class VerificationState extends State<Verification> {
                                 (_verificationStatus == "VERIFIED" ||
                                         _verificationStatus ==
                                             "DOC_SUBMITTED" ||
-                                        _verificationStatus == "UNDER_REVIEW"||  _verificationStatus == "DOC_REJECTED")
+                                        _verificationStatus == "UNDER_REVIEW" ||
+                                        _verificationStatus == "DOC_REJECTED")
                                     ? Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Column(

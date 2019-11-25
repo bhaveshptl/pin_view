@@ -204,7 +204,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private void initWebEngage() {
         WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866")
-                .setDebugMode(true)
                 .setPushSmallIcon(R.drawable.notification_icon_small)
                 .setPushAccentColor(Color.parseColor("#d32518"))
                 .build();
