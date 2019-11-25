@@ -120,23 +120,33 @@ class ContestsState extends State<Contests> {
         int lowerButOneEntryFee = -1;
         int upperNBDContestId = 0;
         int lowerNBDContestId = 0;
+        int equalEntryFeeContestId = 0;
         int lowerButOneNBDContestId = 0;
 
         for (var i = 0; i < brandContestsLength; i++) {
           entryFeeList[i] = brandContests[i].entryFee;
           int entryFee = (brandContests[i].entryFee * 100).toInt();
-          if (entryFee >= userBalance &&
+          if (entryFee > userBalance &&
               (entryFee < upperEntryFee || upperEntryFee == -1)) {
             upperEntryFee = entryFee;
             upperNBDContestId = brandContests[i].id;
+          }
+          if (entryFee == userBalance) {
+            equalEntryFeeContestId = brandContests[i].id;
           }
           if (entryFee < userBalance &&
               (entryFee > lowerEntryFee || lowerEntryFee == -1)) {
             lowerEntryFee = entryFee;
             lowerNBDContestId = brandContests[i].id;
-            lowerButOneEntryFee = entryFee;
           }
-          if (entryFee < lowerEntryFee && entryFee > lowerButOneEntryFee) {
+        }
+
+        for (var i = 0; i < brandContestsLength; i++) {
+          entryFeeList[i] = brandContests[i].entryFee;
+          int entryFee = (brandContests[i].entryFee * 100).toInt();
+          if ((entryFee < lowerEntryFee) &&
+              (entryFee < userBalance) &&
+              (entryFee > lowerButOneEntryFee || lowerButOneEntryFee == -1)) {
             lowerButOneEntryFee = entryFee;
             lowerButOneNBDContestId = brandContests[i].id;
           }
@@ -149,26 +159,29 @@ class ContestsState extends State<Contests> {
                 return -1;
               } else if (b.brandPriority) {
                 return 1;
-              } else if (a.id == upperNBDContestId) {
+              } else if (a.id == upperNBDContestId && userBalance > 0) {
                 return -1;
-              } else if (b.id == upperNBDContestId) {
+              } else if (b.id == upperNBDContestId && userBalance > 0) {
                 return 1;
-              } else if (a.id == lowerNBDContestId) {
+              } else if (a.id == equalEntryFeeContestId) {
                 return -1;
-              } else if (b.id == lowerNBDContestId) {
+              } else if (b.id == equalEntryFeeContestId) {
                 return 1;
-              } else if (a.id == lowerButOneNBDContestId) {
+              } else if (a.id == lowerNBDContestId && userBalance > 0) {
                 return -1;
-              } else if (b.id == lowerButOneNBDContestId) {
+              } else if (b.id == lowerNBDContestId && userBalance > 0) {
+                return 1;
+              } else if (a.id == lowerButOneNBDContestId && userBalance > 0) {
+                return -1;
+              } else if (b.id == lowerButOneNBDContestId && userBalance > 0) {
                 return 1;
               } else {
-                return (a.prizeDetails[0]["totalPrizeAmount"] ==
-                        b.prizeDetails[0]["totalPrizeAmount"]
-                    ? ((a.entryFee - b.entryFee) * 100).toInt()
-                    : ((b.prizeDetails[0]["totalPrizeAmount"] -
+                return (a.entryFee == b.entryFee
+                    ? ((b.prizeDetails[0]["totalPrizeAmount"] -
                                 a.prizeDetails[0]["totalPrizeAmount"]) *
                             100)
-                        .toInt());
+                        .toInt()
+                    : ((a.entryFee - b.entryFee) * 100).toInt());
               }
             } else {
               return (a.brand["info"] as String)
@@ -612,8 +625,8 @@ class ContestsState extends State<Contests> {
   }
 
   getBrandContestsWidgetList() {
-   List<Widget> list = [];
-   list.add(getContestsListWidget(_contests));
+    List<Widget> list = [];
+    list.add(getContestsListWidget(_contests));
     return list;
   }
 
@@ -622,7 +635,7 @@ class ContestsState extends State<Contests> {
       child: ListView.builder(
         itemCount: brandContestList.length,
         padding: EdgeInsets.only(bottom: 16.0),
-        shrinkWrap: true, 
+        shrinkWrap: true,
         physics: ClampingScrollPhysics(),
         itemBuilder: (context, index) {
           /*When bShowBrandInfo is true at some index, then new brand starts */

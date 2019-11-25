@@ -292,7 +292,7 @@ class MyProfileState extends State<MyProfile> {
     String defaultText = _controller.text;
     String placeHolder=label;
     if(label=="First name" || label =="Last name"){
-      placeHolder ="Enter the name (as of Govt ID)";
+      placeHolder ="Enter the name (as per Govt ID)";
     }
     showDialog(
       context: context,
@@ -1062,7 +1062,7 @@ class MyProfileState extends State<MyProfile> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 Text(
-                                  "Birthday"+( _userProfile.dob != null ?" " :"(Enter the DOB as of Govt ID)"),
+                                  "Birthday"+( _userProfile.dob != null ?" " :"(Enter the DOB as per Govt ID)"),
                                   style: TextStyle(
                                       fontSize: Theme.of(context)
                                           .primaryTextTheme
