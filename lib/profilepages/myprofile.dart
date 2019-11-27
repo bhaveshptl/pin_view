@@ -168,7 +168,8 @@ class MyProfileState extends State<MyProfile> {
     }
     if (_verificationStatus == "VERIFIED" ||
         _verificationStatus == "DOC_REJECTED" ||
-        _verificationStatus == "UNDER_REVIEW" || _verificationStatus=="DOC_SUBMITTED" ) {
+        _verificationStatus == "UNDER_REVIEW" ||
+        _verificationStatus == "DOC_SUBMITTED") {
       return false;
     } else {
       return true;
@@ -880,16 +881,21 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: _userProfile.fname == null ||
-                                  _userProfile.fname == "" ||
-                                  allowMyProfileFieldEdit("firstName")
-                              ? () {
-                                  _showChangeValueDialog(
-                                    _fNameController,
-                                    "First name",
-                                  );
-                                }
-                              : null,
+                          onPressed: () {
+                            if (!allowMyProfileFieldEdit("firstName")) {
+                              _showMessage(
+                                "Please contact support@howzat.com for any changes",
+                              );
+                            } else if (_userProfile.fname == null ||
+                                _userProfile.fname == "" || allowMyProfileFieldEdit("firstName")) {
+                              _showChangeValueDialog(
+                                _fNameController,
+                                "First name",
+                              );
+                            }else{
+                              return null;
+                            }
+                          },
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -941,16 +947,21 @@ class MyProfileState extends State<MyProfile> {
                         height: 40.0,
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
-                          onPressed: _userProfile.lname == null ||
-                                  _userProfile.lname == "" ||
-                                  allowMyProfileFieldEdit("lastName")
-                              ? () {
-                                  _showChangeValueDialog(
-                                    _lNameController,
-                                    "Last name",
-                                  );
-                                }
-                              : null,
+                          onPressed: () {
+                            if (!allowMyProfileFieldEdit("lastName")) {
+                              _showMessage(
+                                "Please contact support@howzat.com for any changes",
+                              );
+                            } else if (_userProfile.lname == null ||
+                                _userProfile.lname == "" || allowMyProfileFieldEdit("lastName")) {
+                              _showChangeValueDialog(
+                                _lNameController,
+                                "Last name",
+                              );
+                            }else{
+                              return null;
+                            }
+                          },
                           child: Container(
                             padding: EdgeInsets.only(left: 32.0, right: 16.0),
                             child: Row(
@@ -1059,13 +1070,17 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: () {
-                            if (_userProfile.dob == null ||
-                                allowMyProfileFieldEdit("dob")) {
-                              _selectDate(context);
-                            } else {
+
+
+                            if (!allowMyProfileFieldEdit("dob")) {
                               _showMessage(
-                                "Please contact support to change this filed.",
+                                "Please contact support@howzat.com for any changes",
                               );
+                            } else if (_userProfile.dob == null ||
+                                 allowMyProfileFieldEdit("dob")) {
+                             _selectDate(context);
+                            }else{
+                              return null;
                             }
                           },
                           child: Container(

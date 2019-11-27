@@ -316,8 +316,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   onTechProcessSuccessResponse(String payload) {
-    print("<<<<<<<<<<<<<<Tech Procees succes response>>>>>>>>>>>>");
-    print(payload);
     showLoader(false);
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.TECHPROCESS_SUCCESS_PAY));
@@ -326,31 +324,48 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
-      print("<<<<<<<<<<<<<<TEch Process success Response");
-      print(response);
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
               "Failed".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
+
+        Event event = Event(name: "pay_failed");
+        event.setDepositAmount(widget.amount);
+        event.setModeOptionId(razorpayPayload["modeOptionId"]);
+        event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
+        event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
+        event.setPromoCode(widget.promoCode);
+        event.setOrderId(response["orderId"] == null
+            ? razorpayPayload["orderId"]
+            : response["orderId"]);
+
+        AnalyticsManager().addEvent(event);
         if (response["orderId"] == null) {
           ActionUtil().showMsgOnTop(
               "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
               context);
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(
-          //       "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
-          //     ),
-          //   ),
-          // );
         } else {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
         }
       } else {
+        Event event = Event(name: "pay_success");
+        event.setDepositAmount(widget.amount);
+        event.setModeOptionId(response["modeOptionId"]);
+        event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
+        event.setGatewayId(int.parse(response["gatewayId"].toString()));
+        event.setPromoCode(widget.promoCode);
+        event.setOrderId(response["orderId"]);
+        event.setUserBalance(
+          response["withdrawable"].toDouble() +
+              response["nonWithdrawable"].toDouble() +
+              response["depositBucket"].toDouble(),
+        );
+
+        AnalyticsManager().addEvent(event);
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
