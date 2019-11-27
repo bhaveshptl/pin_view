@@ -96,26 +96,20 @@ class ActionUtil {
         final response = json.decode(result);
         if (!response["error"]) {
           final createdContest = Contest.fromJson(response["contest"]);
-          final contestDetailsResult = await Navigator.of(scaffoldKey.currentContext).push(
+          Navigator.of(scaffoldKey.currentContext).push(
             FantasyPageRoute(
               pageBuilder: (context) => ContestDetail(
-                l1Data: l1Data,
-                contest: createdContest,
-                league: league,
-                sportsType: sportsType,
-                myTeams: myTeams,
-                launchPageSource:"privateContest"
-              ),
+                  l1Data: l1Data,
+                  contest: createdContest,
+                  league: league,
+                  sportsType: sportsType,
+                  myTeams: myTeams,
+                  launchPageSource: "privateContest"),
             ),
           );
-          
-          if (launchPageSource != null) {
-            onContestJoinSuccess(response["message"].toString(),
-                scaffoldKey.currentContext, l1Data, league,launchPageSource);
-          } else {
-            onContestJoinSuccess(response["message"].toString(),
-                scaffoldKey.currentContext, l1Data, league, "");   
-          }
+
+          onContestJoinSuccess(response["message"].toString(),
+              scaffoldKey.currentContext, l1Data, league, (launchPageSource !=null && launchPageSource=="jc_cc" )?"jc_cc":"privateContest");
         } else {
           final result = onJoinContestError(
             scaffoldKey.currentContext,
@@ -159,7 +153,17 @@ class ActionUtil {
 
     if (result != null) {
       if (result["userOption"] == "joinContest") {
-        Navigator.of(context).pop();
+        if (launchPageSource == "jc_cc") {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        } else if (launchPageSource == "privateContest" ||
+            launchPageSource == "joinedContests") {
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context).pop();
+        }
       } else if (result["userOption"] == "createTeam") {
         final result = await Navigator.of(context).push(
           FantasyPageRoute(

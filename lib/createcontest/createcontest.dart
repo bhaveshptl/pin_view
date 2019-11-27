@@ -31,9 +31,10 @@ class CreateContest extends StatefulWidget {
   final League league;
   final List<MyTeam> myTeams;
   final sportsType;
+  final String launchPageSource;
 
 
-  CreateContest({this.league, this.l1data, this.myTeams, this.sportsType});
+  CreateContest({this.league, this.l1data, this.myTeams, this.sportsType,this.launchPageSource});
 
   @override
   State<StatefulWidget> createState() => CreateContestState();
@@ -163,7 +164,7 @@ class CreateContestState extends State<CreateContest> {
         scaffoldKey: _scaffoldKey,
         createContestPayload: payload,
         sportsType:widget.sportsType,
-        launchPageSource:"l2"
+        launchPageSource: (widget.launchPageSource !=null && widget.launchPageSource=="joinedContests") ? "jc_cc" :"l1"
       );
 
       // final result = await showDialog(

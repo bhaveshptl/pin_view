@@ -493,7 +493,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
             sportsType: _sportType,
             league: widget.league,
             scaffoldKey: _scaffoldKey,
-            launchPageSource: "l2");
+            launchPageSource: widget.launchPageSource !=null ? widget.launchPageSource:"l2");
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
@@ -514,7 +514,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
               sportsType: _sportType,
               league: widget.league,
               scaffoldKey: _scaffoldKey,
-              launchPageSource: "l2");
+              launchPageSource:widget.launchPageSource !=null ? widget.launchPageSource:"l2");
         }
       }
     }

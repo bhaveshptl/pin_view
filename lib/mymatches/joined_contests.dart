@@ -332,6 +332,7 @@ class JoinedContestsState extends State<JoinedContests>
           myTeams: _myTeams,
           mapContestTeams:
               _mapContestTeams != null ? _mapContestTeams[contest.id] : null,
+          launchPageSource: "joinedContests" 
         ),
       ),
     );
@@ -561,6 +562,7 @@ class JoinedContestsState extends State<JoinedContests>
               l1data: _l1Data,
               myTeams: _myTeams,
               league: widget.league,
+              launchPageSource: "joinedContests",
             ),
           ),
         );
