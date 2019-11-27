@@ -127,10 +127,11 @@ class UpcomingHowzatContest extends StatelessWidget {
                   ColorButton(
                     onPressed: (bIsContestFull || onJoin == null)
                         ? null
-                        : () {
+                        :contest.joined==contest.size ? null: () {
                             onJoin(contest);
                           },
                     elevation: 0.0,
+                    color:contest.joined==contest.size ? Colors.black26 :Color.fromRGBO(70, 165, 12, 1),
                     padding: EdgeInsets.all(0.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,

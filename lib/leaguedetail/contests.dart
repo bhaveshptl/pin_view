@@ -477,7 +477,8 @@ class ContestsState extends State<Contests> {
             myTeams: _myTeams,
             league: widget.league,
             scaffoldKey: widget.scaffoldKey,
-            launchPageSource: "l1");
+            launchPageSource: "l1"
+            );
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
@@ -498,7 +499,8 @@ class ContestsState extends State<Contests> {
               sportsType: widget.sportsType,
               league: widget.league,
               scaffoldKey: widget.scaffoldKey,
-              launchPageSource: "l1");
+              launchPageSource: "l1"
+              );
         }
       }
     }

@@ -96,15 +96,26 @@ class ActionUtil {
         final response = json.decode(result);
         if (!response["error"]) {
           final createdContest = Contest.fromJson(response["contest"]);
-          Navigator.of(scaffoldKey.currentContext).pushReplacement(
+          final contestDetailsResult = await Navigator.of(scaffoldKey.currentContext).push(
             FantasyPageRoute(
               pageBuilder: (context) => ContestDetail(
                 l1Data: l1Data,
                 contest: createdContest,
                 league: league,
+                sportsType: sportsType,
+                myTeams: myTeams,
+                launchPageSource:"privateContest"
               ),
             ),
           );
+          
+          if (launchPageSource != null) {
+            onContestJoinSuccess(response["message"].toString(),
+                scaffoldKey.currentContext, l1Data, league,launchPageSource);
+          } else {
+            onContestJoinSuccess(response["message"].toString(),
+                scaffoldKey.currentContext, l1Data, league, "");   
+          }
         } else {
           final result = onJoinContestError(
             scaffoldKey.currentContext,
@@ -159,8 +170,8 @@ class ActionUtil {
           ),
         );
 
-        if(result !=null){
-           ActionUtil().showMsgOnTop(result.toString(), context);
+        if (result != null) {
+          ActionUtil().showMsgOnTop(result.toString(), context);
         }
       }
     }

@@ -160,6 +160,7 @@ class MyProfileState extends State<MyProfile> {
           _verificationStatus = "UNDER_REVIEW";
         } else if (kycStatus == "DOC_SUBMITTED" &&
             addressStatus == "VERIFIED") {
+          _verificationStatus = "UNDER_REVIEW";
         } else {
           _verificationStatus = "DOC_NOT_SUBMITTED";
         }
@@ -167,7 +168,7 @@ class MyProfileState extends State<MyProfile> {
     }
     if (_verificationStatus == "VERIFIED" ||
         _verificationStatus == "DOC_REJECTED" ||
-        _verificationStatus == "UNDER_REVIEW") {
+        _verificationStatus == "UNDER_REVIEW" || _verificationStatus=="DOC_SUBMITTED" ) {
       return false;
     } else {
       return true;

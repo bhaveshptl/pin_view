@@ -40,6 +40,7 @@ class ContestDetail extends StatefulWidget {
 
   final L1 l1Data;
   final List<MyTeam> myTeams;
+  final String launchPageSource;
 
   ContestDetail(
       {this.league,
@@ -47,7 +48,9 @@ class ContestDetail extends StatefulWidget {
       this.contest,
       this.myTeams,
       this.mapContestTeams,
-      this.sportsType});
+      this.sportsType,
+      this.launchPageSource
+      });
 
   @override
   State<StatefulWidget> createState() => ContestDetailState();
@@ -855,7 +858,12 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   }
 
   Future<bool> _onWillPop() async {
-    Navigator.of(context).pop(false);
+    if(widget.launchPageSource !=null &&   widget.launchPageSource=="privateContest"){
+     Navigator.of(context).pop();
+     Navigator.of(context).pop();
+    }else{
+       Navigator.of(context).pop();
+    }
     return false;
   }
 

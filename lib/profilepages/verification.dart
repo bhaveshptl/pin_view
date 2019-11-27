@@ -184,6 +184,7 @@ class VerificationState extends State<Verification> {
           _verificationStatus = "UNDER_REVIEW";
         } else if (kycStatus == "DOC_SUBMITTED" &&
             addressStatus == "VERIFIED") {
+               _verificationStatus = "UNDER_REVIEW";
         } else {
           _verificationStatus = "DOC_NOT_SUBMITTED";
         }
