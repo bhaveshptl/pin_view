@@ -23,29 +23,30 @@ class SimpleTextBox extends StatelessWidget {
   final EdgeInsetsGeometry contentPadding;
   final FormFieldValidator<String> validator;
   final List<TextInputFormatter> inputFormatters;
+  final TextCapitalization textCapitalization;
 
-  SimpleTextBox({
-    this.style,
-    this.enabled,
-    this.onSaved,
-    this.hintText,
-    this.focusNode,
-    this.labelText,
-    this.validator,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.color,
-    this.controller,
-    this.labelStyle,
-    this.borderColor,
-    this.borderWidth,
-    this.keyboardType,
-    this.contentPadding,
-    this.inputFormatters,
-    this.focusedBorderColor,
-    this.obscureText = false,
-    this.alwaysShowPlaceholder = true,
-  });
+  SimpleTextBox(
+      {this.style,
+      this.enabled,
+      this.onSaved,
+      this.hintText,
+      this.focusNode,
+      this.labelText,
+      this.validator,
+      this.prefixIcon,
+      this.suffixIcon,
+      this.color,
+      this.controller,
+      this.labelStyle,
+      this.borderColor,
+      this.borderWidth,
+      this.keyboardType,
+      this.contentPadding,
+      this.inputFormatters,
+      this.focusedBorderColor,
+      this.obscureText = false,
+      this.alwaysShowPlaceholder = true,
+      this.textCapitalization});
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +88,9 @@ class SimpleTextBox extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
+      textCapitalization: textCapitalization != null
+          ? textCapitalization
+          : TextCapitalization.none,
       decoration: InputDecoration(
         filled: true,
         hintText: hintText,

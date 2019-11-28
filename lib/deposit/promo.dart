@@ -597,6 +597,7 @@ class _PromoStateInput extends State<PromoInput> {
               hintText: "Enter promo".toUpperCase(),
               labelText: "Enter promo".toUpperCase(),
               controller: promoController,
+              textCapitalization:TextCapitalization.characters
               
             ),
           ),
