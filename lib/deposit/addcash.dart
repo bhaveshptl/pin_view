@@ -381,8 +381,7 @@ class AddCashState extends State<AddCash> {
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
-      print("<<<<<<<<<<<<<<TEch Process success Response");
-      print(response);
+     
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
@@ -1584,15 +1583,16 @@ class AddCashState extends State<AddCash> {
               ),
               padding: EdgeInsets.all(0),
               onPressed: () {
-                Event event = Event(name: "enter_code_button");
+                Event event = Event(name: "have_promo_code");
                 event.setDepositAmount(customAmountController.text == ""
                     ? 0
                     : int.parse(customAmountController.text));
                 event.setFirstDeposit(
                     widget.depositData.chooseAmountData.isFirstDeposit);
                 event.setIsOpening(true);
-                addAnalyticsEvent(event: event);
-
+                if(selectedPromo == null){
+                   addAnalyticsEvent(event: event);
+                }
                 launchPromoSelector();
               },
             ),

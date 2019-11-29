@@ -74,6 +74,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Map<String, dynamic> razorpayPayload;
+   Map<String, dynamic> techProcessPayload;
   /* Card payment UI */
   final _formKey = new GlobalKey<FormState>();
   TextEditingController cformNameOnCardController = TextEditingController();
@@ -295,7 +296,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       } else {
         Event event = Event(name: "pay_success");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(response["modeOptionId"]);
+        event.setModeOptionId(razorpayPayload["modeOptionId"]);
         event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
         event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
@@ -334,12 +335,12 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               "Fail".toLowerCase()) {
         Event event = Event(name: "pay_failed");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(razorpayPayload["modeOptionId"]);
-        event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
-        event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
+        event.setModeOptionId(techProcessPayload["modeOptionId"]);
+        event.setFirstDeposit(techProcessPayload["isFirstDeposit"]);
+        event.setGatewayId(int.parse(techProcessPayload["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
         event.setOrderId(response["orderId"] == null
-            ? razorpayPayload["orderId"]
+            ? techProcessPayload["orderId"]
             : response["orderId"]);
 
         AnalyticsManager().addEvent(event);
@@ -355,8 +356,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       } else {
         Event event = Event(name: "pay_success");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(response["modeOptionId"]);
-        event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
+        event.setModeOptionId(techProcessPayload["modeOptionId"]);
+        event.setFirstDeposit(techProcessPayload["isFirstDeposit"]);
         event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
         event.setOrderId(response["orderId"]);
@@ -708,12 +709,24 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     }
   }
 
+  clearCardPlaceholderDetails() {
+    cformNameOnTheCard = "";
+    cformCVV = null;
+    cformCardNumber = "";
+    cformExpMonth = "";
+    cformExpYear = "";
+    cformExpDate = "";
+    cFormIsValidDateEntered = false;
+    cformCardImagePath = " ";
+    cformSaveCardDetails = false;
+    cformNameOnCardController.text = " ";
+    cformCVVController.text ='';
+    cformCardNumberController.text = " ";
+    cformExpDateController.text = " ";
+  }
+
   onPaySecurely(Map<String, dynamic> paymentModeDetails, String type) async {
     String querParamString = '';
-    print("Gateway name>>>>>>>Check");
-    print(paymentModeDetails["info"]["gatewayId"]);
-    print(paymentModeDetails["info"]["gateway"]);
-
     Map<String, dynamic> payload = {
       "channelId": AppConfig.of(context).channelId,
       "orderId": null,
@@ -792,6 +805,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       var dateNow = new DateTime.now();
       var formatter = new DateFormat('dd-MM-yyyy');
       String formattedDate = formatter.format(dateNow);
+      techProcessPayload=payload;
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
@@ -926,7 +940,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         } catch (e) {
           print(e);
         }
-
         Navigator.of(context).pop(result);
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
@@ -1538,7 +1551,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               event.setPaymentType(type["type"]);
 
               AnalyticsManager().addEvent(event);
-
+              clearCardPlaceholderDetails();
               setState(() {
                 lastPaymentExpanded = !lastPaymentExpanded;
               });
@@ -1666,6 +1679,18 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 padding: EdgeInsets.all(0.0),
                 onPressed: () {
                   if (paymentTypeData != null) {
+                    Event event = Event(name: "pay_mode_select");
+                    event.setDepositAmount(widget.amount);
+                    event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+                    event.setFLEM(getFLEM());
+                    event.setPayModeExpanded(
+                        _selectedPaymentModeType == paymentTypeData["type"]);
+                    event.setPaymentType(paymentTypeData["type"]);
+
+                    AnalyticsManager().addEvent(event);
+                    print(" clearCardPlaceholderDetails is about to call");
+                    lastPaymentExpanded = false;
+                    clearCardPlaceholderDetails();
                     if (_selectedPaymentModeType == paymentTypeData["type"]) {
                       setState(() {
                         _selectedPaymentModeType = " ";
@@ -1719,7 +1744,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     ));
   }
 
-  getExpandableCardPaymentWidget(
+  getExpandableCardPaymentWidgetHeader(
       dynamic paymentTypeData, dynamic selectedPaymentData) {
     return Container(
         child: Column(
@@ -1731,6 +1756,17 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 padding: EdgeInsets.all(0.0),
                 onPressed: () {
                   if (paymentTypeData != null) {
+                    Event event = Event(name: "pay_mode_select");
+                    event.setDepositAmount(widget.amount);
+                    event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+                    event.setFLEM(getFLEM());
+                    event.setPayModeExpanded(
+                        _selectedPaymentModeType == paymentTypeData["type"]);
+                    event.setPaymentType(paymentTypeData["type"]);
+                    AnalyticsManager().addEvent(event);
+                    setState(() {
+                      clearCardPlaceholderDetails();
+                    });
                     if (_selectedPaymentModeType == paymentTypeData["type"]) {
                       setState(() {
                         _selectedPaymentModeType = " ";
@@ -1796,6 +1832,16 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             child: FlatButton(
               padding: EdgeInsets.all(0.0),
               onPressed: () {
+                Event event = Event(name: "pay_mode_select");
+                event.setDepositAmount(widget.amount);
+                event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
+                event.setFLEM(getFLEM());
+                event.setPayModeExpanded(
+                    _selectedPaymentModeType == paymentTypeData["type"]);
+                event.setPaymentType(paymentTypeData["type"]);
+
+                AnalyticsManager().addEvent(event);
+
                 if (validateUserInfo(paymentTypeData["type"])) {
                   setState(() {
                     _selectedPaymentModeType = paymentTypeData["type"];
@@ -1870,8 +1916,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           );
         }
         if (showCardDetailsUI && !isLastPaymentType) {
-          paymentModeWidgetItems.add(
-              getExpandableCardPaymentWidget(type, paymentModesListData[i]));
+          paymentModeWidgetItems.add(getExpandableCardPaymentWidgetHeader(
+              type, paymentModesListData[i]));
         }
         if (paymentBanksLength > 1 &&
             !isLastPaymentType &&
