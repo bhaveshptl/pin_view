@@ -1094,35 +1094,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     );
   }
 
-  getExpandablePaymentModes() {
-    var paymentModes = [];
-    Map<String, dynamic> lastPaymentArray = widget.paymentMode["choosePayment"]
-                ["userInfo"]["lastPaymentArray"] !=
-            null
-        ? widget.paymentMode["choosePayment"]["userInfo"]["lastPaymentArray"][0]
-        : {};
-    (widget.paymentMode["choosePayment"]["paymentInfo"]["paymentTypes"])
-        .forEach((type) {
-      /* Check for detailRequired is true any one of bank */
-      bool showCardDetailsUI = false;
-      (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]])
-          .forEach((bankType) {
-        if (bankType["info"]["detailRequired"]) {
-          showCardDetailsUI = true;
-        }
-      });
-      if (widget.paymentMode["choosePayment"]["paymentInfo"][type["type"]]
-                      .length >
-                  1 &&
-              lastPaymentArray["paymentType"] != type["type"] ||
-          showCardDetailsUI) {
-        paymentModes.add(type);
-      }
-    });
-
-    return paymentModes;
-  }
-
+  
   Form getCardPaymentFormWidget(String paymentType) {
     return Form(
         key: _formKey,
@@ -1432,7 +1404,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
 
               setState(() {
                 lastPaymentExpanded = !lastPaymentExpanded;
+                _selectedPaymentModeType = " ";
               });
+              
               FocusScope.of(context).requestFocus(new FocusNode());
             },
             children: [
@@ -1554,6 +1528,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               clearCardPlaceholderDetails();
               setState(() {
                 lastPaymentExpanded = !lastPaymentExpanded;
+                _selectedPaymentModeType = " ";
               });
               FocusScope.of(context).requestFocus(new FocusNode());
             },
@@ -1688,9 +1663,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     event.setPaymentType(paymentTypeData["type"]);
 
                     AnalyticsManager().addEvent(event);
-                    print(" clearCardPlaceholderDetails is about to call");
-                    lastPaymentExpanded = false;
-                    clearCardPlaceholderDetails();
+                                       setState(() {
+                      lastPaymentExpanded = false;
+                     clearCardPlaceholderDetails();
+                    });
                     if (_selectedPaymentModeType == paymentTypeData["type"]) {
                       setState(() {
                         _selectedPaymentModeType = " ";
@@ -1698,7 +1674,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     } else {
                       setState(() {
                         _selectedPaymentModeType = paymentTypeData["type"];
-
                         paymentModesListData.remove(selectedPaymentData);
                         paymentModesListData.insert(0, selectedPaymentData);
                       });
@@ -1764,8 +1739,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                         _selectedPaymentModeType == paymentTypeData["type"]);
                     event.setPaymentType(paymentTypeData["type"]);
                     AnalyticsManager().addEvent(event);
+                   
                     setState(() {
-                      clearCardPlaceholderDetails();
+                      lastPaymentExpanded = false;
+                     clearCardPlaceholderDetails();
                     });
                     if (_selectedPaymentModeType == paymentTypeData["type"]) {
                       setState(() {
@@ -1774,7 +1751,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     } else {
                       setState(() {
                         _selectedPaymentModeType = paymentTypeData["type"];
-
                         paymentModesListData.remove(selectedPaymentData);
                         paymentModesListData.insert(0, selectedPaymentData);
                       });
