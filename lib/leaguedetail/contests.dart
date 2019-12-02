@@ -698,6 +698,8 @@ class ContestsState extends State<Contests> {
                                   ),
                         ),
                         onTap: () {
+                          AnalyticsManager().setJourney("contest_journey");
+                          AnalyticsManager().setSource("l1_lobby");
                           Event event = Event(name: "l1_view_more_clicked");
                           event.setMatchSportType(widget.sportsType);
                           event.setMatchBrandId(brandContestList[index].brand["id"].toString());
@@ -713,8 +715,7 @@ class ContestsState extends State<Contests> {
                           }
                           event.setMatchFirstOrRepeatDepositor(isFirstOrRepeatDepositor);
                           addAnalyticsEvent(event: event);
-                          AnalyticsManager().setJourney("joincontest");
-                          AnalyticsManager().setSource("l1_lobby");
+                          
                           
                           setState(() {
                             if (showMoreContestBrandName !=
