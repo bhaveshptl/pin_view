@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/modal/account.dart';
+import 'package:playfantasy/modal/deposit.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -40,6 +41,7 @@ class LeagueDetail extends StatefulWidget {
   final Map<String, int> mapSportTypes;
   final bool activateDeepLinkingNavigation;
   final Account accountDetails;
+  final Deposit depositData;
   
   LeagueDetail(this.league,
       {this.leagues,
@@ -47,7 +49,8 @@ class LeagueDetail extends StatefulWidget {
       this.onSportChange,
       this.mapSportTypes,
       this.activateDeepLinkingNavigation,
-      this.accountDetails});
+      this.accountDetails,
+      this.depositData});
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -88,7 +91,6 @@ class LeagueDetailState extends State<LeagueDetail>
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _sportType = widget.sportType;
     _createL1WSObject();
-
     _getMyContests();
     tabController =
         TabController(length: bIsPredictionAvailable ? 2 : 1, vsync: this);
@@ -1040,6 +1042,7 @@ class LeagueDetailState extends State<LeagueDetail>
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
+                              depositData:widget.depositData
                             ),
                       predictionData == null
                           ? Container()
@@ -1070,7 +1073,8 @@ class LeagueDetailState extends State<LeagueDetail>
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
                               onContestTeamsUpdated:onContestTeamsUpdated,
-                              accountDetails:widget.accountDetails
+                              accountDetails:widget.accountDetails,
+                              depositData:widget.depositData
                             ),
                     ],
                   ),

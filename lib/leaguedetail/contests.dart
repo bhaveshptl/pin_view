@@ -5,9 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/modal/account.dart';
+import 'package:playfantasy/modal/analytics.dart';
+import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -28,6 +31,7 @@ class Contests extends StatefulWidget {
   final Map<int, List<MyTeam>> mapContestTeams;
   final Function onContestTeamsUpdated;
   final Account accountDetails;
+  final Deposit depositData;
 
   Contests(
       {this.league,
@@ -38,7 +42,8 @@ class Contests extends StatefulWidget {
       this.scaffoldKey,
       this.mapContestTeams,
       this.onContestTeamsUpdated,
-      this.accountDetails});
+      this.accountDetails,
+      this.depositData});
 
   @override
   State<StatefulWidget> createState() => ContestsState();
@@ -69,7 +74,11 @@ class ContestsState extends State<Contests> {
     _myTeams = widget.myTeams;
     setContestsByCategory(widget.l1Data.contests);
     _streamSubscription =
-        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg); 
+  }
+
+  addAnalyticsEvent({Event event}) {
+    AnalyticsManager().addEvent(event);
   }
 
   setContestsByCategory(List<Contest> contests) async {
@@ -126,18 +135,20 @@ class ContestsState extends State<Contests> {
         for (var i = 0; i < brandContestsLength; i++) {
           entryFeeList[i] = brandContests[i].entryFee;
           int entryFee = (brandContests[i].entryFee * 100).toInt();
-          if (entryFee > userBalance &&
-              (entryFee < upperEntryFee || upperEntryFee == -1)) {
-            upperEntryFee = entryFee;
-            upperNBDContestId = brandContests[i].id;
-          }
-          if (entryFee == userBalance) {
-            equalEntryFeeContestId = brandContests[i].id;
-          }
-          if (entryFee < userBalance &&
-              (entryFee > lowerEntryFee || lowerEntryFee == -1)) {
-            lowerEntryFee = entryFee;
-            lowerNBDContestId = brandContests[i].id;
+          if (!brandContests[i].brandPriority) {
+            if (entryFee > userBalance &&
+                (entryFee < upperEntryFee || upperEntryFee == -1)) {
+              upperEntryFee = entryFee;
+              upperNBDContestId = brandContests[i].id;
+            }
+            if (entryFee == userBalance) {
+              equalEntryFeeContestId = brandContests[i].id;
+            }
+            if (entryFee < userBalance &&
+                (entryFee > lowerEntryFee || lowerEntryFee == -1)) {
+              lowerEntryFee = entryFee;
+              lowerNBDContestId = brandContests[i].id;
+            }
           }
         }
 
@@ -146,7 +157,8 @@ class ContestsState extends State<Contests> {
           int entryFee = (brandContests[i].entryFee * 100).toInt();
           if ((entryFee < lowerEntryFee) &&
               (entryFee < userBalance) &&
-              (entryFee > lowerButOneEntryFee || lowerButOneEntryFee == -1)) {
+              (entryFee > lowerButOneEntryFee || lowerButOneEntryFee == -1) &&
+              !brandContests[i].brandPriority) {
             lowerButOneEntryFee = entryFee;
             lowerButOneNBDContestId = brandContests[i].id;
           }
@@ -477,8 +489,7 @@ class ContestsState extends State<Contests> {
             myTeams: _myTeams,
             league: widget.league,
             scaffoldKey: widget.scaffoldKey,
-            launchPageSource: "l1"
-            );
+            launchPageSource: "l1");
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
@@ -499,8 +510,7 @@ class ContestsState extends State<Contests> {
               sportsType: widget.sportsType,
               league: widget.league,
               scaffoldKey: widget.scaffoldKey,
-              launchPageSource: "l1"
-              );
+              launchPageSource: "l1");
         }
       }
     }
@@ -663,7 +673,9 @@ class ContestsState extends State<Contests> {
                       moreContestBrandsShowMap[_contests[index].brand["info"]]
                   ? getContestCards(index, bShowBrandInfo)
                   : Container(),
-              _contests[index].bisLastContestOfBrand && showMoreContestsButton && !moreContestBrandsShowMap[_contests[index].brand["info"]]
+              _contests[index].bisLastContestOfBrand &&
+                      showMoreContestsButton &&
+                      !moreContestBrandsShowMap[_contests[index].brand["info"]]
                   ? Container(
                       padding: EdgeInsets.only(right: 20),
                       width: MediaQuery.of(context).size.width,
@@ -686,12 +698,31 @@ class ContestsState extends State<Contests> {
                                   ),
                         ),
                         onTap: () {
+                          Event event = Event(name: "l1_view_more_clicked");
+                          event.setMatchSportType(widget.sportsType);
+                          event.setMatchBrandId(brandContestList[index].brand["id"].toString());
+                          event.setMatchLeagueId(brandContestList[index].leagueId);
+                          event.setMatchStartTime(brandContestList[index].startTime);
+                          int isFirstOrRepeatDepositor=0;
+                          if(widget.depositData !=null){
+                             if(widget.depositData.chooseAmountData.isFirstDeposit){
+                               isFirstOrRepeatDepositor=0;
+                             }else{
+                               isFirstOrRepeatDepositor=1;
+                             }  
+                          }
+                          event.setMatchFirstOrRepeatDepositor(isFirstOrRepeatDepositor);
+                          addAnalyticsEvent(event: event);
+                          AnalyticsManager().setJourney("joincontest");
+                          AnalyticsManager().setSource("l1_lobby");
+                          
                           setState(() {
                             if (showMoreContestBrandName !=
                                 _contests[index].brand["info"]) {
                               showMoreContestBrandName =
                                   _contests[index].brand["info"];
-                            moreContestBrandsShowMap[_contests[index].brand["info"]]=true;      
+                              moreContestBrandsShowMap[
+                                  _contests[index].brand["info"]] = true;
                             } else {
                               showMoreContestBrandName = " ";
                             }

@@ -137,6 +137,23 @@ class Event {
   setPaymentOptionType(String type) {
     this.s3 = type;
   }
+  
+  setMatchStartTime(int matchStartTime){
+    this.v1=matchStartTime;
+  }
+  setMatchLeagueId(int leagueId){
+    this.v2=leagueId;
+  }
+  setMatchFirstOrRepeatDepositor(int first_or_repeat_depositor){
+    this.v3=first_or_repeat_depositor;
+  }
+  setMatchSportType(int sport_type){
+    this.v4=sport_type;
+  }
+  setMatchBrandId(String brand_id){
+    this.s1=brand_id;
+  }
+  
 }
 
 class Visit {

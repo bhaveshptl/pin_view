@@ -12,6 +12,7 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 import 'package:playfantasy/modal/account.dart';
+import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/profilepages/verification.dart';
@@ -84,8 +85,8 @@ class LobbyState extends State<Lobby>
     }
     _mapSportTypes = sports.mapSports;
     _sportType = _mapSportTypes[_mapSportTypes.keys.toList()[0]];
-     
-     deepLinkingNavigationManager();
+
+    deepLinkingNavigationManager();
     _controller = TabController(
         vsync: this,
         length: _mapSportTypes.length,
@@ -103,12 +104,7 @@ class LobbyState extends State<Lobby>
     });
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
-  
-     
-}
-
-
-
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -125,8 +121,6 @@ class LobbyState extends State<Lobby>
     }
     super.didChangeDependencies();
   }
-
-  
 
   _showUpdatingAppDialog(String url) {
     showDialog(
@@ -148,17 +142,17 @@ class LobbyState extends State<Lobby>
     }
     return double.tryParse(str) != null;
   }
+
   deepLinkingNavigationManager() {
     if (widget.activateDeepLinkingNavigation != null) {
       if (widget.activateDeepLinkingNavigation) {
         deactivateDeepLinkingNavigation = false;
-        deepLinkingNavigationData=widget.deepLinkingNavigationData;
+        deepLinkingNavigationData = widget.deepLinkingNavigationData;
         try {
           if (deepLinkingNavigationData != null) {
-            String type =
-                deepLinkingNavigationData["dl_sport_type"] != null
-                    ? deepLinkingNavigationData["dl_sport_type"]
-                    : 0;
+            String type = deepLinkingNavigationData["dl_sport_type"] != null
+                ? deepLinkingNavigationData["dl_sport_type"]
+                : 0;
             int sportTypeFromDeepLinking = int.parse(type);
             if (sportTypeFromDeepLinking == 1) {
               _sportType = _mapSportTypes["CRICKET"];
@@ -202,10 +196,9 @@ class LobbyState extends State<Lobby>
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
       if (deepLinkingNavigationData != null) {
-        String routePage =
-            deepLinkingNavigationData["dl_page_route"] != null
-                ? deepLinkingNavigationData["dl_page_route"]
-                : "";
+        String routePage = deepLinkingNavigationData["dl_page_route"] != null
+            ? deepLinkingNavigationData["dl_page_route"]
+            : "";
         switch (routePage) {
           case "earnCash":
             deactivateDeepLinkingNavigation = true;
@@ -221,8 +214,7 @@ class LobbyState extends State<Lobby>
                 .deepLinkingNavigationData["dl_ac_promoamount"]
                 .toString();
             String dl_unique_id = "deeplinking";
-            dl_unique_id =
-                deepLinkingNavigationData["dl_unique_id"].toString();
+            dl_unique_id = deepLinkingNavigationData["dl_unique_id"].toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
               promoAmountDouble = double.parse(promoAmountString);
@@ -325,11 +317,15 @@ class LobbyState extends State<Lobby>
     }
   }
 
-  launchL1ByDeepLinking(
-      BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) async{
-        Map<String, dynamic> accountData = await getUserAccountsData();
+  launchL1ByDeepLinking(BuildContext context, List<League> _leaguesList,
+      int leagueIdFromDLData) async {
+    Map<String, dynamic> accountData = await getUserAccountsData();
+    Map<String, dynamic> depositDataMap = await getUserDepositsData();
     Account accountDetails = Account();
+    Deposit depositData = Deposit();
     accountDetails = Account.fromJson(accountData);
+    depositData = Deposit.fromJson(depositDataMap);
+
     if (_leaguesList != null) {
       for (var league in _leaguesList) {
         if (league.leagueId == leagueIdFromDLData) {
@@ -340,7 +336,7 @@ class LobbyState extends State<Lobby>
                   sportType: _sportType,
                   onSportChange: _onSportSelectionChaged,
                   mapSportTypes: _mapSportTypes,
-                  accountDetails:accountDetails),
+                  accountDetails: accountDetails),
             ),
           );
         }
@@ -348,7 +344,7 @@ class LobbyState extends State<Lobby>
     }
   }
 
-  getUserAccountsData() async{
+  getUserAccountsData() async {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
@@ -358,22 +354,41 @@ class LobbyState extends State<Lobby>
     return HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
-           
-             return json.decode(res.body);
-           
-        } else if (res.statusCode >= 400 &&
-            res.statusCode <= 499 
-            ) {
-              return null;
-                  }
+          return json.decode(res.body);
+        } else if (res.statusCode >= 400 && res.statusCode <= 499) {
+          return null;
+        }
       },
     );
   }
 
+  getUserDepositsData() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.DEPOSIT_INFO,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          return json.decode(res.body);
+        } else if (res.statusCode >= 400 && res.statusCode <= 499) {
+          return null;
+        }
+      },
+    );
+  }
 
-  launchCreateTeamDeepLinking(
-      BuildContext context, List<League> _leaguesList, int leagueIdFromDLData) {
+  launchCreateTeamDeepLinking(BuildContext context, List<League> _leaguesList,
+      int leagueIdFromDLData) async {
     if (_leaguesList != null) {
+      Map<String, dynamic> accountData = await getUserAccountsData();
+      Map<String, dynamic> depositDataMap = await getUserDepositsData();
+      Account accountDetails = Account();
+      Deposit depositData = Deposit();
+      accountDetails = Account.fromJson(accountData);
+      depositData = Deposit.fromJson(depositDataMap);
       for (var league in _leaguesList) {
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
@@ -383,7 +398,9 @@ class LobbyState extends State<Lobby>
                   sportType: _sportType,
                   onSportChange: _onSportSelectionChaged,
                   mapSportTypes: _mapSportTypes,
-                  activateDeepLinkingNavigation: true),
+                  activateDeepLinkingNavigation: true,
+                  accountDetails:accountDetails,
+                  depositData:depositData),
             ),
           );
         }
