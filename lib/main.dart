@@ -21,14 +21,14 @@ disableDeviceRotation() {
 /// Bootstraping APP.
 ///
 void main() async {
-  String channelId = "13";
-  const apiBaseUrl = "https://www.howzat.com";
-  String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_prod';
- 
+  String channelId = "10";
+  const apiBaseUrl = "https://stage.howzat.com";
+  String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';
+
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   String appVersion = packageInfo.version.toString();
   bool isIos = Platform.isIOS;
-  
+
   disableDeviceRotation();
 
   HttpManager.channelId = channelId;

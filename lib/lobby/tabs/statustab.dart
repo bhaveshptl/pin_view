@@ -11,6 +11,7 @@ import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 class StatusTab extends StatelessWidget {
   final int sportType;
   final int leagueStatus;
+  final double cashBalance;
   final Function onSportChange;
   final List<League> allLeagues;
   final List<League> statusLeagues;
@@ -24,6 +25,7 @@ class StatusTab extends StatelessWidget {
     this.statusLeagues,
     this.onSportChange,
     this.mapSportTypes,
+    this.cashBalance,
     this.onLeagueStatusChanged,
   });
 
@@ -38,12 +40,13 @@ class StatusTab extends StatelessWidget {
     Navigator.of(context).push(
       FantasyPageRoute(
         pageBuilder: (context) => LeagueDetail(
-              league,
-              leagues: allLeagues,
-              sportType: sportType,
-              onSportChange: onSportChange,
-              mapSportTypes: mapSportTypes,
-            ),
+          league,
+          leagues: allLeagues,
+          sportType: sportType,
+          onSportChange: onSportChange,
+          mapSportTypes: mapSportTypes,
+          cashBalance: cashBalance,
+        ),
       ),
     );
   }

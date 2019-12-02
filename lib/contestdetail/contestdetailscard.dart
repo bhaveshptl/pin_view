@@ -565,6 +565,20 @@ class ContestDetailsCard extends StatelessWidget {
                                 ],
                               ),
                             ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FlatButton(
+                            onPressed: () {
+                              onShareContest();
+                            },
+                            child: Container(
+                              height: 48.0,
+                              child: Image.asset("images/Share_Icon.png"),
+                            ),
+                          )
+                        ],
+                      )
                     ],
                   ),
           ],

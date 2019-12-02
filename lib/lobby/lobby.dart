@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
@@ -83,8 +84,8 @@ class LobbyState extends State<Lobby>
     }
     _mapSportTypes = sports.mapSports;
     _sportType = _mapSportTypes[_mapSportTypes.keys.toList()[0]];
-     
-     deepLinkingNavigationManager();
+
+    deepLinkingNavigationManager();
     _controller = TabController(
         vsync: this,
         length: _mapSportTypes.length,
@@ -102,12 +103,7 @@ class LobbyState extends State<Lobby>
     });
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
-  
-     
-}
-
-
-
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -124,8 +120,6 @@ class LobbyState extends State<Lobby>
     }
     super.didChangeDependencies();
   }
-
-  
 
   _showUpdatingAppDialog(String url) {
     showDialog(
@@ -147,17 +141,17 @@ class LobbyState extends State<Lobby>
     }
     return double.tryParse(str) != null;
   }
+
   deepLinkingNavigationManager() {
     if (widget.activateDeepLinkingNavigation != null) {
       if (widget.activateDeepLinkingNavigation) {
         deactivateDeepLinkingNavigation = false;
-        deepLinkingNavigationData=widget.deepLinkingNavigationData;
+        deepLinkingNavigationData = widget.deepLinkingNavigationData;
         try {
           if (deepLinkingNavigationData != null) {
-            String type =
-                deepLinkingNavigationData["dl_sport_type"] != null
-                    ? deepLinkingNavigationData["dl_sport_type"]
-                    : 0;
+            String type = deepLinkingNavigationData["dl_sport_type"] != null
+                ? deepLinkingNavigationData["dl_sport_type"]
+                : 0;
             int sportTypeFromDeepLinking = int.parse(type);
             if (sportTypeFromDeepLinking == 1) {
               _sportType = _mapSportTypes["CRICKET"];
@@ -201,10 +195,9 @@ class LobbyState extends State<Lobby>
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
       if (deepLinkingNavigationData != null) {
-        String routePage =
-            deepLinkingNavigationData["dl_page_route"] != null
-                ? deepLinkingNavigationData["dl_page_route"]
-                : "";
+        String routePage = deepLinkingNavigationData["dl_page_route"] != null
+            ? deepLinkingNavigationData["dl_page_route"]
+            : "";
         switch (routePage) {
           case "earnCash":
             deactivateDeepLinkingNavigation = true;
@@ -220,8 +213,7 @@ class LobbyState extends State<Lobby>
                 .deepLinkingNavigationData["dl_ac_promoamount"]
                 .toString();
             String dl_unique_id = "deeplinking";
-            dl_unique_id =
-                deepLinkingNavigationData["dl_unique_id"].toString();
+            dl_unique_id = deepLinkingNavigationData["dl_unique_id"].toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
               promoAmountDouble = double.parse(promoAmountString);
@@ -331,11 +323,14 @@ class LobbyState extends State<Lobby>
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
             FantasyPageRoute(
-              pageBuilder: (context) => LeagueDetail(league,
-                  leagues: _leagues,
-                  sportType: _sportType,
-                  onSportChange: _onSportSelectionChaged,
-                  mapSportTypes: _mapSportTypes),
+              pageBuilder: (context) => LeagueDetail(
+                league,
+                leagues: _leagues,
+                sportType: _sportType,
+                onSportChange: _onSportSelectionChaged,
+                mapSportTypes: _mapSportTypes,
+                cashBalance: userBalance,
+              ),
             ),
           );
         }
@@ -350,12 +345,15 @@ class LobbyState extends State<Lobby>
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
             FantasyPageRoute(
-              pageBuilder: (context) => LeagueDetail(league,
-                  leagues: _leagues,
-                  sportType: _sportType,
-                  onSportChange: _onSportSelectionChaged,
-                  mapSportTypes: _mapSportTypes,
-                  activateDeepLinkingNavigation: true),
+              pageBuilder: (context) => LeagueDetail(
+                league,
+                leagues: _leagues,
+                sportType: _sportType,
+                onSportChange: _onSportSelectionChaged,
+                mapSportTypes: _mapSportTypes,
+                cashBalance: userBalance,
+                activateDeepLinkingNavigation: true,
+              ),
             ),
           );
         }
@@ -827,6 +825,7 @@ class LobbyState extends State<Lobby>
                             },
                             onSportChange: _onSportSelectionChaged,
                             mapSportTypes: _mapSportTypes,
+                            cashBalance: userBalance,
                           ),
                         ),
                       ],
@@ -886,7 +885,12 @@ class LobbyState extends State<Lobby>
         appBar: AppBar(
           elevation: 0.0,
           actions: <Widget>[
-            Container(),
+            AddCashButton(
+              text: formatCurrency.format(userBalance),
+              onPressed: () {
+                _launchAddCash(source: "topright");
+              },
+            ),
           ],
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -907,45 +911,51 @@ class LobbyState extends State<Lobby>
                   ),
                 ],
               ),
-              ColorButton(
-                padding: EdgeInsets.only(
-                    left: 8.0, right: 6.0, top: 6.0, bottom: 6.0),
-                color: Color.fromRGBO(125, 13, 13, 1),
-                elevation: 6.0,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: Color.fromRGBO(70, 165, 12, 1),
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Image.asset(
-                      "images/add-cash-header.png",
-                      height: 24.0,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        formatCurrency.format(userBalance),
-                        style:
-                            Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                      ),
-                    ),
-                    Image.asset(
-                      "images/header_add.png",
-                      height: 30.0,
-                    ),
-                  ],
-                ),
-                onPressed: () {
-                  _launchAddCash(source: "topright");
-                },
-              ),
+              // AddCashButton(
+              //   text: formatCurrency.format(userBalance),
+              //   onPressed: () {
+              //     _launchAddCash(source: "topright");
+              //   },
+              // ),
+              // ColorButton(
+              //   padding: EdgeInsets.only(
+              //       left: 8.0, right: 6.0, top: 6.0, bottom: 6.0),
+              //   color: Color.fromRGBO(125, 13, 13, 1),
+              //   elevation: 6.0,
+              //   shape: RoundedRectangleBorder(
+              //     side: BorderSide(
+              //       color: Color.fromRGBO(70, 165, 12, 1),
+              //       width: 1.5,
+              //     ),
+              //     borderRadius: BorderRadius.circular(24.0),
+              //   ),
+              //   child: Row(
+              //     children: <Widget>[
+              //       Image.asset(
+              //         "images/add-cash-header.png",
+              //         height: 24.0,
+              //       ),
+              //       Padding(
+              //         padding: EdgeInsets.symmetric(horizontal: 8.0),
+              //         child: Text(
+              //           formatCurrency.format(userBalance),
+              //           style:
+              //               Theme.of(context).primaryTextTheme.subhead.copyWith(
+              //                     color: Colors.white,
+              //                     fontWeight: FontWeight.w700,
+              //                   ),
+              //         ),
+              //       ),
+              //       Image.asset(
+              //         "images/header_add.png",
+              //         height: 30.0,
+              //       ),
+              //     ],
+              //   ),
+              //   onPressed: () {
+              //     _launchAddCash(source: "topright");
+              //   },
+              // ),
               // InkWell(
               //   onTap: () {
               //     Navigator.of(context).push(

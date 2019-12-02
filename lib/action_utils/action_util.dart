@@ -106,6 +106,7 @@ class ActionUtil {
             ),
           );
         } else {
+          balance["cashBalance"] -= contest.entryFee;
           final result = onJoinContestError(
             scaffoldKey.currentContext,
             contest,
@@ -126,23 +127,45 @@ class ActionUtil {
         }
       } else if (result != null) {
         if (launchPageSource != null) {
-          onContestJoinSuccess(result.toString(), scaffoldKey.currentContext,
-              l1Data, league, launchPageSource);
+          onContestJoinSuccess(
+            result.toString(),
+            scaffoldKey.currentContext,
+            l1Data,
+            league,
+            launchPageSource,
+            balance,
+          );
         } else {
-          onContestJoinSuccess(result.toString(), scaffoldKey.currentContext,
-              l1Data, league, "");
+          onContestJoinSuccess(
+            result.toString(),
+            scaffoldKey.currentContext,
+            l1Data,
+            league,
+            "",
+            balance,
+          );
         }
       }
     }
   }
 
-  onContestJoinSuccess(String message, BuildContext context, L1 l1Data,
-      League league, String launchPageSource) async {
+  onContestJoinSuccess(
+    String message,
+    BuildContext context,
+    L1 l1Data,
+    League league,
+    String launchPageSource,
+    Map<String, dynamic> balance,
+  ) async {
     Map<String, dynamic> result = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return JoinContestSuccess(
-            successMessage: message, launchPageSource: launchPageSource);
+          l1Data: l1Data,
+          balance: balance,
+          successMessage: message,
+          launchPageSource: launchPageSource,
+        );
       },
     );
 
@@ -159,8 +182,8 @@ class ActionUtil {
           ),
         );
 
-        if(result !=null){
-           ActionUtil().showMsgOnTop(result.toString(), context);
+        if (result != null) {
+          ActionUtil().showMsgOnTop(result.toString(), context);
         }
       }
     }

@@ -11,12 +11,14 @@ class LobbyWidget extends StatefulWidget {
   final Function onLeagues;
   final Function onSportChange;
   final Map<String, int> mapSportTypes;
+  final double cashBalance;
 
   LobbyWidget({
     this.sportType = 1,
     this.onLeagues,
     this.onSportChange,
     this.mapSportTypes,
+    this.cashBalance,
   });
 
   @override
@@ -243,6 +245,7 @@ class LobbyWidgetState extends State<LobbyWidget> with WidgetsBindingObserver {
                       onSportChange: widget.onSportChange,
                       leagueStatus: LeagueStatus.UPCOMING,
                       mapSportTypes: widget.mapSportTypes,
+                      cashBalance: widget.cashBalance,
                       onLeagueStatusChanged: () {
                         _seperateLeaguesByRunningStatus(_allLeagues);
                       }),
