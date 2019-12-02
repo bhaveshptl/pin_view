@@ -1840,11 +1840,11 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     paymentModesListData.remove(selectedPaymentData);
                     paymentModesListData.insert(0, selectedPaymentData);
                   });
+                  onPaySecurely(
+                      widget.paymentMode["choosePayment"]["paymentInfo"]
+                          [paymentTypeData["type"]][0],
+                      paymentTypeData["type"]);
                 }
-                onPaySecurely(
-                    widget.paymentMode["choosePayment"]["paymentInfo"]
-                        [paymentTypeData["type"]][0],
-                    paymentTypeData["type"]);
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
