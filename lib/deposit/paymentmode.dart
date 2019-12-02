@@ -74,7 +74,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Map<String, dynamic> razorpayPayload;
-   Map<String, dynamic> techProcessPayload;
+  Map<String, dynamic> techProcessPayload;
+  Map<String, dynamic> initPayPayload;
+  Map<String, dynamic> paymentPayload;
   /* Card payment UI */
   final _formKey = new GlobalKey<FormState>();
   TextEditingController cformNameOnCardController = TextEditingController();
@@ -337,7 +339,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         event.setDepositAmount(widget.amount);
         event.setModeOptionId(techProcessPayload["modeOptionId"]);
         event.setFirstDeposit(techProcessPayload["isFirstDeposit"]);
-        event.setGatewayId(int.parse(techProcessPayload["gatewayId"].toString()));
+        event.setGatewayId(
+            int.parse(techProcessPayload["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
         event.setOrderId(response["orderId"] == null
             ? techProcessPayload["orderId"]
@@ -640,6 +643,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       event.setGatewayId(int.parse(
           selectedPaymentMethod[paymentType]["info"]["gatewayId"].toString()));
       event.setFLEM(getFLEM());
+      event.setPromoCode(widget.promoCode);
 
       AnalyticsManager().addEvent(event);
 
@@ -655,6 +659,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           selectedPaymentMethod[paymentType]["info"]["gatewayId"].toString()));
       event.setFLEM(getFLEM());
       event.setErrorMessage("First name is required to proceed.");
+      event.setPromoCode(widget.promoCode);
 
       AnalyticsManager().addEvent(event);
 
@@ -671,6 +676,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           selectedPaymentMethod[paymentType]["info"]["gatewayId"].toString()));
       event.setFLEM(getFLEM());
       event.setErrorMessage("Mobile number is required to proceed.");
+      event.setPromoCode(widget.promoCode);
 
       AnalyticsManager().addEvent(event);
 
@@ -688,6 +694,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
           selectedPaymentMethod[paymentType]["info"]["gatewayId"].toString()));
       event.setFLEM(getFLEM());
       event.setErrorMessage("Email id is required to proceed.");
+      event.setPromoCode(widget.promoCode);
 
       AnalyticsManager().addEvent(event);
 
@@ -702,6 +709,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       event.setGatewayId(int.parse(
           selectedPaymentMethod[paymentType]["info"]["gatewayId"].toString()));
       event.setFLEM(getFLEM());
+      event.setPromoCode(widget.promoCode);
 
       AnalyticsManager().addEvent(event);
 
@@ -720,7 +728,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     cformCardImagePath = " ";
     cformSaveCardDetails = false;
     cformNameOnCardController.text = " ";
-    cformCVVController.text ='';
+    cformCVVController.text = '';
     cformCardNumberController.text = " ";
     cformExpDateController.text = " ";
   }
@@ -771,6 +779,8 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "native": true,
     };
 
+    paymentPayload=payload;
+
     Event event = Event(name: "pay_securely");
     event.setDepositAmount(widget.amount);
     event.setModeOptionId(payload["modeOptionId"]);
@@ -805,7 +815,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       var dateNow = new DateTime.now();
       var formatter = new DateFormat('dd-MM-yyyy');
       String formattedDate = formatter.format(dateNow);
-      techProcessPayload=payload;
+      techProcessPayload = payload;
       http.Request req = http.Request(
           "GET",
           Uri.parse(BaseUrl().apiUrl +
@@ -876,6 +886,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         showLoader(false);
       });
     } else {
+      initPayPayload = payload;
       initPayment(
           BaseUrl().apiUrl + ApiUtil.INIT_PAYMENT + querParamString, payload);
     }
@@ -911,7 +922,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         try {
           Event event = Event(name: "pay_failed");
           event.setDepositAmount(widget.amount);
-          event.setModeOptionId(response["modeOptionId"]);
+          event.setModeOptionId(initPayPayload["modeOptionId"]);
           event.setFirstDeposit(response["firstDepositor"] != "false");
           event.setGatewayId(int.parse(payload["gatewayId"].toString()));
           event.setPromoCode(widget.promoCode);
@@ -925,7 +936,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         try {
           Event event = Event(name: "pay_success");
           event.setDepositAmount(widget.amount);
-          event.setModeOptionId(response["modeOptionId"]);
+          event.setModeOptionId(initPayPayload["modeOptionId"]);
           event.setFirstDeposit(response["firstDepositor"] != "false");
           event.setUserBalance(
             double.parse(response["withdrawable"]) +
@@ -1069,7 +1080,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         return TransactionFailed(transactionResult, () {
           Event event = Event(name: "pay_failed_retry");
           event.setDepositAmount(widget.amount);
-          event.setModeOptionId(transactionResult["modeOptionId"]);
+          event.setModeOptionId(paymentPayload["modeOptionId"]);
           event.setFirstDeposit(transactionResult["firstDepositor"] != "false");
           event.setPromoCode(widget.promoCode);
           event.setOrderId(transactionResult["orderId"]);
@@ -1080,7 +1091,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         }, () {
           Event event = Event(name: "pay_failed_cancel");
           event.setDepositAmount(widget.amount);
-          event.setModeOptionId(transactionResult["modeOptionId"]);
+          event.setModeOptionId(paymentPayload["modeOptionId"]);
           event.setFirstDeposit(transactionResult["firstDepositor"] != "false");
           event.setPromoCode(widget.promoCode);
           event.setOrderId(transactionResult["orderId"]);
@@ -1427,6 +1438,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               event.setFLEM(getFLEM());
               event.setPayModeExpanded(isExpanded);
               event.setPaymentType(type["type"]);
+              event.setPromoCode(widget.promoCode);
 
               AnalyticsManager().addEvent(event);
 
@@ -1480,6 +1492,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                                   widget.paymentMode["isFirstDeposit"]);
                               event.setFLEM(getFLEM());
                               event.setPaymentOptionType(value["name"]);
+                              event.setPromoCode(widget.promoCode);
 
                               AnalyticsManager().addEvent(event);
 
@@ -1549,6 +1562,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               event.setFLEM(getFLEM());
               event.setPayModeExpanded(isExpanded);
               event.setPaymentType(type["type"]);
+              event.setPromoCode(widget.promoCode);
 
               AnalyticsManager().addEvent(event);
               clearCardPlaceholderDetails();
@@ -1615,6 +1629,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                   event.setFirstDeposit(widget.paymentMode["isFirstDeposit"]);
                   event.setFLEM(getFLEM());
                   event.setPaymentOptionType(value["name"]);
+                  event.setPromoCode(widget.promoCode);
 
                   AnalyticsManager().addEvent(event);
 
@@ -1686,6 +1701,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     event.setPayModeExpanded(
                         _selectedPaymentModeType == paymentTypeData["type"]);
                     event.setPaymentType(paymentTypeData["type"]);
+                    event.setPromoCode(widget.promoCode);
 
                     AnalyticsManager().addEvent(event);
                     print(" clearCardPlaceholderDetails is about to call");
@@ -1763,6 +1779,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     event.setPayModeExpanded(
                         _selectedPaymentModeType == paymentTypeData["type"]);
                     event.setPaymentType(paymentTypeData["type"]);
+                    event.setPromoCode(widget.promoCode);
                     AnalyticsManager().addEvent(event);
                     setState(() {
                       clearCardPlaceholderDetails();
@@ -1839,6 +1856,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 event.setPayModeExpanded(
                     _selectedPaymentModeType == paymentTypeData["type"]);
                 event.setPaymentType(paymentTypeData["type"]);
+                event.setPromoCode(widget.promoCode);
 
                 AnalyticsManager().addEvent(event);
 
