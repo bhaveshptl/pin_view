@@ -2880,6 +2880,7 @@ class AddCashState extends State<AddCash> {
         event.setFirstDeposit(
             widget.depositData.chooseAmountData.isFirstDeposit);
         event.setPaymentSuccess(bSuccess);
+        event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
 
         addAnalyticsEvent(event: event);
 
