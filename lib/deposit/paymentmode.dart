@@ -779,7 +779,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       "native": true,
     };
 
-    paymentPayload=payload;
+    paymentPayload = payload;
 
     Event event = Event(name: "pay_securely");
     event.setDepositAmount(widget.amount);
@@ -1105,7 +1105,6 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     );
   }
 
-  
   Form getCardPaymentFormWidget(String paymentType) {
     return Form(
         key: _formKey,
@@ -1418,7 +1417,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 lastPaymentExpanded = !lastPaymentExpanded;
                 _selectedPaymentModeType = " ";
               });
-              
+
               FocusScope.of(context).requestFocus(new FocusNode());
             },
             children: [
@@ -1679,9 +1678,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     event.setPromoCode(widget.promoCode);
 
                     AnalyticsManager().addEvent(event);
-                                       setState(() {
+                    setState(() {
                       lastPaymentExpanded = false;
-                     clearCardPlaceholderDetails();
+                      clearCardPlaceholderDetails();
                     });
                     if (_selectedPaymentModeType == paymentTypeData["type"]) {
                       setState(() {
@@ -1756,10 +1755,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                     event.setPaymentType(paymentTypeData["type"]);
                     event.setPromoCode(widget.promoCode);
                     AnalyticsManager().addEvent(event);
-                   
                     setState(() {
                       lastPaymentExpanded = false;
-                     clearCardPlaceholderDetails();
+                      clearCardPlaceholderDetails();
                     });
                     if (_selectedPaymentModeType == paymentTypeData["type"]) {
                       setState(() {

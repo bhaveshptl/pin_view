@@ -660,10 +660,10 @@ class ContestsState extends State<Contests> {
                   ? getContestCards(index, bShowBrandInfo)
                   : Container(),
               showMoreContestsButton &&
-                      showMoreContestBrandName == _contests[index].brand["info"]
+                      moreContestBrandsShowMap[_contests[index].brand["info"]]
                   ? getContestCards(index, bShowBrandInfo)
                   : Container(),
-              _contests[index].bisLastContestOfBrand && showMoreContestsButton
+              _contests[index].bisLastContestOfBrand && showMoreContestsButton && !moreContestBrandsShowMap[_contests[index].brand["info"]]
                   ? Container(
                       padding: EdgeInsets.only(right: 20),
                       width: MediaQuery.of(context).size.width,
@@ -676,7 +676,7 @@ class ContestsState extends State<Contests> {
                                           maxContestForEachBrand)
                                       .toString() +
                                   " more"
-                              : "View Less ",
+                              : " ",
                           textAlign: TextAlign.end,
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
@@ -691,6 +691,7 @@ class ContestsState extends State<Contests> {
                                 _contests[index].brand["info"]) {
                               showMoreContestBrandName =
                                   _contests[index].brand["info"];
+                            moreContestBrandsShowMap[_contests[index].brand["info"]]=true;      
                             } else {
                               showMoreContestBrandName = " ";
                             }
