@@ -32,6 +32,7 @@ void main() async {
   disableDeviceRotation();
 
   HttpManager.channelId = channelId;
+  HttpManager.appVersion = appVersion;
   final store = Store<LoaderModel>(
     showLoader,
     initialState: LoaderModel(isLoading: false),
