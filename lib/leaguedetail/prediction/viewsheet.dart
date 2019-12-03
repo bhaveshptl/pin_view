@@ -96,6 +96,7 @@ class ViewSheetState extends State<ViewSheet> {
   void _onEditSheet(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               selectedSheet: sheet,
@@ -114,6 +115,7 @@ class ViewSheetState extends State<ViewSheet> {
   void _onCloneSheet(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               selectedSheet: sheet,

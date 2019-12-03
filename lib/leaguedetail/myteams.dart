@@ -64,6 +64,7 @@ class MyTeamsState extends State<MyTeams> {
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: widget.l1Data,
@@ -81,6 +82,7 @@ class MyTeamsState extends State<MyTeams> {
   void _onEditTeam(BuildContext context, MyTeam team) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: widget.l1Data,
@@ -99,6 +101,7 @@ class MyTeamsState extends State<MyTeams> {
   void _onCloneTeam(BuildContext context, MyTeam team) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: widget.l1Data,
@@ -213,6 +216,7 @@ class MyTeamsState extends State<MyTeams> {
                       onPressed: () {
                         Navigator.of(context).push(
                           FantasyPageRoute(
+                            routeSettings: RouteSettings(name: "TeamPreview"),
                             pageBuilder: (BuildContext context) => TeamPreview(
                               myTeam: team,
                               allowEditTeam: true,

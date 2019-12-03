@@ -504,6 +504,7 @@ class CreateTeamState extends State<CreateTeam>
     });
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "ChooseCaptain"),
         pageBuilder: (context) => ChooseCaptain(
           captain: _captain,
           l1Data: widget.l1Data,
@@ -1244,6 +1245,7 @@ class CreateTeamState extends State<CreateTeam>
                         onPressed: () {
                           Navigator.of(context).push(
                             FantasyPageRoute(
+                              routeSettings: RouteSettings(name: "TeamPreview"),
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
                                 league: widget.league,

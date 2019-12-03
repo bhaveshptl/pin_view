@@ -798,6 +798,7 @@ class CreateSheetState extends State<CreateSheet>
     }
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "PredictionSummary"),
         pageBuilder: (context) => PredictionSummary(
               answers: answers,
               xBooster: xBooster,

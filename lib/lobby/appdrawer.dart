@@ -121,6 +121,7 @@ class AppDrawerState extends State<AppDrawer> {
   _onVerify() {
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "Verification"),
         pageBuilder: (context) => Verification(),
       ),
     );
@@ -129,6 +130,7 @@ class AppDrawerState extends State<AppDrawer> {
   _onMyProfile() async {
     await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "MyProfile"),
         pageBuilder: (context) => MyProfile(),
       ),
     );
@@ -210,6 +212,7 @@ class AppDrawerState extends State<AppDrawer> {
   _showPartnerPage() {
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "Partner"),
         pageBuilder: (context) => Partner(),
       ),
     );
@@ -218,6 +221,7 @@ class AppDrawerState extends State<AppDrawer> {
   _showContactUsPage() {
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "ContactUs"),
         pageBuilder: (context) => ContactUs(),
         fullscreenDialog: true,
       ),

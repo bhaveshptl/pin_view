@@ -497,6 +497,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "CreateTeam"),
             pageBuilder: (context) => CreateTeam(
               l1Data: _l1Data,
               league: widget.league,
@@ -529,6 +530,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
       waitToLoadL1ForViewTeam = false;
       Navigator.of(context).push(
         FantasyPageRoute(
+            routeSettings: RouteSettings(name: "ViewTeam"),
             pageBuilder: (context) => ViewTeam(
                   team: _team,
                   l1Data: _l1Data,
@@ -551,6 +553,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     }
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: _l1Data,
@@ -722,6 +725,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   onSwitchTeamPressed(MyTeam myTeam) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "SwitchMyContestTeams"),
         pageBuilder: (BuildContext context) => SwitchMyContestTeams(
           l1Data: _l1Data,
           oldTeam: myTeam,
@@ -1052,6 +1056,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                 showLoader(false);
                                 Navigator.of(context).push(
                                   FantasyPageRoute(
+                                    routeSettings: RouteSettings(name: "TeamPreview"),
                                     pageBuilder: (BuildContext context) =>
                                         TeamPreview(
                                       myTeam: myTeam,

@@ -328,6 +328,7 @@ class CreateContestState extends State<CreateContest> {
     Navigator.of(context).pop();
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: _l1Data,

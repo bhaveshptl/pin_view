@@ -286,6 +286,7 @@ class JoinContestState extends State<JoinContest> {
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: widget.l1Data,
@@ -492,6 +493,7 @@ class JoinContestState extends State<JoinContest> {
                                                 onTap: () {
                                                   Navigator.of(context).push(
                                                     FantasyPageRoute(
+                                                      routeSettings: RouteSettings(name: "TeamPreview"),
                                                       pageBuilder: (BuildContext
                                                               context) =>
                                                           TeamPreview(

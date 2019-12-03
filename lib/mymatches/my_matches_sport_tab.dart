@@ -149,7 +149,9 @@ class MyMatchesSportsTabState extends State<MyMatchesSportsTab>
                         onClick: (League league) {
                           ActionUtil().showLoader(context, true);
                           Navigator.of(context).push(
+                            
                             FantasyPageRoute(
+                              routeSettings: RouteSettings(name: "JoinedContests"),
                               pageBuilder: (BuildContext context) =>
                                   JoinedContests(
                                     league: league,

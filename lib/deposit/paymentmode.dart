@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
@@ -97,6 +98,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   FocusNode cformExpDateFocusnode = FocusNode();
   FocusNode cformNameFocusnode = FocusNode();
   FocusNode cformCardNumberFocusnode = FocusNode();
+  final paymentCardWidgetDataKey = new GlobalKey();
 
   @override
   void initState() {
@@ -276,7 +278,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               "Fail".toLowerCase()) {
         Event event = Event(name: "pay_failed");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(razorpayPayload["modeOptionId"]);
+        event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
         event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
@@ -298,7 +300,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       } else {
         Event event = Event(name: "pay_success");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(razorpayPayload["modeOptionId"]);
+        event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(razorpayPayload["isFirstDeposit"]);
         event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
@@ -337,7 +339,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               "Fail".toLowerCase()) {
         Event event = Event(name: "pay_failed");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(techProcessPayload["modeOptionId"]);
+        event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(techProcessPayload["isFirstDeposit"]);
         event.setGatewayId(
             int.parse(techProcessPayload["gatewayId"].toString()));
@@ -359,7 +361,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       } else {
         Event event = Event(name: "pay_success");
         event.setDepositAmount(widget.amount);
-        event.setModeOptionId(techProcessPayload["modeOptionId"]);
+        event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(techProcessPayload["isFirstDeposit"]);
         event.setGatewayId(int.parse(response["gatewayId"].toString()));
         event.setPromoCode(widget.promoCode);
@@ -902,6 +904,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   initPayment(String url, Map<String, dynamic> payload) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "InitPay"),
         pageBuilder: (context) => InitPay(
           url: url,
           waitForCookieset: bWaitForCookieset,
@@ -922,7 +925,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         try {
           Event event = Event(name: "pay_failed");
           event.setDepositAmount(widget.amount);
-          event.setModeOptionId(initPayPayload["modeOptionId"]);
+          event.setModeOptionId(response["modeOptionId"]);
           event.setFirstDeposit(response["firstDepositor"] != "false");
           event.setGatewayId(int.parse(payload["gatewayId"].toString()));
           event.setPromoCode(widget.promoCode);
@@ -936,7 +939,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         try {
           Event event = Event(name: "pay_success");
           event.setDepositAmount(widget.amount);
-          event.setModeOptionId(initPayPayload["modeOptionId"]);
+          event.setModeOptionId(response["modeOptionId"]);
           event.setFirstDeposit(response["firstDepositor"] != "false");
           event.setUserBalance(
             double.parse(response["withdrawable"]) +
@@ -1667,6 +1670,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               child: FlatButton(
                 padding: EdgeInsets.all(0.0),
                 onPressed: () {
+                  const twentyMillis = const Duration(milliseconds: 50);
+                  new Timer(twentyMillis,
+                      () => Scrollable.ensureVisible(paymentCardWidgetDataKey.currentContext));
                   if (paymentTypeData != null) {
                     Event event = Event(name: "pay_mode_select");
                     event.setDepositAmount(widget.amount);
@@ -1745,6 +1751,9 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               child: FlatButton(
                 padding: EdgeInsets.all(0.0),
                 onPressed: () {
+                   const twentyMillis = const Duration(milliseconds: 50);
+                  new Timer(twentyMillis,
+                      () => Scrollable.ensureVisible(paymentCardWidgetDataKey.currentContext));
                   if (paymentTypeData != null) {
                     Event event = Event(name: "pay_mode_select");
                     event.setDepositAmount(widget.amount);
@@ -1933,6 +1942,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return Container(
       child: Card(
         elevation: 3.0,
+        key: paymentCardWidgetDataKey,
         child: Column(
           children: getAllExpandablePaymentModeWidgetList(),
         ),

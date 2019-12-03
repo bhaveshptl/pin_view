@@ -548,6 +548,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
                         onPressed: () {
                           Navigator.of(context).push(
                             FantasyPageRoute(
+                              routeSettings: RouteSettings(name: "TeamPreview"),
                               pageBuilder: (BuildContext context) =>
                                   TeamPreview(
                                 league: widget.league,

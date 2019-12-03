@@ -130,6 +130,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
       showLoader(true);
       Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "ViewSheet"),
           pageBuilder: (context) => ViewSheet(
                 sheet: sheet,
                 league: widget.league,
@@ -329,6 +330,7 @@ class PredictionContestDetailState extends State<PredictionContestDetail>
 
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               predictionData: predictionData,

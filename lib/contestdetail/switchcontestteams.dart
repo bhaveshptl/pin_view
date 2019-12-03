@@ -204,6 +204,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
   void _onCreateTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: widget.league,
           l1Data: widget.l1Data,
@@ -410,6 +411,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
                                                 onTap: () {
                                                   Navigator.of(context).push(
                                                     FantasyPageRoute(
+                                                      routeSettings: RouteSettings(name: "TeamPreview"),
                                                       pageBuilder: (BuildContext
                                                               context) =>
                                                           TeamPreview(

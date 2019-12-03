@@ -65,6 +65,7 @@ class SearchContestState extends State<SearchContest> {
             } else {
               Navigator.of(context).push(
                 FantasyPageRoute(
+                  routeSettings: RouteSettings(name: "ContestDetail"),
                   pageBuilder: (context) => ContestDetail(
                         contest: contest,
                         league: league,

@@ -124,6 +124,7 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
   void _onCreateSheet(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               predictionData: widget.prediction,
@@ -353,6 +354,7 @@ class JoinPredictionContestState extends State<JoinPredictionContest> {
                                             showLoader(true);
                                             Navigator.of(context).push(
                                               FantasyPageRoute(
+                                                routeSettings: RouteSettings(name: "ViewSheet"),
                                                 pageBuilder: (context) =>
                                                     ViewSheet(
                                                       sheet: sheet,

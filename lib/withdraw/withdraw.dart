@@ -1074,6 +1074,7 @@ class WithdrawState extends State<Withdraw>
   openWithdrawHistory(BuildContext context,bool onBackPressedNavigateToLobby) {
     return Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "WithdrawHistory"),
         pageBuilder: (context) => WithdrawHistory(onBackPressedNavigateToLobby:onBackPressedNavigateToLobby),
         fullscreenDialog: true,
       ),

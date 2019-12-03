@@ -230,6 +230,7 @@ class LobbyState extends State<Lobby>
             deactivateDeepLinkingNavigation = true;
             Navigator.of(context).push(
               FantasyPageRoute(
+                routeSettings: RouteSettings(name: "Verification"),
                 pageBuilder: (context) => Verification(),
               ),
             );
@@ -331,6 +332,7 @@ class LobbyState extends State<Lobby>
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
             FantasyPageRoute(
+              routeSettings: RouteSettings(name: "LeagueDetail"),
               pageBuilder: (context) => LeagueDetail(league,
                   leagues: _leagues,
                   sportType: _sportType,
@@ -393,6 +395,7 @@ class LobbyState extends State<Lobby>
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
             FantasyPageRoute(
+              routeSettings: RouteSettings(name: "LeagueDetail"),
               pageBuilder: (context) => LeagueDetail(league,
                   leagues: _leagues,
                   sportType: _sportType,

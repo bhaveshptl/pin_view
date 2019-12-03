@@ -106,6 +106,8 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _onWsMsg(data) {
+    print("on ws msg arrived.......");
+    print(data);
     if (data["bReady"] == 1) {
       _getL1Data();
     } else if (data["iType"] == RequestType.GET_ALL_L1 &&
@@ -215,6 +217,7 @@ class LeagueDetailState extends State<LeagueDetail>
       if (squadStatus()) {
         result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "CreateTeam"),
             pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: l1Data,
@@ -702,6 +705,7 @@ class LeagueDetailState extends State<LeagueDetail>
         quiz.questions.length > 0) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "MySheets"),
           pageBuilder: (context) => MySheets(
             league: widget.league,
             predictionData: predictionData,
@@ -827,6 +831,7 @@ class LeagueDetailState extends State<LeagueDetail>
   _onSearchContest() {
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "SearchContest"),
         pageBuilder: (context) => SearchContest(
           leagues: widget.leagues,
         ),
@@ -842,6 +847,7 @@ class LeagueDetailState extends State<LeagueDetail>
           if (squadStatus()) {
             result = await Navigator.of(context).push(
               FantasyPageRoute(
+                routeSettings: RouteSettings(name: "CreateContest"),
                 pageBuilder: (context) => CreateContest(
                   league: widget.league,
                   l1data: l1Data,
@@ -860,6 +866,7 @@ class LeagueDetailState extends State<LeagueDetail>
           if (squadStatus()) {
             result = await Navigator.of(context).push(
               FantasyPageRoute(
+                routeSettings: RouteSettings(name: "MyTeams"),
                 pageBuilder: (context) => MyTeams(
                   league: widget.league,
                   l1Data: l1Data,
@@ -875,6 +882,7 @@ class LeagueDetailState extends State<LeagueDetail>
       case 2:
          final result = await  Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "JoinedContests"),
             pageBuilder: (BuildContext context) => JoinedContests(
               l1Data: l1Data,
               myTeams: _myTeams,
@@ -892,6 +900,7 @@ class LeagueDetailState extends State<LeagueDetail>
           if (squadStatus()) {
             result = await Navigator.of(context).push(
               FantasyPageRoute(
+                routeSettings: RouteSettings(name: "CreateTeam"),
                 pageBuilder: (context) => CreateTeam(
                   league: widget.league,
                   l1Data: l1Data,
@@ -926,6 +935,7 @@ class LeagueDetailState extends State<LeagueDetail>
         quiz.questions.length > 0) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "CreateSheet"),
           pageBuilder: (context) => CreateSheet(
             league: widget.league,
             predictionData: predictionData,

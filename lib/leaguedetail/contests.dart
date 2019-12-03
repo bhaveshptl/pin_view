@@ -61,7 +61,6 @@ class ContestsState extends State<Contests> {
   StreamSubscription _streamSubscription;
   int contestsCountOfBrands = 1;
   int maxContestForEachBrand = 3;
-  String showMoreContestBrandName = "";
   bool showMoreContestsButton = false;
   Map moreContestBrandsShowMap;
   Map sortedContestsListMap;
@@ -74,7 +73,7 @@ class ContestsState extends State<Contests> {
     _myTeams = widget.myTeams;
     setContestsByCategory(widget.l1Data.contests);
     _streamSubscription =
-        FantasyWebSocket().subscriber().stream.listen(_onWsMsg); 
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
 
   addAnalyticsEvent({Event event}) {
@@ -451,6 +450,7 @@ class ContestsState extends State<Contests> {
   _onContestClick(Contest contest, League league) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "ContestDetail"),
         pageBuilder: (context) => ContestDetail(
           contest: contest,
           league: league,
@@ -493,6 +493,7 @@ class ContestsState extends State<Contests> {
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "CreateTeam"),
             pageBuilder: (context) => CreateTeam(
               league: widget.league,
               l1Data: widget.l1Data,
@@ -681,14 +682,10 @@ class ContestsState extends State<Contests> {
                       width: MediaQuery.of(context).size.width,
                       child: InkWell(
                         child: Text(
-                          showMoreContestBrandName !=
-                                  _contests[index].brand["info"]
-                              ? "View " +
-                                  (contestsCountOfBrands -
-                                          maxContestForEachBrand)
-                                      .toString() +
-                                  " more"
-                              : " ",
+                          "View " +
+                              (contestsCountOfBrands - maxContestForEachBrand)
+                                  .toString() +
+                              " more",
                           textAlign: TextAlign.end,
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
@@ -702,30 +699,33 @@ class ContestsState extends State<Contests> {
                           AnalyticsManager().setSource("l1_lobby");
                           Event event = Event(name: "l1_view_more_clicked");
                           event.setMatchSportType(widget.sportsType);
-                          event.setMatchBrandId(brandContestList[index].brand["id"].toString());
-                          event.setMatchLeagueId(brandContestList[index].leagueId);
-                          event.setMatchStartTime(brandContestList[index].startTime);
-                          int isFirstOrRepeatDepositor=0;
-                          if(widget.depositData !=null){
-                             if(widget.depositData.chooseAmountData.isFirstDeposit){
-                               isFirstOrRepeatDepositor=0;
-                             }else{
-                               isFirstOrRepeatDepositor=1;
-                             }  
+                          event.setMatchBrandId(
+                              brandContestList[index].brand["id"].toString());
+                          event.setMatchLeagueId(
+                              brandContestList[index].leagueId);
+                          event.setMatchStartTime(
+                              brandContestList[index].startTime);
+                          int isFirstOrRepeatDepositor = 0;
+                          if (widget.depositData != null) {
+                            if (widget
+                                .depositData.chooseAmountData.isFirstDeposit) {
+                              isFirstOrRepeatDepositor = 0;
+                            } else {
+                              isFirstOrRepeatDepositor = 1;
+                            }
                           }
-                          event.setMatchFirstOrRepeatDepositor(isFirstOrRepeatDepositor);
+                          event.setMatchFirstOrRepeatDepositor(
+                              isFirstOrRepeatDepositor);
                           addAnalyticsEvent(event: event);
-                          
-                          
+
                           setState(() {
-                            if (showMoreContestBrandName !=
-                                _contests[index].brand["info"]) {
-                              showMoreContestBrandName =
-                                  _contests[index].brand["info"];
+                            if (moreContestBrandsShowMap[
+                                _contests[index].brand["info"]]) {
+                              moreContestBrandsShowMap[
+                                  _contests[index].brand["info"]] = false;
+                            } else {
                               moreContestBrandsShowMap[
                                   _contests[index].brand["info"]] = true;
-                            } else {
-                              showMoreContestBrandName = " ";
                             }
                           });
                         },

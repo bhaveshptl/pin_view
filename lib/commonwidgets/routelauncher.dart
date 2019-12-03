@@ -99,6 +99,7 @@ class RouteLauncher {
     if (depositData != null) {
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "AddCash"),
           pageBuilder: (context) => AddCash(
             depositData: depositData,
             promoCodes: filteredPromo,
@@ -398,6 +399,7 @@ class RouteLauncher {
   launchMyProfile(BuildContext context, {Function onComplete}) async {
     await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "MyProfile"),
         pageBuilder: (context) => MyProfile(),
       ),
     );
@@ -409,6 +411,7 @@ class RouteLauncher {
   showWithdraw(BuildContext context, Map<String, dynamic> response) {
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "Withdraw"),
         pageBuilder: (context) => Withdraw(
           data: response,
         ),
@@ -448,6 +451,7 @@ class RouteLauncher {
     if (response != null) {
       await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "EarnCash"),
           pageBuilder: (context) => EarnCash(
             data: response,
           ),
@@ -581,6 +585,7 @@ class RouteLauncher {
     if (data != null) {
       Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "MyAccount"),
           pageBuilder: (context) => MyAccount(
             accountData: data,
           ),

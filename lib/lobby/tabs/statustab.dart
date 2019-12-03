@@ -49,6 +49,7 @@ class StatusTab extends StatelessWidget {
     if (accountData != null) {
       Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "LeagueDetail"),
           pageBuilder: (context) => LeagueDetail(
             league,
             leagues: allLeagues,

@@ -71,6 +71,7 @@ class AddCashState extends State<AddCash> {
   bool bShowBonusDistribution = false;
 
   Map<String, dynamic> razorpayPayload;
+  Map<String, dynamic> paymentPayload;
 
   TextEditingController promoController = TextEditingController();
   double prefilledAmountInRupees;
@@ -258,8 +259,6 @@ class AddCashState extends State<AddCash> {
       value = await techprocess_platform.invokeMethod(
           '_openTechProcessNative', payload);
       showLoader(false);
-      print("((((((((((Tech Process Result)))))))))))");
-      print(value);
       if (Platform.isIOS) {}
     } catch (e) {
       showLoader(false);
@@ -327,7 +326,7 @@ class AddCashState extends State<AddCash> {
               "Fail".toLowerCase()) {
         Event event = Event(name: "pay_failed");
         event.setDepositAmount(amount);
-        event.setModeOptionId(razorpayPayload["modeOptionId"]);
+        event.setModeOptionId(response["modeOptionId"]);
         event.setFirstDeposit(false);
         event.setGatewayId(int.parse(razorpayPayload["gatewayId"].toString()));
         event.setPromoCode(
@@ -381,13 +380,25 @@ class AddCashState extends State<AddCash> {
         .sendRequest(req)
         .then((http.Response res) {
       Map<String, dynamic> response = json.decode(res.body);
-     
+
       if ((response["authStatus"] as String).toLowerCase() ==
               "Declined".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
               "Failed".toLowerCase() ||
           (response["authStatus"] as String).toLowerCase() ==
               "Fail".toLowerCase()) {
+        Event event = Event(name: "pay_failed");
+        event.setDepositAmount(amount);
+        event.setModeOptionId(response["modeOptionId"]);
+        event.setFirstDeposit(false);
+        event.setGatewayId(int.parse(response["gatewayId"].toString()));
+        event.setPromoCode(
+            selectedPromo == null ? "" : selectedPromo["promoCode"]);
+        event.setOrderId(response["orderId"] == null
+            ? razorpayPayload["orderId"]
+            : response["orderId"]);
+
+        AnalyticsManager().addEvent(event);
         if (response["orderId"] == null) {
           ActionUtil().showMsgOnTop(
               "Payment cancelled please retry transaction. In case your money has been deducted, please contact customer support team!",
@@ -398,6 +409,21 @@ class AddCashState extends State<AddCash> {
           webengageEventTransactionFailed(response);
         }
       } else {
+        Event event = Event(name: "pay_success");
+        event.setDepositAmount(amount);
+        event.setModeOptionId(response["modeOptionId"]);
+        event.setFirstDeposit(false);
+        event.setUserBalance(
+          response["withdrawable"].toDouble() +
+              response["nonWithdrawable"].toDouble() +
+              response["depositBucket"].toDouble(),
+        );
+        event.setGatewayId(int.parse(response["gatewayId"].toString()));
+        event.setPromoCode(
+            selectedPromo == null ? "" : selectedPromo["promoCode"]);
+        event.setOrderId(response["orderId"]);
+        AnalyticsManager().addEvent(event);
+
         branchEventTransactionSuccess(response);
         webengageEventTransactionSuccess(response);
         Navigator.of(context).pop(res.body);
@@ -1590,8 +1616,8 @@ class AddCashState extends State<AddCash> {
                 event.setFirstDeposit(
                     widget.depositData.chooseAmountData.isFirstDeposit);
                 event.setIsOpening(true);
-                if(selectedPromo == null){
-                   addAnalyticsEvent(event: event);
+                if (selectedPromo == null) {
+                  addAnalyticsEvent(event: event);
                 }
                 launchPromoSelector();
               },
@@ -2880,7 +2906,8 @@ class AddCashState extends State<AddCash> {
         event.setFirstDeposit(
             widget.depositData.chooseAmountData.isFirstDeposit);
         event.setPaymentSuccess(bSuccess);
-        event.setPromoCode(selectedPromo == null ? "" : selectedPromo["promoCode"]);
+        event.setPromoCode(
+            selectedPromo == null ? "" : selectedPromo["promoCode"]);
 
         addAnalyticsEvent(event: event);
 
@@ -2936,6 +2963,7 @@ class AddCashState extends State<AddCash> {
       flutterWebviewPlugin.close();
       final result = await Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "ChoosePaymentMode"),
           pageBuilder: (context) => ChoosePaymentMode(
             amount: amount,
             expandPreferredMethod: expandPreferredMethod,
@@ -3018,6 +3046,9 @@ class AddCashState extends State<AddCash> {
       "native": true,
     };
 
+    print("paymentModeDetails['modeOptionId'] = " +
+        paymentModeDetails["modeOptionId"].toString());
+
     int index = 0;
     payload.forEach((key, value) {
       if (index != 0) {
@@ -3026,6 +3057,8 @@ class AddCashState extends State<AddCash> {
       querParamString += key + '=' + value.toString();
       index++;
     });
+
+    paymentPayload = payload;
 
     Event event = Event(name: "pay_securely");
     event.setDepositAmount(amount);
@@ -3140,6 +3173,7 @@ class AddCashState extends State<AddCash> {
   startInitPayment(String url) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "InitPay"),
         pageBuilder: (context) => InitPay(
           url: url,
           waitForCookieset: bWaitForCookieset,
@@ -3166,7 +3200,6 @@ class AddCashState extends State<AddCash> {
           _showTransactionFailed(response);
           branchEventTransactionFailed(response);
           webengageEventTransactionFailed(response);
-
           try {
             Event event = Event(name: "pay_failed");
             event.setDepositAmount(amount);
@@ -3197,7 +3230,6 @@ class AddCashState extends State<AddCash> {
           event.setPromoCode(
               selectedPromo == null ? "" : selectedPromo["promoCode"]);
           event.setOrderId(response["orderId"]);
-
           AnalyticsManager().addEvent(event);
         } catch (e) {
           print(e);

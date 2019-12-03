@@ -324,6 +324,7 @@ class JoinedContestsState extends State<JoinedContests>
     await updateContestData();
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "ContestDetail"),
         pageBuilder: (context) => ContestDetail(
           contest: contest,
           league: league,
@@ -348,6 +349,7 @@ class JoinedContestsState extends State<JoinedContests>
   _onPredictionClick(Contest contest, League league) {
     Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "PredictionContestDetail"),
         pageBuilder: (context) => PredictionContestDetail(
           contest: contest,
           league: league,
@@ -438,6 +440,7 @@ class JoinedContestsState extends State<JoinedContests>
     } else {
       var result = await Navigator.of(context).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "CreateTeam"),
           pageBuilder: (context) => CreateTeam(
             league: widget.league,
             l1Data: _l1Data,
@@ -558,6 +561,7 @@ class JoinedContestsState extends State<JoinedContests>
       case 0:
         result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "CreateContest"),
             pageBuilder: (context) => CreateContest(
               l1data: _l1Data,
               myTeams: _myTeams,
@@ -570,6 +574,7 @@ class JoinedContestsState extends State<JoinedContests>
       case 1:
         result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "MyTeams"),
             pageBuilder: (context) => MyTeams(
               l1Data: _l1Data,
               myTeams: _myTeams,
@@ -581,6 +586,7 @@ class JoinedContestsState extends State<JoinedContests>
       case 2:
         result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "MySheets"),
             pageBuilder: (context) => MySheets(
               predictionData: _predictionData,
               mySheets: _mySheets,

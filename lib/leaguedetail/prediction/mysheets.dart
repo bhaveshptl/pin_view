@@ -159,6 +159,7 @@ class MySheetsState extends State<MySheets> {
   void _onEditSheet(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               predictionData: widget.predictionData,
@@ -179,6 +180,7 @@ class MySheetsState extends State<MySheets> {
   void _onCloneSheet(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               predictionData: widget.predictionData,
@@ -202,6 +204,7 @@ class MySheetsState extends State<MySheets> {
   void _onCreateSheet(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateSheet"),
         pageBuilder: (context) => CreateSheet(
               league: widget.league,
               mode: SheetCreationMode.CREATE_SHEET,

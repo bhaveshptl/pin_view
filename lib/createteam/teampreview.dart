@@ -27,6 +27,7 @@ class TeamPreview extends StatelessWidget {
   void _onEditTeam(BuildContext context) async {
     final result = await Navigator.of(context).push(
       FantasyPageRoute(
+        routeSettings: RouteSettings(name: "CreateTeam"),
         pageBuilder: (context) => CreateTeam(
           league: league,
           l1Data: l1Data,

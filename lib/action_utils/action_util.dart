@@ -62,6 +62,7 @@ class ActionUtil {
       showLoader(scaffoldKey.currentContext, contest == null ? false : true);
       final result = await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "JoinContest"),
           pageBuilder: (context) => JoinContest(
             league: league,
             l1Data: l1Data,
@@ -98,6 +99,7 @@ class ActionUtil {
           final createdContest = Contest.fromJson(response["contest"]);
           Navigator.of(scaffoldKey.currentContext).push(
             FantasyPageRoute(
+              routeSettings: RouteSettings(name: "ContestDetail"),
               pageBuilder: (context) => ContestDetail(
                   l1Data: l1Data,
                   contest: createdContest,
@@ -108,8 +110,14 @@ class ActionUtil {
             ),
           );
 
-          onContestJoinSuccess(response["message"].toString(),
-              scaffoldKey.currentContext, l1Data, league, (launchPageSource !=null && launchPageSource=="jc_cc" )?"jc_cc":"privateContest");
+          onContestJoinSuccess(
+              response["message"].toString(),
+              scaffoldKey.currentContext,
+              l1Data,
+              league,
+              (launchPageSource != null && launchPageSource == "jc_cc")
+                  ? "jc_cc"
+                  : "privateContest");
         } else {
           final result = onJoinContestError(
             scaffoldKey.currentContext,
@@ -153,20 +161,16 @@ class ActionUtil {
 
     if (result != null) {
       if (result["userOption"] == "joinContest") {
-        if (launchPageSource == "jc_cc") {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-        } else if (launchPageSource == "privateContest" ||
-            launchPageSource == "joinedContests") {
-          Navigator.of(context).pop();
-          Navigator.of(context).pop();
-        } else {
-          Navigator.of(context).pop();
+        try {
+          Navigator.of(context).popUntil((route) =>
+              route.settings.name == "LeagueDetail" || route.settings.name == "MyMatches" || route.isFirst);
+        } catch (e) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
         }
       } else if (result["userOption"] == "createTeam") {
         final result = await Navigator.of(context).push(
           FantasyPageRoute(
+            routeSettings: RouteSettings(name: "CreateTeam"),
             pageBuilder: (context) => CreateTeam(
               league: league,
               l1Data: l1Data,
@@ -286,6 +290,7 @@ class ActionUtil {
       showLoader(scaffoldKey.currentContext, true);
       final result = await Navigator.of(scaffoldKey.currentContext).push(
         FantasyPageRoute(
+          routeSettings: RouteSettings(name: "JoinPredictionContest"),
           pageBuilder: (context) => JoinPredictionContest(
             league: league,
             contest: contest,
