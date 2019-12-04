@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/commonwidgets/underline_textbox.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
@@ -31,7 +32,6 @@ class CreateContest extends StatefulWidget {
   final League league;
   final List<MyTeam> myTeams;
   final sportsType;
-
 
   CreateContest({this.league, this.l1data, this.myTeams, this.sportsType});
 
@@ -157,14 +157,13 @@ class CreateContestState extends State<CreateContest> {
       };
 
       ActionUtil().launchJoinContest(
-        l1Data: widget.l1data,
-        league: widget.league,
-        myTeams: widget.myTeams,
-        scaffoldKey: _scaffoldKey,
-        createContestPayload: payload,
-        sportsType:widget.sportsType,
-        launchPageSource:"l2"
-      );
+          l1Data: widget.l1data,
+          league: widget.league,
+          myTeams: widget.myTeams,
+          scaffoldKey: _scaffoldKey,
+          createContestPayload: payload,
+          sportsType: widget.sportsType,
+          launchPageSource: "l2");
 
       // final result = await showDialog(
       //   context: context,
@@ -480,25 +479,35 @@ class CreateContestState extends State<CreateContest> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-          strings.get("CREATE_CONTEST").toUpperCase(),
+        title: Row(
+          children: <Widget>[
+            Expanded(
+              child: LeagueTitleEPOC(
+                timeInMiliseconds: widget.league.matchStartTime,
+                title: widget.league.teamA.name +
+                    " vs " +
+                    widget.league.teamB.name,
+              ),
+            ),
+          ],
         ),
+        titleSpacing: 0.0,
         elevation: 0.0,
       ),
       body: Column(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: LeagueTitle(
-                    league: widget.league,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: <Widget>[
+          //     Expanded(
+          //       child: Padding(
+          //         padding: const EdgeInsets.only(bottom: 8.0),
+          //         child: LeagueTitle(
+          //           league: widget.league,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
           Expanded(
             child: Form(
               key: _formKey,

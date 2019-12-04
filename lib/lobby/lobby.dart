@@ -12,6 +12,7 @@ import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
+import 'package:playfantasy/lobby/jungleerummy.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/profilepages/verification.dart';
@@ -892,7 +893,13 @@ class LobbyState extends State<Lobby>
               IconButton(
                 icon: Image.asset("images/Rummy_BTN.png"),
                 iconSize: 80.0,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    FantasyPageRoute(
+                      pageBuilder: (context) => JungleeRummy(),
+                    ),
+                  );
+                },
               ),
               Row(
                 children: <Widget>[

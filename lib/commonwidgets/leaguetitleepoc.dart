@@ -70,232 +70,236 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      child: Container(
-        alignment: Alignment.topLeft,
-        margin: EdgeInsets.symmetric(vertical: 8.0),
-        padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(148, 21, 19, 1),
-          borderRadius: BorderRadius.circular(4.0),
-          border: Border.all(
-            width: 1.0,
-            color: Color.fromRGBO(173, 55, 53, 1),
-          ),
-        ),
-        child: Row(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 8.0, left: 8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    widget.title,
-                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
-              ),
+    return Container(
+      alignment: Alignment.topLeft,
+      child: FittedBox(
+        child: Container(
+          alignment: Alignment.topLeft,
+          margin: EdgeInsets.symmetric(vertical: 8.0),
+          padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(148, 21, 19, 1),
+            borderRadius: BorderRadius.circular(4.0),
+            border: Border.all(
+              width: 1.0,
+              color: Color.fromRGBO(173, 55, 53, 1),
             ),
-            bIsTimerClosed
-                ? Container(
-                    child: Text("CLOSED"),
-                    padding: EdgeInsets.all(4.0),
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(100, 12, 10, 1),
-                      borderRadius: BorderRadius.circular(4.0),
+          ),
+          child: Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(right: 8.0, left: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      widget.title,
+                      style:
+                          Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(100, 12, 10, 1),
-                          borderRadius: BorderRadius.circular(4.0),
+                  ],
+                ),
+              ),
+              bIsTimerClosed
+                  ? Container(
+                      child: Text("CLOSED"),
+                      padding: EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(100, 12, 10, 1),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(2.0),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(100, 12, 10, 1),
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              leftDays != 0
+                                  ? Container(
+                                      width: 16.0,
+                                      child: Text(
+                                        leftDays < 10
+                                            ? "0" + leftDays.toString()
+                                            : leftDays.toString(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subhead
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  : Container(),
+                              leftDays != 0
+                                  ? Container(
+                                      width: 14.0,
+                                      child: Text(
+                                        " : ",
+                                        style: TextStyle(
+                                          color: Color.fromRGBO(193, 80, 79, 1),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                              Container(
+                                width: 16.0,
+                                child: Text(
+                                  leftHours < 10
+                                      ? "0" + leftHours.toString()
+                                      : leftHours.toString(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.white,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              Container(
+                                width: 14.0,
+                                child: Text(
+                                  " : ",
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(193, 80, 79, 1),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 16.0,
+                                child: Text(
+                                  leftMinutes < 10
+                                      ? "0" + leftMinutes.toString()
+                                      : leftMinutes.toString(),
+                                  style: Theme.of(context)
+                                      .primaryTextTheme
+                                      .subhead
+                                      .copyWith(
+                                        color: Colors.white,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              leftDays == 0
+                                  ? Container(
+                                      width: 14.0,
+                                      child: Text(
+                                        " : ",
+                                        style: TextStyle(
+                                          color: Color.fromRGBO(193, 80, 79, 1),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                              leftDays == 0
+                                  ? Container(
+                                      width: 16.0,
+                                      child: Text(
+                                        leftSeconds < 10
+                                            ? "0" + leftSeconds.toString()
+                                            : leftSeconds.toString(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subhead
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
-                        child: Row(
+                        Row(
                           children: <Widget>[
                             leftDays != 0
                                 ? Container(
                                     width: 16.0,
+                                    alignment: Alignment.center,
                                     child: Text(
-                                      leftDays < 10
-                                          ? "0" + leftDays.toString()
-                                          : leftDays.toString(),
+                                      "D",
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .subhead
+                                          .caption
                                           .copyWith(
-                                            color: Colors.white,
+                                            color: Color.fromRGBO(
+                                                255, 149, 147, 1),
                                           ),
-                                      textAlign: TextAlign.center,
                                     ),
                                   )
                                 : Container(),
                             leftDays != 0
                                 ? Container(
                                     width: 14.0,
-                                    child: Text(
-                                      " : ",
-                                      style: TextStyle(
-                                        color: Color.fromRGBO(193, 80, 79, 1),
-                                      ),
-                                    ),
                                   )
                                 : Container(),
                             Container(
                               width: 16.0,
+                              alignment: Alignment.center,
                               child: Text(
-                                leftHours < 10
-                                    ? "0" + leftHours.toString()
-                                    : leftHours.toString(),
+                                "H",
                                 style: Theme.of(context)
                                     .primaryTextTheme
-                                    .subhead
+                                    .caption
                                     .copyWith(
-                                      color: Colors.white,
+                                      color: Color.fromRGBO(255, 149, 147, 1),
                                     ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
                             Container(
                               width: 14.0,
-                              child: Text(
-                                " : ",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(193, 80, 79, 1),
-                                ),
-                              ),
                             ),
                             Container(
                               width: 16.0,
+                              alignment: Alignment.center,
                               child: Text(
-                                leftMinutes < 10
-                                    ? "0" + leftMinutes.toString()
-                                    : leftMinutes.toString(),
+                                "M",
                                 style: Theme.of(context)
                                     .primaryTextTheme
-                                    .subhead
+                                    .caption
                                     .copyWith(
-                                      color: Colors.white,
+                                      color: Color.fromRGBO(255, 149, 147, 1),
                                     ),
-                                textAlign: TextAlign.center,
                               ),
                             ),
                             leftDays == 0
                                 ? Container(
                                     width: 14.0,
-                                    child: Text(
-                                      " : ",
-                                      style: TextStyle(
-                                        color: Color.fromRGBO(193, 80, 79, 1),
-                                      ),
-                                    ),
                                   )
                                 : Container(),
                             leftDays == 0
                                 ? Container(
                                     width: 16.0,
+                                    alignment: Alignment.center,
                                     child: Text(
-                                      leftSeconds < 10
-                                          ? "0" + leftSeconds.toString()
-                                          : leftSeconds.toString(),
+                                      "S",
                                       style: Theme.of(context)
                                           .primaryTextTheme
-                                          .subhead
+                                          .caption
                                           .copyWith(
-                                            color: Colors.white,
+                                            color: Color.fromRGBO(
+                                                255, 149, 147, 1),
                                           ),
-                                      textAlign: TextAlign.center,
                                     ),
                                   )
                                 : Container(),
                           ],
                         ),
-                      ),
-                      Row(
-                        children: <Widget>[
-                          leftDays != 0
-                              ? Container(
-                                  width: 16.0,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "D",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .copyWith(
-                                          color:
-                                              Color.fromRGBO(255, 149, 147, 1),
-                                        ),
-                                  ),
-                                )
-                              : Container(),
-                          leftDays != 0
-                              ? Container(
-                                  width: 14.0,
-                                )
-                              : Container(),
-                          Container(
-                            width: 16.0,
-                            alignment: Alignment.center,
-                            child: Text(
-                              "H",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Color.fromRGBO(255, 149, 147, 1),
-                                  ),
-                            ),
-                          ),
-                          Container(
-                            width: 14.0,
-                          ),
-                          Container(
-                            width: 16.0,
-                            alignment: Alignment.center,
-                            child: Text(
-                              "M",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Color.fromRGBO(255, 149, 147, 1),
-                                  ),
-                            ),
-                          ),
-                          leftDays == 0
-                              ? Container(
-                                  width: 14.0,
-                                )
-                              : Container(),
-                          leftDays == 0
-                              ? Container(
-                                  width: 16.0,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "S",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .copyWith(
-                                          color:
-                                              Color.fromRGBO(255, 149, 147, 1),
-                                        ),
-                                  ),
-                                )
-                              : Container(),
-                        ],
-                      ),
-                    ],
-                  ),
-          ],
+                      ],
+                    ),
+            ],
+          ),
         ),
       ),
     );

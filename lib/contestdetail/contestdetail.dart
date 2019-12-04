@@ -1009,7 +1009,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     final userBalFormatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: strings.rupee,
-      decimalDigits: 0,
+      decimalDigits: 2,
     );
 
     bool bIsContestFull = (_mapContestTeams != null &&
