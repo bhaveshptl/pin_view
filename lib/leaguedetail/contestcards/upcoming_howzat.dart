@@ -301,81 +301,91 @@ class UpcomingHowzatContest extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Tooltip(
-                      message: strings.get("NO_OF_WINNERS"),
-                      child: FlatButton(
-                        padding: EdgeInsets.all(0.0),
-                        onPressed: () {
-                          if (onPrizeStructure != null) {
-                            onPrizeStructure(contest);
-                          }
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              contest.prizeDetails[0]["noOfPrizes"].toString() +
-                                  " ",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .subhead
-                                  .copyWith(
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                            ),
-                            Text(
-                              contest.prizeDetails[0]["noOfPrizes"]
-                                          .toString() ==
-                                      "1"
-                                  ? "Winner"
-                                  : strings.get("WINNERS"),
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .subhead
-                                  .copyWith(
-                                    color: Colors.orange,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              size: 16.0,
-                              color: Colors.orange,
-                            )
-                          ],
-                        ),
+              Row(
+                children: <Widget>[
+                  Tooltip(
+                    message: strings.get("NO_OF_WINNERS"),
+                    child: FlatButton(
+                      padding: EdgeInsets.all(0.0),
+                      onPressed: () {
+                        if (onPrizeStructure != null) {
+                          onPrizeStructure(contest);
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            contest.prizeDetails[0]["noOfPrizes"].toString() +
+                                " ",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                          ),
+                          Text(
+                            contest.prizeDetails[0]["noOfPrizes"].toString() ==
+                                    "1"
+                                ? "Winner"
+                                : strings.get("WINNERS"),
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            size: 16.0,
+                            color: Colors.orange,
+                          )
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Expanded(
-                flex: 2,
-                child: FlatButton(
-                  onPressed: () {
-                    _shareContestDialog(context);
-                  },
-                  padding: EdgeInsets.all(2.0),
-                  child: Image.asset("images/Share_Icon.png"),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        contest.guaranteed
-                            ? Container(
+              Row(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      contest.guaranteed
+                          ? Container(
+                              padding: EdgeInsets.all(4.0),
+                              height: 24.0,
+                              constraints: BoxConstraints(minWidth: 24.0),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: Text(
+                                "G",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: Theme.of(context)
+                                      .primaryTextTheme
+                                      .caption
+                                      .fontSize,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                          : Container(),
+                      contest.teamsAllowed > 1
+                          ? Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Container(
                                 padding: EdgeInsets.all(4.0),
                                 height: 24.0,
                                 constraints: BoxConstraints(minWidth: 24.0),
@@ -387,95 +397,63 @@ class UpcomingHowzatContest extends StatelessWidget {
                                   ),
                                   borderRadius: BorderRadius.circular(4.0),
                                 ),
-                                child: Text(
-                                  "G",
-                                  style: TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: Theme.of(context)
-                                        .primaryTextTheme
-                                        .caption
-                                        .fontSize,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                        contest.teamsAllowed > 1
-                            ? Padding(
-                                padding: EdgeInsets.only(left: 8.0),
-                                child: Container(
-                                  padding: EdgeInsets.all(4.0),
-                                  height: 24.0,
-                                  constraints: BoxConstraints(minWidth: 24.0),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0),
-                                  ),
-                                  child: Tooltip(
-                                    message: strings
-                                        .get("MAXIMUM_ENTRY")
-                                        .replaceAll("\$count",
-                                            contest.teamsAllowed.toString()),
-                                    child: Text(
-                                      "M" + contest.teamsAllowed.toString(),
-                                      style: TextStyle(
-                                        color: Colors.indigo,
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .caption
-                                            .fontSize,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                child: Tooltip(
+                                  message: strings
+                                      .get("MAXIMUM_ENTRY")
+                                      .replaceAll("\$count",
+                                          contest.teamsAllowed.toString()),
+                                  child: Text(
+                                    "M" + contest.teamsAllowed.toString(),
+                                    style: TextStyle(
+                                      color: Colors.indigo,
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .caption
+                                          .fontSize,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                              )
-                            : Container(),
-                        contest.bonusAllowed > 0
-                            ? Padding(
-                                padding: EdgeInsets.only(left: 8.0),
-                                child: Container(
-                                  padding: EdgeInsets.all(4.0),
-                                  height: 24.0,
-                                  constraints: BoxConstraints(minWidth: 24.0),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                    borderRadius: BorderRadius.circular(4.0),
+                              ),
+                            )
+                          : Container(),
+                      contest.bonusAllowed > 0
+                          ? Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Container(
+                                padding: EdgeInsets.all(4.0),
+                                height: 24.0,
+                                constraints: BoxConstraints(minWidth: 24.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
                                   ),
-                                  child: Tooltip(
-                                    message: strings
-                                        .get("USE_BONUS")
-                                        .replaceAll("\$bonusPercent",
-                                            contest.bonusAllowed.toString()),
-                                    child: Text(
-                                      "B" +
-                                          contest.bonusAllowed.toString() +
-                                          "%",
-                                      style: TextStyle(
-                                        color: Color.fromRGBO(70, 165, 12, 1),
-                                        fontSize: Theme.of(context)
-                                            .primaryTextTheme
-                                            .caption
-                                            .fontSize,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                                child: Tooltip(
+                                  message: strings.get("USE_BONUS").replaceAll(
+                                      "\$bonusPercent",
+                                      contest.bonusAllowed.toString()),
+                                  child: Text(
+                                    "B" + contest.bonusAllowed.toString() + "%",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(70, 165, 12, 1),
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .caption
+                                          .fontSize,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                  ],
-                ),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
+                ],
               )
             ],
           ),

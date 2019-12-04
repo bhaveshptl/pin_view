@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
@@ -835,23 +836,44 @@ class LeagueDetailState extends State<LeagueDetail>
     );
   }
 
+  _onCreateContest(BuildContext context) async {
+    if (squadStatus()) {
+      var createTeamResult;
+      var waitForCreateTeam = _myTeams.length == 0;
+      if (_myTeams.length == 0) {
+        waitForCreateTeam = false;
+        createTeamResult = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: l1Data,
+              mode: TeamCreationMode.CREATE_TEAM,
+            ),
+          ),
+        );
+      }
+      if (!waitForCreateTeam ||
+          (waitForCreateTeam && createTeamResult != null)) {
+        var result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateContest(
+              league: widget.league,
+              l1data: l1Data,
+              sportsType: widget.sportType,
+              myTeams: _myTeams,
+            ),
+          ),
+        );
+        ActionUtil().showMsgOnTop(result, context);
+      }
+    }
+  }
+
   _onBottomButtonClick(int index) async {
     var result;
     switch (index) {
       case 0:
         if (activeTabIndex == 0) {
-          if (squadStatus()) {
-            result = await Navigator.of(context).push(
-              FantasyPageRoute(
-                pageBuilder: (context) => CreateContest(
-                  league: widget.league,
-                  l1data: l1Data,
-                  sportsType: widget.sportType,
-                  myTeams: _myTeams,
-                ),
-              ),
-            );
-          }
         } else {
           _showComingSoonDialog();
         }
@@ -957,6 +979,12 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   Widget build(BuildContext context) {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 2,
+    );
+
     bool notAllowJoinedContests =
         (activeTabIndex == 0 && joinedContestCount == 0) ||
             (activeTabIndex == 1 && joinedPredictionContestCount == 0);
@@ -976,18 +1004,21 @@ class LeagueDetailState extends State<LeagueDetail>
         titleSpacing: 0.0,
         title: Row(
           children: <Widget>[
-            LeagueTitleEPOC(
-              title:
-                  widget.league.teamA.name + " vs " + widget.league.teamB.name,
-              timeInMiliseconds: widget.league.matchStartTime,
-              onTimeComplete: () {},
-              style: TextStyle(color: Colors.black),
+            Expanded(
+              child: LeagueTitleEPOC(
+                title: widget.league.teamA.name +
+                    " vs " +
+                    widget.league.teamB.name,
+                timeInMiliseconds: widget.league.matchStartTime,
+                onTimeComplete: () {},
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ],
         ),
         actions: <Widget>[
           AddCashButton(
-            text: widget.cashBalance.toStringAsFixed(2),
+            text: formatCurrency.format(widget.cashBalance),
             onPressed: () {
               _launchAddCash();
             },
@@ -1022,78 +1053,94 @@ class LeagueDetailState extends State<LeagueDetail>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(left: 16.0),
-                  height: 30.0,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4.0),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(0.0, 0),
-                        color: Colors.grey.shade400,
-                        blurRadius: 4.0,
-                        spreadRadius: 1.0,
-                      ),
-                    ],
-                  ),
-                  child: FlatButton(
-                    color: Colors.white,
-                    child: Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: 4.0, bottom: 4.0, right: 8.0),
-                          child: Image.asset("images/Contest_Icon.png"),
-                        ),
-                        Text(
-                          "CREATE CONTEST",
-                          style: TextStyle(
-                            color: Color.fromRGBO(41, 41, 41, 1),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    child: Container(
+                      margin: EdgeInsets.only(left: 16.0, right: 16.0),
+                      height: 30.0,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.0),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0.0, 0),
+                            color: Colors.grey.shade400,
+                            blurRadius: 4.0,
+                            spreadRadius: 1.0,
                           ),
+                        ],
+                      ),
+                      child: FlatButton(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: 2.0, bottom: 2.0, right: 8.0),
+                              child: Image.asset("images/Contest_Icon.png"),
+                            ),
+                            Text(
+                              "CREATE CONTEST",
+                              style: TextStyle(
+                                color: Color.fromRGBO(41, 41, 41, 1),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                        onPressed: () {
+                          _onCreateContest(context);
+                        },
+                      ),
                     ),
-                    onPressed: () {
-                      _onBottomButtonClick(0);
-                    },
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(right: 16.0),
-                  height: 30.0,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4.0),
-                    boxShadow: [
-                      BoxShadow(
-                        offset: Offset(0.0, 0),
-                        color: Colors.grey.shade400,
-                        blurRadius: 4.0,
-                        spreadRadius: 1.0,
-                      ),
-                    ],
-                  ),
-                  child: FlatButton(
-                    color: Colors.white,
-                    child: Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                              top: 4.0, bottom: 4.0, right: 8.0),
-                          child: Image.asset("images/ContestCode_Icon.png"),
-                        ),
-                        Text(
-                          "CONTEST CODE",
-                          style: TextStyle(
-                            color: Color.fromRGBO(41, 41, 41, 1),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    child: Container(
+                      margin: EdgeInsets.only(right: 16.0, left: 16.0),
+                      height: 30.0,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.0),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0.0, 0),
+                            color: Colors.grey.shade400,
+                            blurRadius: 4.0,
+                            spreadRadius: 1.0,
                           ),
+                        ],
+                      ),
+                      child: FlatButton(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: 4.0, bottom: 4.0, right: 8.0),
+                              child: Image.asset("images/ContestCode_Icon.png"),
+                            ),
+                            Text(
+                              "CONTEST CODE",
+                              style: TextStyle(
+                                color: Color.fromRGBO(41, 41, 41, 1),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                        onPressed: () {
+                          _onSearchContest();
+                        },
+                      ),
                     ),
-                    onPressed: () {
-                      _onSearchContest();
-                    },
                   ),
                 ),
               ],
@@ -1330,70 +1377,16 @@ class LeagueDetailState extends State<LeagueDetail>
                                 ),
                               ),
                             ),
-                            activeTabIndex == 0
-                                ? Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 8.0),
-                                    child: Container(
-                                      width: 1.0,
-                                      height: 72.0,
-                                      color: Colors.black12,
-                                    ),
-                                  )
-                                : Container(),
-                            activeTabIndex == 0
-                                ? Expanded(
-                                    child: Container(
-                                      height: 72.0,
-                                      child: FlatButton(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Container(
-                                              width: 24.0,
-                                              height: 24.0,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.orange,
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 4.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Text(
-                                                    "Create Contest",
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        onPressed: () {
-                                          _onBottomButtonClick(0);
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                : Container(),
                           ],
                         ),
                       )
                     : Container(
                         height: 48.0,
                         padding: isIos ? EdgeInsets.only(bottom: 7.0) : null,
-                        width: MediaQuery.of(context).size.width / 2,
+                        // width: MediaQuery.of(context).size.width / 1.6,
                         child: ColorButton(
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.only(

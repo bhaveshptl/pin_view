@@ -884,17 +884,16 @@ class LobbyState extends State<Lobby>
         endDrawer: AppDrawer(),
         appBar: AppBar(
           elevation: 0.0,
-          actions: <Widget>[
-            AddCashButton(
-              text: formatCurrency.format(userBalance),
-              onPressed: () {
-                _launchAddCash(source: "topright");
-              },
-            ),
-          ],
+          actions: <Widget>[Container()],
+          titleSpacing: 0.0,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              IconButton(
+                icon: Image.asset("images/Rummy_BTN.png"),
+                iconSize: 80.0,
+                onPressed: () {},
+              ),
               Row(
                 children: <Widget>[
                   SvgPicture.asset(
@@ -911,70 +910,12 @@ class LobbyState extends State<Lobby>
                   ),
                 ],
               ),
-              // AddCashButton(
-              //   text: formatCurrency.format(userBalance),
-              //   onPressed: () {
-              //     _launchAddCash(source: "topright");
-              //   },
-              // ),
-              // ColorButton(
-              //   padding: EdgeInsets.only(
-              //       left: 8.0, right: 6.0, top: 6.0, bottom: 6.0),
-              //   color: Color.fromRGBO(125, 13, 13, 1),
-              //   elevation: 6.0,
-              //   shape: RoundedRectangleBorder(
-              //     side: BorderSide(
-              //       color: Color.fromRGBO(70, 165, 12, 1),
-              //       width: 1.5,
-              //     ),
-              //     borderRadius: BorderRadius.circular(24.0),
-              //   ),
-              //   child: Row(
-              //     children: <Widget>[
-              //       Image.asset(
-              //         "images/add-cash-header.png",
-              //         height: 24.0,
-              //       ),
-              //       Padding(
-              //         padding: EdgeInsets.symmetric(horizontal: 8.0),
-              //         child: Text(
-              //           formatCurrency.format(userBalance),
-              //           style:
-              //               Theme.of(context).primaryTextTheme.subhead.copyWith(
-              //                     color: Colors.white,
-              //                     fontWeight: FontWeight.w700,
-              //                   ),
-              //         ),
-              //       ),
-              //       Image.asset(
-              //         "images/header_add.png",
-              //         height: 30.0,
-              //       ),
-              //     ],
-              //   ),
-              //   onPressed: () {
-              //     _launchAddCash(source: "topright");
-              //   },
-              // ),
-              // InkWell(
-              //   onTap: () {
-              //     Navigator.of(context).push(
-              //       FantasyPageRoute(
-              //         pageBuilder: (context) => AppDrawer(),
-              //       ),
-              //     );
-              //   },
-              //   child: ClipRRect(
-              //     borderRadius: BorderRadius.circular(5.0),
-              //     child: Container(
-              //       color: Color.fromRGBO(242, 242, 242, 1),
-              //       child: Image.asset(
-              //         "images/person-icon.png",
-              //         height: 40.0,
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              AddCashButton(
+                text: formatCurrency.format(userBalance),
+                onPressed: () {
+                  _launchAddCash(source: "topright");
+                },
+              ),
             ],
           ),
           automaticallyImplyLeading: false,

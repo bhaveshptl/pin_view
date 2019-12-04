@@ -970,6 +970,20 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   //   });
   // }
 
+  _launchAddCash(
+      {String source, String promoCode, double prefilledAmount}) async {
+    showLoader(true);
+    routeLauncher.launchAddCash(
+      context,
+      source: source,
+      promoCode: promoCode,
+      prefilledAmount: prefilledAmount,
+      onComplete: () {
+        showLoader(false);
+      },
+    );
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
@@ -989,6 +1003,12 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: widget.contest.prizeType == 1 ? "" : strings.rupee,
+      decimalDigits: 0,
+    );
+
+    final userBalFormatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
       decimalDigits: 0,
     );
 
@@ -1015,18 +1035,22 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
           ),
           title: Row(
             children: <Widget>[
-              LeagueTitleEPOC(
-                timeInMiliseconds: widget.league.matchStartTime,
-                title: widget.league.teamA.name +
-                    " vs " +
-                    widget.league.teamB.name,
+              Expanded(
+                child: LeagueTitleEPOC(
+                  timeInMiliseconds: widget.league.matchStartTime,
+                  title: widget.league.teamA.name +
+                      " vs " +
+                      widget.league.teamB.name,
+                ),
               ),
             ],
           ),
           actions: <Widget>[
             AddCashButton(
-              onPressed: () {},
-              text: userBalance.toStringAsFixed(2),
+              onPressed: () {
+                _launchAddCash(source: "contest_details");
+              },
+              text: userBalFormatCurrency.format(userBalance),
             )
           ],
           elevation: 0.0,

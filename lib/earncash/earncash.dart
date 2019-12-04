@@ -4,10 +4,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/earncash/bonus_distribution.dart';
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/analytics.dart';
@@ -154,6 +158,26 @@ class EarnCashState extends State<EarnCash> {
       final value =
           await utils_platform.invokeMethod('onUserInfoRefreshed', userInfo);
     } catch (e) {}
+  }
+
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
+  }
+
+  _launchAddCash(
+      {String source, String promoCode, double prefilledAmount}) async {
+    showLoader(true);
+    routeLauncher.launchAddCash(
+      context,
+      source: source,
+      promoCode: promoCode,
+      prefilledAmount: prefilledAmount,
+      onComplete: () {
+        showLoader(false);
+      },
+    );
   }
 
   _getProfileData() async {
@@ -354,6 +378,12 @@ class EarnCashState extends State<EarnCash> {
 
   @override
   Widget build(BuildContext context) {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 2,
+    );
+
     BoxDecoration iconDecoration = BoxDecoration(
       shape: BoxShape.circle,
       border: Border.all(
@@ -380,8 +410,10 @@ class EarnCashState extends State<EarnCash> {
         ),
         actions: <Widget>[
           AddCashButton(
-            onPressed: () {},
-            text: userBalance.toStringAsFixed(2),
+            onPressed: () {
+              _launchAddCash(source: "earn_cash");
+            },
+            text: formatCurrency.format(userBalance),
           )
         ],
       ),
