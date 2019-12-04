@@ -62,16 +62,19 @@ class ContestsState extends State<Contests> {
   int contestsCountOfBrands = 1;
   int maxContestForEachBrand = 3;
   bool showMoreContestsButton = false;
-  Map moreContestBrandsShowMap;
+  Map showOrHIdeMoreContestsMap;
   Map sortedContestsListMap;
 
   @override
   void initState() {
     super.initState();
     sortedContestsListMap = new Map<String, List<Contest>>();
+    showOrHIdeMoreContestsMap = new Map();
     _l1Data = widget.l1Data;
     _myTeams = widget.myTeams;
     setContestsByCategory(widget.l1Data.contests);
+    setShowOrHIdeMoreContestsMap();
+
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
   }
@@ -108,7 +111,7 @@ class ContestsState extends State<Contests> {
     List<Contest> brandContests = [];
     List<Contest> sortedContests = [];
     int userBalance = 0;
-    moreContestBrandsShowMap = new Map();
+
     if (widget.accountDetails != null) {
       userBalance = (widget.accountDetails.totalBalance * 100).toInt();
     }
@@ -120,7 +123,7 @@ class ContestsState extends State<Contests> {
 
       if (bShowBrandInfo) {
         brandContests.add(contest);
-        moreContestBrandsShowMap[contests[loopIndex].brand["info"]] = false;
+
         var brandContestsLength = brandContests.length;
         var entryFeeList = new List(brandContestsLength);
         int upperEntryFee = -1;
@@ -229,6 +232,14 @@ class ContestsState extends State<Contests> {
     _contests.addAll(cashRecomendedContests);
     _contests.addAll(cashNonRecomendedContests);
     _contests.addAll(practiseContests);
+  }
+
+  setShowOrHIdeMoreContestsMap() {
+    int loopIndex = 0;
+    _contests.forEach((Contest contest) {
+      showOrHIdeMoreContestsMap[_contests[loopIndex].brand["info"]] = false;
+      loopIndex++;
+    });
   }
 
   _onWsMsg(data) {
@@ -671,12 +682,12 @@ class ContestsState extends State<Contests> {
                   ? getContestCards(index, bShowBrandInfo)
                   : Container(),
               showMoreContestsButton &&
-                      moreContestBrandsShowMap[_contests[index].brand["info"]]
+                      showOrHIdeMoreContestsMap[_contests[index].brand["info"]]
                   ? getContestCards(index, bShowBrandInfo)
                   : Container(),
               _contests[index].bisLastContestOfBrand &&
                       showMoreContestsButton &&
-                      !moreContestBrandsShowMap[_contests[index].brand["info"]]
+                      !showOrHIdeMoreContestsMap[_contests[index].brand["info"]]
                   ? Container(
                       padding: EdgeInsets.only(right: 20),
                       width: MediaQuery.of(context).size.width,
@@ -719,12 +730,12 @@ class ContestsState extends State<Contests> {
                           addAnalyticsEvent(event: event);
 
                           setState(() {
-                            if (moreContestBrandsShowMap[
+                            if (showOrHIdeMoreContestsMap[
                                 _contests[index].brand["info"]]) {
-                              moreContestBrandsShowMap[
+                              showOrHIdeMoreContestsMap[
                                   _contests[index].brand["info"]] = false;
                             } else {
-                              moreContestBrandsShowMap[
+                              showOrHIdeMoreContestsMap[
                                   _contests[index].brand["info"]] = true;
                             }
                           });

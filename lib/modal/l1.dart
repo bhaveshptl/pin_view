@@ -450,7 +450,7 @@ class Contest {
         multiplier: json["multiplier"] == null ? false : json["multiplier"],
         topPrecent: json["topPrecent"],
         winningsMultiplier: json["winningsMultiplier"],
-        brandPriority: json["brandPriority"]
+        brandPriority: json["brandPriority"] !=null ? json["brandPriority"] : false  
         );
   }
 
