@@ -21,7 +21,6 @@ class StatusTab extends StatelessWidget {
   final List<League> statusLeagues;
   final Map<String, int> mapSportTypes;
   final Function onLeagueStatusChanged;
- 
 
   StatusTab(
       {this.sportType,
@@ -42,10 +41,14 @@ class StatusTab extends StatelessWidget {
     showLoader(true, context);
     Map<String, dynamic> accountData = await getUserAccountsData();
     Map<String, dynamic> depositDataMap = await getUserDepositsData();
-    Account accountDetails = Account();
-    Deposit depositData = Deposit();
-    accountDetails = Account.fromJson(accountData);
-    depositData = Deposit.fromJson(depositDataMap);
+    Account accountDetails;
+    Deposit depositData;
+    if (accountData != null) {
+      accountDetails = Account.fromJson(accountData);
+    }
+    if (depositDataMap != null) {
+      depositData = Deposit.fromJson(depositDataMap);
+    }
     if (accountData != null) {
       Navigator.of(context).push(
         FantasyPageRoute(

@@ -112,7 +112,8 @@ class ContestsState extends State<Contests> {
     List<Contest> sortedContests = [];
     int userBalance = 0;
 
-    if (widget.accountDetails != null) {
+    if (widget.accountDetails != null &&
+        widget.accountDetails.totalBalance != null) {
       userBalance = (widget.accountDetails.totalBalance * 100).toInt();
     }
     contests.forEach((Contest contest) {
@@ -717,13 +718,16 @@ class ContestsState extends State<Contests> {
                           event.setMatchStartTime(
                               brandContestList[index].startTime);
                           int isFirstOrRepeatDepositor = 0;
-                          if (widget.depositData != null) {
+                          if (widget.depositData != null &&
+                              widget.depositData.chooseAmountData != null) {
                             if (widget
                                 .depositData.chooseAmountData.isFirstDeposit) {
                               isFirstOrRepeatDepositor = 0;
                             } else {
                               isFirstOrRepeatDepositor = 1;
                             }
+                          } else {
+                            isFirstOrRepeatDepositor = 2;
                           }
                           event.setMatchFirstOrRepeatDepositor(
                               isFirstOrRepeatDepositor);

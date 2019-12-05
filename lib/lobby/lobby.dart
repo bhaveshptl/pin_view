@@ -322,10 +322,14 @@ class LobbyState extends State<Lobby>
       int leagueIdFromDLData) async {
     Map<String, dynamic> accountData = await getUserAccountsData();
     Map<String, dynamic> depositDataMap = await getUserDepositsData();
-    Account accountDetails = Account();
-    Deposit depositData = Deposit();
-    accountDetails = Account.fromJson(accountData);
-    depositData = Deposit.fromJson(depositDataMap);
+    Account accountDetails;
+    Deposit depositData;
+    if (accountData != null) {
+      accountDetails = Account.fromJson(accountData);
+    }
+    if (depositDataMap != null) {
+      depositData = Deposit.fromJson(depositDataMap);
+    }
 
     if (_leaguesList != null) {
       for (var league in _leaguesList) {
@@ -338,7 +342,8 @@ class LobbyState extends State<Lobby>
                   sportType: _sportType,
                   onSportChange: _onSportSelectionChaged,
                   mapSportTypes: _mapSportTypes,
-                  accountDetails: accountDetails),
+                  accountDetails: accountDetails,
+                  depositData: depositData),
             ),
           );
         }
@@ -387,10 +392,15 @@ class LobbyState extends State<Lobby>
     if (_leaguesList != null) {
       Map<String, dynamic> accountData = await getUserAccountsData();
       Map<String, dynamic> depositDataMap = await getUserDepositsData();
-      Account accountDetails = Account();
-      Deposit depositData = Deposit();
-      accountDetails = Account.fromJson(accountData);
-      depositData = Deposit.fromJson(depositDataMap);
+      Account accountDetails;
+      Deposit depositData;
+      if (accountData != null) {
+        accountDetails = Account.fromJson(accountData);
+      }
+      if (depositDataMap != null) {
+        depositData = Deposit.fromJson(depositDataMap);
+      }
+
       for (var league in _leaguesList) {
         if (league.leagueId == leagueIdFromDLData) {
           Navigator.of(context).push(
@@ -402,8 +412,8 @@ class LobbyState extends State<Lobby>
                   onSportChange: _onSportSelectionChaged,
                   mapSportTypes: _mapSportTypes,
                   activateDeepLinkingNavigation: true,
-                  accountDetails:accountDetails,
-                  depositData:depositData),
+                  accountDetails: accountDetails,
+                  depositData: depositData),
             ),
           );
         }

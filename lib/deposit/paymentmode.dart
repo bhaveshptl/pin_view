@@ -720,19 +720,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
   }
 
   clearCardPlaceholderDetails() {
-    cformNameOnTheCard = "";
-    cformCVV = null;
-    cformCardNumber = "";
-    cformExpMonth = "";
-    cformExpYear = "";
-    cformExpDate = "";
-    cFormIsValidDateEntered = false;
-    cformCardImagePath = " ";
-    cformSaveCardDetails = false;
-    cformNameOnCardController.text = " ";
-    cformCVVController.text = '';
-    cformCardNumberController.text = " ";
-    cformExpDateController.text = " ";
+    cformNameOnCardController.clear();
+    cformCVVController.clear();
+    cformCardNumberController.clear();
+    cformExpDateController.clear();
   }
 
   onPaySecurely(Map<String, dynamic> paymentModeDetails, String type) async {
