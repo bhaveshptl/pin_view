@@ -173,11 +173,12 @@ class WithdrawState extends State<Withdraw>
           addressStatus == "DOC_SUBMITTED") {
         _verificationStatus = "DOC_SUBMITTED";
       } else {
-       if(kycStatus=="VERIFIED" && addressStatus == "DOC_SUBMITTED"){
+        if (kycStatus == "VERIFIED" && addressStatus == "DOC_SUBMITTED") {
           _verificationStatus = "UNDER_REVIEW";
-        }else if(kycStatus=="DOC_SUBMITTED" && addressStatus == "VERIFIED"){
-           _verificationStatus = "UNDER_REVIEW";
-          }else{
+        } else if (kycStatus == "DOC_SUBMITTED" &&
+            addressStatus == "VERIFIED") {
+          _verificationStatus = "UNDER_REVIEW";
+        } else {
           _verificationStatus = "DOC_NOT_SUBMITTED";
         }
       }
@@ -1050,8 +1051,8 @@ class WithdrawState extends State<Withdraw>
                 withdrawType: withdrawType),
           );
 
-          if (result != null) {            
-            openWithdrawHistory(context,true);
+          if (result != null) {
+            openWithdrawHistory(context, true);
           }
         } else {
           Map<String, dynamic> response = json.decode(res.body);
@@ -1071,11 +1072,14 @@ class WithdrawState extends State<Withdraw>
     });
   }
 
-  openWithdrawHistory(BuildContext context,bool onBackPressedNavigateToLobby) {
-    return Navigator.of(context).push(
+
+  openWithdrawHistory(
+      BuildContext context, bool onBackPressedNavigateToLobby) async {
+    var result = await Navigator.of(context).push(
       FantasyPageRoute(
         routeSettings: RouteSettings(name: "WithdrawHistory"),
-        pageBuilder: (context) => WithdrawHistory(onBackPressedNavigateToLobby:onBackPressedNavigateToLobby),
+        pageBuilder: (context) => WithdrawHistory(
+            onBackPressedNavigateToLobby: onBackPressedNavigateToLobby),
         fullscreenDialog: true,
       ),
     );
@@ -1452,9 +1456,9 @@ class WithdrawState extends State<Withdraw>
                                                     .withdrawableAmount) {
                                               return "You can not withdraw more than " +
                                                   _withdrawData
-                                                      .withdrawableAmount.toStringAsFixed(2)
-                                                      .toString(); 
-                
+                                                      .withdrawableAmount
+                                                      .toStringAsFixed(2)
+                                                      .toString();
                                             } else if (amount >
                                                 _withdrawData.maxWithdraw) {
                                               return "You can not withdraw more than " +
@@ -1652,7 +1656,7 @@ class WithdrawState extends State<Withdraw>
               size: Theme.of(context).primaryTextTheme.display1.fontSize,
             ),
             onPressed: () async {
-              await openWithdrawHistory(context,false);
+              await openWithdrawHistory(context, false);
               updateWithdrawData();
             },
           )

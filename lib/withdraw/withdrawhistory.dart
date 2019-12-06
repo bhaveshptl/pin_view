@@ -80,10 +80,11 @@ class WithdrawHistoryState extends State<WithdrawHistory> {
     return WillPopScope(
       onWillPop: (){
         if(widget.onBackPressedNavigateToLobby){
-          Navigator.of(context).popUntil((r) => r.isFirst);
-          return Future.value(true);
+          // Navigator.of(context).popUntil((r) => r.isFirst);
+          // return Future.value(true);
+           Navigator.of(context).pop(true);  
         }else{
-           Navigator.of(context).pop();  
+           Navigator.of(context).pop(true);  
         }
       },
       child: ScaffoldPage(
