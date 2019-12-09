@@ -468,7 +468,7 @@ class AddCashState extends State<AddCash> {
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: strings.rupee,
-      decimalDigits: 2,
+      decimalDigits: 0,
     );
 
     if (widget.depositData != null) {

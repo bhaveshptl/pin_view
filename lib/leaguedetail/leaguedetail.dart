@@ -986,7 +986,7 @@ class LeagueDetailState extends State<LeagueDetail>
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: strings.rupee,
-      decimalDigits: 2,
+      decimalDigits: 0,
     );
 
     bool notAllowJoinedContests =
