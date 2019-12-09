@@ -638,15 +638,104 @@ class ContestsState extends State<Contests> {
   _buildMainContent() {
     return CustomScrollView(
       slivers: <Widget>[
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Column(
-              children: getBrandContestsWidgetList(),
-            )
-          ]),
-        )
+        SliverList(delegate: new SliverChildListDelegate(_buildContestList(_contests))),
       ],
     );
+  }
+
+  
+
+  List _buildContestList(List<Contest> brandContestList) {
+    List<Widget> listItems = List();
+
+    for (int index = 0; index < brandContestList.length; index++) {
+      /*When bShowBrandInfo is true at some index, then new brand starts */
+      bool bShowBrandInfo = index > 0
+          ? !((brandContestList[index - 1]).brand["info"] ==
+              brandContestList[index].brand["info"])
+          : true;
+      if (brandContestList[index].bisFirstContestOfBrand) {
+        showMoreContestsButton = false;
+        contestsCountOfBrands = 1;
+      } else {
+        contestsCountOfBrands++;
+      }
+      if (brandContestList[index].showMore) {
+        showMoreContestsButton = true;
+      }
+
+      listItems.add(Column(
+        children: <Widget>[
+          !showMoreContestsButton
+              ? getContestCards(index, bShowBrandInfo)
+              : Container(),
+          showMoreContestsButton &&
+                  showOrHIdeMoreContestsMap[_contests[index].brand["info"]]
+              ? getContestCards(index, bShowBrandInfo)
+              : Container(),
+          _contests[index].bisLastContestOfBrand &&
+                  showMoreContestsButton &&
+                  !showOrHIdeMoreContestsMap[_contests[index].brand["info"]]
+              ? Container(
+                  padding: EdgeInsets.only(right: 20),
+                  width: MediaQuery.of(context).size.width,
+                  child: InkWell(
+                    child: Text(
+                      "View " +
+                          (contestsCountOfBrands - maxContestForEachBrand)
+                              .toString() +
+                          " more",
+                      textAlign: TextAlign.end,
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
+                    ),
+                    onTap: () {
+                      AnalyticsManager().setJourney("contest_journey");
+                      AnalyticsManager().setSource("l1_lobby");
+                      Event event = Event(name: "l1_view_more_clicked");
+                      event.setMatchSportType(widget.sportsType);
+                      event.setMatchBrandId(
+                          brandContestList[index].brand["id"].toString());
+                      event.setMatchLeagueId(brandContestList[index].leagueId);
+                      event
+                          .setMatchStartTime(brandContestList[index].startTime);
+                      int isFirstOrRepeatDepositor = 0;
+                      if (widget.depositData != null &&
+                          widget.depositData.chooseAmountData != null) {
+                        if (widget
+                            .depositData.chooseAmountData.isFirstDeposit) {
+                          isFirstOrRepeatDepositor = 0;
+                        } else {
+                          isFirstOrRepeatDepositor = 1;
+                        }
+                      } else {
+                        isFirstOrRepeatDepositor = 2;
+                      }
+                      event.setMatchFirstOrRepeatDepositor(
+                          isFirstOrRepeatDepositor);
+                      addAnalyticsEvent(event: event);
+
+                      setState(() {
+                        if (showOrHIdeMoreContestsMap[
+                            _contests[index].brand["info"]]) {
+                          showOrHIdeMoreContestsMap[
+                              _contests[index].brand["info"]] = false;
+                        } else {
+                          showOrHIdeMoreContestsMap[
+                              _contests[index].brand["info"]] = true;
+                        }
+                      });
+                    },
+                  ))
+              : Container()
+        ],
+      ));
+    }
+
+    return listItems;
   }
 
   getBrandContestsWidgetList() {
