@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:playfantasy/commonwidgets/createteamepoc.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
 import 'dart:io';
@@ -34,7 +35,7 @@ class CreateTeam extends StatefulWidget {
   final L1 l1Data;
   final League league;
   final MyTeam selectedTeam;
- 
+
   CreateTeam({this.league, this.l1Data, this.mode, this.selectedTeam});
 
   @override
@@ -62,7 +63,7 @@ class CreateTeamState extends State<CreateTeam>
   List<Player> _selectedPlayers = [];
   Map<String, dynamic> _playerCountByStyle = {};
   Map<int, List<Player>> _selectedPlayersByStyleId = {};
-  List<int> initialSquad =[];
+  List<int> initialSquad = [];
 
   int teamAPlayerCount = 0;
   int teamBPlayerCount = 0;
@@ -72,11 +73,10 @@ class CreateTeamState extends State<CreateTeam>
     super.initState();
     _addPlayerTeamId();
     _getSportsType();
-    
-    
-     if(widget.l1Data.initialSquad !=null){
-        initialSquad=widget.l1Data.initialSquad;
-     }
+
+    if (widget.l1Data.initialSquad != null) {
+      initialSquad = widget.l1Data.initialSquad;
+    }
     _selectedPlayers =
         widget.selectedTeam != null ? widget.selectedTeam.players : [];
 
@@ -558,35 +558,33 @@ class CreateTeamState extends State<CreateTeam>
     );
   }
 
-   onPlayerSquadePlayersChanged(List<int> modifiedList){
+  onPlayerSquadePlayersChanged(List<int> modifiedList) {
     // setState(() {
     //   initialSquad=modifiedList;
     // });
   }
 
-
   _getTabsBodyBasedOnPlayingStyle() {
     List<PlayingStyleTab> tabsBody = [];
-    bool showSquadAnnouncedPlayersStatus =false;
-    if(widget.l1Data.initialSquad !=null){
-      showSquadAnnouncedPlayersStatus= widget.l1Data.initialSquad.isNotEmpty;
+    bool showSquadAnnouncedPlayersStatus = false;
+    if (widget.l1Data.initialSquad != null) {
+      showSquadAnnouncedPlayersStatus = widget.l1Data.initialSquad.isNotEmpty;
     }
     for (PlayingStyle style in _fanTeamRules.styles) {
       tabsBody.add(
         PlayingStyleTab(
-          style: style,
-          onSort: onSort,
-          sortedBy: _sortedBy,
-          league: widget.league,
-          l1Data: widget.l1Data,
-          allPlayers: allPlayers,
-          isAscending: bIsAscending,
-          onPlayerSelect: _selectPlayer,
-          mapSportLabel: sports.playingStyles,
-          selectedPlayers: _selectedPlayersByStyleId[style.id],
-          showSquadAnnouncedPlayersStatus:showSquadAnnouncedPlayersStatus,
-          initialSquad:initialSquad
-        ),
+            style: style,
+            onSort: onSort,
+            sortedBy: _sortedBy,
+            league: widget.league,
+            l1Data: widget.l1Data,
+            allPlayers: allPlayers,
+            isAscending: bIsAscending,
+            onPlayerSelect: _selectPlayer,
+            mapSportLabel: sports.playingStyles,
+            selectedPlayers: _selectedPlayersByStyleId[style.id],
+            showSquadAnnouncedPlayersStatus: showSquadAnnouncedPlayersStatus,
+            initialSquad: initialSquad),
       );
     }
     return tabsBody;
@@ -685,7 +683,8 @@ class CreateTeamState extends State<CreateTeam>
     webengageTeamData["MatchId"] = widget.league.matchId;
     webengageTeamData["LeagueId"] = widget.l1Data.league.id;
     webengageTeamData["SeriesId"] = widget.league.series.id;
-    webengageTeamData["MatchDate"] =getReadableDateFromTimeStamp(widget.l1Data.league.rounds[0].matches[0].startTime.toString());
+    webengageTeamData["MatchDate"] = getReadableDateFromTimeStamp(
+        widget.l1Data.league.rounds[0].matches[0].startTime.toString());
     webengageTeamData["MatchName"] = widget.l1Data.league.name;
     webengageTeamData["SportType"] = _sportType;
     webengageTeamData["Team1"] =
@@ -872,13 +871,19 @@ class CreateTeamState extends State<CreateTeam>
                   Column(
                     children: <Widget>[
                       AppBar(
-                        title: EPOC(
-                          timeInMiliseconds: widget.league.matchStartTime,
-                          style:
-                              Theme.of(context).primaryTextTheme.body2.copyWith(
+                        title: Row(
+                          children: <Widget>[
+                            CreateTeamEPOC(
+                              timeInMiliseconds: widget.league.matchStartTime,
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .body2
+                                  .copyWith(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,
                                   ),
+                            ),
+                          ],
                         ),
                         elevation: 0.0,
                         centerTitle: true,

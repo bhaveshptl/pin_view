@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/commonwidgets/addcashbutton.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -42,15 +45,19 @@ class LeagueDetail extends StatefulWidget {
   final bool activateDeepLinkingNavigation;
   final Account accountDetails;
   final Deposit depositData;
-  
-  LeagueDetail(this.league,
-      {this.leagues,
-      this.sportType,
-      this.onSportChange,
-      this.mapSportTypes,
-      this.activateDeepLinkingNavigation,
-      this.accountDetails,
-      this.depositData});
+  final double cashBalance;
+
+  LeagueDetail(
+    this.league, {
+    this.leagues,
+    this.sportType,
+    this.onSportChange,
+    this.mapSportTypes,
+    this.cashBalance,
+    this.depositData,
+    this.accountDetails,
+    this.activateDeepLinkingNavigation,
+  });
 
   @override
   State<StatefulWidget> createState() => LeagueDetailState();
@@ -80,8 +87,8 @@ class LeagueDetailState extends State<LeagueDetail>
   bool deactivateDeepLinkingNavigation = true;
   TabController tabController;
   int activeTabIndex = 0;
-  final CreateTeamState createTeamState = new  CreateTeamState();
-  
+  final CreateTeamState createTeamState = new CreateTeamState();
+
   @override
   initState() {
     super.initState();
@@ -839,6 +846,43 @@ class LeagueDetailState extends State<LeagueDetail>
     );
   }
 
+  _onCreateContest(BuildContext context) async {
+    if (squadStatus()) {
+      var createTeamResult;
+      var waitForCreateTeam = _myTeams.length == 0;
+      if (_myTeams.length == 0) {
+        createTeamResult = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateTeam(
+              league: widget.league,
+              l1Data: l1Data,
+              mode: TeamCreationMode.CREATE_TEAM,
+            ),
+          ),
+        );
+        if (createTeamResult != null) {
+          waitForCreateTeam = false;
+        }
+      }
+      if (!waitForCreateTeam) {
+        var result = await Navigator.of(context).push(
+          FantasyPageRoute(
+            pageBuilder: (context) => CreateContest(
+              league: widget.league,
+              l1data: l1Data,
+              sportsType: widget.sportType,
+              myTeams: _myTeams,
+              userBalance: widget.cashBalance,
+            ),
+          ),
+        );
+        if (result != null) {
+          ActionUtil().showMsgOnTop(result, context);
+        }
+      }
+    }
+  }
+
   _onBottomButtonClick(int index) async {
     var result;
     switch (index) {
@@ -880,16 +924,15 @@ class LeagueDetailState extends State<LeagueDetail>
         }
         break;
       case 2:
-         final result = await  Navigator.of(context).push(
+        final result = await Navigator.of(context).push(
           FantasyPageRoute(
             routeSettings: RouteSettings(name: "JoinedContests"),
             pageBuilder: (BuildContext context) => JoinedContests(
-              l1Data: l1Data,
-              myTeams: _myTeams,
-              league: widget.league,
-              sportsType: widget.sportType,
-              onContestTeamsUpdated:onContestTeamsUpdated
-            ),
+                l1Data: l1Data,
+                myTeams: _myTeams,
+                league: widget.league,
+                sportsType: widget.sportType,
+                onContestTeamsUpdated: onContestTeamsUpdated),
           ),
         );
 
@@ -967,6 +1010,12 @@ class LeagueDetailState extends State<LeagueDetail>
 
   @override
   Widget build(BuildContext context) {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 0,
+    );
+
     bool notAllowJoinedContests =
         (activeTabIndex == 0 && joinedContestCount == 0) ||
             (activeTabIndex == 1 && joinedPredictionContestCount == 0);
@@ -974,36 +1023,164 @@ class LeagueDetailState extends State<LeagueDetail>
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-          title.toUpperCase(),
+        leading: IconButton(
+          icon: Image.asset(
+            "images/Arrow.png",
+            height: 18.0,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        titleSpacing: 0.0,
+        title: Row(
+          children: <Widget>[
+            Expanded(
+              child: LeagueTitleEPOC(
+                title: widget.league.teamA.name +
+                    " vs " +
+                    widget.league.teamB.name,
+                timeInMiliseconds: widget.league.matchStartTime,
+                onTimeComplete: () {},
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            AddCashButton(
+              text: formatCurrency.format(widget.cashBalance),
+              onPressed: () {
+                _launchAddCash();
+              },
+            ),
+          ],
         ),
         actions: <Widget>[
-          FlatButton(
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.search,
-                  color: Colors.white,
-                ),
-                Text(
-                  " Contest code".toUpperCase(),
-                  style: Theme.of(context).primaryTextTheme.button.copyWith(
-                        color: Colors.white,
-                      ),
-                ),
-              ],
-            ),
-            onPressed: () {
-              _onSearchContest();
-            },
-          ),
+          Container(),
+          // FlatButton(
+          //   child: Row(
+          //     children: <Widget>[
+          //       Icon(
+          //         Icons.search,
+          //         color: Colors.white,
+          //       ),
+          //       Text(
+          //         " Contest code".toUpperCase(),
+          //         style: Theme.of(context).primaryTextTheme.button.copyWith(
+          //               color: Colors.white,
+          //             ),
+          //       ),
+          //     ],
+          //   ),
+          //   onPressed: () {
+          //     _onSearchContest();
+          //   },
+          // ),
         ],
         elevation: 0.0,
       ),
       body: Column(
         children: <Widget>[
-          LeagueTitle(
-            league: widget.league,
+          Container(
+            height: 56.0,
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    child: Container(
+                      margin: EdgeInsets.only(left: 16.0, right: 16.0),
+                      height: 24.0,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.0),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0.0, 0),
+                            color: Colors.grey.shade400,
+                            blurRadius: 4.0,
+                            spreadRadius: 1.0,
+                          ),
+                        ],
+                      ),
+                      child: FlatButton(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: 4.0, bottom: 4.0, right: 8.0),
+                              child: Image.asset("images/Contest_Icon.png"),
+                            ),
+                            Text(
+                              "CREATE CONTEST",
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .copyWith(
+                                    color: Color.fromRGBO(41, 41, 41, 1),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          _onCreateContest(context);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    child: Container(
+                      margin: EdgeInsets.only(right: 16.0, left: 16.0),
+                      height: 24.0,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(4.0),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: Offset(0.0, 0),
+                            color: Colors.grey.shade400,
+                            blurRadius: 4.0,
+                            spreadRadius: 1.0,
+                          ),
+                        ],
+                      ),
+                      child: FlatButton(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  top: 6.0, bottom: 6.0, right: 6.0),
+                              child: Image.asset("images/ContestCode_Icon.png"),
+                            ),
+                            Text(
+                              "CONTEST CODE",
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .copyWith(
+                                    color: Color.fromRGBO(41, 41, 41, 1),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          _onSearchContest();
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           bIsPredictionAvailable
               ? Container(
@@ -1052,8 +1229,7 @@ class LeagueDetailState extends State<LeagueDetail>
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
-                              depositData:widget.depositData
-                            ),
+                              depositData: widget.depositData),
                       predictionData == null
                           ? Container()
                           : PredictionView(
@@ -1082,10 +1258,9 @@ class LeagueDetailState extends State<LeagueDetail>
                               showLoader: showLoader,
                               scaffoldKey: _scaffoldKey,
                               mapContestTeams: _mapContestTeams,
-                              onContestTeamsUpdated:onContestTeamsUpdated,
-                              accountDetails:widget.accountDetails,
-                              depositData:widget.depositData
-                            ),
+                              onContestTeamsUpdated: onContestTeamsUpdated,
+                              accountDetails: widget.accountDetails,
+                              depositData: widget.depositData),
                     ],
                   ),
                 ),
@@ -1240,83 +1415,40 @@ class LeagueDetailState extends State<LeagueDetail>
                                 ),
                               ),
                             ),
-                            activeTabIndex == 0
-                                ? Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 8.0),
-                                    child: Container(
-                                      width: 1.0,
-                                      height: 72.0,
-                                      color: Colors.black12,
-                                    ),
-                                  )
-                                : Container(),
-                            activeTabIndex == 0
-                                ? Expanded(
-                                    child: Container(
-                                      height: 72.0,
-                                      child: FlatButton(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Container(
-                                              width: 24.0,
-                                              height: 24.0,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.orange,
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 4.0),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: <Widget>[
-                                                  Text(
-                                                    "Create Contest",
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        onPressed: () {
-                                          _onBottomButtonClick(0);
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                : Container(),
                           ],
                         ),
                       )
                     : Container(
                         height: 48.0,
                         padding: isIos ? EdgeInsets.only(bottom: 7.0) : null,
-                        width: MediaQuery.of(context).size.width / 2,
+                        // width: MediaQuery.of(context).size.width / 1.6,
                         child: ColorButton(
-                          color: Colors.orange,
-                          child: Text(
-                            (activeTabIndex == 0
-                                    ? "Create team"
-                                    : "Create prediction")
-                                .toUpperCase(),
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .title
-                                .copyWith(
-                                  color: Colors.white,
-                                  fontWeight:
-                                      isIos ? FontWeight.w600 : FontWeight.w900,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    right: 8.0, top: 6.0, bottom: 6.0),
+                                child: Image.asset(
+                                  "images/CricketBall_Icon.png",
                                 ),
+                              ),
+                              Text(
+                                (activeTabIndex == 0
+                                        ? "Create team"
+                                        : "Create prediction")
+                                    .toUpperCase(),
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Colors.white,
+                                      fontWeight: isIos
+                                          ? FontWeight.w600
+                                          : FontWeight.w900,
+                                    ),
+                              ),
+                            ],
                           ),
                           onPressed: () {
                             _onBottomButtonClick(3);

@@ -4,11 +4,18 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/addcashbutton.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/earncash/bonus_distribution.dart';
+import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
@@ -31,9 +38,11 @@ class EarnCashState extends State<EarnCash> {
   String refCode = "";
   String inviteUrl = "";
   String inviteMsg = "";
+  double userBalance = 0.0;
   List<dynamic> inviteSteps;
   static const social_share_platform =
       const MethodChannel('com.algorin.pf.socialshare');
+  static const utils_platform = const MethodChannel('com.algorin.pf.utils');
 
   List<dynamic> _carousel = [];
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -52,6 +61,142 @@ class EarnCashState extends State<EarnCash> {
     if (Platform.isIOS) {
       initSocialShareChannel();
     }
+    updateUserInfo();
+  }
+
+  updateUserInfo() async {
+    var _user = await getUserInfo();
+    if (_user != null) {
+      setState(() {
+        userBalance =
+            (_user.nonWithdrawable == null ? 0.0 : _user.nonWithdrawable) +
+                (_user.withdrawable == null ? 0.0 : _user.withdrawable) +
+                (_user.depositBucket == null ? 0.0 : _user.depositBucket);
+      });
+    }
+  }
+
+  getUserInfo() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.AUTH_CHECK_URL,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> user = json.decode(res.body)["user"];
+        setWebEngageKeys(user);
+
+        SharedPrefHelper.internal().saveToSharedPref(
+            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
+        return User.fromJson(user);
+      } else {
+        return null;
+      }
+    });
+  }
+
+  setWebEngageKeys(Map<dynamic, dynamic> data) async {
+    Map<dynamic, dynamic> userInfo = new Map();
+
+    userInfo["first_name"] =
+        data["first_name"] != null ? data["first_name"] : "";
+    userInfo["lastName"] = data["lastName"] != null ? data["lastName"] : "";
+    userInfo["login_name"] =
+        data["login_name"] != null ? data["login_name"] : "";
+    userInfo["channelId"] = data["channelId"] != null ? data["channelId"] : "";
+    userInfo["withdrawable"] =
+        data["withdrawable"] != null ? data["withdrawable"] : "";
+    userInfo["depositBucket"] =
+        data["depositBucket"] != null ? data["depositBucket"] : "";
+    userInfo["nonWithdrawable"] =
+        data["nonWithdrawable"] != null ? data["nonWithdrawable"] : "";
+    userInfo["nonPlayableBucket"] =
+        data["nonPlayableBucket"] != null ? data["nonPlayableBucket"] : "";
+    userInfo["accountStatus"] = "";
+    userInfo["user_balance_webengage"] =
+        data["depositBucket"] + data["withdrawable"];
+    Map<dynamic, dynamic> verificationStatus = data["verificationStatus"];
+    userInfo["pan_verification"] = verificationStatus["pan_verification"];
+    userInfo["mobile_verification"] = verificationStatus["mobile_verification"];
+    userInfo["address_verification"] =
+        verificationStatus["address_verification"];
+    userInfo["email_verification"] = verificationStatus["email_verification"];
+    Map<String, dynamic> profileData = await _getProfileData();
+
+    if (profileData["email"] != null) {
+      userInfo["email"] =
+          await AnalyticsManager.dosha256Encoding(profileData["email"]);
+    }
+    if (profileData["mobile"] != null) {
+      String mobile = await AnalyticsManager.dosha256Encoding(
+          "+91" + profileData["mobile"].toString());
+      userInfo["mobile"] = mobile;
+    }
+    if (profileData["fname"] != null) {
+      userInfo["first_name"] = profileData["fname"];
+    }
+    if (profileData["lname"] != null) {
+      userInfo["lastName"] = profileData["lname"];
+    }
+    if (profileData["status"] == "ACTIVE") {
+      userInfo["accountStatus"] = "1";
+    } else if (profileData["status"] == "CLOSED") {
+      userInfo["accountStatus"] = "2";
+    } else if (profileData["status"] == "BLOCKED") {
+      userInfo["accountStatus"] = "3";
+    }
+    userInfo["pincode"] =
+        profileData["pincode"] != null ? profileData["pincode"] : "";
+    userInfo["dob"] = profileData["dob"] != null ? profileData["dob"] : "";
+    userInfo["state"] =
+        profileData["state"] != null ? profileData["state"] : "";
+    try {
+      final value =
+          await utils_platform.invokeMethod('onUserInfoRefreshed', userInfo);
+    } catch (e) {}
+  }
+
+  showLoader(bool bShow) {
+    AppConfig.of(context)
+        .store
+        .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
+  }
+
+  _launchAddCash(
+      {String source, String promoCode, double prefilledAmount}) async {
+    showLoader(true);
+    routeLauncher.launchAddCash(
+      context,
+      source: source,
+      promoCode: promoCode,
+      prefilledAmount: prefilledAmount,
+      onComplete: () {
+        showLoader(false);
+      },
+    );
+  }
+
+  _getProfileData() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.GET_USER_PROFILE,
+      ),
+    );
+    return HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          Map<String, dynamic> response = json.decode(res.body);
+          return response;
+        } else if (res.statusCode == 401) {
+          return {};
+        }
+      },
+    ).whenComplete(() {});
   }
 
   setReferralDetails() async {
@@ -233,6 +378,12 @@ class EarnCashState extends State<EarnCash> {
 
   @override
   Widget build(BuildContext context) {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 0,
+    );
+
     BoxDecoration iconDecoration = BoxDecoration(
       shape: BoxShape.circle,
       border: Border.all(
@@ -244,8 +395,29 @@ class EarnCashState extends State<EarnCash> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-          "Refer & Earn".toUpperCase(),
+        leading: IconButton(
+          icon: Image.asset(
+            "images/Arrow.png",
+            height: 18.0,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        titleSpacing: 0.0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              "Refer & Earn".toUpperCase(),
+            ),
+            AddCashButton(
+              onPressed: () {
+                _launchAddCash(source: "earn_cash");
+              },
+              text: formatCurrency.format(userBalance),
+            )
+          ],
         ),
       ),
       body: SingleChildScrollView(

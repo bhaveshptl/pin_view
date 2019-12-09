@@ -27,6 +27,7 @@ class LeagueDetails {
   int status;
   final List<Round> rounds;
   List<dynamic> allowedContestTypes;
+  List<dynamic> priorityBrands;
   LeagueDetails({
     this.fanTeamRules,
     this.inningsId,
@@ -37,6 +38,7 @@ class LeagueDetails {
     this.status,
     this.rounds,
     this.allowedContestTypes,
+    this.priorityBrands,
   });
 
   factory LeagueDetails.fromJson(Map<String, dynamic> json) {
@@ -50,6 +52,7 @@ class LeagueDetails {
       status: json["status"],
       rounds: (json["rounds"] as List).map((i) => Round.fromJson(i)).toList(),
       allowedContestTypes: json["allowedContestTypes"],
+      priorityBrands: json["priorityBrands"],
     );
   }
 }

@@ -16,20 +16,23 @@ import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 class StatusTab extends StatelessWidget {
   final int sportType;
   final int leagueStatus;
+  final double cashBalance;
   final Function onSportChange;
   final List<League> allLeagues;
   final List<League> statusLeagues;
   final Map<String, int> mapSportTypes;
   final Function onLeagueStatusChanged;
 
-  StatusTab(
-      {this.sportType,
-      this.allLeagues,
-      this.leagueStatus,
-      this.statusLeagues,
-      this.onSportChange,
-      this.mapSportTypes,
-      this.onLeagueStatusChanged});
+  StatusTab({
+    this.sportType,
+    this.allLeagues,
+    this.leagueStatus,
+    this.statusLeagues,
+    this.onSportChange,
+    this.mapSportTypes,
+    this.cashBalance,
+    this.onLeagueStatusChanged,
+  });
 
   showLoader(bool bShow, BuildContext context) {
     AppConfig.of(context)

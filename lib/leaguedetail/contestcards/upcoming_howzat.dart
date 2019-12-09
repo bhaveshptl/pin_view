@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class UpcomingHowzatContest extends StatelessWidget {
@@ -13,6 +17,9 @@ class UpcomingHowzatContest extends StatelessWidget {
   final Function onPrizeStructure;
   final List<MyTeam> myJoinedTeams;
 
+  static const social_share_platform =
+      const MethodChannel('com.algorin.pf.socialshare');
+
   UpcomingHowzatContest({
     this.league,
     this.onJoin,
@@ -20,6 +27,31 @@ class UpcomingHowzatContest extends StatelessWidget {
     this.myJoinedTeams,
     this.onPrizeStructure,
   });
+
+  _shareContestDialog(BuildContext context) {
+    String contestVisibility = contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
+    String contestCode = contest.contestJoinCode;
+    String contestShareUrl = BaseUrl().contestShareUrl;
+    String inviteMsg =
+        "Join my HOWZAT $contestVisibility Contest! Use the contest code $contestCode in Howzat to join! \n $contestShareUrl";
+
+    if (Platform.isAndroid) {
+      _shareNowViaSystemApplication(inviteMsg);
+    }
+    if (Platform.isIOS) {
+      _shareNowViaSystemApplication(inviteMsg);
+    }
+  }
+
+  Future<String> _shareNowViaSystemApplication(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareText', msg);
+    } catch (e) {
+      print(e);
+    }
+    return value;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -270,97 +302,78 @@ class UpcomingHowzatContest extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Tooltip(
-                message: strings.get("NO_OF_WINNERS"),
-                child: FlatButton(
-                  padding: EdgeInsets.all(0.0),
-                  onPressed: () {
-                    if (onPrizeStructure != null) {
-                      onPrizeStructure(contest);
-                    }
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        contest.prizeDetails[0]["noOfPrizes"].toString() + " ",
-                        style:
-                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+              Row(
+                children: <Widget>[
+                  Tooltip(
+                    message: strings.get("NO_OF_WINNERS"),
+                    child: FlatButton(
+                      padding: EdgeInsets.all(0.0),
+                      onPressed: () {
+                        if (onPrizeStructure != null) {
+                          onPrizeStructure(contest);
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            contest.prizeDetails[0]["noOfPrizes"].toString() +
+                                " ",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
                                   color: Colors.orange,
                                   fontWeight: FontWeight.w900,
                                 ),
-                      ),
-                      Text(
-                        contest.prizeDetails[0]["noOfPrizes"].toString() == "1"
-                            ? "Winner"
-                            : strings.get("WINNERS"),
-                        style:
-                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                          ),
+                          Text(
+                            contest.prizeDetails[0]["noOfPrizes"].toString() ==
+                                    "1"
+                                ? "Winner"
+                                : strings.get("WINNERS"),
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .subhead
+                                .copyWith(
                                   color: Colors.orange,
                                   fontWeight: FontWeight.w600,
                                 ),
+                          ),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            size: 16.0,
+                            color: Colors.orange,
+                          )
+                        ],
                       ),
-                      Icon(
-                        Icons.arrow_drop_down,
-                        size: 16.0,
-                        color: Colors.orange,
-                      )
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  contest.guaranteed
-                      ? Container(
-                          padding: EdgeInsets.all(4.0),
-                          height: 24.0,
-                          constraints: BoxConstraints(minWidth: 24.0),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                            ),
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: Text(
-                            "G",
-                            style: TextStyle(
-                              color: Colors.orange,
-                              fontSize: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .fontSize,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        )
-                      : Container(),
-                  contest.teamsAllowed > 1
-                      ? Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Container(
-                            padding: EdgeInsets.all(4.0),
-                            height: 24.0,
-                            constraints: BoxConstraints(minWidth: 24.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Colors.grey.shade300,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      contest.guaranteed
+                          ? Container(
+                              padding: EdgeInsets.all(4.0),
+                              height: 24.0,
+                              constraints: BoxConstraints(minWidth: 24.0),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                ),
+                                borderRadius: BorderRadius.circular(4.0),
                               ),
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: Tooltip(
-                              message: strings.get("MAXIMUM_ENTRY").replaceAll(
-                                  "\$count", contest.teamsAllowed.toString()),
                               child: Text(
-                                "M" + contest.teamsAllowed.toString(),
+                                "G",
                                 style: TextStyle(
-                                  color: Colors.indigo,
+                                  color: Colors.orange,
                                   fontSize: Theme.of(context)
                                       .primaryTextTheme
                                       .caption
@@ -368,44 +381,79 @@ class UpcomingHowzatContest extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                          ),
-                        )
-                      : Container(),
-                  contest.bonusAllowed > 0
-                      ? Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Container(
-                            padding: EdgeInsets.all(4.0),
-                            height: 24.0,
-                            constraints: BoxConstraints(minWidth: 24.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                              ),
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: Tooltip(
-                              message: strings.get("USE_BONUS").replaceAll(
-                                  "\$bonusPercent",
-                                  contest.bonusAllowed.toString()),
-                              child: Text(
-                                "B" + contest.bonusAllowed.toString() + "%",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(70, 165, 12, 1),
-                                  fontSize: Theme.of(context)
-                                      .primaryTextTheme
-                                      .caption
-                                      .fontSize,
-                                  fontWeight: FontWeight.bold,
+                            )
+                          : Container(),
+                      contest.teamsAllowed > 1
+                          ? Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Container(
+                                padding: EdgeInsets.all(4.0),
+                                height: 24.0,
+                                constraints: BoxConstraints(minWidth: 24.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                                child: Tooltip(
+                                  message: strings
+                                      .get("MAXIMUM_ENTRY")
+                                      .replaceAll("\$count",
+                                          contest.teamsAllowed.toString()),
+                                  child: Text(
+                                    "M" + contest.teamsAllowed.toString(),
+                                    style: TextStyle(
+                                      color: Colors.indigo,
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .caption
+                                          .fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        )
-                      : Container(),
+                            )
+                          : Container(),
+                      contest.bonusAllowed > 0
+                          ? Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Container(
+                                padding: EdgeInsets.all(4.0),
+                                height: 24.0,
+                                constraints: BoxConstraints(minWidth: 24.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.0),
+                                ),
+                                child: Tooltip(
+                                  message: strings.get("USE_BONUS").replaceAll(
+                                      "\$bonusPercent",
+                                      contest.bonusAllowed.toString()),
+                                  child: Text(
+                                    "B" + contest.bonusAllowed.toString() + "%",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(70, 165, 12, 1),
+                                      fontSize: Theme.of(context)
+                                          .primaryTextTheme
+                                          .caption
+                                          .fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
                 ],
               )
             ],

@@ -533,38 +533,20 @@ class ContestDetailsCard extends StatelessWidget {
                                 ],
                               ),
                       ),
-                      bIsContestFull
-                          ? Container()
-                          : Padding(
-                              padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ColorButton(
-                                      onPressed: bIsContestFull
-                                          ? null
-                                          : () {
-                                              onJoinContest(contest);
-                                            },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 12.0),
-                                        child: Text(
-                                          "Join the contest".toUpperCase(),
-                                          style: Theme.of(context)
-                                              .primaryTextTheme
-                                              .headline
-                                              .copyWith(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FlatButton(
+                            onPressed: () {
+                              onShareContest();
+                            },
+                            child: Container(
+                              height: 48.0,
+                              child: Image.asset("images/Share_Icon.png"),
                             ),
+                          )
+                        ],
+                      )
                     ],
                   ),
           ],

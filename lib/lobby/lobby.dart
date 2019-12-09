@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/lobby/jungleerummy.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/profilepages/verification.dart';
@@ -337,13 +339,24 @@ class LobbyState extends State<Lobby>
           Navigator.of(context).push(
             FantasyPageRoute(
               routeSettings: RouteSettings(name: "LeagueDetail"),
-              pageBuilder: (context) => LeagueDetail(league,
-                  leagues: _leagues,
-                  sportType: _sportType,
-                  onSportChange: _onSportSelectionChaged,
-                  mapSportTypes: _mapSportTypes,
-                  accountDetails: accountDetails,
-                  depositData: depositData),
+              pageBuilder: (context) => LeagueDetail(
+                league,
+                leagues: _leagues,
+                sportType: _sportType,
+                onSportChange: _onSportSelectionChaged,
+                mapSportTypes: _mapSportTypes,
+                accountDetails: accountDetails,
+                depositData: depositData,
+                cashBalance: userBalance,
+              ),
+              // pageBuilder: (context) => LeagueDetail(
+              //   league,
+              //   leagues: _leagues,
+              //   sportType: _sportType,
+              //   onSportChange: _onSportSelectionChaged,
+              //   mapSportTypes: _mapSportTypes,
+              //   cashBalance: userBalance,
+              // ),
             ),
           );
         }
@@ -406,14 +419,27 @@ class LobbyState extends State<Lobby>
           Navigator.of(context).push(
             FantasyPageRoute(
               routeSettings: RouteSettings(name: "LeagueDetail"),
-              pageBuilder: (context) => LeagueDetail(league,
-                  leagues: _leagues,
-                  sportType: _sportType,
-                  onSportChange: _onSportSelectionChaged,
-                  mapSportTypes: _mapSportTypes,
-                  activateDeepLinkingNavigation: true,
-                  accountDetails: accountDetails,
-                  depositData: depositData),
+              pageBuilder: (context) => LeagueDetail(
+                league,
+                leagues: _leagues,
+                sportType: _sportType,
+                onSportChange: _onSportSelectionChaged,
+                mapSportTypes: _mapSportTypes,
+                activateDeepLinkingNavigation: true,
+                accountDetails: accountDetails,
+                depositData: depositData,
+                cashBalance: userBalance,
+              ),
+              // pageBuilder: (context) => LeagueDetail(
+              //   league,
+              //   leagues: _leagues,
+              //   sportType: _sportType,
+              //   onSportChange: _onSportSelectionChaged,
+              //   mapSportTypes: _mapSportTypes,
+              //   cashBalance: userBalance,
+              //   accountDetails: accountDetails,
+              //   activateDeepLinkingNavigation: true,
+              // ),
             ),
           );
         }
@@ -885,6 +911,7 @@ class LobbyState extends State<Lobby>
                             },
                             onSportChange: _onSportSelectionChaged,
                             mapSportTypes: _mapSportTypes,
+                            cashBalance: userBalance,
                           ),
                         ),
                       ],
@@ -933,7 +960,7 @@ class LobbyState extends State<Lobby>
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",
       symbol: strings.rupee,
-      decimalDigits: 2,
+      decimalDigits: 0,
     );
 
     return WillPopScope(
@@ -943,12 +970,22 @@ class LobbyState extends State<Lobby>
         endDrawer: AppDrawer(),
         appBar: AppBar(
           elevation: 0.0,
-          actions: <Widget>[
-            Container(),
-          ],
+          actions: <Widget>[Container()],
+          titleSpacing: 0.0,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              IconButton(
+                icon: Image.asset("images/Rummy_BTN.png"),
+                iconSize: 80.0,
+                onPressed: () {
+                  Navigator.of(context).push(
+                    FantasyPageRoute(
+                      pageBuilder: (context) => JungleeRummy(),
+                    ),
+                  );
+                },
+              ),
               Row(
                 children: <Widget>[
                   SvgPicture.asset(
@@ -965,64 +1002,12 @@ class LobbyState extends State<Lobby>
                   ),
                 ],
               ),
-              ColorButton(
-                padding: EdgeInsets.only(
-                    left: 8.0, right: 6.0, top: 6.0, bottom: 6.0),
-                color: Color.fromRGBO(125, 13, 13, 1),
-                elevation: 6.0,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: Color.fromRGBO(70, 165, 12, 1),
-                    width: 1.5,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Image.asset(
-                      "images/add-cash-header.png",
-                      height: 24.0,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        formatCurrency.format(userBalance),
-                        style:
-                            Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                      ),
-                    ),
-                    Image.asset(
-                      "images/header_add.png",
-                      height: 30.0,
-                    ),
-                  ],
-                ),
+              AddCashButton(
+                text: formatCurrency.format(userBalance),
                 onPressed: () {
                   _launchAddCash(source: "topright");
                 },
               ),
-              // InkWell(
-              //   onTap: () {
-              //     Navigator.of(context).push(
-              //       FantasyPageRoute(
-              //         pageBuilder: (context) => AppDrawer(),
-              //       ),
-              //     );
-              //   },
-              //   child: ClipRRect(
-              //     borderRadius: BorderRadius.circular(5.0),
-              //     child: Container(
-              //       color: Color.fromRGBO(242, 242, 242, 1),
-              //       child: Image.asset(
-              //         "images/person-icon.png",
-              //         height: 40.0,
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
           automaticallyImplyLeading: false,
