@@ -64,6 +64,7 @@ class StatusTab extends StatelessWidget {
             mapSportTypes: mapSportTypes,
             accountDetails: accountDetails,
             depositData: depositData,
+            cashBalance: cashBalance,
           ),
         ),
       );
