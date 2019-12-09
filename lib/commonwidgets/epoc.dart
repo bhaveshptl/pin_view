@@ -64,22 +64,198 @@ class EPOCState extends State<EPOC> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      bIsTimerClosed
-          ? "CLOSED"
-          : (leftDays.toString() +
-              "d : " +
-              (leftHours >= 0 ? leftHours.toString() : "0") +
-              "h : " +
-              (leftMinutes >= 0 ? leftMinutes.toString() : "0") +
-              "m : " +
-              (leftSeconds >= 0 ? leftSeconds.toString() : "0") +
-              "s"),
-      style: widget.style ??
-          Theme.of(context).primaryTextTheme.body1.copyWith(
-                color: Theme.of(context).primaryColor,
-              ),
-      textAlign: TextAlign.center,
-    );
+    return bIsTimerClosed
+        ? Text(
+            "CLOSED",
+            style: widget.style ??
+                Theme.of(context).primaryTextTheme.body1.copyWith(
+                      color: Theme.of(context).primaryColor,
+                    ),
+          )
+        : Container(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2.0),
+                    color: Colors.grey.shade100,
+                  ),
+                  padding: EdgeInsets.all(2.0),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        width: 16.0,
+                        child: Text(
+                          leftDays < 10
+                              ? "0" + leftDays.toString()
+                              : leftDays.toString(),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subtitle
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        width: 8.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          " : ",
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 16.0,
+                        child: Text(
+                          leftHours < 10
+                              ? "0" + leftHours.toString()
+                              : leftHours.toString(),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subtitle
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        width: 8.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          " : ",
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 16.0,
+                        child: Text(
+                          leftMinutes < 10
+                              ? "0" + leftMinutes.toString()
+                              : leftMinutes.toString(),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subtitle
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        width: 8.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          " : ",
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 16.0,
+                        child: Text(
+                          leftSeconds < 10
+                              ? "0" + leftSeconds.toString()
+                              : leftSeconds.toString(),
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .subtitle
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 2.0),
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        width: 16.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "D",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                              ),
+                        ),
+                      ),
+                      Container(
+                        width: 8.0,
+                      ),
+                      Container(
+                        width: 16.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "H",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                              ),
+                        ),
+                      ),
+                      Container(
+                        width: 8.0,
+                      ),
+                      Container(
+                        width: 16.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "M",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                              ),
+                        ),
+                      ),
+                      Container(
+                        width: 8.0,
+                      ),
+                      Container(
+                        width: 16.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "S",
+                          style: Theme.of(context)
+                              .primaryTextTheme
+                              .caption
+                              .copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w300,
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
   }
 }

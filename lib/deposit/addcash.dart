@@ -10,6 +10,7 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
@@ -19,9 +20,11 @@ import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/deposit/promo.dart';
 import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/modal/deposit.dart';
+import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/deposit/paymentmode.dart';
 import 'package:playfantasy/deposit/transactionfailed.dart';
@@ -37,12 +40,13 @@ class AddCash extends StatefulWidget {
   final double prefilledAmount;
   final String promoCode;
 
-  AddCash(
-      {this.depositData,
-      this.promoCodes,
-      this.source,
-      this.prefilledAmount,
-      this.promoCode});
+  AddCash({
+    this.depositData,
+    this.promoCodes,
+    this.source,
+    this.prefilledAmount,
+    this.promoCode,
+  });
 
   @override
   State<StatefulWidget> createState() => AddCashState();
@@ -70,6 +74,8 @@ class AddCashState extends State<AddCash> {
   Timer bgAnimationTimer;
   bool bShowBonusDistribution = false;
 
+  double userBalance = 0.0;
+
   Map<String, dynamic> razorpayPayload;
 
   TextEditingController promoController = TextEditingController();
@@ -96,6 +102,7 @@ class AddCashState extends State<AddCash> {
   void initState() {
     super.initState();
     initWebview();
+    updateUserInfo();
 
     if (!widget.depositData.bAllowRepeatDeposit ||
         widget.depositData.chooseAmountData.lastPaymentArray == null ||
@@ -212,6 +219,42 @@ class AddCashState extends State<AddCash> {
         hidden: true,
       );
     } catch (e) {}
+  }
+
+  updateUserInfo() async {
+    var _user = await getUserInfo();
+    if (_user != null) {
+      setState(() {
+        userBalance =
+            (_user.nonWithdrawable == null ? 0.0 : _user.nonWithdrawable) +
+                (_user.withdrawable == null ? 0.0 : _user.withdrawable) +
+                (_user.depositBucket == null ? 0.0 : _user.depositBucket);
+      });
+    }
+  }
+
+  getUserInfo() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.AUTH_CHECK_URL,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> user = json.decode(res.body)["user"];
+
+        SharedPrefHelper.internal().saveToSharedPref(
+            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
+        return User.fromJson(user);
+      } else {
+        return null;
+      }
+    }).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   _launchStaticPage(String name) {
@@ -422,9 +465,37 @@ class AddCashState extends State<AddCash> {
   }
 
   createChooseAmountUI() {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 2,
+    );
+
     if (widget.depositData != null) {
       return Column(
         children: [
+          Container(
+            height: 56.0,
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  "Current Balance".toUpperCase(),
+                  style: Theme.of(context).primaryTextTheme.title.copyWith(
+                        color: Colors.grey.shade800,
+                      ),
+                ),
+                Text(
+                  formatCurrency.format(userBalance),
+                  style: Theme.of(context).primaryTextTheme.title.copyWith(
+                        color: Colors.grey.shade800,
+                      ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -3383,9 +3454,22 @@ class AddCashState extends State<AddCash> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-          "Payments".toUpperCase(),
+        titleSpacing: 0.0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              "Payments".toUpperCase(),
+            ),
+
+            // AddCashButton(
+            //   onPressed: () {},
+            //   text: formatCurrency.format(userBalance),
+            //   showPlus: false,
+            // )
+          ],
         ),
+        actions: <Widget>[Container()],
       ),
       body: createChooseAmountUI(),
       //body: Container(width: 320, height: 620, child: createChooseAmountUI(),),

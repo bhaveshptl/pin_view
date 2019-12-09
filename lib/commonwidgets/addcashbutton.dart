@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 
 class AddCashButton extends StatelessWidget {
   final String text;
+  final bool showPlus;
   final Function onPressed;
-  AddCashButton({@required this.text, @required this.onPressed});
+  AddCashButton(
+      {@required this.text, @required this.onPressed, this.showPlus = true});
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      height: 36.0,
       padding: EdgeInsets.only(right: 8.0),
       child: FlatButton(
         padding: EdgeInsets.all(0.0),
@@ -27,22 +30,30 @@ class AddCashButton extends StatelessWidget {
               children: <Widget>[
                 Container(
                   padding: EdgeInsets.all(8.0),
+                  constraints: BoxConstraints(
+                    minWidth: 80.0,
+                  ),
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(61, 99, 37, 1),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
-                  child: Text(
-                    text,
-                    style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  child: Center(
+                    child: Text(
+                      text,
+                      style:
+                          Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                    ),
                   ),
                 ),
-                Icon(
-                  Icons.add,
-                  color: Colors.white,
-                )
+                showPlus
+                    ? Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      )
+                    : Container()
               ],
             ),
           ),

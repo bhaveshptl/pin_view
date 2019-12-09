@@ -1043,16 +1043,14 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                       widget.league.teamB.name,
                 ),
               ),
+              AddCashButton(
+                onPressed: () {
+                  _launchAddCash(source: "contest_details");
+                },
+                text: userBalFormatCurrency.format(userBalance),
+              )
             ],
           ),
-          actions: <Widget>[
-            AddCashButton(
-              onPressed: () {
-                _launchAddCash(source: "contest_details");
-              },
-              text: userBalFormatCurrency.format(userBalance),
-            )
-          ],
           elevation: 0.0,
         ),
         body: NestedScrollView(

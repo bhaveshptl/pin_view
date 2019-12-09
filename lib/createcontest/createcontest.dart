@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/commonwidgets/underline_textbox.dart';
 import 'dart:io';
@@ -19,7 +21,6 @@ import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
@@ -32,8 +33,15 @@ class CreateContest extends StatefulWidget {
   final League league;
   final List<MyTeam> myTeams;
   final sportsType;
+  final double userBalance;
 
-  CreateContest({this.league, this.l1data, this.myTeams, this.sportsType});
+  CreateContest({
+    this.league,
+    this.l1data,
+    this.myTeams,
+    this.sportsType,
+    this.userBalance,
+  });
 
   @override
   State<StatefulWidget> createState() => CreateContestState();
@@ -355,7 +363,7 @@ class CreateContestState extends State<CreateContest> {
       _totalPrize += prizeStructure.amount;
     });
 
-    return _totalPrize;
+    return _totalPrize.truncateToDouble();
   }
 
   List<double> getPrizeList(List<PrizeStructure> _suggestedPrizes) {
@@ -468,6 +476,17 @@ class CreateContestState extends State<CreateContest> {
     return int.parse(s, onError: (e) => null) != null;
   }
 
+  _launchAddCash() async {
+    showLoader(true);
+    routeLauncher.launchAddCash(
+      context,
+      onSuccess: (result) {},
+      onComplete: () {
+        showLoader(false);
+      },
+    );
+  }
+
   @override
   void dispose() {
     _streamSubscription.cancel();
@@ -476,6 +495,12 @@ class CreateContestState extends State<CreateContest> {
 
   @override
   Widget build(BuildContext context) {
+    final formatCurrency = NumberFormat.currency(
+      locale: "hi_IN",
+      symbol: strings.rupee,
+      decimalDigits: 2,
+    );
+
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
@@ -489,6 +514,12 @@ class CreateContestState extends State<CreateContest> {
                     widget.league.teamB.name,
               ),
             ),
+            AddCashButton(
+              onPressed: () {
+                _launchAddCash();
+              },
+              text: formatCurrency.format(widget.userBalance),
+            ),
           ],
         ),
         titleSpacing: 0.0,
@@ -496,18 +527,6 @@ class CreateContestState extends State<CreateContest> {
       ),
       body: Column(
         children: <Widget>[
-          // Row(
-          //   children: <Widget>[
-          //     Expanded(
-          //       child: Padding(
-          //         padding: const EdgeInsets.only(bottom: 8.0),
-          //         child: LeagueTitle(
-          //           league: widget.league,
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
           Expanded(
             child: Form(
               key: _formKey,

@@ -405,17 +405,20 @@ class EarnCashState extends State<EarnCash> {
           },
         ),
         titleSpacing: 0.0,
-        title: Text(
-          "Refer & Earn".toUpperCase(),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              "Refer & Earn".toUpperCase(),
+            ),
+            AddCashButton(
+              onPressed: () {
+                _launchAddCash(source: "earn_cash");
+              },
+              text: formatCurrency.format(userBalance),
+            )
+          ],
         ),
-        actions: <Widget>[
-          AddCashButton(
-            onPressed: () {
-              _launchAddCash(source: "earn_cash");
-            },
-            text: formatCurrency.format(userBalance),
-          )
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(

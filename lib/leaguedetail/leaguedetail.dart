@@ -841,7 +841,6 @@ class LeagueDetailState extends State<LeagueDetail>
       var createTeamResult;
       var waitForCreateTeam = _myTeams.length == 0;
       if (_myTeams.length == 0) {
-        waitForCreateTeam = false;
         createTeamResult = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateTeam(
@@ -851,9 +850,11 @@ class LeagueDetailState extends State<LeagueDetail>
             ),
           ),
         );
+        if (createTeamResult != null) {
+          waitForCreateTeam = false;
+        }
       }
-      if (!waitForCreateTeam ||
-          (waitForCreateTeam && createTeamResult != null)) {
+      if (!waitForCreateTeam) {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateContest(
@@ -861,10 +862,13 @@ class LeagueDetailState extends State<LeagueDetail>
               l1data: l1Data,
               sportsType: widget.sportType,
               myTeams: _myTeams,
+              userBalance: widget.cashBalance,
             ),
           ),
         );
-        ActionUtil().showMsgOnTop(result, context);
+        if (result != null) {
+          ActionUtil().showMsgOnTop(result, context);
+        }
       }
     }
   }
@@ -1014,15 +1018,16 @@ class LeagueDetailState extends State<LeagueDetail>
                 style: TextStyle(color: Colors.black),
               ),
             ),
+            AddCashButton(
+              text: formatCurrency.format(widget.cashBalance),
+              onPressed: () {
+                _launchAddCash();
+              },
+            ),
           ],
         ),
         actions: <Widget>[
-          AddCashButton(
-            text: formatCurrency.format(widget.cashBalance),
-            onPressed: () {
-              _launchAddCash();
-            },
-          ),
+          Container(),
           // FlatButton(
           //   child: Row(
           //     children: <Widget>[
@@ -1058,7 +1063,7 @@ class LeagueDetailState extends State<LeagueDetail>
                     fit: BoxFit.fitHeight,
                     child: Container(
                       margin: EdgeInsets.only(left: 16.0, right: 16.0),
-                      height: 30.0,
+                      height: 24.0,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(4.0),
@@ -1073,21 +1078,23 @@ class LeagueDetailState extends State<LeagueDetail>
                       ),
                       child: FlatButton(
                         color: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 8.0),
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
                         child: Row(
                           children: <Widget>[
                             Padding(
                               padding: EdgeInsets.only(
-                                  top: 2.0, bottom: 2.0, right: 8.0),
+                                  top: 4.0, bottom: 4.0, right: 8.0),
                               child: Image.asset("images/Contest_Icon.png"),
                             ),
                             Text(
                               "CREATE CONTEST",
-                              style: TextStyle(
-                                color: Color.fromRGBO(41, 41, 41, 1),
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .copyWith(
+                                    color: Color.fromRGBO(41, 41, 41, 1),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ],
                         ),
@@ -1103,7 +1110,7 @@ class LeagueDetailState extends State<LeagueDetail>
                     fit: BoxFit.fitHeight,
                     child: Container(
                       margin: EdgeInsets.only(right: 16.0, left: 16.0),
-                      height: 30.0,
+                      height: 24.0,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(4.0),
@@ -1118,21 +1125,23 @@ class LeagueDetailState extends State<LeagueDetail>
                       ),
                       child: FlatButton(
                         color: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 8.0),
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
                         child: Row(
                           children: <Widget>[
                             Padding(
                               padding: EdgeInsets.only(
-                                  top: 4.0, bottom: 4.0, right: 8.0),
+                                  top: 6.0, bottom: 6.0, right: 6.0),
                               child: Image.asset("images/ContestCode_Icon.png"),
                             ),
                             Text(
                               "CONTEST CODE",
-                              style: TextStyle(
-                                color: Color.fromRGBO(41, 41, 41, 1),
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .primaryTextTheme
+                                  .caption
+                                  .copyWith(
+                                    color: Color.fromRGBO(41, 41, 41, 1),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ],
                         ),

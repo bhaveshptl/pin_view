@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:playfantasy/appconfig.dart';
@@ -18,6 +19,8 @@ import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/profilepages/statedob.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
+import 'package:playfantasy/utils/apiutil.dart';
+import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
@@ -28,15 +31,16 @@ class ActionUtil {
 
   Flushbar flushbar;
 
-  launchJoinContest(
-      {L1 l1Data,
-      League league,
-      Contest contest,
-      int sportsType,
-      List<MyTeam> myTeams,
-      GlobalKey<ScaffoldState> scaffoldKey,
-      Map<String, dynamic> createContestPayload,
-      String launchPageSource}) async {
+  launchJoinContest({
+    L1 l1Data,
+    League league,
+    Contest contest,
+    int sportsType,
+    List<MyTeam> myTeams,
+    GlobalKey<ScaffoldState> scaffoldKey,
+    Map<String, dynamic> createContestPayload,
+    String launchPageSource,
+  }) async {
     showLoader(scaffoldKey.currentContext, true);
     final balance = await routeLauncher.getUserBalance(
       leagueId: league.leagueId,
@@ -70,23 +74,27 @@ class ActionUtil {
             myTeams: myTeams,
             createContestPayload: createContestPayload,
             onError: ((Contest contest, Map<String, dynamic> errorResponse) {
-              final result = onJoinContestError(
-                scaffoldKey.currentContext,
-                contest,
-                errorResponse,
-                createContestPayload: createContestPayload,
-                onJoin: () {
-                  launchJoinContest(
-                    league: league,
-                    l1Data: l1Data,
-                    sportsType: sportsType,
-                    contest: contest,
-                    myTeams: myTeams,
-                    scaffoldKey: scaffoldKey,
-                  );
-                },
-                userBalance: balance,
-              );
+              if (errorResponse["resultCode"] == -2) {
+                showMsgOnTop(errorResponse["message"], context);
+              } else {
+                final result = onJoinContestError(
+                  scaffoldKey.currentContext,
+                  contest,
+                  errorResponse,
+                  createContestPayload: createContestPayload,
+                  onJoin: () {
+                    launchJoinContest(
+                      league: league,
+                      l1Data: l1Data,
+                      sportsType: sportsType,
+                      contest: contest,
+                      myTeams: myTeams,
+                      scaffoldKey: scaffoldKey,
+                    );
+                  },
+                  userBalance: balance,
+                );
+              }
             }),
           ),
         ),
@@ -129,20 +137,24 @@ class ActionUtil {
         if (launchPageSource != null) {
           onContestJoinSuccess(
             result.toString(),
-            scaffoldKey.currentContext,
+            scaffoldKey,
             l1Data,
             league,
+            myTeams,
             launchPageSource,
             balance,
+            sportId: sportsType,
           );
         } else {
           onContestJoinSuccess(
             result.toString(),
-            scaffoldKey.currentContext,
+            scaffoldKey,
             l1Data,
             league,
+            myTeams,
             "",
             balance,
+            sportId: sportsType,
           );
         }
       }
@@ -151,19 +163,48 @@ class ActionUtil {
 
   onContestJoinSuccess(
     String message,
-    BuildContext context,
+    GlobalKey<ScaffoldState> scaffoldKey,
     L1 l1Data,
     League league,
+    List<MyTeam> myTeams,
     String launchPageSource,
-    Map<String, dynamic> balance,
-  ) async {
+    Map<String, dynamic> balance, {
+    int sportId,
+  }) async {
+    var leagueContestIds =
+        await getMyContestIds(scaffoldKey.currentContext, sportId);
+    List<dynamic> contestIds = (leagueContestIds[league.leagueId.toString()]);
+    Map<int, List<MyTeam>> myJoinedTeams;
+    if (contestIds == null) {
+      myJoinedTeams = {};
+    } else {
+      myJoinedTeams =
+          await getMyContestTeams(scaffoldKey.currentContext, contestIds);
+    }
+
     Map<String, dynamic> result = await showDialog(
-      context: context,
+      context: scaffoldKey.currentContext,
       builder: (BuildContext context) {
         return JoinContestSuccess(
           l1Data: l1Data,
+          league: league,
+          myTeams: myTeams,
+          scaffoldKey: scaffoldKey,
           balance: balance,
           successMessage: message,
+          myContestJoinedTeams: myJoinedTeams,
+          sportId: sportId,
+          onJoin: (Contest contest) {
+            Navigator.of(context).pop();
+            launchJoinContest(
+              league: league,
+              l1Data: l1Data,
+              contest: contest,
+              sportsType: sportId,
+              myTeams: myTeams,
+              scaffoldKey: scaffoldKey,
+            );
+          },
           launchPageSource: launchPageSource,
         );
       },
@@ -171,9 +212,9 @@ class ActionUtil {
 
     if (result != null) {
       if (result["userOption"] == "joinContest") {
-        Navigator.of(context).pop();
+        Navigator.of(scaffoldKey.currentContext).pop();
       } else if (result["userOption"] == "createTeam") {
-        final result = await Navigator.of(context).push(
+        final result = await Navigator.of(scaffoldKey.currentContext).push(
           FantasyPageRoute(
             pageBuilder: (context) => CreateTeam(
               league: league,
@@ -183,10 +224,62 @@ class ActionUtil {
         );
 
         if (result != null) {
-          ActionUtil().showMsgOnTop(result.toString(), context);
+          ActionUtil()
+              .showMsgOnTop(result.toString(), scaffoldKey.currentContext);
         }
       }
     }
+  }
+
+  Future<dynamic> getMyContestIds(BuildContext context, int sporttype) async {
+    showLoader(context, true);
+
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+          BaseUrl().apiUrl + ApiUtil.GET_MY_ALL_MATCHES + sporttype.toString()),
+    );
+
+    return await HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        showLoader(context, false);
+        Map<String, dynamic> response = json.decode(res.body);
+
+        return response["myContestIds"];
+      }
+      return null;
+    }).whenComplete(() {
+      showLoader(context, false);
+    });
+  }
+
+  Future<Map<int, List<MyTeam>>> getMyContestTeams(
+      BuildContext context, List<dynamic> contestIds) async {
+    http.Request req = http.Request(
+        "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.GET_MY_CONTEST_MY_TEAMS));
+    req.body = json.encode(contestIds);
+    return await HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          // Map<String, dynamic> response = json.decode(res.body);
+
+          Map<int, List<MyTeam>> _mapContestMyTeams = {};
+          Map<String, dynamic> response = json.decode(res.body);
+          response.forEach((String key, dynamic value) {
+            List<MyTeam> _myTeams =
+                (value as List).map((i) => MyTeam.fromJson(i)).toList();
+            _mapContestMyTeams[int.parse(key)] = _myTeams;
+          });
+
+          return _mapContestMyTeams;
+        }
+        return null;
+      },
+    ).whenComplete(() {
+      ActionUtil().showLoader(context, false);
+    });
   }
 
   showLoader(BuildContext context, bool bShow) {

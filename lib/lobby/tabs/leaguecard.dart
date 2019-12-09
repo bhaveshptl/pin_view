@@ -143,32 +143,53 @@ class LeagueCard extends StatelessWidget {
                                   ),
                                 )
                               : Container(
-                                  width: 32.0,
-                                  height: 32.0,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey.shade400,
-                                      width: 1.0,
-                                    ),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Text(
-                                        "vs".toUpperCase(),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          fontSize: Theme.of(context)
-                                              .primaryTextTheme
-                                              .caption
-                                              .fontSize,
-                                          fontWeight: FontWeight.w900,
-                                          color: Colors.black87,
+                                  child: _league.status ==
+                                              LeagueStatus.COMPLETED ||
+                                          _league.status == LeagueStatus.LIVE
+                                      ? Container(
+                                          alignment: Alignment.center,
+                                          child: Text(
+                                            contestCount.toString() +
+                                                " Contest Joined",
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .body1
+                                                .copyWith(
+                                                  color: Colors.black,
+                                                ),
+                                          ),
+                                        )
+                                      : EPOC(
+                                          onTimeComplete: onTimeComplete,
+                                          timeInMiliseconds:
+                                              _league.matchStartTime,
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                  // width: 32.0,
+                                  // height: 32.0,
+                                  // decoration: BoxDecoration(
+                                  //   border: Border.all(
+                                  //     color: Colors.grey.shade400,
+                                  //     width: 1.0,
+                                  //   ),
+                                  //   shape: BoxShape.circle,
+                                  // ),
+                                  // child: Column(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: <Widget>[
+                                  //     Text(
+                                  //       "vs".toUpperCase(),
+                                  //       textAlign: TextAlign.center,
+                                  //       style: TextStyle(
+                                  //         fontSize: Theme.of(context)
+                                  //             .primaryTextTheme
+                                  //             .caption
+                                  //             .fontSize,
+                                  //         fontWeight: FontWeight.w900,
+                                  //         color: Colors.black87,
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
                                 ),
                           Column(
                             children: <Widget>[
@@ -232,32 +253,32 @@ class LeagueCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            child: _league.status == LeagueStatus.COMPLETED ||
-                                    _league.status == LeagueStatus.LIVE
-                                ? Container(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      contestCount.toString() +
-                                          " Contest Joined",
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .body1
-                                          .copyWith(
-                                            color: Colors.black,
-                                          ),
-                                    ),
-                                  )
-                                : EPOC(
-                                    onTimeComplete: onTimeComplete,
-                                    timeInMiliseconds: _league.matchStartTime,
-                                  ),
-                          )
-                        ],
-                      )
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: <Widget>[
+                      //     Expanded(
+                      //       child: _league.status == LeagueStatus.COMPLETED ||
+                      //               _league.status == LeagueStatus.LIVE
+                      //           ? Container(
+                      //               alignment: Alignment.center,
+                      //               child: Text(
+                      //                 contestCount.toString() +
+                      //                     " Contest Joined",
+                      //                 style: Theme.of(context)
+                      //                     .primaryTextTheme
+                      //                     .body1
+                      //                     .copyWith(
+                      //                       color: Colors.black,
+                      //                     ),
+                      //               ),
+                      //             )
+                      //           : EPOC(
+                      //               onTimeComplete: onTimeComplete,
+                      //               timeInMiliseconds: _league.matchStartTime,
+                      //             ),
+                      //     )
+                      //   ],
+                      // )
                     ],
                   ),
                 ),
