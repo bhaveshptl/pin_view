@@ -967,7 +967,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                       .body1
                                       .copyWith(
                                         color: Colors.black,
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.w800,
                                       ),
                                 ),
                               ),
@@ -982,7 +982,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                             .body1
                                             .copyWith(
                                               color: Colors.black,
-                                              fontWeight: FontWeight.w900,
+                                              fontWeight: FontWeight.w800,
                                             ),
                                       ),
                                     )
@@ -997,7 +997,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                       .body1
                                       .copyWith(
                                         color: Colors.black,
-                                        fontWeight: FontWeight.w900,
+                                        fontWeight: FontWeight.w800,
                                       ),
                                 ),
                               ),
@@ -1108,7 +1108,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                                 .subhead
                                                 .copyWith(
                                                   color: Colors.black87,
-                                                  fontWeight: FontWeight.w900,
+                                                  fontWeight: FontWeight.w600,
                                                 ),
                                           ),
                                           widget.league.status ==

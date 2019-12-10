@@ -532,7 +532,7 @@ class AppDrawerState extends State<AppDrawer> {
                         style:
                             Theme.of(context).primaryTextTheme.title.copyWith(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w600,
                                 ),
                       ),
                       subtitle: Text(
