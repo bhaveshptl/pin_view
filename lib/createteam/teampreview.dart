@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/modal/l1.dart';
@@ -405,6 +406,7 @@ class TeamPreview extends StatelessWidget {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0.0,
+            leading: LeadingButton(),
             title:
                 Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
             actions: <Widget>[

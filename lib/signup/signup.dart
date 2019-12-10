@@ -10,6 +10,7 @@ import 'package:package_info/package_info.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/signin/signin.dart';
@@ -43,7 +44,7 @@ class SignupState extends State<Signup> {
   String _installReferring_link = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
   String chosenloginTypeByUser = "";
-  String location_longitude="";
+  String location_longitude = "";
   String location_latitude = "";
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
@@ -98,16 +99,16 @@ class SignupState extends State<Signup> {
         .getFromSharedPref(ApiUtil.SHARED_PREFERENCE_INSTALLREFERRING_BRANCH);
     installReferringlinkFromBranch.then((value) {
       if (value != null) {
-        if(value.length > 3){
-           _installReferring_link = value;
+        if (value.length > 3) {
+          _installReferring_link = value;
         }
       } else {
         _getInstallReferringLink().then((String link) {
-           if (value != null) {
-             if(link.length>3){
-            _installReferring_link = link;
+          if (value != null) {
+            if (link.length > 3) {
+              _installReferring_link = link;
+            }
           }
-           }
         });
       }
     });
@@ -154,7 +155,7 @@ class SignupState extends State<Signup> {
 
   _initBranchStuff() async {
     _getInstallReferringLink().then((String value) {
-      if(value.length>2){
+      if (value.length > 2) {
         _installReferring_link = value;
       }
     });
@@ -198,10 +199,9 @@ class SignupState extends State<Signup> {
     return value;
   }
 
- 
   Future<String> setLongLatValues() async {
     PermissionStatus permission =
-          await LocationPermissions().requestPermissions();
+        await LocationPermissions().requestPermissions();
     Map<dynamic, dynamic> value;
     PermissionStatus permissionStatus =
         await LocationPermissions().checkPermissionStatus();
@@ -210,21 +210,20 @@ class SignupState extends State<Signup> {
         value = await utils_platform.invokeMethod('getLocationLongLat');
         print("^^^^^^^^^Inside the Geo location********");
         print(value);
-        if(value["bAccessGiven"] != null){
-        if(value["bAccessGiven"]=="true"){
-          location_longitude=value["longitude"];
-          location_latitude=value["latitude"];
+        if (value["bAccessGiven"] != null) {
+          if (value["bAccessGiven"] == "true") {
+            location_longitude = value["longitude"];
+            location_latitude = value["latitude"];
+          }
         }
-      } 
       } catch (e) {
-         print("^^^^^^^^^Inside the Geo location error ********");
+        print("^^^^^^^^^Inside the Geo location error ********");
         print(e);
         value = null;
       }
     } else if (permissionStatus.toString() ==
         PermissionStatus.denied.toString()) {
       await showLocationPermissionInformationPopup();
-      
     } else {
       PermissionStatus permission =
           await LocationPermissions().requestPermissions();
@@ -236,77 +235,74 @@ class SignupState extends State<Signup> {
     return showDialog(
       context: context,
       builder: (context) => WillPopScope(
-            onWillPop: () {},
-            child: AlertDialog(
-              contentPadding: EdgeInsets.all(0.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    height: 80.0,
-                    color: Theme.of(context).primaryColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SvgPicture.asset(
-                          "images/logo_white.svg",
-                          color: Colors.white,
-                          width: 40.0,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.0),
-                          child: Image.asset(
-                            "images/logo_name_white.png",
-                            height: 20.0,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: RichText(
-                            textAlign: TextAlign.justify,
-                            text: TextSpan(
-                              style: TextStyle(
-                                color: Colors.black87,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text:
-                                      "Howzat needs access to your location.Please allow access to your location settings and restart app to move forward.",
-                                ),
-                                
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(right: 8.0),
-                  child: FlatButton(
-                    child: Text("Settings"),
-                    onPressed: () {
-                      openSettingForGrantingPermissions();
-                                          
-                    },
-                  ),
-                ),
-              ],
-            ),
+        onWillPop: () {},
+        child: AlertDialog(
+          contentPadding: EdgeInsets.all(0.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
           ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                height: 80.0,
+                color: Theme.of(context).primaryColor,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SvgPicture.asset(
+                      "images/logo_white.svg",
+                      color: Colors.white,
+                      width: 40.0,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Image.asset(
+                        "images/logo_name_white.png",
+                        height: 20.0,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: RichText(
+                        textAlign: TextAlign.justify,
+                        text: TextSpan(
+                          style: TextStyle(
+                            color: Colors.black87,
+                          ),
+                          children: [
+                            TextSpan(
+                              text:
+                                  "Howzat needs access to your location.Please allow access to your location settings and restart app to move forward.",
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(right: 8.0),
+              child: FlatButton(
+                child: Text("Settings"),
+                onPressed: () {
+                  openSettingForGrantingPermissions();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
       barrierDismissible: false,
     );
   }
@@ -315,15 +311,12 @@ class SignupState extends State<Signup> {
     bool isOpened = await LocationPermissions().openAppSettings();
     PermissionStatus permissionStatus =
         await LocationPermissions().checkPermissionStatus();
-    if (permissionStatus.toString() == PermissionStatus.granted.toString()){
-         print("We are inside granted permission");
-         Navigator.of(context).pop();
-          
-       }else{
-          print("We are outside granted permission");
-          
-       } 
-    
+    if (permissionStatus.toString() == PermissionStatus.granted.toString()) {
+      print("We are inside granted permission");
+      Navigator.of(context).pop();
+    } else {
+      print("We are outside granted permission");
+    }
   }
 
   _showReferralInput() {
@@ -332,7 +325,7 @@ class SignupState extends State<Signup> {
     });
   }
 
-  _doSignUp() async { 
+  _doSignUp() async {
     showLoader(true);
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -340,7 +333,7 @@ class SignupState extends State<Signup> {
     String model = "";
     String manufacturer = "";
     String serial = "";
-    
+
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       model = androidInfo.model;
@@ -374,8 +367,8 @@ class SignupState extends State<Signup> {
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter,
-      "location_longitude":location_longitude,
-      "location_latitude":location_latitude
+      "location_longitude": location_longitude,
+      "location_latitude": location_latitude
     };
 
     bool disableBranchIOAttribution =
@@ -507,8 +500,7 @@ class SignupState extends State<Signup> {
     showLoader(true);
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
-    var result = await facebookLogin
-        .logIn(['email', 'public_profile']);
+    var result = await facebookLogin.logIn(['email', 'public_profile']);
 
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
@@ -559,8 +551,8 @@ class SignupState extends State<Signup> {
       "serial": serial,
       "branchinstallReferringlink": _installReferring_link,
       "app_version_flutter": app_version_flutter,
-      "location_longitude":location_longitude,
-      "location_latitude":location_latitude
+      "location_longitude": location_longitude,
+      "location_latitude": location_latitude
     };
 
     bool disableBranchIOAttribution =
@@ -650,11 +642,8 @@ class SignupState extends State<Signup> {
     data["value"] = userId;
     try {
       result =
-          await webengage_platform.invokeMethod('webengageTrackUser', data);   
-      
-    } catch (e) {
-      
-    }
+          await webengage_platform.invokeMethod('webengageTrackUser', data);
+    } catch (e) {}
     return "";
   }
 
@@ -679,8 +668,7 @@ class SignupState extends State<Signup> {
     try {
       String trackValue = await webengage_platform.invokeMethod(
           'webEngageEventSigniup', signupdata);
-    } catch (e) {
-    }
+    } catch (e) {}
     return trackValue;
   }
 
@@ -719,13 +707,14 @@ class SignupState extends State<Signup> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: isIos ? Uri.encodeFull(url) : url,
-              appBar: AppBar(
-                title: Text(
-                  title.toUpperCase(),
-                ),
-              ),
+          url: isIos ? Uri.encodeFull(url) : url,
+          appBar: AppBar(
+            leading: LeadingButton(),
+            title: Text(
+              title.toUpperCase(),
             ),
+          ),
+        ),
       ),
     );
   }
@@ -741,6 +730,7 @@ class SignupState extends State<Signup> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Row(

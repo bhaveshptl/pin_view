@@ -72,6 +72,7 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.topLeft,
+      padding: EdgeInsets.symmetric(vertical: 4.0),
       child: FittedBox(
         child: Container(
           alignment: Alignment.topLeft,
@@ -88,17 +89,16 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
           child: Row(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.only(right: 8.0, left: 8.0),
+                padding: EdgeInsets.only(right: 16.0, left: 8.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
                       widget.title,
-                      style:
-                          Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ],
                 ),
@@ -125,16 +125,17 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                             children: <Widget>[
                               leftDays != 0
                                   ? Container(
-                                      width: 16.0,
+                                      width: 20.0,
                                       child: Text(
                                         leftDays < 10
                                             ? "0" + leftDays.toString()
                                             : leftDays.toString(),
                                         style: Theme.of(context)
                                             .primaryTextTheme
-                                            .subhead
+                                            .title
                                             .copyWith(
                                               color: Colors.white,
+                                              fontWeight: FontWeight.w400,
                                             ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -152,16 +153,17 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                                     )
                                   : Container(),
                               Container(
-                                width: 16.0,
+                                width: 20.0,
                                 child: Text(
                                   leftHours < 10
                                       ? "0" + leftHours.toString()
                                       : leftHours.toString(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .subhead
+                                      .title
                                       .copyWith(
                                         color: Colors.white,
+                                        fontWeight: FontWeight.w400,
                                       ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -176,16 +178,17 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                                 ),
                               ),
                               Container(
-                                width: 16.0,
+                                width: 20.0,
                                 child: Text(
                                   leftMinutes < 10
                                       ? "0" + leftMinutes.toString()
                                       : leftMinutes.toString(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .subhead
+                                      .title
                                       .copyWith(
                                         color: Colors.white,
+                                        fontWeight: FontWeight.w400,
                                       ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -203,16 +206,17 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                                   : Container(),
                               leftDays == 0
                                   ? Container(
-                                      width: 16.0,
+                                      width: 20.0,
                                       child: Text(
                                         leftSeconds < 10
                                             ? "0" + leftSeconds.toString()
                                             : leftSeconds.toString(),
                                         style: Theme.of(context)
                                             .primaryTextTheme
-                                            .subhead
+                                            .title
                                             .copyWith(
                                               color: Colors.white,
+                                              fontWeight: FontWeight.w400,
                                             ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -225,7 +229,7 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                           children: <Widget>[
                             leftDays != 0
                                 ? Container(
-                                    width: 16.0,
+                                    width: 20.0,
                                     alignment: Alignment.center,
                                     child: Text(
                                       "D",
@@ -245,7 +249,7 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                                   )
                                 : Container(),
                             Container(
-                              width: 16.0,
+                              width: 20.0,
                               alignment: Alignment.center,
                               child: Text(
                                 "H",
@@ -261,7 +265,7 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                               width: 14.0,
                             ),
                             Container(
-                              width: 16.0,
+                              width: 20.0,
                               alignment: Alignment.center,
                               child: Text(
                                 "M",
@@ -280,7 +284,7 @@ class LeagueTitleEPOCState extends State<LeagueTitleEPOC> {
                                 : Container(),
                             leftDays == 0
                                 ? Container(
-                                    width: 16.0,
+                                    width: 20.0,
                                     alignment: Alignment.center,
                                     child: Text(
                                       "S",

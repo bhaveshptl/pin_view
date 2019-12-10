@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
@@ -175,16 +177,22 @@ class MyTeamsState extends State<MyTeams> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-          strings.get("MY_TEAMS").toUpperCase(),
+        leading: LeadingButton(),
+        title: Row(
+          children: <Widget>[
+            LeagueTitleEPOC(
+              title:
+                  widget.league.teamA.name + " vs " + widget.league.teamB.name,
+              timeInMiliseconds: widget.league.matchStartTime,
+              onTimeComplete: () {},
+              style: TextStyle(color: Colors.black),
+            )
+          ],
         ),
         elevation: 0.0,
       ),
       body: Column(
         children: <Widget>[
-          LeagueTitle(
-            league: widget.league,
-          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(

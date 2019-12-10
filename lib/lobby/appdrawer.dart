@@ -7,6 +7,7 @@ import 'package:package_info/package_info.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/createteam/sports.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/modal/user.dart';
@@ -179,6 +180,7 @@ class AppDrawerState extends State<AppDrawer> {
         builder: (context) => WebviewScaffold(
           url: isIos ? Uri.encodeFull(url) : url,
           appBar: AppBar(
+            leading: LeadingButton(),
             title: Text(
               title.toUpperCase(),
             ),
@@ -614,7 +616,6 @@ class AppDrawerState extends State<AppDrawer> {
               },
             ),
           ),
-
           Padding(
             padding: EdgeInsets.symmetric(vertical: verticalPadding),
             child: ListTile(
@@ -633,7 +634,6 @@ class AppDrawerState extends State<AppDrawer> {
               },
             ),
           ),
-
           Divider(
             color: Colors.grey.shade400,
             height: 1.0,

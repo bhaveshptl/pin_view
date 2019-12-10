@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/modal/analytics.dart';
@@ -181,6 +182,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         builder: (context) => WebviewScaffold(
           url: url,
           appBar: AppBar(
+            leading: LeadingButton(),
             title: Text(
               title.toUpperCase(),
             ),
@@ -2319,6 +2321,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Text(
           "Payment".toUpperCase(),
         ),

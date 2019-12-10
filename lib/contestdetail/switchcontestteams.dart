@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -127,7 +129,6 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
     req.body = json.encode([widget.contest.id]);
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
-       
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           Map<String, dynamic> response = json.decode(res.body);
           if (response[widget.contest.id.toString()] != null) {
@@ -155,7 +156,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
           : widget.l1Data.league.rounds[0].matches[0].id,
       "channelId": AppConfig.of(context).channelId,
     };
-    
+
     http.Request req = http.Request(
         "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SWITCH_CONTEST_TEAM));
     req.body = json.encode(payload);
@@ -168,7 +169,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
           print(response);
           if (response["error"] == false) {
             print("Switch response is true");
-            
+
             Navigator.of(context).pop(
               json.encode({
                 "error": false,
@@ -229,15 +230,23 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
     return ScaffoldPage(
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
-        title: Text("SWITCH TEAM".toUpperCase()),
+        leading: LeadingButton(),
+        title: Row(
+          children: <Widget>[
+            LeagueTitleEPOC(
+              title:
+                  widget.league.teamA.name + " vs " + widget.league.teamB.name,
+              timeInMiliseconds: widget.league.matchStartTime,
+              onTimeComplete: () {},
+              style: TextStyle(color: Colors.black),
+            )
+          ],
+        ),
         elevation: 0.0,
       ),
       body: _myUniqueTeams.length == 0
           ? Column(
               children: <Widget>[
-                LeagueTitle(
-                  league: widget.league,
-                ),
                 Expanded(
                   child: Center(
                     child: Text(
@@ -255,9 +264,6 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                LeagueTitle(
-                  league: widget.league,
-                ),
                 Row(
                   children: <Widget>[
                     Expanded(
@@ -411,7 +417,10 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
                                                 onTap: () {
                                                   Navigator.of(context).push(
                                                     FantasyPageRoute(
-                                                      routeSettings: RouteSettings(name: "TeamPreview"),
+                                                      routeSettings:
+                                                          RouteSettings(
+                                                              name:
+                                                                  "TeamPreview"),
                                                       pageBuilder: (BuildContext
                                                               context) =>
                                                           TeamPreview(

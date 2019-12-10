@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
@@ -1023,15 +1024,7 @@ class LeagueDetailState extends State<LeagueDetail>
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Image.asset(
-            "images/Arrow.png",
-            height: 18.0,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        leading: LeadingButton(),
         titleSpacing: 0.0,
         title: Row(
           children: <Widget>[
@@ -1097,8 +1090,8 @@ class LeagueDetailState extends State<LeagueDetail>
                         boxShadow: [
                           BoxShadow(
                             offset: Offset(0.0, 0),
-                            color: Colors.grey.shade400,
-                            blurRadius: 4.0,
+                            color: Colors.grey.shade300,
+                            blurRadius: 1.0,
                             spreadRadius: 1.0,
                           ),
                         ],
@@ -1109,9 +1102,11 @@ class LeagueDetailState extends State<LeagueDetail>
                         child: Row(
                           children: <Widget>[
                             Padding(
-                              padding: EdgeInsets.only(
-                                  top: 4.0, bottom: 4.0, right: 8.0),
-                              child: Image.asset("images/Contest_Icon.png"),
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Image.asset(
+                                "images/Contest_Icon.png",
+                                height: 12.0,
+                              ),
                             ),
                             Text(
                               "CREATE CONTEST",
@@ -1144,8 +1139,8 @@ class LeagueDetailState extends State<LeagueDetail>
                         boxShadow: [
                           BoxShadow(
                             offset: Offset(0.0, 0),
-                            color: Colors.grey.shade400,
-                            blurRadius: 4.0,
+                            color: Colors.grey.shade300,
+                            blurRadius: 1.0,
                             spreadRadius: 1.0,
                           ),
                         ],
@@ -1156,9 +1151,11 @@ class LeagueDetailState extends State<LeagueDetail>
                         child: Row(
                           children: <Widget>[
                             Padding(
-                              padding: EdgeInsets.only(
-                                  top: 6.0, bottom: 6.0, right: 6.0),
-                              child: Image.asset("images/ContestCode_Icon.png"),
+                              padding: EdgeInsets.only(right: 8.0),
+                              child: Image.asset(
+                                "images/ContestCode_Icon.png",
+                                height: 12.0,
+                              ),
                             ),
                             Text(
                               "CONTEST CODE",

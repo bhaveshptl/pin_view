@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
@@ -272,6 +273,7 @@ class AddCashState extends State<AddCash> {
         builder: (context) => WebviewScaffold(
           url: url,
           appBar: AppBar(
+            leading: LeadingButton(),
             title: Text(
               title.toUpperCase(),
             ),
@@ -3488,6 +3490,7 @@ class AddCashState extends State<AddCash> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         titleSpacing: 0.0,
+        leading: LeadingButton(),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[

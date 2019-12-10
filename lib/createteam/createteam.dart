@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/commonwidgets/createteamepoc.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
 import 'dart:io';
@@ -873,7 +874,10 @@ class CreateTeamState extends State<CreateTeam>
                       AppBar(
                         title: Row(
                           children: <Widget>[
-                            CreateTeamEPOC(
+                            LeagueTitleEPOC(
+                              title: widget.league.teamA.name +
+                                  " vs " +
+                                  widget.league.teamB.name,
                               timeInMiliseconds: widget.league.matchStartTime,
                               style: Theme.of(context)
                                   .primaryTextTheme

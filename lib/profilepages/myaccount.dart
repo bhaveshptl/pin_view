@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/modal/account.dart';
@@ -46,7 +47,7 @@ class MyAccountState extends State<MyAccount> {
     String amountInString = amount.toStringAsFixed(2);
     try {
       var decimalAmount = amountInString.split('.');
-      if(decimalAmount[1]=="00"){
+      if (decimalAmount[1] == "00") {
         amountInString = amount.toStringAsFixed(0);
       }
     } catch (e) {}
@@ -64,6 +65,7 @@ class MyAccountState extends State<MyAccount> {
     return ScaffoldPage(
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Text(
           "My account".toUpperCase(),
         ),
@@ -235,7 +237,8 @@ class MyAccountState extends State<MyAccount> {
                                   ),
                                   Text(
                                     strings.rupee +
-                                        getAbsoluteAmount(accountDetails.bonusAmount),
+                                        getAbsoluteAmount(
+                                            accountDetails.bonusAmount),
                                     style: TextStyle(
                                       fontSize: Theme.of(context)
                                           .primaryTextTheme
@@ -261,7 +264,9 @@ class MyAccountState extends State<MyAccount> {
                                           ),
                                         ),
                                         Text(
-                                          strings.rupee+getAbsoluteAmount(accountDetails.unreleasedBonus),
+                                          strings.rupee +
+                                              getAbsoluteAmount(accountDetails
+                                                  .unreleasedBonus),
                                           style: TextStyle(
                                             fontSize: Theme.of(context)
                                                 .primaryTextTheme

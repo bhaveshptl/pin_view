@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/contestdetail/switchcontestteams.dart';
 import 'dart:io';
@@ -54,8 +55,7 @@ class ContestDetail extends StatefulWidget {
       this.myTeams,
       this.mapContestTeams,
       this.sportsType,
-      this.launchPageSource
-      });
+      this.launchPageSource});
 
   @override
   State<StatefulWidget> createState() => ContestDetailState();
@@ -618,7 +618,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
             sportsType: _sportType,
             league: widget.league,
             scaffoldKey: _scaffoldKey,
-            launchPageSource: widget.launchPageSource !=null ? widget.launchPageSource:"l2");
+            launchPageSource: widget.launchPageSource != null
+                ? widget.launchPageSource
+                : "l2");
       } else {
         var result = await Navigator.of(context).push(
           FantasyPageRoute(
@@ -640,7 +642,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
               sportsType: _sportType,
               league: widget.league,
               scaffoldKey: _scaffoldKey,
-              launchPageSource:widget.launchPageSource !=null ? widget.launchPageSource:"l2");
+              launchPageSource: widget.launchPageSource != null
+                  ? widget.launchPageSource
+                  : "l2");
         }
       }
     }
@@ -1001,11 +1005,12 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   }
 
   Future<bool> _onWillPop() async {
-    if(widget.launchPageSource !=null &&   widget.launchPageSource=="privateContest"){
-     Navigator.of(context).pop();
-     Navigator.of(context).pop();
-    }else{
-       Navigator.of(context).pop();
+    if (widget.launchPageSource != null &&
+        widget.launchPageSource == "privateContest") {
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    } else {
+      Navigator.of(context).pop();
     }
     return false;
   }
@@ -1036,14 +1041,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
         scaffoldKey: _scaffoldKey,
         appBar: AppBar(
           titleSpacing: 0.0,
-          leading: IconButton(
-            icon: Image.asset(
-              "images/Arrow2.png",
-              height: 18.0,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+          leading: LeadingButton(
+            isSinglePage: false,
           ),
           title: Row(
             children: <Widget>[

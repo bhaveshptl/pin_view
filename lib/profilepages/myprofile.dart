@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/modal/profile.dart';
@@ -636,6 +637,7 @@ class MyProfileState extends State<MyProfile> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Text(
           "MY PROFILE".toUpperCase(),
         ),
@@ -887,12 +889,13 @@ class MyProfileState extends State<MyProfile> {
                                 "Please contact support@howzat.com for any changes",
                               );
                             } else if (_userProfile.fname == null ||
-                                _userProfile.fname == "" || allowMyProfileFieldEdit("firstName")) {
+                                _userProfile.fname == "" ||
+                                allowMyProfileFieldEdit("firstName")) {
                               _showChangeValueDialog(
                                 _fNameController,
                                 "First name",
                               );
-                            }else{
+                            } else {
                               return null;
                             }
                           },
@@ -953,12 +956,13 @@ class MyProfileState extends State<MyProfile> {
                                 "Please contact support@howzat.com for any changes",
                               );
                             } else if (_userProfile.lname == null ||
-                                _userProfile.lname == "" || allowMyProfileFieldEdit("lastName")) {
+                                _userProfile.lname == "" ||
+                                allowMyProfileFieldEdit("lastName")) {
                               _showChangeValueDialog(
                                 _lNameController,
                                 "Last name",
                               );
-                            }else{
+                            } else {
                               return null;
                             }
                           },
@@ -1070,16 +1074,14 @@ class MyProfileState extends State<MyProfile> {
                         child: FlatButton(
                           padding: EdgeInsets.all(0.0),
                           onPressed: () {
-
-
                             if (!allowMyProfileFieldEdit("dob")) {
                               _showMessage(
                                 "Please contact support@howzat.com for any changes",
                               );
                             } else if (_userProfile.dob == null ||
-                                 allowMyProfileFieldEdit("dob")) {
-                             _selectDate(context);
-                            }else{
+                                allowMyProfileFieldEdit("dob")) {
+                              _selectDate(context);
+                            } else {
                               return null;
                             }
                           },

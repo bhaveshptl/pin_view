@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 
@@ -184,7 +185,7 @@ class VerificationState extends State<Verification> {
           _verificationStatus = "UNDER_REVIEW";
         } else if (kycStatus == "DOC_SUBMITTED" &&
             addressStatus == "VERIFIED") {
-               _verificationStatus = "UNDER_REVIEW";
+          _verificationStatus = "UNDER_REVIEW";
         } else {
           _verificationStatus = "DOC_NOT_SUBMITTED";
         }
@@ -501,6 +502,7 @@ class VerificationState extends State<Verification> {
     return ScaffoldPage(
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Text(
           strings.get("ACCOUNT_VERIFICATION").toUpperCase(),
         ),

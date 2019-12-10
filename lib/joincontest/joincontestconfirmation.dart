@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/stringtable.dart';
@@ -45,6 +46,7 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
         builder: (context) => WebviewScaffold(
               url: url,
               appBar: AppBar(
+                leading: LeadingButton(),
                 title: Text(
                   title.toUpperCase(),
                 ),

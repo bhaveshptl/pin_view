@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/commonwidgets/underline_textbox.dart';
 import 'dart:io';
@@ -510,6 +511,7 @@ class CreateContestState extends State<CreateContest> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Row(
           children: <Widget>[
             Expanded(

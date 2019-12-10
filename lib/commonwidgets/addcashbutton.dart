@@ -9,7 +9,7 @@ class AddCashButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 36.0,
+      height: 40.0,
       padding: EdgeInsets.only(right: 8.0),
       child: FlatButton(
         padding: EdgeInsets.all(0.0),
@@ -31,7 +31,7 @@ class AddCashButton extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.0),
                   constraints: BoxConstraints(
-                    minWidth: 80.0,
+                    minWidth: 60.0,
                   ),
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(61, 99, 37, 1),
@@ -40,11 +40,10 @@ class AddCashButton extends StatelessWidget {
                   child: Center(
                     child: Text(
                       text,
-                      style:
-                          Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
                   ),
                 ),

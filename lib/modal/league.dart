@@ -1,5 +1,6 @@
 class League {
   int status;
+  final int squad;
   final Team teamA;
   final Team teamB;
   final int matchId;
@@ -11,6 +12,7 @@ class League {
   int matchStartTime;
 
   League({
+    this.squad,
     this.teamA,
     this.teamB,
     this.status,
@@ -28,6 +30,7 @@ class League {
       return League();
     } else {
       return League(
+        squad: json["squad"],
         status: json['status'],
         matchId: json['matchId'],
         leagueId: json['leagueId'],

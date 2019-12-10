@@ -43,8 +43,7 @@ class LeagueCard extends StatelessWidget {
                   }
                 },
                 child: Container(
-                  margin:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                  margin: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                   child: Column(
                     children: <Widget>[
                       Row(
@@ -164,32 +163,6 @@ class LeagueCard extends StatelessWidget {
                                           timeInMiliseconds:
                                               _league.matchStartTime,
                                         ),
-                                  // width: 32.0,
-                                  // height: 32.0,
-                                  // decoration: BoxDecoration(
-                                  //   border: Border.all(
-                                  //     color: Colors.grey.shade400,
-                                  //     width: 1.0,
-                                  //   ),
-                                  //   shape: BoxShape.circle,
-                                  // ),
-                                  // child: Column(
-                                  //   mainAxisAlignment: MainAxisAlignment.center,
-                                  //   children: <Widget>[
-                                  //     Text(
-                                  //       "vs".toUpperCase(),
-                                  //       textAlign: TextAlign.center,
-                                  //       style: TextStyle(
-                                  //         fontSize: Theme.of(context)
-                                  //             .primaryTextTheme
-                                  //             .caption
-                                  //             .fontSize,
-                                  //         fontWeight: FontWeight.w900,
-                                  //         color: Colors.black87,
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
                                 ),
                           Column(
                             children: <Widget>[
@@ -252,6 +225,52 @@ class LeagueCard extends StatelessWidget {
                             ],
                           ),
                         ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 4.0),
+                        child: _league.squad == 2
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  border: Border.all(
+                                    width: 1.0,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                height: 16.0,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 2.0, horizontal: 8.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    FittedBox(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(right: 12.0),
+                                        child: Icon(
+                                          Icons.calendar_today,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ),
+                                    FittedBox(
+                                      child: Text(
+                                        "Lineups out!".toUpperCase(),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .caption
+                                            .copyWith(
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Container(
+                                height: 16.0,
+                              ),
                       ),
                       // Row(
                       //   mainAxisAlignment: MainAxisAlignment.center,

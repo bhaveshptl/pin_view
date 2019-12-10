@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 
@@ -221,6 +222,7 @@ class ContactUsState extends State<ContactUs> {
         builder: (context) => WebviewScaffold(
           url: url,
           appBar: AppBar(
+            leading: LeadingButton(),
             title: Text(
               title.toUpperCase(),
             ),
@@ -235,6 +237,7 @@ class ContactUsState extends State<ContactUs> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Text(
           "Contact Us".toUpperCase(),
         ),
@@ -344,9 +347,9 @@ class ContactUsState extends State<ContactUs> {
                               if (value.isEmpty) {
                                 return "Please explain your issue!";
                               }
-                              if (value.length < descriptionMinChar ) {
+                              if (value.length < descriptionMinChar) {
                                 return descriptionMinCharError;
-                              }                          
+                              }
                             },
                             keyboardType: TextInputType.text,
                           ),

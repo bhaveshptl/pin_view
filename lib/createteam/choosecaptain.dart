@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/createteamepoc.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
@@ -112,11 +115,20 @@ class ChooseCaptainState extends State<ChooseCaptain> {
   Widget build(BuildContext context) {
     return ScaffoldPage(
       appBar: AppBar(
-        title: EPOC(
-          timeInMiliseconds: widget.league.matchStartTime,
-          style: Theme.of(context).primaryTextTheme.title.copyWith(
-                color: Colors.white,
-              ),
+        leading: LeadingButton(),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            LeagueTitleEPOC(
+              title:
+                  widget.league.teamA.name + " vs " + widget.league.teamB.name,
+              timeInMiliseconds: widget.league.matchStartTime,
+              style: Theme.of(context).primaryTextTheme.body2.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+          ],
         ),
         elevation: 0.0,
         centerTitle: true,

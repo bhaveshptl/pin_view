@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 
 import 'package:playfantasy/utils/apiutil.dart';
@@ -67,6 +68,7 @@ class PartnerState extends State<Partner> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Text(
           "Partner request".toUpperCase(),
         ),

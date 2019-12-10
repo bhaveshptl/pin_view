@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 
@@ -71,7 +73,7 @@ class JoinedContestsState extends State<JoinedContests>
     _streamSubscription =
         FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
     _l1Data = widget.l1Data;
-      _myTeams = widget.myTeams;
+    _myTeams = widget.myTeams;
     initTabController();
     super.initState();
   }
@@ -326,15 +328,14 @@ class JoinedContestsState extends State<JoinedContests>
       FantasyPageRoute(
         routeSettings: RouteSettings(name: "ContestDetail"),
         pageBuilder: (context) => ContestDetail(
-          contest: contest,
-          league: league,
-          l1Data: _l1Data,
-          sportsType: widget.sportsType,
-          myTeams: _myTeams,
-          mapContestTeams:
-              _mapContestTeams != null ? _mapContestTeams[contest.id] : null,
-          launchPageSource: "joinedContests" 
-        ),
+            contest: contest,
+            league: league,
+            l1Data: _l1Data,
+            sportsType: widget.sportsType,
+            myTeams: _myTeams,
+            mapContestTeams:
+                _mapContestTeams != null ? _mapContestTeams[contest.id] : null,
+            launchPageSource: "joinedContests"),
       ),
     );
     updateContestData();
@@ -620,15 +621,21 @@ class JoinedContestsState extends State<JoinedContests>
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
         elevation: 0.0,
-        title: Text(
-          "Joined Contests".toUpperCase(),
+        leading: LeadingButton(),
+        title: Row(
+          children: <Widget>[
+            LeagueTitleEPOC(
+              title:
+                  widget.league.teamA.name + " vs " + widget.league.teamB.name,
+              timeInMiliseconds: widget.league.matchStartTime,
+              onTimeComplete: () {},
+              style: TextStyle(color: Colors.black),
+            )
+          ],
         ),
       ),
       body: Column(
         children: <Widget>[
-          LeagueTitle(
-            league: widget.league,
-          ),
           Row(
             children: <Widget>[
               Expanded(

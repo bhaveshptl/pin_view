@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/redux/models/loader_model.dart';
 import 'package:playfantasy/commonwidgets/loader/loader.dart';
 
@@ -48,6 +49,7 @@ class ScaffoldPage extends StatelessWidget {
                       actions: <Widget>[
                         action,
                       ],
+                      leading: LeadingButton(),
                     )
               : appBar,
           body: body,

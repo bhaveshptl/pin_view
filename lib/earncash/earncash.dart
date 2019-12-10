@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/earncash/bonus_distribution.dart';
 import 'package:playfantasy/modal/user.dart';
@@ -395,15 +396,7 @@ class EarnCashState extends State<EarnCash> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        leading: IconButton(
-          icon: Image.asset(
-            "images/Arrow.png",
-            height: 18.0,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
+        leading: LeadingButton(),
         titleSpacing: 0.0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

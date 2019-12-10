@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
@@ -455,8 +456,7 @@ class SignInPageState extends State<SignInPage> {
     showLoader(true);
     var facebookLogin = new FacebookLogin();
     facebookLogin.loginBehavior = FacebookLoginBehavior.webViewOnly;
-    var result = await facebookLogin
-        .logIn(['email', 'public_profile']);
+    var result = await facebookLogin.logIn(['email', 'public_profile']);
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         _sendTokenToAuthenticate(result.accessToken.token, 2);
@@ -637,7 +637,8 @@ class SignInPageState extends State<SignInPage> {
       email = await AnalyticsManager.dosha256Encoding(loginData["email_id"]);
     }
     if (loginData["mobile"].length > 3) {
-      phone =await AnalyticsManager.dosha256Encoding("+91" + loginData["mobile"]);
+      phone =
+          await AnalyticsManager.dosha256Encoding("+91" + loginData["mobile"]);
     }
     signupdata["phone"] = phone;
     signupdata["email"] = email;
@@ -668,6 +669,7 @@ class SignInPageState extends State<SignInPage> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         title: Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Row(
@@ -751,7 +753,8 @@ class SignInPageState extends State<SignInPage> {
                                       padding: EdgeInsets.only(bottom: 16.0),
                                       child: SimpleTextBox(
                                         onSaved: (val) => _authName = val,
-                                        labelText: strings.get("EMAIL_OR_MOBILE") +
+                                        labelText:
+                                            strings.get("EMAIL_OR_MOBILE") +
                                                 "*",
                                         validator: (value) {
                                           if (value.isEmpty) {

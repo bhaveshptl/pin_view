@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/textbox.dart';
 
@@ -1072,7 +1073,6 @@ class WithdrawState extends State<Withdraw>
     });
   }
 
-
   openWithdrawHistory(
       BuildContext context, bool onBackPressedNavigateToLobby) async {
     var result = await Navigator.of(context).push(
@@ -1645,6 +1645,7 @@ class WithdrawState extends State<Withdraw>
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
+        leading: LeadingButton(),
         elevation: 0.0,
         title: Text(
           "withdrawal".toUpperCase(),

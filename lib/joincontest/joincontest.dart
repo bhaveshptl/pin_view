@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
+import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -312,15 +314,23 @@ class JoinContestState extends State<JoinContest> {
     return ScaffoldPage(
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
-        title: Text("My Teams".toUpperCase()),
+        leading: LeadingButton(),
+        title: Row(
+          children: <Widget>[
+            LeagueTitleEPOC(
+              title:
+                  widget.league.teamA.name + " vs " + widget.league.teamB.name,
+              timeInMiliseconds: widget.league.matchStartTime,
+              onTimeComplete: () {},
+              style: TextStyle(color: Colors.black),
+            )
+          ],
+        ),
         elevation: 0.0,
       ),
       body: _myUniqueTeams.length == 0
           ? Column(
               children: <Widget>[
-                LeagueTitle(
-                  league: widget.league,
-                ),
                 Expanded(
                   child: Center(
                     child: Text(
@@ -338,9 +348,6 @@ class JoinContestState extends State<JoinContest> {
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                LeagueTitle(
-                  league: widget.league,
-                ),
                 Row(
                   children: <Widget>[
                     Expanded(
@@ -494,7 +501,10 @@ class JoinContestState extends State<JoinContest> {
                                                 onTap: () {
                                                   Navigator.of(context).push(
                                                     FantasyPageRoute(
-                                                      routeSettings: RouteSettings(name: "TeamPreview"),
+                                                      routeSettings:
+                                                          RouteSettings(
+                                                              name:
+                                                                  "TeamPreview"),
                                                       pageBuilder: (BuildContext
                                                               context) =>
                                                           TeamPreview(
