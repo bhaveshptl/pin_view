@@ -12,6 +12,7 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
 import 'package:playfantasy/modal/account.dart';
+import 'package:playfantasy/modal/deeplinkingdata.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
@@ -38,7 +39,7 @@ class Lobby extends StatefulWidget {
   final bool isForceUpdate;
   final bool updateAvailable;
   final bool activateDeepLinkingNavigation;
-  final Map<String, dynamic> deepLinkingNavigationData;
+  final DeepLinkingData deepLinkingNavigationData;
 
   Lobby(
       {this.logs,
@@ -69,7 +70,7 @@ class LobbyState extends State<Lobby>
   bool isIos = false;
   static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   bool deactivateDeepLinkingNavigation = true;
-  Map<String, dynamic> deepLinkingNavigationData = new Map();
+  DeepLinkingData deepLinkingNavigationData ;
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
@@ -150,8 +151,8 @@ class LobbyState extends State<Lobby>
         deepLinkingNavigationData = widget.deepLinkingNavigationData;
         try {
           if (deepLinkingNavigationData != null) {
-            String type = deepLinkingNavigationData["dl_sport_type"] != null
-                ? deepLinkingNavigationData["dl_sport_type"]
+            String type = deepLinkingNavigationData.dl_sport_type != null
+                ? deepLinkingNavigationData.dl_sport_type
                 : 0;
             int sportTypeFromDeepLinking = int.parse(type);
             if (sportTypeFromDeepLinking == 1) {
@@ -196,8 +197,8 @@ class LobbyState extends State<Lobby>
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
       if (deepLinkingNavigationData != null) {
-        String routePage = deepLinkingNavigationData["dl_page_route"] != null
-            ? deepLinkingNavigationData["dl_page_route"]
+        String routePage = deepLinkingNavigationData.dl_page_route != null
+            ? deepLinkingNavigationData.dl_page_route
             : "";
         switch (routePage) {
           case "earnCash":
@@ -209,12 +210,12 @@ class LobbyState extends State<Lobby>
           case "addCash":
             deactivateDeepLinkingNavigation = true;
             String promoCode =
-                deepLinkingNavigationData["dl_ac_promocode"].toString();
-            String promoAmountString = widget
-                .deepLinkingNavigationData["dl_ac_promoamount"]
+                deepLinkingNavigationData.dl_ac_promocode;
+            String promoAmountString = 
+                deepLinkingNavigationData.dl_ac_promoamount
                 .toString();
             String dl_unique_id = "deeplinking";
-            dl_unique_id = deepLinkingNavigationData["dl_unique_id"].toString();
+            dl_unique_id = deepLinkingNavigationData.dl_unique_id.toString();
             var promoAmountDouble = 0.0;
             if (promoAmountString.length > 0 && _isNumeric(promoAmountString)) {
               promoAmountDouble = double.parse(promoAmountString);
@@ -246,7 +247,7 @@ class LobbyState extends State<Lobby>
               int dl_leagueId = 0;
               try {
                 String leagueString =
-                    deepLinkingNavigationData["dl_leagueId"].toString();
+                    deepLinkingNavigationData.dl_leagueId.toString();
                 dl_leagueId = int.parse(leagueString);
               } catch (e) {}
               launchL1ByDeepLinking(context, _leagues, dl_leagueId);
@@ -258,7 +259,7 @@ class LobbyState extends State<Lobby>
               int dl_leagueId = 0;
               try {
                 String leagueString =
-                    widget.deepLinkingNavigationData["dl_leagueId"].toString();
+                    widget.deepLinkingNavigationData.dl_leagueId.toString();
                 dl_leagueId = int.parse(leagueString);
               } catch (e) {}
               launchCreateTeamDeepLinking(context, _leagues, dl_leagueId);
@@ -304,9 +305,9 @@ class LobbyState extends State<Lobby>
           case "staticpage":
             deactivateDeepLinkingNavigation = true;
             String pageTitle =
-                deepLinkingNavigationData["dl_sp_pageTitle"].toString();
+                deepLinkingNavigationData.dl_sp_pageTitle.toString();
             String pageLocation = widget
-                .deepLinkingNavigationData["dl_sp_pageLocation"]
+                .deepLinkingNavigationData.dl_sp_pageLocation
                 .toString();
             routeLauncher.launchCustomeStaticPage(
                 pageTitle, pageLocation, context, onComplete: () {
