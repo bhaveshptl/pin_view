@@ -11,7 +11,7 @@ import CoreLocation
 import FBSDKCoreKit
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocolWithData,CLLocationManagerDelegate {
+@objc class AppDelegate: FlutterAppDelegate,RazorpayPaymentCompletionProtocolWithData,CLLocationManagerDelegate ,FlutterStreamHandler{
     private var controller : FlutterViewController!;
     private var razorpay: Razorpay!
     private var razorpayProdKey:String="rzp_live_jpaEKwXwl8iWX6";
@@ -27,9 +27,11 @@ import FBSDKCoreKit
     private var SOCIAL_SHARE_CHANNEL:FlutterMethodChannel!;
     private var BROWSER_LAUNCH_CHANNEL:FlutterMethodChannel!;
     private var UTILS_CHANNEL:FlutterMethodChannel!;
+    private var DEEPLINKING_STREAM_CHANNEL:FlutterEventChannel!;
     private var razorpay_result: FlutterResult!;
     private var location_permission_result: FlutterResult!;
     private var device_info_result: FlutterResult!;
+    private var deepLinkingEventSink:FlutterEventSink!;
     private var deepLinkingDataObjectResult: FlutterResult!;
     private var bBranchLodead:Bool = false;
     private var app_launchOptions: [UIApplicationLaunchOptionsKey: Any]?;
@@ -71,7 +73,21 @@ import FBSDKCoreKit
         SOCIAL_SHARE_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.socialshare",binaryMessenger: controller.binaryMessenger)
         BROWSER_LAUNCH_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.browser",binaryMessenger: controller.binaryMessenger)
         UTILS_CHANNEL = FlutterMethodChannel(name: "com.algorin.pf.utils",binaryMessenger: controller.binaryMessenger)
+        
+        /*Channel to listen for incoming messages*/
+              DEEPLINKING_STREAM_CHANNEL = FlutterEventChannel(name: "com.algorin.pf.deeplinkingstream", binaryMessenger: controller.binaryMessenger);
+              DEEPLINKING_STREAM_CHANNEL.setStreamHandler(self)
     }
+    
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        deepLinkingEventSink=events;
+        return nil
+    }
+    
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        return nil;
+    }
+
     
     private func initPushNotifications(_ application: UIApplication){
         FirebaseApp.configure()
@@ -121,6 +137,9 @@ import FBSDKCoreKit
                 print(error);
             } else if let params = params {
                 self.initBranchSession(branchResultData:params as? [String: AnyObject]);
+                if( self.deepLinkingEventSink != nil){
+                    self.deepLinkingEventSink(self.deepLinkingDataObject);
+                }
             }
             self.bBranchLodead = true;
         }

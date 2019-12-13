@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
@@ -70,14 +71,16 @@ class LobbyState extends State<Lobby>
   bool isIos = false;
   static const utils_platform = const MethodChannel('com.algorin.pf.utils');
   bool deactivateDeepLinkingNavigation = true;
-  DeepLinkingData deepLinkingNavigationData ;
+  DeepLinkingData deepLinkingNavigationData;
   Map<String, dynamic> referDetail;
   final formatCurrency = NumberFormat.currency(
     locale: "hi_IN",
     symbol: strings.rupee,
     decimalDigits: 2,
   );
-
+  static const DEEPLINKING_STREAM_CHANNEL =
+      const EventChannel('com.algorin.pf.deeplinkingstream');
+  StreamSubscription _deeplinking_subscription = null;
   @override
   initState() {
     super.initState();
@@ -105,6 +108,24 @@ class LobbyState extends State<Lobby>
     });
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
+
+    if (_deeplinking_subscription == null) {
+      _deeplinking_subscription = DEEPLINKING_STREAM_CHANNEL
+          .receiveBroadcastStream()
+          .listen((deepLinkingData) {
+        if (deepLinkingData != null) {
+          if (deepLinkingData["activateDeepLinkingNavigation"] != null) {
+            if (deepLinkingData["activateDeepLinkingNavigation"]) {
+              deactivateDeepLinkingNavigation = false;
+              deepLinkingNavigationData =
+                  DeepLinkingData.fromJson(deepLinkingData);
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => deepLinkingPageRouting(context));
+            }
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -194,6 +215,13 @@ class LobbyState extends State<Lobby>
     }
   }
 
+  unsubscribeToDeepLinkingListener() {
+    if (_deeplinking_subscription != null) {
+      _deeplinking_subscription.cancel();
+      _deeplinking_subscription = null;
+    }
+  }
+
   deepLinkingPageRouting(BuildContext context) async {
     if (!deactivateDeepLinkingNavigation) {
       if (deepLinkingNavigationData != null) {
@@ -209,11 +237,9 @@ class LobbyState extends State<Lobby>
             break;
           case "addCash":
             deactivateDeepLinkingNavigation = true;
-            String promoCode =
-                deepLinkingNavigationData.dl_ac_promocode;
-            String promoAmountString = 
-                deepLinkingNavigationData.dl_ac_promoamount
-                .toString();
+            String promoCode = deepLinkingNavigationData.dl_ac_promocode;
+            String promoAmountString =
+                deepLinkingNavigationData.dl_ac_promoamount.toString();
             String dl_unique_id = "deeplinking";
             dl_unique_id = deepLinkingNavigationData.dl_unique_id.toString();
             var promoAmountDouble = 0.0;
@@ -306,9 +332,8 @@ class LobbyState extends State<Lobby>
             deactivateDeepLinkingNavigation = true;
             String pageTitle =
                 deepLinkingNavigationData.dl_sp_pageTitle.toString();
-            String pageLocation = widget
-                .deepLinkingNavigationData.dl_sp_pageLocation
-                .toString();
+            String pageLocation =
+                widget.deepLinkingNavigationData.dl_sp_pageLocation.toString();
             routeLauncher.launchCustomeStaticPage(
                 pageTitle, pageLocation, context, onComplete: () {
               showLoader(false);
