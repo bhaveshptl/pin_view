@@ -383,6 +383,11 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
     }
+    else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
+      _payload["context"]["utm_source"] = "indus_os";
+      _payload["context"]["utm_medium"] = "indus_os";
+      _payload["context"]["utm_campaign"] = "indus_os";
+    }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
       _payload["context"]["googleaddid"] = androidDeviceInfoMap["googleaddid"];
@@ -429,8 +434,7 @@ class SignInPageState extends State<SignInPage> {
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
       scopes: [
-        'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
+        'email'
       ],
     );
 
@@ -528,6 +532,10 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
+    }else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
+      _payload["context"]["utm_source"] = "indus_os";
+      _payload["context"]["utm_medium"] = "indus_os";
+      _payload["context"]["utm_campaign"] = "indus_os";
     }
 
     try {
