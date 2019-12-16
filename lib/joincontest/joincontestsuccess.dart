@@ -111,9 +111,10 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
         }
       });
     });
-
+    var maxLength = updatedSuggestedContests.length - 1;
     setState(() {
-      contests = updatedSuggestedContests;
+      contests =
+          updatedSuggestedContests.getRange(0, maxLength > 2 ? 2 : maxLength);
     });
   }
 
