@@ -133,7 +133,7 @@ class JoinContestState extends State<JoinContest> {
             if (response["error"] == false) {
               webEngageJoinContestEvent();
               /* On contest joined successfully */
-              Navigator.of(context).pop(response["message"]);
+              Navigator.of(context).pop(response);
             } else if (response["error"] == true) {
               // Navigator.of(context).pop(response["message"]);
               widget.onError(widget.contest, response);

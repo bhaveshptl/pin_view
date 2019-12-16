@@ -246,11 +246,8 @@ class LeagueCard extends StatelessWidget {
                                   children: <Widget>[
                                     FittedBox(
                                       child: Padding(
-                                        padding: EdgeInsets.only(right: 12.0),
-                                        child: Icon(
-                                          Icons.calendar_today,
-                                          color: Colors.green,
-                                        ),
+                                        padding: EdgeInsets.only(right: 16.0),
+                                        child: Image.asset("images/mic.png"),
                                       ),
                                     ),
                                     FittedBox(

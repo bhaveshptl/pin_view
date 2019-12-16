@@ -898,6 +898,7 @@ class LeagueDetailState extends State<LeagueDetail>
                   l1data: l1Data,
                   sportsType: widget.sportType,
                   myTeams: _myTeams,
+                  userBalance: widget.cashBalance,
                 ),
               ),
             );

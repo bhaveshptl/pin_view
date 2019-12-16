@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 
@@ -7,6 +9,7 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/prizestructure/prizestructure.dart';
+import 'package:playfantasy/utils/fantasywebsocket.dart';
 
 class JoinContestSuccess extends StatefulWidget {
   final L1 l1Data;
@@ -17,8 +20,10 @@ class JoinContestSuccess extends StatefulWidget {
   final Map<String, dynamic> balance;
   final Function onJoin;
   final Map<int, List<MyTeam>> myContestJoinedTeams;
+
   final GlobalKey<ScaffoldState> scaffoldKey;
   final int sportId;
+  final List<Contest> contests;
   JoinContestSuccess({
     this.balance,
     this.league,
@@ -30,18 +35,103 @@ class JoinContestSuccess extends StatefulWidget {
     this.myContestJoinedTeams,
     this.onJoin,
     this.scaffoldKey,
+    this.contests,
   });
   @override
   JoinContestSuccessState createState() => JoinContestSuccessState();
 }
 
 class JoinContestSuccessState extends State<JoinContestSuccess> {
-  List<Contest> contestToCrossSell = [];
+  List<Contest> contests;
+  StreamSubscription _streamSubscription;
 
   @override
   void initState() {
-    setCrossSellContests();
+    _streamSubscription =
+        FantasyWebSocket().subscriber().stream.listen(_onWsMsg);
+    contests = widget.contests;
     super.initState();
+  }
+
+  _onWsMsg(data) {
+    if (data["iType"] == RequestType.L1_DATA_REFRESHED &&
+        data["bSuccessful"] == true) {
+      _applyL1DataUpdate(data["diffData"]["ld"]);
+    } else if (data["iType"] == RequestType.JOIN_COUNT_CHNAGE &&
+        data["bSuccessful"] == true) {
+      _updateJoinCount(data["data"]);
+    }
+  }
+
+  _applyL1DataUpdate(Map<String, dynamic> _data) {
+    List<Contest> _addedContests = [];
+    List<Contest> _lstRemovedContests = [];
+    if (_data["lstAdded"] != null && _data["lstAdded"].length > 0) {
+      _addedContests =
+          (_data["lstAdded"] as List).map((i) => Contest.fromJson(i)).toList();
+      setState(() {
+        for (Contest _contest in _addedContests) {
+          bool bFound = false;
+          for (Contest _curContest in widget.l1Data.contests) {
+            if (_curContest.id == _contest.id) {
+              bFound = true;
+            }
+          }
+          if (!bFound && widget.l1Data.league.id == _contest.leagueId) {
+            widget.l1Data.contests.add(_contest);
+          }
+        }
+      });
+    }
+    if (_data["lstRemoved"] != null && _data["lstRemoved"].length > 0) {
+      List<Contest> updatedContests = [];
+      _lstRemovedContests = (_data["lstRemoved"] as List)
+          .map((i) => Contest.fromJson(i))
+          .toList();
+      for (Contest _contest in widget.l1Data.contests) {
+        bool bFound = false;
+        for (Contest _removedContest in _lstRemovedContests) {
+          if (_removedContest.id == _contest.id) {
+            bFound = true;
+          }
+        }
+        if (!bFound) {
+          updatedContests.add(_contest);
+        }
+      }
+      widget.l1Data.contests = updatedContests;
+    }
+
+    List<Contest> updatedSuggestedContests = [];
+    contests.forEach((suggestedContest) {
+      widget.l1Data.contests.forEach((contest) {
+        if (contest.brand["id"] == suggestedContest.brand["id"] &&
+            contest.entryFee == suggestedContest.entryFee) {
+          updatedSuggestedContests.add(contest);
+        }
+      });
+    });
+
+    setState(() {
+      contests = updatedSuggestedContests;
+    });
+  }
+
+  _updateJoinCount(Map<String, dynamic> _data) {
+    for (Contest _contest in widget.l1Data.contests) {
+      if (_contest.id == _data["cId"]) {
+        setState(() {
+          _contest.joined = _data["iJC"];
+        });
+      }
+    }
+    for (Contest _contest in contests) {
+      if (_contest.id == _data["cId"]) {
+        setState(() {
+          _contest.joined = _data["iJC"];
+        });
+      }
+    }
   }
 
   onGoToLobbyPressed() async {
@@ -66,46 +156,6 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
     Navigator.of(context).pop(data);
   }
 
-  setCrossSellContests() {
-    Map<int, List<Contest>> priorityBrandContests = {};
-    widget.l1Data.contests.forEach((contest) {
-      if (widget.l1Data.league.priorityBrands != null &&
-          widget.l1Data.league.priorityBrands.indexOf(contest.brand["id"]) !=
-              -1 &&
-          (widget.myContestJoinedTeams[contest.id] == null ||
-              widget.myContestJoinedTeams[contest.id].length == 0)) {
-        if (priorityBrandContests[contest.brand["id"]] == null) {
-          priorityBrandContests[contest.brand["id"]] = [];
-        }
-        priorityBrandContests[contest.brand["id"]].add(contest);
-      }
-    });
-
-    priorityBrandContests.keys.forEach((key) {
-      priorityBrandContests[key].sort((a, b) {
-        return a.entryFee - b.entryFee;
-      });
-    });
-
-    List<Contest> lstContestsToSell = [];
-    priorityBrandContests.keys.forEach((key) {
-      List<Contest> contests = priorityBrandContests[key];
-      int i = 0;
-      for (; i < contests.length; i++) {
-        if (contests[i].entryFee > widget.balance["cashBalance"]) {
-          break;
-        }
-      }
-      if (i == contests.length) {
-        lstContestsToSell.add(contests[contests.length - 1]);
-      } else {
-        lstContestsToSell.add(contests[i]);
-      }
-    });
-
-    contestToCrossSell = lstContestsToSell;
-  }
-
   void _showPrizeStructure(Contest contest) async {
     List<dynamic> prizeStructure =
         await routeLauncher.getPrizeStructure(contest);
@@ -121,6 +171,12 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
         },
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -159,7 +215,7 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
         ],
       ),
       contentPadding: EdgeInsets.all(0.0),
-      content: contestToCrossSell.length == 0
+      content: contests.length == 0
           ? Container(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -222,23 +278,66 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
                             ],
                           ),
                           Column(
-                            children: contestToCrossSell.map((contest) {
-                              return Card(
-                                child: UpcomingHowzatContest(
-                                  contest: contest,
-                                  onJoin: (Contest contest) {
-                                    widget.onJoin(contest);
-                                  },
-                                  myJoinedTeams:
-                                      widget.myContestJoinedTeams == null
-                                          ? []
-                                          : widget.myContestJoinedTeams[
-                                              contest.id.toString()],
-                                  onPrizeStructure: (Contest contest) {
-                                    _showPrizeStructure(contest);
-                                  },
-                                ),
-                              );
+                            children: contests.map((contest) {
+                              return contest.size == contest.joined
+                                  ? Container()
+                                  : Stack(
+                                      children: <Widget>[
+                                        Card(
+                                          child: UpcomingHowzatContest(
+                                            contest: contest,
+                                            onJoin: (Contest contest) {
+                                              widget.onJoin(contest);
+                                            },
+                                            myJoinedTeams: widget
+                                                        .myContestJoinedTeams ==
+                                                    null
+                                                ? []
+                                                : widget.myContestJoinedTeams[
+                                                    contest.id.toString()],
+                                            onPrizeStructure:
+                                                (Contest contest) {
+                                              _showPrizeStructure(contest);
+                                            },
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Container(),
+                                            ),
+                                            Expanded(
+                                              child: Container(
+                                                margin:
+                                                    EdgeInsets.only(top: 8.0),
+                                                child: FittedBox(
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 2.0,
+                                                            horizontal: 8.0),
+                                                    decoration: BoxDecoration(
+                                                        color: Colors
+                                                            .grey.shade200,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                    12.0)),
+                                                    child: Text(
+                                                        contest.brand["info"]),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Container(),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
                             }).toList(),
                           ),
                         ],

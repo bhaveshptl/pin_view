@@ -12,6 +12,7 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
@@ -29,6 +30,7 @@ import 'package:playfantasy/prizestructure/prizestructure.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestcard.dart';
 import 'package:playfantasy/leaguedetail/prediction/predictioncontestdetails.dart';
+import 'package:playfantasy/utils/sharedprefhelper.dart';
 
 class JoinedContests extends StatefulWidget {
   final L1 l1Data;
@@ -64,6 +66,8 @@ class JoinedContestsState extends State<JoinedContests>
   TabController _tabController;
   int activeTabIndex = 0;
 
+  double userBalance = 0.0;
+
   @override
   void initState() {
     _getMyContests();
@@ -75,6 +79,7 @@ class JoinedContestsState extends State<JoinedContests>
     _l1Data = widget.l1Data;
     _myTeams = widget.myTeams;
     initTabController();
+    updateUserInfo();
     super.initState();
   }
 
@@ -115,6 +120,42 @@ class JoinedContestsState extends State<JoinedContests>
         activeTabIndex = 0;
       });
     }
+  }
+
+  updateUserInfo() async {
+    var _user = await getUserInfo();
+    if (_user != null) {
+      setState(() {
+        userBalance =
+            (_user.nonWithdrawable == null ? 0.0 : _user.nonWithdrawable) +
+                (_user.withdrawable == null ? 0.0 : _user.withdrawable) +
+                (_user.depositBucket == null ? 0.0 : _user.depositBucket);
+      });
+    }
+  }
+
+  getUserInfo() async {
+    http.Request req = http.Request(
+      "GET",
+      Uri.parse(
+        BaseUrl().apiUrl + ApiUtil.AUTH_CHECK_URL,
+      ),
+    );
+    return HttpManager(http.Client())
+        .sendRequest(req)
+        .then((http.Response res) {
+      if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> user = json.decode(res.body)["user"];
+
+        SharedPrefHelper.internal().saveToSharedPref(
+            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
+        return User.fromJson(user);
+      } else {
+        return null;
+      }
+    }).whenComplete(() {
+      showLoader(false);
+    });
   }
 
   _onWsMsg(data) {
@@ -568,6 +609,7 @@ class JoinedContestsState extends State<JoinedContests>
               myTeams: _myTeams,
               league: widget.league,
               launchPageSource: "joinedContests",
+              userBalance: userBalance,
             ),
           ),
         );

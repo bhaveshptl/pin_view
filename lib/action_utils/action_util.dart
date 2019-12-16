@@ -127,9 +127,11 @@ class ActionUtil {
                 ? "jc_cc"
                 : "privateContest",
             balance,
+            contests: (response["contests"] as List)
+                .map((i) => Contest.fromJson(i))
+                .toList(),
           );
         } else {
-          balance["cashBalance"] -= contest.entryFee;
           final result = onJoinContestError(
             scaffoldKey.currentContext,
             contest,
@@ -149,29 +151,19 @@ class ActionUtil {
           );
         }
       } else if (result != null) {
-        if (launchPageSource != null) {
-          onContestJoinSuccess(
-            result.toString(),
-            scaffoldKey,
-            l1Data,
-            league,
-            myTeams,
-            launchPageSource,
-            balance,
-            sportId: sportsType,
-          );
-        } else {
-          onContestJoinSuccess(
-            result.toString(),
-            scaffoldKey,
-            l1Data,
-            league,
-            myTeams,
-            "",
-            balance,
-            sportId: sportsType,
-          );
-        }
+        onContestJoinSuccess(
+          result["message"].toString(),
+          scaffoldKey,
+          l1Data,
+          league,
+          myTeams,
+          launchPageSource != null ? launchPageSource : "",
+          balance,
+          sportId: sportsType,
+          contests: (result["contests"] as List)
+              .map((i) => Contest.fromJson(i))
+              .toList(),
+        );
       }
     }
   }
@@ -184,6 +176,7 @@ class ActionUtil {
     List<MyTeam> myTeams,
     String launchPageSource,
     Map<String, dynamic> balance, {
+    List<Contest> contests,
     int sportId,
   }) async {
     var leagueContestIds =
@@ -209,6 +202,7 @@ class ActionUtil {
           successMessage: message,
           myContestJoinedTeams: myJoinedTeams,
           sportId: sportId,
+          contests: contests,
           onJoin: (Contest contest) {
             Navigator.of(context).pop();
             launchJoinContest(
@@ -337,6 +331,13 @@ class ActionUtil {
     } else {
       int errorCode = error.getErrorCode();
       switch (errorCode) {
+        case 2:
+          _showJoinContestError(
+            context,
+            title: "ERROR",
+            message: "Contest is full. Please join another contest.",
+          );
+          break;
         case 3:
           final result = await showDialog(
             context: context,

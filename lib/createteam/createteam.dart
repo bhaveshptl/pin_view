@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:playfantasy/commonwidgets/createteamepoc.dart';
+import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
@@ -872,6 +873,7 @@ class CreateTeamState extends State<CreateTeam>
                   Column(
                     children: <Widget>[
                       AppBar(
+                        leading: LeadingButton(),
                         title: Row(
                           children: <Widget>[
                             LeagueTitleEPOC(

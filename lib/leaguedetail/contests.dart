@@ -638,12 +638,12 @@ class ContestsState extends State<Contests> {
   _buildMainContent() {
     return CustomScrollView(
       slivers: <Widget>[
-        SliverList(delegate: new SliverChildListDelegate(_buildContestList(_contests))),
+        SliverList(
+            delegate:
+                new SliverChildListDelegate(_buildContestList(_contests))),
       ],
     );
   }
-
-  
 
   List _buildContestList(List<Contest> brandContestList) {
     List<Widget> listItems = List();
@@ -670,12 +670,17 @@ class ContestsState extends State<Contests> {
               ? getContestCards(index, bShowBrandInfo)
               : Container(),
           showMoreContestsButton &&
-                  showOrHIdeMoreContestsMap[_contests[index].brand["info"]]
+                  (showOrHIdeMoreContestsMap[_contests[index].brand["info"]] !=
+                          null &&
+                      showOrHIdeMoreContestsMap[_contests[index].brand["info"]])
               ? getContestCards(index, bShowBrandInfo)
               : Container(),
           _contests[index].bisLastContestOfBrand &&
                   showMoreContestsButton &&
-                  !showOrHIdeMoreContestsMap[_contests[index].brand["info"]]
+                  (showOrHIdeMoreContestsMap[_contests[index].brand["info"]] !=
+                          null &&
+                      !showOrHIdeMoreContestsMap[
+                          _contests[index].brand["info"]])
               ? Container(
                   padding: EdgeInsets.only(right: 20),
                   width: MediaQuery.of(context).size.width,

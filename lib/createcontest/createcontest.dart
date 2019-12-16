@@ -522,12 +522,14 @@ class CreateContestState extends State<CreateContest> {
                     widget.league.teamB.name,
               ),
             ),
-            AddCashButton(
-              onPressed: () {
-                _launchAddCash();
-              },
-              text: formatCurrency.format(widget.userBalance),
-            ),
+            widget.userBalance == null
+                ? Container()
+                : AddCashButton(
+                    onPressed: () {
+                      _launchAddCash();
+                    },
+                    text: formatCurrency.format(widget.userBalance),
+                  ),
           ],
         ),
         titleSpacing: 0.0,

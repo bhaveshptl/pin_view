@@ -15,11 +15,11 @@ class JoinContestError {
           _errorMessage = strings.get("AC_BLOCKED_MSG");
           _bIsBlockedUser = true;
           break;
-        case 2:
-          _title = strings.get("ACCOUNT_CLOSED");
-          _errorMessage = strings.get("AC_CLOSED_MSG");
-          _bIsBlockedUser = true;
-          break;
+        // case 2:
+        //   _title = strings.get("ACCOUNT_CLOSED");
+        //   _errorMessage = strings.get("AC_CLOSED_MSG");
+        //   _bIsBlockedUser = true;
+        //   break;
         case 4:
           _title = strings.get("ALERT");
           _errorMessage = strings.get("AGE_LESS_MSG");
@@ -57,7 +57,9 @@ class JoinContestError {
   }
 
   int getErrorCode() {
-    if (_errorCodes.indexOf(12) != -1 || _errorCodes.indexOf(-7) != -1) {
+    if (_errorCodes.indexOf(2) != -1) {
+      return 2;
+    } else if (_errorCodes.indexOf(12) != -1 || _errorCodes.indexOf(-7) != -1) {
       return 12;
     } else if (_errorCodes.indexOf(3) != -1) {
       return 3;
