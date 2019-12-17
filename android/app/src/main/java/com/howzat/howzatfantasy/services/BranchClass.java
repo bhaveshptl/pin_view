@@ -25,7 +25,7 @@ public class BranchClass  extends FlutterApplication {
 
     private void initWebEngage() {
         WebEngageConfig config = new WebEngageConfig.Builder()
-                .setWebEngageKey("~47b65866")
+                .setWebEngageKey(MyConstants.WEBENGAGE_REGKEY)
                 .setPushSmallIcon(R.drawable.notification_icon_small)
                 .setPushAccentColor(Color.parseColor("#d32518"))
                 .build();
@@ -33,7 +33,6 @@ public class BranchClass  extends FlutterApplication {
         FlutterApplication flutterApplication = new FlutterApplication();
         registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(flutterApplication, config));
         WebEngage.registerPushNotificationCallback(new MainActivity());
-        WebEngage.registerInAppNotificationCallback(new MainActivity());
 
     }
 

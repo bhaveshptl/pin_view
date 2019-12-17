@@ -108,24 +108,7 @@ class LobbyState extends State<Lobby>
     });
     WidgetsBinding.instance
         .addPostFrameCallback((_) => deepLinkingPageRouting(context));
-
-    if (_deeplinking_subscription == null) {
-      _deeplinking_subscription = DEEPLINKING_STREAM_CHANNEL
-          .receiveBroadcastStream()
-          .listen((deepLinkingData) {
-        if (deepLinkingData != null) {
-          if (deepLinkingData["activateDeepLinkingNavigation"] != null) {
-            if (deepLinkingData["activateDeepLinkingNavigation"]) {
-              deactivateDeepLinkingNavigation = false;
-              deepLinkingNavigationData =
-                  DeepLinkingData.fromJson(deepLinkingData);
-              WidgetsBinding.instance
-                  .addPostFrameCallback((_) => deepLinkingPageRouting(context));
-            }
-          }
-        }
-      });
-    }
+    subscribeToDeepLinkingListener();
   }
 
   @override
@@ -212,6 +195,30 @@ class LobbyState extends State<Lobby>
           }
         } catch (e) {}
       }
+    }
+  }
+
+
+  subscribeToDeepLinkingListener(){
+    if (_deeplinking_subscription == null) {
+      Map<dynamic, dynamic> screendata = new Map();
+      screendata["screenName"] = "LOBBY0";
+      AnalyticsManager.webengageAddScreenData(screendata);
+      _deeplinking_subscription = DEEPLINKING_STREAM_CHANNEL
+          .receiveBroadcastStream()
+          .listen((deepLinkingData) {
+        if (deepLinkingData != null) {
+          if (deepLinkingData["activateDeepLinkingNavigation"] != null) {
+            if (deepLinkingData["activateDeepLinkingNavigation"]) {
+              deactivateDeepLinkingNavigation = false;
+              deepLinkingNavigationData =
+                  DeepLinkingData.fromJson(deepLinkingData);
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => deepLinkingPageRouting(context));
+            }
+          }
+        }
+      });
     }
   }
 

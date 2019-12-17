@@ -16,9 +16,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.howzat.howzatfantasy.services.BranchClass;
+import com.howzat.howzatfantasy.services.DeepLinkingDataModel;
 import com.howzat.howzatfantasy.services.DeviceInfo;
+import com.howzat.howzatfantasy.services.MyConstants;
 import com.howzat.howzatfantasy.services.MyHelperClass;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +29,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +56,7 @@ import com.razorpay.PaymentResultWithDataListener;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
+
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -66,6 +72,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 import java.util.function.Function;
+
 import com.webengage.sdk.android.WebEngageConfig;
 import com.webengage.sdk.android.WebEngageActivityLifeCycleCallbacks;
 import com.webengage.sdk.android.WebEngage;
@@ -80,21 +87,22 @@ import com.paynimo.android.payment.PaymentModesActivity;
 import com.paynimo.android.payment.util.Constant;
 import com.webengage.sdk.android.callbacks.InAppNotificationCallbacks;
 import com.webengage.sdk.android.callbacks.PushNotificationCallbacks;
+
 import io.flutter.plugin.common.EventChannel;
 
-public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener ,PushNotificationCallbacks, InAppNotificationCallbacks{
+public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener, PushNotificationCallbacks, InAppNotificationCallbacks {
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
     private static final String RAZORPAY_IO_CHANNEL = "com.algorin.pf.razorpay";
     private static final String PF_FCM_CHANNEL = "com.algorin.pf.fcm";
     private static final String BROWSER_LAUNCH_CHANNEL = "com.algorin.pf.browser";
     private static final String WEBENGAGE_CHANNEL = "com.algorin.pf.webengage";
     private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
-    private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
-    private static final String TECH_PROCESS_CHANNEL="com.algorin.pf.techprocess";
-    private static final String   DEEPLINKING_STREAM_CHANNEL  = "com.algorin.pf.deeplinkingstream";
+    private static final String SOCIAL_SHARE_CHANNEL = "com.algorin.pf.socialshare";
+    private static final String TECH_PROCESS_CHANNEL = "com.algorin.pf.techprocess";
+    private static final String DEEPLINKING_STREAM_CHANNEL = "com.algorin.pf.deeplinkingstream";
     public static Context applicationContext;
     private MethodChannel.Result deepLinkingDataObjectResult;
-    private EventChannel.EventSink  deepLinkingDataEventSink;
+    private EventChannel.EventSink deepLinkingDataEventSink;
 
 
     MyHelperClass myHeperClass;
@@ -107,32 +115,35 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private User weUser;
     Function callback;
     boolean bBranchLodead = false;
-    private boolean bActivateIndiusOSAttribution=false;
+    private boolean bActivateIndiusOSAttribution = false;
     Map<String, Object> deepLinkingDataObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        applicationContext=getApplicationContext();
+        applicationContext = getApplicationContext();
         deepLinkingDataObject = new HashMap();
-        deepLinkingDataObject.put("activateDeepLinkingNavigation",false);
+        deepLinkingDataObject.put("activateDeepLinkingNavigation", false);
         initPushNotifications();
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
         initFlutterChannels();
         initFlutterEvents();
         initWebEngage();
+        WebEngage.registerInAppNotificationCallback(this);
+
 
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        deepLinkingDataObject.put("activateDeepLinkingNavigation",false);
-        if(bActivateIndiusOSAttribution){
+        deepLinkingDataObject.put("activateDeepLinkingNavigation", false);
+
+        if (bActivateIndiusOSAttribution) {
             initIndusOSBranchAttribution();
             /*For indus OS branch attribution call the async call first and then init the branch plugin*/
-        }else{
+        } else {
             initBranchPlugin();
         }
     }
@@ -149,6 +160,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     @Override
     public void onPushNotificationShown(Context context, PushNotificationData notificationData) {
+
     }
 
     @Override
@@ -182,28 +194,32 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     @Override
     public boolean onInAppNotificationClicked(Context context, InAppNotificationData notificationData, String actionId) {
-        return false;
+        return onWEInnAppNotificationCLicked(notificationData,actionId);
     }
 
-    private void initIndusOSBranchAttribution(){
+
+
+
+
+    private void initIndusOSBranchAttribution() {
         if (!getSharedPreferences("branch", 0).getBoolean("branchTrackUrlHit", false)) {
             //IndusOSAttribution runner = new IndusOSAttribution();
             indusOSTask.execute();
-        }else {
+        } else {
             initBranchPlugin();
         }
     }
 
 
     private void initWebEngage() {
-        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey("~47b65866")
+        WebEngageConfig webEngageConfig = new WebEngageConfig.Builder().setWebEngageKey(MyConstants.WEBENGAGE_REGKEY)
                 .setPushSmallIcon(R.drawable.notification_icon_small)
                 .setPushAccentColor(Color.parseColor("#d32518"))
                 .build();
         this.getApplication()
                 .registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(this, webEngageConfig));
         FlutterApplication flutterApplication = new FlutterApplication();
-        BranchClass branchClass =new BranchClass();
+        BranchClass branchClass = new BranchClass();
         flutterApplication.registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(flutterApplication, webEngageConfig));
         branchClass.registerActivityLifecycleCallbacks(new WebEngageActivityLifeCycleCallbacks(branchClass, webEngageConfig));
         weAnalytics = WebEngage.get().analytics();
@@ -214,26 +230,26 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     /**************************** BRANCH IO RELATED CODE ************************************************/
 
     private void initBranchPlugin() {
-            final Intent intent = getIntent();
-            try {
-                Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
-                    @Override
-                    public void onInitFinished(JSONObject referringParams, BranchError error) {
-                        bBranchLodead = true;
-                        if (error == null) {
-                            initBranchSession(referringParams);
-                            if(deepLinkingDataEventSink !=null){
-                                deepLinkingDataEventSink.success(deepLinkingDataObject);
-                            }
-
-                        } else {
-                            initBranchSession(referringParams);
+        final Intent intent = getIntent();
+        try {
+            Branch.getInstance().initSession(new Branch.BranchReferralInitListener() {
+                @Override
+                public void onInitFinished(JSONObject referringParams, BranchError error) {
+                    bBranchLodead = true;
+                    if (error == null) {
+                        initBranchSession(referringParams);
+                        if (deepLinkingDataEventSink != null) {
+                            deepLinkingDataEventSink.success(deepLinkingDataObject);
                         }
+
+                    } else {
+                        initBranchSession(referringParams);
                     }
-                }, intent.getData(), this);
-            } catch (Exception e) {
-                initBranchSession(null);
-            }
+                }
+            }, intent.getData(), this);
+        } catch (Exception e) {
+            initBranchSession(null);
+        }
     }
 
     private void getBranchData(MethodChannel.Result result) {
@@ -453,43 +469,43 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    private void setDeepLinkingBranchData(JSONObject referringParams ) {
-        String dl_page_route = referringParams.optString("dl_page_route", "");
-        String dl_leagueId = referringParams.optString("dl_leagueId", "");
-        String dl_ac_promocode = referringParams.optString("dl_ac_promocode", "");
-        String dl_ac_promoamount = referringParams.optString("dl_ac_promoamount", "");
-        String dl_sp_pageLocation = referringParams.optString("dl_sp_pageLocation", "");
-        String dl_sp_pageTitle = referringParams.optString("dl_sp_pageTitle", "");
-        String dl_sport_type = referringParams.optString("dl_sport_type", "0");
-        String dl_unique_id = referringParams.optString("dl_unique_id", " ");
-
-        if (dl_page_route.length() > 2) {
-            deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
-            deepLinkingDataObject.put("dl_page_route", dl_page_route);
-            deepLinkingDataObject.put("dl_leagueId", dl_leagueId);
-            deepLinkingDataObject.put("dl_ac_promocode", dl_ac_promocode);
-            deepLinkingDataObject.put("dl_ac_promoamount", dl_ac_promoamount);
-            deepLinkingDataObject.put("dl_sp_pageLocation", dl_sp_pageLocation);
-            deepLinkingDataObject.put("dl_sp_pageTitle", dl_sp_pageTitle);
-            deepLinkingDataObject.put("dl_sport_type", dl_sport_type);
-            deepLinkingDataObject.put("dl_unique_id", dl_unique_id);
+    private void setDeepLinkingBranchData(JSONObject referringParams) {
+        String enableDeepLinking = referringParams.optString("enableDeepLinking", "");
+        DeepLinkingDataModel deepLinkingDataModel = new DeepLinkingDataModel();
+        if (enableDeepLinking.equals("true")) {
+            deepLinkingDataModel.setActivateDeepLinkingNavigation(true);
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_page_route", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_page_route", ""));
+            deepLinkingDataModel.setDlLeagueId(referringParams.optString("dl_leagueId", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_ac_promocode", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_ac_promoamount", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_sp_pageLocation", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_sp_pageTitle", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_sport_type", ""));
+            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_unique_id", ""));
+            deepLinkingDataObject = deepLinkingDataModel.getDeepLinkingDataMap();
         }
     }
 
 
-    private void  deepLinkingRoutingHandler(){
+    private void deepLinkingRoutingHandler() {
         deepLinkingDataObjectResult.success(deepLinkingDataObject);
     }
 
-    private void initFlutterEvents(){
+    private void initFlutterEvents() {
+
         new EventChannel(getFlutterView(), DEEPLINKING_STREAM_CHANNEL).setStreamHandler(
+
                 new EventChannel.StreamHandler() {
+
                     @Override
                     public void onListen(Object args, final EventChannel.EventSink events) {
-                        deepLinkingDataEventSink=events;
+                        deepLinkingDataEventSink = events;
                     }
+
                     @Override
                     public void onCancel(Object args) {
+
 
                     }
                 }
@@ -503,14 +519,14 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_getBranchRefCode")) {
                             String pfRefCode = " ";
-                            if(!bActivateIndiusOSAttribution) {
+                            if (!bActivateIndiusOSAttribution) {
                                 pfRefCode = (String) getRefCodeUsingBranch();
                             }
                             result.success(pfRefCode);
                         }
                         if (methodCall.method.equals("_initBranchIoPlugin")) {
                             Map<String, String> object = new HashMap();
-                            if(!bActivateIndiusOSAttribution) {
+                            if (!bActivateIndiusOSAttribution) {
                                 if (bBranchLodead) {
                                     String pfRefCode = (String) getRefCodeUsingBranch();
                                     String installReferring_link = (String) getInstallReferringLink();
@@ -522,7 +538,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                     getBranchData(result);
                                 }
 
-                            }else {
+                            } else {
                                 object.put("installReferring_link", "");
                                 object.put("refCodeFromBranch", "");
                                 result.success(object.toString());
@@ -530,7 +546,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         }
                         if (methodCall.method.equals("_getInstallReferringLink")) {
                             String installReferring_link = " ";
-                            if(!bActivateIndiusOSAttribution) {
+                            if (!bActivateIndiusOSAttribution) {
                                 installReferring_link = (String) getInstallReferringLink();
                             }
                             result.success(installReferring_link);
@@ -588,7 +604,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                         if (methodCall.method.equals("_openRazorpayNative")) {
                             Map<String, Object> arguments = methodCall.arguments();
-                           startPayment(arguments);
+                            startPayment(arguments);
                             String razocode = "testrazo";
                             result.success(razocode);
 
@@ -612,7 +628,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         } else {
                             result.notImplemented();
                         }
-                        }});
+                    }
+                });
 
         new MethodChannel(getFlutterView(), PF_FCM_CHANNEL).setMethodCallHandler(new MethodChannel.MethodCallHandler() {
             @Override
@@ -718,11 +735,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             }
                         }
                     });
-                } else if ( methodCall.method.equals("onUserInfoRefreshed")) {
+                } else if (methodCall.method.equals("onUserInfoRefreshed")) {
                     Map<String, Object> arguments = methodCall.arguments();
                     onUserInfoRefreshed(arguments);
                 } else if (methodCall.method.equals("_deepLinkingRoutingHandler")) {
-                    deepLinkingDataObjectResult =result;
+                    deepLinkingDataObjectResult = result;
                     deepLinkingRoutingHandler();
 
                 } else {
@@ -736,130 +753,119 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
                 if (methodCall.method.equals("initSocialShareChannel")) {
                     result.success("Social Share init success");
-                }
-                else if(methodCall.method.equals("shareText")) {
+                } else if (methodCall.method.equals("shareText")) {
                     String message = methodCall.arguments();
                     inviteFriend(message);
                     result.success("Social Share init success");
-                }
-                else if(methodCall.method.equals("shareViaFacebook")) {
+                } else if (methodCall.method.equals("shareViaFacebook")) {
                     String message = methodCall.arguments();
                     inviteFriendViaFacebook(message);
                     result.success("Social Share init success");
-                }else if(methodCall.method.equals("shareViaWhatsApp")) {
+                } else if (methodCall.method.equals("shareViaWhatsApp")) {
                     String message = methodCall.arguments();
                     inviteFriendViaWhatsapp(message);
                     result.success("Social Share init success");
-                }
-                else if(methodCall.method.equals("shareViaGmail")) {
+                } else if (methodCall.method.equals("shareViaGmail")) {
                     String message = methodCall.arguments();
                     inviteFriendViaGmail(message);
                     result.success("Social Share init success");
-                }
-                else  {
+                } else {
                     result.success("Social Share init success");
                 }
             }
         });
 
 
-
     }
 
 
-    private String onUserInfoRefreshed(Map<String, Object> arguments){
-       
-        if(arguments.get("first_name") != null && ((String) arguments.get("first_name")).length()>0){
-            weUser.setFirstName((String)arguments.get("first_name"));
-            weUser.setAttribute("first_name", (String)arguments.get("first_name"));
+    private String onUserInfoRefreshed(Map<String, Object> arguments) {
+
+        if (arguments.get("first_name") != null && ((String) arguments.get("first_name")).length() > 0) {
+            weUser.setFirstName((String) arguments.get("first_name"));
+            weUser.setAttribute("first_name", (String) arguments.get("first_name"));
         }
-        if(arguments.get("email") != null && ((String) arguments.get("email")).length()>0){
-            weUser.setHashedEmail((String)arguments.get("email"));
+        if (arguments.get("email") != null && ((String) arguments.get("email")).length() > 0) {
+            weUser.setHashedEmail((String) arguments.get("email"));
 
         }
-        if(arguments.get("mobile") != null && ((String) arguments.get("mobile")).length()>0){
-            weUser.setHashedPhoneNumber((String)arguments.get("mobile"));
+        if (arguments.get("mobile") != null && ((String) arguments.get("mobile")).length() > 0) {
+            weUser.setHashedPhoneNumber((String) arguments.get("mobile"));
 
         }
-        if(arguments.get("lastName") != null && ((String) arguments.get("lastName")).length()>0){
-            weUser.setLastName((String)arguments.get("lastName"));
-            weUser.setAttribute("last_name", (String)arguments.get("lastName"));
+        if (arguments.get("lastName") != null && ((String) arguments.get("lastName")).length() > 0) {
+            weUser.setLastName((String) arguments.get("lastName"));
+            weUser.setAttribute("last_name", (String) arguments.get("lastName"));
         }
-        if(arguments.get("login_name") != null && ((String) arguments.get("login_name")).length()>0){
-            weUser.setAttribute("userName", (String)arguments.get("login_name"));
+        if (arguments.get("login_name") != null && ((String) arguments.get("login_name")).length() > 0) {
+            weUser.setAttribute("userName", (String) arguments.get("login_name"));
         }
-        if(arguments.get("channelId") != null && ((String) arguments.get("channelId")).length()>0){
-            weUser.setAttribute("channelId", (String)arguments.get("channelId"));
+        if (arguments.get("channelId") != null && ((String) arguments.get("channelId")).length() > 0) {
+            weUser.setAttribute("channelId", (String) arguments.get("channelId"));
         }
-        if(arguments.get("withdrawable") != null && (arguments.get("withdrawable")).toString().length()>0){
-            double withdrawable =new Double(arguments.get("withdrawable").toString());
-            weUser.setAttribute("withdrawable",Math.round(withdrawable * 100.0) / 100.0 );
+        if (arguments.get("withdrawable") != null && (arguments.get("withdrawable")).toString().length() > 0) {
+            double withdrawable = new Double(arguments.get("withdrawable").toString());
+            weUser.setAttribute("withdrawable", Math.round(withdrawable * 100.0) / 100.0);
         }
-        if(arguments.get("depositBucket") != null && (arguments.get("depositBucket")).toString().length()>0){
+        if (arguments.get("depositBucket") != null && (arguments.get("depositBucket")).toString().length() > 0) {
             double depositBucket = new Double(arguments.get("depositBucket").toString());
-            weUser.setAttribute("depositBucket",  Math.round(depositBucket * 100.0) / 100.0 );
+            weUser.setAttribute("depositBucket", Math.round(depositBucket * 100.0) / 100.0);
         }
-        if(arguments.get("nonWithdrawable") != null && (arguments.get("nonWithdrawable")).toString().length()>0){
+        if (arguments.get("nonWithdrawable") != null && (arguments.get("nonWithdrawable")).toString().length() > 0) {
             double nonWithdrawable = new Double(arguments.get("nonWithdrawable").toString());
-            weUser.setAttribute("nonWithdrawable", Math.round(nonWithdrawable * 100.0) / 100.0  );
+            weUser.setAttribute("nonWithdrawable", Math.round(nonWithdrawable * 100.0) / 100.0);
         }
-        if(arguments.get("nonPlayableBucket") != null && (arguments.get("nonPlayableBucket")).toString().length()>0){
-            double nonPlayableBucket= new Double(arguments.get("nonPlayableBucket").toString());
+        if (arguments.get("nonPlayableBucket") != null && (arguments.get("nonPlayableBucket")).toString().length() > 0) {
+            double nonPlayableBucket = new Double(arguments.get("nonPlayableBucket").toString());
             weUser.setAttribute("nonPlayableBucket", Math.round(nonPlayableBucket * 100.0) / 100.0);
         }
-        if(arguments.get("pan_verification") != null && ((String) arguments.get("pan_verification")).length()>0){
-            if(arguments.get("pan_verification").toString().equals("DOC_NOT_SUBMITTED")){
+        if (arguments.get("pan_verification") != null && ((String) arguments.get("pan_verification")).length() > 0) {
+            if (arguments.get("pan_verification").toString().equals("DOC_NOT_SUBMITTED")) {
                 weUser.setAttribute("idProofStatus", 0);
-            }
-            else if(arguments.get("pan_verification").toString().equals("DOC_SUBMITTED")){
+            } else if (arguments.get("pan_verification").toString().equals("DOC_SUBMITTED")) {
                 weUser.setAttribute("idProofStatus", 1);
-            }
-            else if(arguments.get("pan_verification").toString().equals("UNDER_REVIEW")){
+            } else if (arguments.get("pan_verification").toString().equals("UNDER_REVIEW")) {
                 weUser.setAttribute("idProofStatus", 2);
-            }
-            else if(arguments.get("pan_verification").toString().equals("DOC_REJECTED")){
+            } else if (arguments.get("pan_verification").toString().equals("DOC_REJECTED")) {
                 weUser.setAttribute("idProofStatus", 3);
 
-            }else if(arguments.get("pan_verification").toString().equals("VERIFIED")){
+            } else if (arguments.get("pan_verification").toString().equals("VERIFIED")) {
                 weUser.setAttribute("idProofStatus", 4);
             }
         }
-        if(arguments.get("mobile_verification") != null){
-            weUser.setAttribute("mobileVerified", (boolean)arguments.get("mobile_verification"));
+        if (arguments.get("mobile_verification") != null) {
+            weUser.setAttribute("mobileVerified", (boolean) arguments.get("mobile_verification"));
         }
-        if(arguments.get("address_verification") != null && ((String) arguments.get("address_verification")).length()>0){
-            if(arguments.get("address_verification").toString().equals("DOC_NOT_SUBMITTED")){
+        if (arguments.get("address_verification") != null && ((String) arguments.get("address_verification")).length() > 0) {
+            if (arguments.get("address_verification").toString().equals("DOC_NOT_SUBMITTED")) {
                 weUser.setAttribute("addressProofStatus", 0);
-            }
-            else if(arguments.get("address_verification").toString().equals("DOC_SUBMITTED")){
+            } else if (arguments.get("address_verification").toString().equals("DOC_SUBMITTED")) {
                 weUser.setAttribute("addressProofStatus", 1);
-            }
-            else if(arguments.get("address_verification").toString().equals("UNDER_REVIEW")){
+            } else if (arguments.get("address_verification").toString().equals("UNDER_REVIEW")) {
                 weUser.setAttribute("addressProofStatus", 2);
-            }
-            else if(arguments.get("address_verification").toString().equals("DOC_REJECTED")){
+            } else if (arguments.get("address_verification").toString().equals("DOC_REJECTED")) {
                 weUser.setAttribute("addressProofStatus", 3);
-            }else if(arguments.get("address_verification").toString().equals("VERIFIED")){
+            } else if (arguments.get("address_verification").toString().equals("VERIFIED")) {
                 weUser.setAttribute("addressProofStatus", 4);
             }
         }
-        if(arguments.get("email_verification") != null){
-            weUser.setAttribute("emailVerified", (boolean)arguments.get("email_verification"));
+        if (arguments.get("email_verification") != null) {
+            weUser.setAttribute("emailVerified", (boolean) arguments.get("email_verification"));
         }
-        if(arguments.get("dob") != null&& ((String) arguments.get("dob")).length()>0){
-            weUser.setBirthDate((String)arguments.get("dob"));
+        if (arguments.get("dob") != null && ((String) arguments.get("dob")).length() > 0) {
+            weUser.setBirthDate((String) arguments.get("dob"));
         }
-        if(arguments.get("state") != null&& ((String) arguments.get("state")).length()>0){
+        if (arguments.get("state") != null && ((String) arguments.get("state")).length() > 0) {
             weUser.setAttribute("State", (String) arguments.get("state"));
         }
-        if(arguments.get("user_balance_webengage") != null){
+        if (arguments.get("user_balance_webengage") != null) {
             double user_balance_webengage = new Double(arguments.get("user_balance_webengage").toString());
-            weUser.setAttribute("balance",Math.round(user_balance_webengage * 100.0) / 100.0 );
+            weUser.setAttribute("balance", Math.round(user_balance_webengage * 100.0) / 100.0);
         }
-        if(arguments.get("accountStatus") != null){
-            weUser.setAttribute("accountStatus",arguments.get("accountStatus").toString() );
+        if (arguments.get("accountStatus") != null) {
+            weUser.setAttribute("accountStatus", arguments.get("accountStatus").toString());
         }
-        
+
         return "Refreshed user Date is used";
 
     }
@@ -868,39 +874,39 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private String webengageTrackUser(Map<String, String> arguments) {
         String trackType = arguments.get("trackingType");
         switch (trackType) {
-        case "login":
-            weUser.login(arguments.get("value"));
-            return "Login Track added";
-        case "logout":
-            weUser.logout();
-            return "Logout To Tracking event done";
-        case "setEmail":
-            weUser.setHashedEmail(arguments.get("value"));
-            return "Email track   added";
-        case "setBirthDate":
-            weUser.setBirthDate(arguments.get("value"));
-            return "Birth Day track added";
-        case "setPhoneNumber":
-            weUser.setHashedPhoneNumber(arguments.get("value"));
-            return "Phone Number track added";
-        case "setFirstName":
-            weUser.setFirstName(arguments.get("value"));
-            return "Login Track added";
-        case "setGender":
-            String gendel = arguments.get("value");
-            if (gendel == "male") {
-                weUser.setGender(Gender.MALE);
-            } else if (gendel == "female") {
-                weUser.setGender(Gender.FEMALE);
-            } else {
-                weUser.setGender(Gender.OTHER);
-            }
-            return "User Gender  added";
-        case "setLastName":
-            weUser.setLastName(arguments.get("value"));
-            return "Last Name  Track added";
-        default:
-            return "No Such tracking type found ";
+            case "login":
+                weUser.login(arguments.get("value"));
+                return "Login Track added";
+            case "logout":
+                weUser.logout();
+                return "Logout To Tracking event done";
+            case "setEmail":
+                weUser.setHashedEmail(arguments.get("value"));
+                return "Email track   added";
+            case "setBirthDate":
+                weUser.setBirthDate(arguments.get("value"));
+                return "Birth Day track added";
+            case "setPhoneNumber":
+                weUser.setHashedPhoneNumber(arguments.get("value"));
+                return "Phone Number track added";
+            case "setFirstName":
+                weUser.setFirstName(arguments.get("value"));
+                return "Login Track added";
+            case "setGender":
+                String gendel = arguments.get("value");
+                if (gendel == "male") {
+                    weUser.setGender(Gender.MALE);
+                } else if (gendel == "female") {
+                    weUser.setGender(Gender.FEMALE);
+                } else {
+                    weUser.setGender(Gender.OTHER);
+                }
+                return "User Gender  added";
+            case "setLastName":
+                weUser.setLastName(arguments.get("value"));
+                return "Last Name  Track added";
+            default:
+                return "No Such tracking type found ";
         }
     }
 
@@ -1163,8 +1169,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     public void onTechProcessPaymentFail(Map<String, Object> arguments) {
         JSONObject object = new JSONObject();
         try {
-            object.put("errorCode", (String)arguments.get("errorCode"));
-            object.put("errorMessage",(String) arguments.get("errorMessage"));
+            object.put("errorCode", (String) arguments.get("errorCode"));
+            object.put("errorMessage", (String) arguments.get("errorMessage"));
             object.put("status", "failed");
         } catch (JSONException e) {
 
@@ -1173,7 +1179,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentFail",
                 object.toString(), new MethodChannel.Result() {
                     @Override
-                    public void success(Object o) {                       
+                    public void success(Object o) {
                     }
 
                     @Override
@@ -1186,68 +1192,70 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 });
     }
 
-    public void onTechProcessPaymentSuccess(JSONObject  data) {
+    public void onTechProcessPaymentSuccess(JSONObject data) {
         new MethodChannel(getFlutterView(), TECH_PROCESS_CHANNEL).invokeMethod("onTechProcessPaymentSuccess",
                 data.toString(), new MethodChannel.Result() {
                     @Override
                     public void success(Object o) {
-                        Log.d("TECHPROCESS",  "Success" );
+                        Log.d("TECHPROCESS", "Success");
                     }
+
                     @Override
                     public void error(String s, String s1, Object o) {
-                        Log.d("TECHPROCESS",  "Success" );
+                        Log.d("TECHPROCESS", "Success");
                     }
+
                     @Override
                     public void notImplemented() {
-                        Log.d("TECHPROCESS",  "Success" );
+                        Log.d("TECHPROCESS", "Success");
                     }
                 });
     }
 
-    private void initTechProcessPayment(Map<String, Object> arguments){
+    private void initTechProcessPayment(Map<String, Object> arguments) {
 
-        String email= (String) arguments.get("email");
+        String email = (String) arguments.get("email");
         String phone = (String) arguments.get("phone");
-        String amount_in_rupees= (String) arguments.get("amount");
-        String date= (String) arguments.get("date");
-        String orderId= (String) arguments.get("orderId");
-        String paymentMethod=(String) arguments.get("method");
-        String userId=(String) arguments.get("userId");
+        String amount_in_rupees = (String) arguments.get("amount");
+        String date = (String) arguments.get("date");
+        String orderId = (String) arguments.get("orderId");
+        String paymentMethod = (String) arguments.get("method");
+        String userId = (String) arguments.get("userId");
         String merchantIdentifier = (String) arguments.get("merchantIdentifier");
-        String extra_public_key =(String) arguments.get("extra_public_key");
-        boolean cardDataCapturingRequired =(boolean) arguments.get("cardDataCapturingRequired");
+        String extra_public_key = (String) arguments.get("extra_public_key");
+        boolean cardDataCapturingRequired = (boolean) arguments.get("cardDataCapturingRequired");
         /*Prepare a checkout object*/
         com.paynimo.android.payment.model.Checkout checkout = new com.paynimo.android.payment.model.Checkout();
         checkout.setMerchantIdentifier(merchantIdentifier);
         checkout.setTransactionIdentifier(orderId);
-        checkout.setTransactionReference (orderId);
-        checkout.setTransactionType (PaymentActivity.TRANSACTION_TYPE_SALE);
-        checkout.setTransactionSubType (PaymentActivity.TRANSACTION_SUBTYPE_DEBIT);
-        checkout.setTransactionCurrency ("INR");
-        checkout.setTransactionAmount (amount_in_rupees);
-        checkout.setTransactionDateTime (date);
+        checkout.setTransactionReference(orderId);
+        checkout.setTransactionType(PaymentActivity.TRANSACTION_TYPE_SALE);
+        checkout.setTransactionSubType(PaymentActivity.TRANSACTION_SUBTYPE_DEBIT);
+        checkout.setTransactionCurrency("INR");
+        checkout.setTransactionAmount(amount_in_rupees);
+        checkout.setTransactionDateTime(date);
         /*User Info*/
-        checkout.setConsumerIdentifier (userId);
-        checkout.setConsumerEmailID (email);
-        checkout.setConsumerMobileNumber (phone);
-        checkout.setConsumerAccountNo (userId);
+        checkout.setConsumerIdentifier(userId);
+        checkout.setConsumerEmailID(email);
+        checkout.setConsumerMobileNumber(phone);
+        checkout.setConsumerAccountNo(userId);
 
-        checkout.addCartItem("FIRST",amount_in_rupees,"0.0", "0.0", "", "", "","");
+        checkout.addCartItem("FIRST", amount_in_rupees, "0.0", "0.0", "", "", "", "");
 
         /**************** Auth Intent ****************/
         Intent authIntent = new Intent(this, PaymentModesActivity.class);
         authIntent.putExtra(PaymentActivity.EXTRA_PUBLIC_KEY, extra_public_key);
 
-        if(paymentMethod.equals("netbanking")){
+        if (paymentMethod.equals("netbanking")) {
             authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_NETBANKING);
-        }else if(paymentMethod.equals("card")){
-            
-            if(cardDataCapturingRequired){
-                String cardNo=(String) arguments.get("tp_cardNumber");
-                String expiryMonth=(String) arguments.get("tp_expireMonth");
-                String expiryYear=(String) arguments.get("tp_expireYear");
-                String cvv=(String) arguments.get("tp_cvv");
-                String nameOnCard=(String) arguments.get("tp_nameOnTheCard");
+        } else if (paymentMethod.equals("card")) {
+
+            if (cardDataCapturingRequired) {
+                String cardNo = (String) arguments.get("tp_cardNumber");
+                String expiryMonth = (String) arguments.get("tp_expireMonth");
+                String expiryYear = (String) arguments.get("tp_expireYear");
+                String cvv = (String) arguments.get("tp_cvv");
+                String nameOnCard = (String) arguments.get("tp_nameOnTheCard");
                 /*Data Capturing Page at Merchant End For - New Card*/
                 checkout.setPaymentInstrumentIdentifier(cardNo);
                 checkout.setPaymentInstrumentExpiryMonth(expiryMonth);
@@ -1257,9 +1265,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 checkout.setTransactionIsRegistration("Y");
                 checkout.setTransactionMerchantInitiated("Y");
                 authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE, PaymentActivity.PAYMENT_METHOD_CARDS);
-            }else{
-                String cvv=(String) arguments.get("tp_cvv");
-                String tp_instrumentToken=(String) arguments.get("tp_instrumentToken");
+            } else {
+                String cvv = (String) arguments.get("tp_cvv");
+                String tp_instrumentToken = (String) arguments.get("tp_instrumentToken");
                 checkout.setTransactionMerchantInitiated("N");
                 checkout.setPaymentMethodToken("00000");
                 checkout.setPaymentInstrumentToken(tp_instrumentToken);
@@ -1267,20 +1275,19 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                 authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
                         PaymentActivity.PAYMENT_METHOD_CARDS);
             }
-        }else if(paymentMethod.equals("upi")){
+        } else if (paymentMethod.equals("upi")) {
             authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
                     PaymentActivity.PAYMENT_METHOD_UPI);
-        }
-        else{
+        } else {
             authIntent.putExtra(PaymentActivity.EXTRA_REQUESTED_PAYMENT_MODE,
                     PaymentActivity.PAYMENT_METHOD_DEFAULT);
         }
-        
+
         /*Now call the payment activity*/
         authIntent.putExtra(Constant.ARGUMENT_DATA_CHECKOUT, checkout);
-        try{
+        try {
             startActivityForResult(authIntent, PaymentActivity.REQUEST_CODE);
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.toString());
         }
     }
@@ -1289,7 +1296,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PaymentActivity.REQUEST_CODE) {
-            Log.d("TECHPROCESS", "Result Code :" +PaymentActivity.REQUEST_CODE );
+            Log.d("TECHPROCESS", "Result Code :" + PaymentActivity.REQUEST_CODE);
             if (resultCode == PaymentActivity.RESULT_OK) {
                 // PAyment  was successful
                 Log.d("TECHPROCESS", "Result Code :" + RESULT_OK);
@@ -1302,7 +1309,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                         if (transactionType != null && transactionType.equalsIgnoreCase(PaymentActivity.TRANSACTION_TYPE_PREAUTH)
                                 && transactionSubType != null && transactionSubType
-                                .equalsIgnoreCase(PaymentActivity.TRANSACTION_SUBTYPE_RESERVE)){
+                                .equalsIgnoreCase(PaymentActivity.TRANSACTION_SUBTYPE_RESERVE)) {
                             Log.d("TECHPROCESS", "Transaction sub type is reserve");
                             // Transaction Completed and Got SUCCESS
                             if (checkout_res.getMerchantResponsePayload()
@@ -1319,9 +1326,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                                 }
 
-                            }
-
-                            else {
+                            } else {
                                 /* some error from bank side*/
                                 Log.d("TECHPROCESS", "Some error");
 
@@ -1345,7 +1350,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                             checkout_res.getMerchantResponsePayload().toString());
 
 
-
                                 } else if (checkout_res.getMerchantResponsePayload().
                                         getPaymentMethod().getPaymentTransaction().
                                         getInstruction().getId() != null && !checkout_res.getMerchantResponsePayload().
@@ -1354,9 +1358,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                                     Log.d("TECHPROCESS", "Transaction sub type is reserve");
                                 }
-                            }
-                            else if (checkout_res
-                                    .getMerchantResponsePayload().getPaymentMethod()			.getPaymentTransaction().getStatusCode().equalsIgnoreCase(
+                            } else if (checkout_res
+                                    .getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode().equalsIgnoreCase(
                                             PaymentActivity.TRANSACTION_STATUS_DIGITAL_MANDATE_SUCCESS
                                     )) {
                                 Log.d("TECHPROCESS", "Transaction sub type is reserve");
@@ -1373,10 +1376,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                                     Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
 
-
                                 }
-                            }
-                            else {
+                            } else {
 
                                 Log.d("TECHPROCESS", "Transaction sub type is reserve");
 
@@ -1385,53 +1386,52 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
                         }
 
-                        String statusCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode();
-                        String statusMessage =checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusMessage();
+                        String statusCode = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusCode();
+                        String statusMessage = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getStatusMessage();
                         String errorMessage = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getErrorMessage();
-                        String amount =checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getAmount();
+                        String amount = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getAmount();
                         String dateTime = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getDateTime();
-                        String merchantTransactionIdentifier=checkout_res.getMerchantResponsePayload().getMerchantTransactionIdentifier();
-                        String identifier = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getIdentifier() ;
-                        String bankSelectionCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getBankSelectionCode();
-                        String bankReferenceIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBankReferenceIdentifier();
-                        String refundIdentifier=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getRefundIdentifier();
-                        String balanceAmount= checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBalanceAmount();
-                        String instrumentAliasName=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentAliasName();
-                        String  instrumentToken=checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentToken();
-                        String  SIMandateId=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
-                        String SIMandateStatus=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
-                        String  SIMandateErrorCode=checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
+                        String merchantTransactionIdentifier = checkout_res.getMerchantResponsePayload().getMerchantTransactionIdentifier();
+                        String identifier = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getIdentifier();
+                        String bankSelectionCode = checkout_res.getMerchantResponsePayload().getPaymentMethod().getBankSelectionCode();
+                        String bankReferenceIdentifier = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBankReferenceIdentifier();
+                        String refundIdentifier = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getRefundIdentifier();
+                        String balanceAmount = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getBalanceAmount();
+                        String instrumentAliasName = checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentAliasName();
+                        String instrumentToken = checkout_res.getMerchantResponsePayload().getPaymentMethod().getInstrumentToken();
+                        String SIMandateId = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getId();
+                        String SIMandateStatus = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getStatusCode();
+                        String SIMandateErrorCode = checkout_res.getMerchantResponsePayload().getPaymentMethod().getPaymentTransaction().getInstruction().getErrorcode();
                         Log.d("TECHPROCESS", statusCode);
-                        if(statusCode.equals("0300")){
+                        if (statusCode.equals("0300")) {
                             Gson gson = new Gson();
                             String jsonString = gson.toJson(checkout_res.getMerchantResponsePayload());
                             try {
                                 JSONObject request = new JSONObject(jsonString);
-                                request.put("amount",amount);
-                                request.put("orderId",merchantTransactionIdentifier);
-                                request.put("status",1);
-                                request.put("instrumentAliasName",instrumentAliasName);
-                                request.put("instrumentToken",instrumentToken);
+                                request.put("amount", amount);
+                                request.put("orderId", merchantTransactionIdentifier);
+                                request.put("status", 1);
+                                request.put("instrumentAliasName", instrumentAliasName);
+                                request.put("instrumentToken", instrumentToken);
                                 onTechProcessPaymentSuccess(request);
 
                             } catch (JSONException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
-                        }else{
+                        } else {
 
-                            Map<String, Object> errorArguments =new HashMap();
-                            errorArguments.put("errorCode",statusCode);
-                            errorArguments.put("errorMessage","");
+                            Map<String, Object> errorArguments = new HashMap();
+                            errorArguments.put("errorCode", statusCode);
+                            errorArguments.put("errorMessage", "");
                             onTechProcessPaymentFail(errorArguments);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();                   
+                        e.printStackTrace();
                     }
 
                 }
-            }
-            else if (resultCode == PaymentActivity.RESULT_ERROR) {
+            } else if (resultCode == PaymentActivity.RESULT_ERROR) {
 
                 Log.d("Exception", "Error");
                 if (data.hasExtra(PaymentActivity.RETURN_ERROR_CODE) &&
@@ -1443,25 +1443,23 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String error_desc = (String) data
                             .getStringExtra(PaymentActivity.RETURN_ERROR_DESCRIPTION);
 
-                    Map<String, Object> errorArguments =new HashMap();
-                    errorArguments.put("errorCode","");
-                    if(error_code.equals("ERROR_PAYNIMO_023")){
-                        errorArguments.put("errorMessage","Enter valid card details");
-                    }
-                    else{
-                        errorArguments.put("errorMessage"," ");
+                    Map<String, Object> errorArguments = new HashMap();
+                    errorArguments.put("errorCode", "");
+                    if (error_code.equals("ERROR_PAYNIMO_023")) {
+                        errorArguments.put("errorMessage", "Enter valid card details");
+                    } else {
+                        errorArguments.put("errorMessage", " ");
                     }
                     onTechProcessPaymentFail(errorArguments);
 
                 }
-            }
-            else if (resultCode == PaymentActivity.RESULT_CANCELED) {
+            } else if (resultCode == PaymentActivity.RESULT_CANCELED) {
 
                 Log.d("Exception", "Cancled");
 
-                Map<String, Object> errorArguments =new HashMap();
-                errorArguments.put("errorCode","");
-                errorArguments.put("errorMessage","Payment cancled by user");
+                Map<String, Object> errorArguments = new HashMap();
+                errorArguments.put("errorCode", "");
+                errorArguments.put("errorMessage", "Payment cancled by user");
                 onTechProcessPaymentFail(errorArguments);
                 onTechProcessPaymentFail(errorArguments);
 
@@ -1469,7 +1467,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
-    
 
     /* Firebase Push notification */
     public void initPushNotifications() {
@@ -1486,66 +1483,48 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         Intent intent = getIntent();
         if (intent != null && intent.getExtras() != null) {
             Bundle extras = intent.getExtras();
-            try{
+            try {
                 if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("enableDeepLinking")) {
-                    String enableDeepLinking= extras.getString("enableDeepLinking");
+                    String enableDeepLinking = extras.getString("enableDeepLinking");
+                    DeepLinkingDataModel deepLinkingDataModel = new DeepLinkingDataModel();
 
-                    if(enableDeepLinking.equals("true")){
-                        if(extras.containsKey("dl_page_route")){
+                    if (enableDeepLinking.equals("true")) {
+                        if (extras.containsKey("dl_page_route")) {
                             String dl_page_route = extras.getString("dl_page_route");
-                            if(dl_page_route.length()>2){
-                                deepLinkingDataObject.put("activateDeepLinkingNavigation", true);
-                                deepLinkingDataObject.put("dl_page_route", (String) extras.get("dl_page_route"));
-
-                                if(extras.containsKey("dl_leagueId")){
-                                    deepLinkingDataObject.put("dl_leagueId", (String) extras.get("dl_leagueId"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_leagueId", "");
+                            if (dl_page_route.length() > 2) {
+                                deepLinkingDataModel.setDlPageRoute(dl_page_route);
+                                deepLinkingDataModel.setActivateDeepLinkingNavigation(true);
+                                if (extras.containsKey("dl_leagueId")) {
+                                    deepLinkingDataModel.setDlLeagueId((String) extras.get("dl_leagueId"));
                                 }
-                                if(extras.containsKey("dl_ac_promocode")){
-                                    deepLinkingDataObject.put("dl_ac_promocode", (String) extras.get("dl_ac_promocode"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_ac_promocode", " ");
+                                if (extras.containsKey("dl_ac_promocode")) {
+                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promocode"));
                                 }
-                                if(extras.containsKey("dl_ac_promoamount")){
-                                    deepLinkingDataObject.put("dl_ac_promoamount", (String) extras.get("dl_ac_promoamount"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_ac_promoamount", " ");
+                                if (extras.containsKey("dl_ac_promoamount")) {
+                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promoamount"));
                                 }
 
-                                if(extras.containsKey("dl_sp_pageLocation")){
-                                    deepLinkingDataObject.put("dl_sp_pageLocation", (String) extras.get("dl_ac_promoamount"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_sp_pageLocation", " ");
+                                if (extras.containsKey("dl_sp_pageLocation")) {
+                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promoamount"));
                                 }
-                                if(extras.containsKey("dl_sp_pageTitle")){
-                                    deepLinkingDataObject.put("dl_sp_pageTitle", (String) extras.get("dl_ac_promoamount"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_sp_pageTitle", " ");
+                                if (extras.containsKey("dl_sp_pageTitle")) {
+                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promoamount"));
                                 }
 
-                                if(extras.containsKey("dl_sport_type")){
-                                    deepLinkingDataObject.put("dl_sport_type", (String) extras.get("dl_sport_type"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_sport_type", "0");
+                                if (extras.containsKey("dl_sport_type")) {
+                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_sport_type"));
                                 }
 
-                                if(extras.containsKey("dl_unique_id")){
-                                    deepLinkingDataObject.put("dl_unique_id", (String) extras.get("dl_unique_id"));
-                                }else{
-                                    deepLinkingDataObject.put("dl_unique_id", " ");
+                                if (extras.containsKey("dl_unique_id")) {
+                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_unique_id"));
                                 }
-
-
-
-                                
-                                
+                                deepLinkingDataObject = deepLinkingDataModel.getDeepLinkingDataMap();
                             }
 
                         }
                     }
                 }
-            } catch(Exception e){
+            } catch (Exception e) {
 
             }
         }
@@ -1694,19 +1673,19 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    private void  inviteFriend(String message){
-        String shareMessage= message;
+    private void inviteFriend(String message) {
+        String shareMessage = message;
         try {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
             startActivity(Intent.createChooser(shareIntent, "Share to"));
-        } catch(Exception e) {
+        } catch (Exception e) {
             //e.toString();
         }
     }
 
-    private void  inviteFriendViaWhatsapp(String message){
+    private void inviteFriendViaWhatsapp(String message) {
         Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
         whatsappIntent.setType("text/plain");
         whatsappIntent.setPackage("com.whatsapp");
@@ -1718,7 +1697,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
-    private void  inviteFriendViaFacebook(String message){
+    private void inviteFriendViaFacebook(String message) {
         Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
         whatsappIntent.setType("text/plain");
         whatsappIntent.setPackage("com.facebook.katana");
@@ -1730,17 +1709,80 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
-    private void inviteFriendViaGmail(String message){
-        String shareMessage= message;
+    private void inviteFriendViaGmail(String message) {
+        String shareMessage = message;
         try {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.setPackage("com.google.android.gm");
             shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
             startActivity(Intent.createChooser(shareIntent, "Share to"));
-        } catch(Exception e) {
+        } catch (Exception e) {
             inviteFriend(message);
         }
+    }
+
+    private boolean onWEInnAppNotificationCLicked(InAppNotificationData notificationData, String actionId ) {
+        DeepLinkingDataModel deepLinkingDataModel = new DeepLinkingDataModel();
+        boolean enableDeepLinking = false;
+        try {
+            Gson gson = new Gson();
+            String customData = gson.toJson(notificationData.getData());
+            JSONObject cusTomeDataJson = new JSONObject(customData);
+            JSONObject actionData = cusTomeDataJson.getJSONObject("nameValuePairs").getJSONObject("actions");
+            JSONArray actionValuesArray = actionData.getJSONArray("values");
+            for (int i = 0; i < actionValuesArray.length(); i++) {
+                String actionEIdFromWe = actionValuesArray.getJSONObject(i).getJSONObject("nameValuePairs").getString("actionEId");
+                if (actionEIdFromWe.equals(actionId)) {
+                    String actionLinkFromWe = actionValuesArray.getJSONObject(i).getJSONObject("nameValuePairs").getString("actionLink");
+                    String decodedURI = Uri.decode(actionLinkFromWe);
+                    String[] parameters = decodedURI.split("\\?");
+                    if (parameters.length > 0) {
+                        String queryParmsPart = parameters[1];
+                        String queryParmsMap[] = queryParmsPart.split("&");
+                        for (int j = 0; j < queryParmsMap.length; j++) {
+                            String[] nameValue = queryParmsMap[j].split("=");
+                            if (nameValue[0].equals("dl_page_route")) {
+                                deepLinkingDataModel.setDlPageRoute(nameValue[1]);
+                            }
+                            if (nameValue[0].equals("dl_leagueId")) {
+                                deepLinkingDataModel.setDlLeagueId(nameValue[1]);
+
+                            }
+                            if (nameValue[0].equals("dl_ac_promocode")) {
+                                deepLinkingDataModel.setDlAcPromocode(nameValue[1]);
+
+                            }
+                            if (nameValue[0].equals("dl_sp_pageLocation")) {
+                                deepLinkingDataModel.setDlSpPageLocation(nameValue[1]);
+                            }
+                            if (nameValue[0].equals("dl_unique_id")) {
+                                deepLinkingDataModel.setDlUnique_id(nameValue[1]);
+                            }
+                            if (nameValue[0].equals("enableDeepLinking")) {
+                                if (nameValue[1].equals("true")) {
+                                    deepLinkingDataModel.setActivateDeepLinkingNavigation(true);
+                                    enableDeepLinking = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (JSONException e) {
+
+        }
+
+        if (enableDeepLinking) {
+            if (this.deepLinkingDataEventSink != null) {
+                this.deepLinkingDataEventSink.success(deepLinkingDataModel.getDeepLinkingDataMap());
+            }
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     private Map<String, Object> getDeviceInfo() {
@@ -1779,7 +1821,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-     AsyncTask<Void, Void, String>  indusOSTask = new AsyncTask<Void, Void, String>() {
+    AsyncTask<Void, Void, String> indusOSTask = new AsyncTask<Void, Void, String>() {
         @Override
         protected String doInBackground(Void... params) {
             String retVal = "false";
@@ -1787,35 +1829,38 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             try {
                 advertId = AdvertisingIdClient.getAdvertisingIdInfo(applicationContext).getId();
 
-            } catch (IOException |GooglePlayServicesNotAvailableException |GooglePlayServicesRepairableException e) {}
+            } catch (IOException | GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException e) {
+            }
             String BRANCH_TRACK_URL = "https://11zy.app.link/howzat_indus?%243p=a_indus_os&%24aaid={aaid}";
 
-            String track_url = BRANCH_TRACK_URL.replace("{aaid}",advertId) + "&%24s2s=true";
+            String track_url = BRANCH_TRACK_URL.replace("{aaid}", advertId) + "&%24s2s=true";
             HttpURLConnection urlConnection = null;
             try {
                 URL url = new URL(track_url);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 StringBuilder result = new StringBuilder();
-                String line ;
+                String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     result.append('\n').append(line);
                 }
                 String response = result.toString();
                 bufferedReader.close();
                 JSONObject object = new JSONObject(response);
-                if(object.getBoolean("success")){
+                if (object.getBoolean("success")) {
                     retVal = "true";
-                };
-            } catch (Exception e) {}
-            finally {
+                }
+                ;
+            } catch (Exception e) {
+            } finally {
                 urlConnection.disconnect();
             }
             return retVal;
         }
+
         @Override
         protected void onPostExecute(String response) {
-            if("true".equalsIgnoreCase(response)){
+            if ("true".equalsIgnoreCase(response)) {
                 SharedPreferences sharedPreferences = getSharedPreferences("branch", 0);
                 sharedPreferences.edit().putBoolean("branchTrackUrlHit", true).apply();
                 initBranchPlugin();
