@@ -112,7 +112,6 @@ class SplashScreenState extends State<SplashScreen>
       if (wsCookie != null && wsCookie != "") {
         final result =
             await SharedPrefHelper().saveWSCookieToStorage(wsCookie["cookie"]);
-        print(result);
       }
 
       setLoadingPercentage(99.0);
@@ -142,8 +141,6 @@ class SplashScreenState extends State<SplashScreen>
 
     if (activateDeepLinkingNavigation) {
       deepLinkingData = DeepLinkingData.fromJson(deepLinkingRoutingData);
-      print("league id in splash screen.........");
-       print(deepLinkingData.dl_leagueId);
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(
@@ -190,12 +187,10 @@ class SplashScreenState extends State<SplashScreen>
     try {
       if (isIos) {
         value = await utils_platform.invokeMethod('_deepLinkingRoutingHandler');
-        print("Deep linking value******");
-        print(value);
       } else {
         value = await utils_platform
             .invokeMethod('_deepLinkingRoutingHandler')
-            .timeout(Duration(seconds: 10));
+            .timeout(Duration(seconds: 10));   
       }
       return value;
     } catch (e) {
@@ -228,8 +223,6 @@ class SplashScreenState extends State<SplashScreen>
       value = await firebase_fcm_platform
           .invokeMethod('_getFirebaseToken')
           .timeout(Duration(seconds: 10));
-      print("####Firebase Token#######");
-      print(value);
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_FIREBASE_TOKEN, value);
     } catch (e) {}
@@ -242,8 +235,6 @@ class SplashScreenState extends State<SplashScreen>
       result = await firebase_fcm_platform
           .invokeMethod('_subscribeToFirebaseTopic', topicName)
           .timeout(Duration(seconds: 10));
-      print("####FCM Topic#######");
-      print(result);
     } catch (e) {
       print(e);
     }
