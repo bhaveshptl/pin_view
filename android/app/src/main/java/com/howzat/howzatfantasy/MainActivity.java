@@ -80,6 +80,7 @@ import com.paynimo.android.payment.PaymentModesActivity;
 import com.paynimo.android.payment.util.Constant;
 import com.webengage.sdk.android.callbacks.InAppNotificationCallbacks;
 import com.webengage.sdk.android.callbacks.PushNotificationCallbacks;
+import io.flutter.plugin.common.EventChannel;
 
 public class MainActivity extends FlutterActivity implements PaymentResultWithDataListener ,PushNotificationCallbacks, InAppNotificationCallbacks{
     private static final String BRANCH_IO_CHANNEL = "com.algorin.pf.branch";
@@ -90,8 +91,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private static final String UTILS_CHANNEL = "com.algorin.pf.utils";
     private static final String SOCIAL_SHARE_CHANNEL="com.algorin.pf.socialshare";
     private static final String TECH_PROCESS_CHANNEL="com.algorin.pf.techprocess";
+    private static final String   DEEPLINKING_STREAM_CHANNEL  = "com.algorin.pf.deeplinkingstream";
     public static Context applicationContext;
     private MethodChannel.Result deepLinkingDataObjectResult;
+    private EventChannel.EventSink  deepLinkingDataEventSink;
 
 
     MyHelperClass myHeperClass;
@@ -117,6 +120,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
         initFlutterChannels();
+        initFlutterEvents();
         initWebEngage();
 
     }
@@ -124,7 +128,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     public void onStart() {
         super.onStart();
-
+        deepLinkingDataObject.put("activateDeepLinkingNavigation",false);
         if(bActivateIndiusOSAttribution){
             initIndusOSBranchAttribution();
             /*For indus OS branch attribution call the async call first and then init the branch plugin*/
@@ -149,17 +153,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     @Override
     public boolean onPushNotificationClicked(Context context, PushNotificationData notificationData) {
-        // try {
-        //     Gson gson = new Gson();
-        //     String customData = gson.toJson(notificationData.getCustomData());
-        //     JSONObject cusTomeDataJson = new JSONObject(customData);
-        //     String enableDeepLinking = cusTomeDataJson.getJSONObject("mMap").getString("enableDeepLinking");
-        //     String disableDeepLinking_android = cusTomeDataJson.getJSONObject("mMap").getString("disableDeepLinking_android");
-        //     String dLR_page = cusTomeDataJson.getJSONObject("mMap").getString("dLR_page");
-        //     String dLR_matchID = cusTomeDataJson.getJSONObject("mMap").getString("dLR_matchID");
-        // } catch (JSONException e) {
-        //     System.out.println(e);
-        // }
         return false;
     }
 
@@ -229,6 +222,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         bBranchLodead = true;
                         if (error == null) {
                             initBranchSession(referringParams);
+                            if(deepLinkingDataEventSink !=null){
+                                deepLinkingDataEventSink.success(deepLinkingDataObject);
+                            }
+
                         } else {
                             initBranchSession(referringParams);
                         }
@@ -482,6 +479,21 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private void  deepLinkingRoutingHandler(){
         deepLinkingDataObjectResult.success(deepLinkingDataObject);
+    }
+
+    private void initFlutterEvents(){
+        new EventChannel(getFlutterView(), DEEPLINKING_STREAM_CHANNEL).setStreamHandler(
+                new EventChannel.StreamHandler() {
+                    @Override
+                    public void onListen(Object args, final EventChannel.EventSink events) {
+                        deepLinkingDataEventSink=events;
+                    }
+                    @Override
+                    public void onCancel(Object args) {
+
+                    }
+                }
+        );
     }
 
     protected void initFlutterChannels() {

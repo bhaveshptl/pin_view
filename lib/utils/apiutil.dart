@@ -147,8 +147,8 @@ class ApiUtil {
 
 class PrivateAttribution {
   static bool disableBranchIOAttribution = false;
-  static String attributionNumber = "2";
-  static String currentVersion = "3_46";
+  static String attributionNumber = "3";
+  static String currentVersion = "3_59";
   static bool getdisableBranchIOAttribution() {
     return disableBranchIOAttribution;
   }
@@ -160,6 +160,8 @@ class PrivateAttribution {
         return "oppo";
       case "2":
         return "xiaomi";
+      case "3":
+        return "indusos";  
       default:
         return "";
     }
@@ -170,11 +172,14 @@ class PrivateAttribution {
     var attributionName = attributionNumber;
     switch (attributionName) {
       case "1":
-        apkNameToDelete = "howzat_oppo_" + currentVersion + ".apk";
+        apkNameToDelete = "hz_oppo_" + currentVersion + ".apk";
         break;
       case "2":
-        apkNameToDelete = "howzat_xiaomi_" + currentVersion + ".apk";
+        apkNameToDelete = "hz_xiaomi_" + currentVersion + ".apk";
         break;
+      case "3":
+        apkNameToDelete = "hz_indusos" + currentVersion + ".apk";
+        break;  
       default:
         apkNameToDelete = "howzat.apk";
         break;

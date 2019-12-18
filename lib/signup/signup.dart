@@ -394,6 +394,10 @@ class SignupState extends State<Signup> {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
+    } else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
+      _payload["context"]["utm_source"] = "indus_os";
+      _payload["context"]["utm_medium"] = "indus_os";
+      _payload["context"]["utm_campaign"] = "indus_os";
     }
     try {
       _payload["context"]["uid"] = androidDeviceInfoMap["uid"];
@@ -473,10 +477,7 @@ class SignupState extends State<Signup> {
   _doGoogleLogin(BuildContext context) async {
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
-      scopes: [
-        'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
-      ],
+      scopes: ['email'],
     );
 
     _googleSignIn.signIn().then(
@@ -577,6 +578,10 @@ class SignupState extends State<Signup> {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
+    } else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
+      _payload["context"]["utm_source"] = "indus_os";
+      _payload["context"]["utm_medium"] = "indus_os";
+      _payload["context"]["utm_campaign"] = "indus_os";
     }
 
     try {
@@ -709,7 +714,6 @@ class SignupState extends State<Signup> {
         builder: (context) => WebviewScaffold(
           url: isIos ? Uri.encodeFull(url) : url,
           appBar: AppBar(
-            leading: LeadingButton(),
             title: Text(
               title.toUpperCase(),
             ),

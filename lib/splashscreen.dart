@@ -19,6 +19,7 @@ import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:permission/permission.dart';
 import 'dart:math';
+import 'modal/deeplinkingdata.dart';
 
 class SplashScreen extends StatefulWidget {
   final String channelId;
@@ -81,7 +82,7 @@ class SplashScreenState extends State<SplashScreen>
     if (!isIos) {
       await _initBranchIoPlugin();
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
-    }else{
+    } else {
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
     }
     await setInitData(initData);
@@ -130,52 +131,24 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   navigateToHomePage() {
+    DeepLinkingData deepLinkingData;
     if (deepLinkingRoutingData != null) {
       if (deepLinkingRoutingData["activateDeepLinkingNavigation"] != null) {
         activateDeepLinkingNavigation =
             deepLinkingRoutingData["activateDeepLinkingNavigation"];
       }
     }
+   
 
     if (activateDeepLinkingNavigation) {
-      Map<String, dynamic> dNdata = new Map();
-      dNdata["dl_page_route"] = deepLinkingRoutingData["dl_page_route"] != null
-          ? deepLinkingRoutingData["dl_page_route"]
-          : " ";
-      dNdata["dl_leagueId"] = deepLinkingRoutingData["dl_leagueId"] != null
-          ? deepLinkingRoutingData["dl_leagueId"]
-          : " ";
-      dNdata["dl_ac_promocode"] =
-          deepLinkingRoutingData["dl_ac_promocode"] != null
-              ? deepLinkingRoutingData["dl_ac_promocode"]
-              : " ";
-      dNdata["dl_ac_promoamount"] =
-          deepLinkingRoutingData["dl_ac_promoamount"] != null
-              ? deepLinkingRoutingData["dl_ac_promoamount"]
-              : " ";
-
-      dNdata["dl_sp_pageLocation"] =
-          deepLinkingRoutingData["dl_sp_pageLocation"] != null
-              ? deepLinkingRoutingData["dl_sp_pageLocation"]
-              : " ";
-
-      dNdata["dl_sp_pageTitle"] =
-          deepLinkingRoutingData["dl_sp_pageTitle"] != null
-              ? deepLinkingRoutingData["dl_sp_pageTitle"]
-              : " ";
-      dNdata["dl_sport_type"] =
-          deepLinkingRoutingData["dl_sport_type"] != null
-              ? deepLinkingRoutingData["dl_sport_type"]
-              : "0";
-      dNdata["dl_unique_id"] =
-          deepLinkingRoutingData["dl_unique_id"] != null
-              ? deepLinkingRoutingData["dl_unique_id"]
-              : "";              
+      deepLinkingData = DeepLinkingData.fromJson(deepLinkingRoutingData);
+      print("league id in splash screen.........");
+       print(deepLinkingData.dl_leagueId);
       Navigator.of(context).pushReplacement(
         FantasyPageRoute(
           pageBuilder: (context) => Lobby(
               activateDeepLinkingNavigation: true,
-              deepLinkingNavigationData: dNdata),
+              deepLinkingNavigationData: deepLinkingData),
         ),
       );
     } else {
@@ -215,16 +188,14 @@ class SplashScreenState extends State<SplashScreen>
   Future<Map<dynamic, dynamic>> _deepLinkingRoutingHandler() async {
     Map<dynamic, dynamic> value = new Map();
     try {
-      if(isIos){
+      if (isIos) {
+        value = await utils_platform.invokeMethod('_deepLinkingRoutingHandler');
+        print("Deep linking value******");
+        print(value);
+      } else {
         value = await utils_platform
-          .invokeMethod('_deepLinkingRoutingHandler');
-       print("Deep linking value******");
-       print(value);   
-          
-      }else{
-        value = await utils_platform
-          .invokeMethod('_deepLinkingRoutingHandler')
-          .timeout(Duration(seconds: 10));
+            .invokeMethod('_deepLinkingRoutingHandler')
+            .timeout(Duration(seconds: 10));
       }
       return value;
     } catch (e) {
