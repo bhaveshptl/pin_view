@@ -92,9 +92,10 @@ class _OtpInputState extends State<OtpInput> {
                       enabled: true,
                       autoFocusFirstField: true,
                       sms: SmsListener(
-                        from: "ADHOWZAT",
-                        formatBody: (body) {
-                          print(body);
+                        from: "AD-HOWZAT",
+                        formatBody: (String body) {
+                          widget.onVerify(body.substring(0, 6));
+                          return body.substring(0, 6);
                         },
                       ),
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
