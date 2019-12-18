@@ -41,7 +41,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   String analyticsUrl;
   String maintenanceMsg = "";
   double loadingPercent = 0.0;
@@ -59,19 +59,20 @@ class SplashScreenState extends State<SplashScreen>
 
   @override
   void initState() {
-    getRequiredData();
     super.initState();
     if (Platform.isIOS) {
       isIos = true;
     }
     initServices();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => getRequiredData(context));
     if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
       AnalyticsManager.deleteInternalStorageFile(
           PrivateAttribution.getApkNameToDelete());
     }
   }
 
-  getRequiredData() async {
+  getRequiredData(BuildContext context) async {
     if (PrivateAttribution.disableBranchIOAttribution && !isIos) {
       await checkForPermission();
     }
@@ -87,7 +88,7 @@ class SplashScreenState extends State<SplashScreen>
     }
     await setInitData(initData);
     setLoadingPercentage(60.0);
-    final result = await AuthCheck().checkStatus(widget.apiBaseUrl);
+    final result = await AuthCheck().checkStatus(context, widget.apiBaseUrl);
     setLoadingPercentage(90.0);
 
     if (initData["update"]) {
@@ -137,7 +138,6 @@ class SplashScreenState extends State<SplashScreen>
             deepLinkingRoutingData["activateDeepLinkingNavigation"];
       }
     }
-   
 
     if (activateDeepLinkingNavigation) {
       deepLinkingData = DeepLinkingData.fromJson(deepLinkingRoutingData);
@@ -190,7 +190,7 @@ class SplashScreenState extends State<SplashScreen>
       } else {
         value = await utils_platform
             .invokeMethod('_deepLinkingRoutingHandler')
-            .timeout(Duration(seconds: 10));   
+            .timeout(Duration(seconds: 10));
       }
       return value;
     } catch (e) {

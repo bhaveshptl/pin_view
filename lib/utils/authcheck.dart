@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
+import 'package:provider/provider.dart';
 
 class AuthCheck {
   AuthCheck();
-  Future<bool> checkStatus(String apiUrl) async {
+  Future<bool> checkStatus(BuildContext context, String apiUrl) async {
     http.Request req = http.Request(
       "GET",
       Uri.parse(
@@ -19,15 +22,17 @@ class AuthCheck {
         .sendRequest(req)
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
+        Map<String, dynamic> userData = json.decode(res.body)["user"];
         SharedPrefHelper.internal().saveToSharedPref(
-            ApiUtil.SHARED_PREFERENCE_USER_KEY,
-            json.encode(json.decode(res.body)["user"]));
-        Map<String, dynamic> refreshdata = json.decode(res.body)["user"];
+            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(userData));
+        var userProvider = Provider.of<User>(context, listen: false);
+        userProvider.setUserFromJson(userData);
+        Map<String, dynamic> refreshdata = userData;
 
-        AnalyticsManager().setUser(json.decode(res.body)["user"]);
-        setWebEngageKeys(json.decode(res.body)["user"]);
+        AnalyticsManager().setUser(userData);
+        setWebEngageKeys(userData);
         print("###########Refresh UserData#############");
-        print(json.decode(res.body)["user"]);
+        print(userData);
 
         return true;
       } else {

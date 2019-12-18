@@ -73,12 +73,19 @@ class EPOCState extends State<EPOC> {
                     ),
           )
         : Container(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(246, 236, 236, 1),
+              borderRadius: BorderRadius.all(
+                Radius.circular(3.0),
+              ),
+            ),
+            padding: EdgeInsets.all(2.0),
             child: Column(
               children: <Widget>[
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(2.0),
-                    color: Colors.grey.shade100,
+                    color: Colors.white,
                   ),
                   padding: EdgeInsets.all(2.0),
                   alignment: Alignment.center,
@@ -86,7 +93,7 @@ class EPOCState extends State<EPOC> {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         child: Text(
                           leftDays < 10
                               ? "0" + leftDays.toString()
@@ -95,8 +102,8 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade800,
+                                fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
                         ),
@@ -112,7 +119,7 @@ class EPOCState extends State<EPOC> {
                         ),
                       ),
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         child: Text(
                           leftHours < 10
                               ? "0" + leftHours.toString()
@@ -121,8 +128,8 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade800,
+                                fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
                         ),
@@ -138,7 +145,7 @@ class EPOCState extends State<EPOC> {
                         ),
                       ),
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         child: Text(
                           leftMinutes < 10
                               ? "0" + leftMinutes.toString()
@@ -147,8 +154,8 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade800,
+                                fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
                         ),
@@ -164,7 +171,7 @@ class EPOCState extends State<EPOC> {
                         ),
                       ),
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         child: Text(
                           leftSeconds < 10
                               ? "0" + leftSeconds.toString()
@@ -173,8 +180,8 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
+                                color: Colors.grey.shade800,
+                                fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
                         ),
@@ -187,15 +194,15 @@ class EPOCState extends State<EPOC> {
                   child: Row(
                     children: <Widget>[
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         alignment: Alignment.center,
                         child: Text(
                           "D",
                           style: Theme.of(context)
                               .primaryTextTheme
-                              .caption
+                              .overline
                               .copyWith(
-                                color: Colors.black,
+                                color: Color.fromRGBO(211, 169, 169, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),
@@ -204,15 +211,15 @@ class EPOCState extends State<EPOC> {
                         width: 8.0,
                       ),
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         alignment: Alignment.center,
                         child: Text(
                           "H",
                           style: Theme.of(context)
                               .primaryTextTheme
-                              .caption
+                              .overline
                               .copyWith(
-                                color: Colors.black,
+                                color: Color.fromRGBO(211, 169, 169, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),
@@ -221,15 +228,15 @@ class EPOCState extends State<EPOC> {
                         width: 8.0,
                       ),
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         alignment: Alignment.center,
                         child: Text(
                           "M",
                           style: Theme.of(context)
                               .primaryTextTheme
-                              .caption
+                              .overline
                               .copyWith(
-                                color: Colors.black,
+                                color: Color.fromRGBO(211, 169, 169, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),
@@ -238,15 +245,15 @@ class EPOCState extends State<EPOC> {
                         width: 8.0,
                       ),
                       Container(
-                        width: 16.0,
+                        width: 20.0,
                         alignment: Alignment.center,
                         child: Text(
                           "S",
                           style: Theme.of(context)
                               .primaryTextTheme
-                              .caption
+                              .overline
                               .copyWith(
-                                color: Colors.black,
+                                color: Color.fromRGBO(211, 169, 169, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),

@@ -1,3 +1,5 @@
+import 'package:playfantasy/providers/user.dart';
+import 'package:provider/provider.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,28 +49,35 @@ void main() async {
     disableBranchIOAttribution: false,
     privateAttributionName: "",
     apiBaseUrl: apiBaseUrl,
-    appVersion:appVersion,
-    isIos:isIos,
+    appVersion: appVersion,
+    isIos: isIos,
     carouselSlideTime: Duration(seconds: 10),
     child: StoreProvider(
       store: store,
-      child: MaterialApp(
-        builder: (context, child) {
-          return MediaQuery(
-            child: child,
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 0.8),
-          );
-        },
-        home: SplashScreen(
-          apiBaseUrl: apiBaseUrl,
-          channelId: channelId,
-          fcmSubscribeId: fcmSubscribeId,
-        ),
-        theme: ThemeData(
-          primaryColor: Color.fromRGBO(134, 16, 14, 1),
-          primaryColorLight: Color.fromRGBO(188, 69, 53, 1),
-          primaryColorDark: Color.fromRGBO(84, 0, 0, 1),
-          accentColor: Color.fromRGBO(211, 37, 24, 1),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<User>.value(
+            value: User(),
+          ),
+        ],
+        child: MaterialApp(
+          builder: (context, child) {
+            return MediaQuery(
+              child: child,
+              data: MediaQuery.of(context).copyWith(textScaleFactor: 0.8),
+            );
+          },
+          home: SplashScreen(
+            apiBaseUrl: apiBaseUrl,
+            channelId: channelId,
+            fcmSubscribeId: fcmSubscribeId,
+          ),
+          theme: ThemeData(
+            primaryColor: Color.fromRGBO(134, 16, 14, 1),
+            primaryColorLight: Color.fromRGBO(188, 69, 53, 1),
+            primaryColorDark: Color.fromRGBO(84, 0, 0, 1),
+            accentColor: Color.fromRGBO(211, 37, 24, 1),
+          ),
         ),
       ),
     ),

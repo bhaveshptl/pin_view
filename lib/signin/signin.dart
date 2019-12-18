@@ -384,8 +384,7 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
-    }
-    else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
+    } else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
       _payload["context"]["utm_source"] = "indus_os";
       _payload["context"]["utm_medium"] = "indus_os";
       _payload["context"]["utm_campaign"] = "indus_os";
@@ -415,7 +414,7 @@ class SignInPageState extends State<SignInPage> {
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         onLoginAuthenticate(json.decode(res.body));
-        AuthResult(res, _scaffoldKey).processResult(() {});
+        AuthResult(res, _scaffoldKey).processResult(context, () {});
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         // setState(() {
@@ -435,9 +434,7 @@ class SignInPageState extends State<SignInPage> {
     _userSelectedLoginType = "GOOGLE";
     showLoader(true);
     GoogleSignIn _googleSignIn = new GoogleSignIn(
-      scopes: [
-        'email'
-      ],
+      scopes: ['email'],
     );
 
     _googleSignIn.signIn().then(
@@ -533,7 +530,7 @@ class SignInPageState extends State<SignInPage> {
       _payload["context"]["utm_source"] = "xiaomi";
       _payload["context"]["utm_medium"] = "xiaomi-store";
       _payload["context"]["utm_campaign"] = "xiaomi-World-Cup";
-    }else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
+    } else if (PrivateAttribution.getPrivateAttributionName() == "indusos") {
       _payload["context"]["utm_source"] = "indus_os";
       _payload["context"]["utm_medium"] = "indus_os";
       _payload["context"]["utm_campaign"] = "indus_os";
@@ -570,9 +567,7 @@ class SignInPageState extends State<SignInPage> {
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         onLoginAuthenticate(json.decode(res.body));
-        AuthResult(res, _scaffoldKey).processResult(
-          () {},
-        );
+        AuthResult(res, _scaffoldKey).processResult(context, () {});
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         // setState(() {
@@ -677,73 +672,45 @@ class SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            children: <Widget>[
-              SvgPicture.asset(
-                "images/logo_white.svg",
-                color: Colors.white,
-                width: 40.0,
-              ),
-              // Image.asset("images/logo_white.png"),
-              Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Image.asset(
-                  "images/logo_name_white.png",
-                  height: 20.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 10.0, bottom: 6.0),
-            child: FlatButton(
-              onPressed: () {
-                _launchSignup(context);
-              },
-              child: Image.asset("images/RegisterButton.png"),
-              // Text(
-              //   "Register".toUpperCase(),
-              //   style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-              //         color: Color.fromRGBO(25, 14, 4, 1),
-              //         fontWeight: FontWeight.w700,
-              //       ),
-              // ),
-              // color: Color.fromRGBO(243, 180, 81, 1),
-            ),
-          )
-        ],
+      backgroundColor: Color.fromRGBO(134, 16, 13, 1),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: Container(),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(!isIos
-                ? "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_referral_raf_250_login.jpg"
-                : "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_firstdeposit_new1_lobby_v2.jpg"),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
+              padding: EdgeInsets.only(top: 8.0, right: 16.0, bottom: 8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Expanded(
+                  FlatButton(
                     child: Text(
-                      "Welcome! Login & Start Playing.",
-                      textAlign: TextAlign.center,
+                      "SIGNUP",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w700,
+                            color: Color.fromRGBO(216, 138, 4, 1),
+                            decoration: TextDecoration.underline,
                           ),
                     ),
+                    onPressed: () {
+                      _launchSignup(context);
+                    },
                   ),
                 ],
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset(
+                  "images/hzlogo.png",
+                  width: MediaQuery.of(context).size.width * 0.4,
+                ),
+              ],
+            ),
             Padding(
-              padding: EdgeInsets.only(left: 56.0, right: 56.0),
+              padding: EdgeInsets.only(top: 32.0, left: 56.0, right: 56.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -760,16 +727,40 @@ class SignInPageState extends State<SignInPage> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
-                                      child: SimpleTextBox(
+                                      child: TextFormField(
                                         onSaved: (val) => _authName = val,
-                                        labelText:
-                                            strings.get("EMAIL_OR_MOBILE") +
-                                                "*",
+                                        decoration: InputDecoration(
+                                          labelText: "Email / Mobile",
+                                          isDense: true,
+                                          labelStyle: Theme.of(context)
+                                              .primaryTextTheme
+                                              .subhead
+                                              .copyWith(
+                                                color: Colors.white,
+                                              ),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white24,
+                                            ),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings
                                                 .get("USERNAME_ERROR");
                                           }
+                                          return null;
                                         },
                                         keyboardType:
                                             TextInputType.emailAddress,
@@ -779,36 +770,64 @@ class SignInPageState extends State<SignInPage> {
                                 ],
                               ),
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: <Widget>[
                                   Expanded(
-                                    child: Stack(
-                                      alignment: Alignment.topRight,
-                                      overflow: Overflow.visible,
-                                      children: <Widget>[
-                                        SimpleTextBox(
-                                          onSaved: (val) => _password = val,
-                                          labelText: "Password*",
-                                          validator: (value) {
-                                            if (value.isEmpty) {
-                                              return strings
-                                                  .get("PASSWORD_ERROR");
-                                            }
-                                          },
-                                          obscureText: _obscureText,
-                                        ),
-                                        Positioned(
-                                          top: -2.0,
-                                          child: IconButton(
-                                            icon: Icon(Icons.visibility),
-                                            onPressed: () {
-                                              setState(() {
-                                                _obscureText = !_obscureText;
-                                              });
-                                            },
+                                    child: TextFormField(
+                                      onSaved: (val) => _password = val,
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        labelText: "Password",
+                                        labelStyle: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subhead
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide: new BorderSide(
+                                            color: Colors.white24,
                                           ),
                                         ),
-                                      ],
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide: new BorderSide(
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ),
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .title
+                                          .copyWith(
+                                            color: Colors.white,
+                                          ),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return strings.get("PASSWORD_ERROR");
+                                        }
+                                        return null;
+                                      },
+                                      obscureText: _obscureText,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8.0),
+                                    child: InkWell(
+                                      child: Text(
+                                        "Forgot Password?",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subtitle
+                                            .copyWith(
+                                              color: Color.fromRGBO(
+                                                  216, 138, 4, 1),
+                                              decoration:
+                                                  TextDecoration.underline,
+                                            ),
+                                      ),
+                                      onTap: () {
+                                        _showForgotPassword();
+                                      },
                                     ),
                                   ),
                                 ],
@@ -819,28 +838,8 @@ class SignInPageState extends State<SignInPage> {
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      InkWell(
-                        onTap: () {
-                          _showForgotPassword();
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(4.0, 4.0, 0.0, 4.0),
-                          child: Text(
-                            strings.get("FORGOT_PASSWORD"),
-                            style: TextStyle(
-                              color: Colors.black54,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0),
+                    padding: EdgeInsets.only(top: 32.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -855,7 +854,7 @@ class SignInPageState extends State<SignInPage> {
                               },
                               child: Container(
                                 child: Text(
-                                  "Login",
+                                  "Login".toUpperCase(),
                                   style: Theme.of(context)
                                       .primaryTextTheme
                                       .title
@@ -872,7 +871,7 @@ class SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(top: 8.0),
+                    padding: EdgeInsets.only(top: 32.0, bottom: 16.0),
                     child: Row(
                       children: <Widget>[
                         Expanded(
@@ -885,26 +884,25 @@ class SignInPageState extends State<SignInPage> {
                             children: <Widget>[
                               Expanded(
                                 child: Divider(
-                                  color: Colors.grey.shade400,
+                                  color: Colors.redAccent,
                                 ),
                               ),
-                              CircleAvatar(
-                                radius: 12.0,
-                                backgroundColor: Colors.white,
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 24.0),
                                 child: Text(
                                   strings.get("OR").toUpperCase(),
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context)
                                       .primaryTextTheme
-                                      .caption
+                                      .title
                                       .copyWith(
-                                        color: Colors.black54,
+                                        color: Colors.white,
                                       ),
                                 ),
                               ),
                               Expanded(
                                 child: Divider(
-                                  color: Colors.grey.shade400,
+                                  color: Colors.redAccent,
                                 ),
                               )
                             ],
@@ -917,103 +915,34 @@ class SignInPageState extends State<SignInPage> {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: FlatButton(
-                            onPressed: () {
-                              _doGoogleLogin(context);
-                            },
-                            padding: EdgeInsets.all(0.0),
-                            color: Colors.transparent,
-                            child: Image.asset(
-                              "images/googleBtn.png",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: FlatButton(
-                            padding: EdgeInsets.all(0.0),
-                            onPressed: () {
-                              _doFacebookLogin(context);
-                            },
-                            color: Colors.transparent,
-                            child: Image.asset(
-                              "images/fbButton.png",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Text(
-                        "Not a Member yet?",
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .subtitle
-                            .copyWith(
-                              color: Colors.grey.shade600,
-                            ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          _launchSignup(context);
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.all(4.0),
-                          child: Text(
-                            "Register now",
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .title
-                                .copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                ),
-                          ),
+                      IconButton(
+                        iconSize: 48.0,
+                        icon: Image.asset(
+                          "images/Google_Icon.png",
+                          height: 48.0,
                         ),
-                      )
+                        onPressed: () {
+                          _doGoogleLogin(context);
+                        },
+                      ),
+                      Container(
+                        width: 48.0,
+                      ),
+                      IconButton(
+                        iconSize: 48.0,
+                        icon: Image.asset(
+                          "images/FB_Icon.png",
+                          height: 48.0,
+                        ),
+                        onPressed: () {
+                          _doFacebookLogin(context);
+                        },
+                      ),
                     ],
                   ),
-                  AppConfig.of(context).channelId != '3' &&
-                          AppConfig.of(context).channelId != '10' &&
-                          AppConfig.of(context).channelId != '13'
-                      ? Column(
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text("powered by"),
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Image.asset(
-                                  "images/playfantasy.png",
-                                  height: 64.0,
-                                  width: 64.0,
-                                ),
-                              ],
-                            ),
-                          ],
-                        )
-                      : Container()
                 ],
               ),
             ),

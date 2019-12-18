@@ -16,12 +16,10 @@ import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/createteam/createteam.dart';
 import 'package:playfantasy/createteam/teampreview.dart';
 import 'package:playfantasy/utils/fantasywebsocket.dart';
-import 'package:playfantasy/commonwidgets/leaguetitle.dart';
 import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
-import 'joincontestsuccess.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;

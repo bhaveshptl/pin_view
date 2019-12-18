@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:playfantasy/lobby/lobby.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:provider/provider.dart';
 
 class AuthResult {
   Response response;
@@ -29,8 +31,11 @@ class AuthResult {
     });
   }
 
-  processResult(Function done) async {
+  processResult(BuildContext context, Function done) async {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
+      var userProvider = Provider.of<User>(context, listen: false);
+      userProvider.setUserFromJson(json.decode(response.body));
+
       HttpManager.cookie = null;
       SharedPrefHelper.internal()
           .saveCookieToStorage(response.headers["set-cookie"]);

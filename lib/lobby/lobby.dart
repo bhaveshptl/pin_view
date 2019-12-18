@@ -17,9 +17,9 @@ import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/deeplinkingdata.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/lobby/jungleerummy.dart';
-import 'package:playfantasy/modal/user.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/profilepages/verification.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/lobby/appdrawer.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -35,6 +35,7 @@ import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:provider/provider.dart';
 
 class Lobby extends StatefulWidget {
   final String appUrl;
@@ -58,7 +59,6 @@ class Lobby extends StatefulWidget {
 
 class LobbyState extends State<Lobby>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  User _user;
   int _sportType = 1;
   int _activeIndex = 0;
   int _curPageIndex = 0;
@@ -113,21 +113,21 @@ class LobbyState extends State<Lobby>
     subscribeToDeepLinkingListener();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      updateUserInfo();
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     updateUserInfo();
+  //   }
+  // }
 
-  @override
-  void didChangeDependencies() {
-    bool ticker = !TickerMode.of(context);
-    if (!ticker) {
-      updateUserInfo();
-    }
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   bool ticker = !TickerMode.of(context);
+  //   if (!ticker) {
+  //     updateUserInfo();
+  //   }
+  //   super.didChangeDependencies();
+  // }
 
   _showUpdatingAppDialog(String url) {
     showDialog(
@@ -200,8 +200,7 @@ class LobbyState extends State<Lobby>
     }
   }
 
-
-  subscribeToDeepLinkingListener(){
+  subscribeToDeepLinkingListener() {
     if (_deeplinking_subscription == null) {
       Map<dynamic, dynamic> screendata = new Map();
       screendata["screenName"] = "LOBBY0";
@@ -477,18 +476,6 @@ class LobbyState extends State<Lobby>
           );
         }
       }
-    }
-  }
-
-  updateUserInfo() async {
-    _user = await getUserInfo();
-    if (_user != null) {
-      setState(() {
-        userBalance =
-            (_user.nonWithdrawable == null ? 0.0 : _user.nonWithdrawable) +
-                (_user.withdrawable == null ? 0.0 : _user.withdrawable) +
-                (_user.depositBucket == null ? 0.0 : _user.depositBucket);
-      });
     }
   }
 
@@ -1035,10 +1022,12 @@ class LobbyState extends State<Lobby>
                   ),
                 ],
               ),
-              AddCashButton(
-                text: formatCurrency.format(userBalance),
-                onPressed: () {
-                  _launchAddCash(source: "topright");
+              Consumer<User>(
+                builder: (context, user, child) {
+                  return AddCashButton(
+                    location: "topright",
+                    amount: user.withdrawable + user.depositedAmount,
+                  );
                 },
               ),
             ],

@@ -261,6 +261,9 @@ class JoinedContestsState extends State<JoinedContests>
         Map<String, dynamic> response = json.decode(res.body);
         _myContests = NewMyContest.fromJson(response)
             .leagues[widget.league.leagueId.toString()];
+        _myContests.normal.sort((a, b) {
+          return a.brand["id"] - b.brand["id"];
+        });
         initTabController();
         setActiveTabIndex();
 

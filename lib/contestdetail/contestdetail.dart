@@ -15,7 +15,7 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
-import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -35,6 +35,7 @@ import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/prizestructure/prizestructure.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/contestdetail/contestdetailscard.dart';
+import 'package:provider/provider.dart';
 
 const TABLE_COLUMN_PADDING = 28;
 
@@ -114,105 +115,6 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     if (Platform.isIOS) {
       initSocialShareChannel();
     }
-    updateUserInfo();
-  }
-
-  updateUserInfo() async {
-    var _user = await getUserInfo();
-    if (_user != null) {
-      setState(() {
-        userBalance =
-            (_user.nonWithdrawable == null ? 0.0 : _user.nonWithdrawable) +
-                (_user.withdrawable == null ? 0.0 : _user.withdrawable) +
-                (_user.depositBucket == null ? 0.0 : _user.depositBucket);
-      });
-    }
-  }
-
-  getUserInfo() async {
-    http.Request req = http.Request(
-      "GET",
-      Uri.parse(
-        BaseUrl().apiUrl + ApiUtil.AUTH_CHECK_URL,
-      ),
-    );
-    return HttpManager(http.Client())
-        .sendRequest(req)
-        .then((http.Response res) {
-      if (res.statusCode >= 200 && res.statusCode <= 299) {
-        Map<String, dynamic> user = json.decode(res.body)["user"];
-        setWebEngageKeys(user);
-
-        SharedPrefHelper.internal().saveToSharedPref(
-            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
-        return User.fromJson(user);
-      } else {
-        return null;
-      }
-    }).whenComplete(() {
-      showLoader(false);
-    });
-  }
-
-  setWebEngageKeys(Map<dynamic, dynamic> data) async {
-    Map<dynamic, dynamic> userInfo = new Map();
-
-    userInfo["first_name"] =
-        data["first_name"] != null ? data["first_name"] : "";
-    userInfo["lastName"] = data["lastName"] != null ? data["lastName"] : "";
-    userInfo["login_name"] =
-        data["login_name"] != null ? data["login_name"] : "";
-    userInfo["channelId"] = data["channelId"] != null ? data["channelId"] : "";
-    userInfo["withdrawable"] =
-        data["withdrawable"] != null ? data["withdrawable"] : "";
-    userInfo["depositBucket"] =
-        data["depositBucket"] != null ? data["depositBucket"] : "";
-    userInfo["nonWithdrawable"] =
-        data["nonWithdrawable"] != null ? data["nonWithdrawable"] : "";
-    userInfo["nonPlayableBucket"] =
-        data["nonPlayableBucket"] != null ? data["nonPlayableBucket"] : "";
-    userInfo["accountStatus"] = "";
-    userInfo["user_balance_webengage"] =
-        data["depositBucket"] + data["withdrawable"];
-    Map<dynamic, dynamic> verificationStatus = data["verificationStatus"];
-    userInfo["pan_verification"] = verificationStatus["pan_verification"];
-    userInfo["mobile_verification"] = verificationStatus["mobile_verification"];
-    userInfo["address_verification"] =
-        verificationStatus["address_verification"];
-    userInfo["email_verification"] = verificationStatus["email_verification"];
-    Map<String, dynamic> profileData = await _getProfileData();
-
-    if (profileData["email"] != null) {
-      userInfo["email"] =
-          await AnalyticsManager.dosha256Encoding(profileData["email"]);
-    }
-    if (profileData["mobile"] != null) {
-      String mobile = await AnalyticsManager.dosha256Encoding(
-          "+91" + profileData["mobile"].toString());
-      userInfo["mobile"] = mobile;
-    }
-    if (profileData["fname"] != null) {
-      userInfo["first_name"] = profileData["fname"];
-    }
-    if (profileData["lname"] != null) {
-      userInfo["lastName"] = profileData["lname"];
-    }
-    if (profileData["status"] == "ACTIVE") {
-      userInfo["accountStatus"] = "1";
-    } else if (profileData["status"] == "CLOSED") {
-      userInfo["accountStatus"] = "2";
-    } else if (profileData["status"] == "BLOCKED") {
-      userInfo["accountStatus"] = "3";
-    }
-    userInfo["pincode"] =
-        profileData["pincode"] != null ? profileData["pincode"] : "";
-    userInfo["dob"] = profileData["dob"] != null ? profileData["dob"] : "";
-    userInfo["state"] =
-        profileData["state"] != null ? profileData["state"] : "";
-    try {
-      final value =
-          await utils_platform.invokeMethod('onUserInfoRefreshed', userInfo);
-    } catch (e) {}
   }
 
   _getProfileData() async {
@@ -672,148 +574,6 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
     }
   }
 
-  void _onCreateTeam(BuildContext context, Contest contest) async {
-    final curContest = contest;
-
-    bWaitingForTeamCreation = true;
-
-    if (AppConfig.of(context).channelId != "10") {
-      Navigator.pop(context);
-    }
-    final result = await Navigator.of(context).push(
-      FantasyPageRoute(
-        routeSettings: RouteSettings(name: "CreateTeam"),
-        pageBuilder: (context) => CreateTeam(
-          league: widget.league,
-          l1Data: _l1Data,
-        ),
-      ),
-    );
-
-    if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
-      // _scaffoldKey.currentState
-      //     .showSnackBar(SnackBar(content: Text("$result")));
-      if (curContest != null) {
-        if (bWaitingForTeamCreation) {
-          bShowJoinContest = true;
-        } else {
-          _onJoinContest(curContest);
-        }
-      }
-    }
-    bWaitingForTeamCreation = false;
-  }
-
-  _onJoinContestError(Contest contest, Map<String, dynamic> errorResponse) {
-    JoinContestError error;
-    if (errorResponse["error"] == true) {
-      error = JoinContestError([errorResponse["resultCode"]]);
-    } else {
-      error = JoinContestError(errorResponse["reasons"]);
-    }
-
-    Navigator.of(context).pop();
-    if (error.isBlockedUser()) {
-      _showJoinContestError(
-        title: error.getTitle(),
-        message: error.getErrorMessage(),
-      );
-    } else {
-      int errorCode = error.getErrorCode();
-      switch (errorCode) {
-        case 3:
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return StateDob();
-            },
-          );
-          break;
-        case 12:
-          _showAddCashConfirmation(contest);
-          break;
-        case 6:
-          _showJoinContestError(
-            message: strings.get("ALERT"),
-            title: strings.get("NOT_VERIFIED"),
-          );
-          break;
-      }
-    }
-  }
-
-  _showJoinContestError({String title, String message}) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("OK").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  _showAddCashConfirmation(Contest contest) {
-    final curContest = contest;
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            strings.get("INSUFFICIENT_FUND").toUpperCase(),
-          ),
-          content: Text(
-            strings.get("INSUFFICIENT_FUND_MSG"),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                strings.get("CANCEL").toUpperCase(),
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _launchDepositJourneyForJoinContest(curContest);
-              },
-              child: Text(
-                strings.get("DEPOSIT").toUpperCase(),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  _launchDepositJourneyForJoinContest(Contest contest) async {
-    final curContest = contest;
-    showLoader(true);
-    routeLauncher.launchAddCash(context, source: "contestbalance",
-        onSuccess: (result) {
-      if (result != null) {
-        _onJoinContest(curContest);
-      }
-    }, onComplete: () {
-      showLoader(false);
-    });
-  }
-
   _shareContestDialog(BuildContext context) {
     String contestVisibility =
         widget.contest.visibilityId == 1 ? "PUBLIC" : "PRIVATE";
@@ -1054,12 +814,14 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                       widget.league.teamB.name,
                 ),
               ),
-              AddCashButton(
-                onPressed: () {
-                  _launchAddCash(source: "contest_details");
+              Consumer<User>(
+                builder: (context, user, child) {
+                  return AddCashButton(
+                    location: "l2-topright",
+                    amount: user.withdrawable + user.depositedAmount,
+                  );
                 },
-                text: userBalFormatCurrency.format(userBalance),
-              )
+              ),
             ],
           ),
           elevation: 0.0,

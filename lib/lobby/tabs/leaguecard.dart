@@ -42,261 +42,271 @@ class LeagueCard extends StatelessWidget {
                     onClick(_league);
                   }
                 },
-                child: Container(
-                  margin: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.60,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Expanded(
-                            child: Text(
-                              _league.matchName,
-                              style: TextStyle(
-                                fontSize: Theme.of(context)
-                                    .primaryTextTheme
-                                    .caption
-                                    .fontSize,
-                                color: Colors.black54,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.all(2.0),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 1.0,
-                                          spreadRadius: 0.5,
-                                          offset: Offset(0.0, 2.0),
-                                        )
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      clipBehavior: Clip.hardEdge,
-                                      borderRadius: BorderRadius.circular(
-                                        TEAM_LOGO_HEIGHT,
-                                      ),
-                                      child: CachedNetworkImage(
-                                        imageUrl: _league.teamA != null
-                                            ? _league.teamA.logoUrl
-                                            : "",
-                                        fit: BoxFit.fitHeight,
-                                        placeholder: (context, string) {
-                                          return Container(
-                                            padding: EdgeInsets.all(12.0),
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
-                                            ),
-                                            width: TEAM_LOGO_HEIGHT,
-                                            height: TEAM_LOGO_HEIGHT,
-                                          );
-                                        },
-                                        height: TEAM_LOGO_HEIGHT,
-                                        width: TEAM_LOGO_HEIGHT,
-                                      ),
-                                    ),
+                            child: LayoutBuilder(
+                              builder: (context, constraint) {
+                                return CustomPaint(
+                                  painter: CardButtonBackground(
+                                    context,
+                                    width: constraint.maxWidth,
+                                    height: 18,
+                                    color: Color.fromRGBO(239, 242, 246, 1),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                      _league.teamA.name,
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .title
-                                          .copyWith(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          _league.status == LeagueStatus.COMPLETED
-                              ? Container(
-                                  height: 32.0,
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    "Completed",
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subhead
-                                        .copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: Theme.of(context).primaryColor,
-                                        ),
-                                  ),
-                                )
-                              : Container(
-                                  child: _league.status ==
-                                              LeagueStatus.COMPLETED ||
-                                          _league.status == LeagueStatus.LIVE
-                                      ? Container(
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            contestCount.toString() +
-                                                " Contest Joined",
-                                            style: Theme.of(context)
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 2.0),
+                                        child: Text(
+                                          _league.matchName,
+                                          style: TextStyle(
+                                            fontSize: Theme.of(context)
                                                 .primaryTextTheme
                                                 .body1
-                                                .copyWith(
-                                                  color: Colors.black,
-                                                ),
+                                                .fontSize,
+                                            color: Colors.grey.shade700,
                                           ),
-                                        )
-                                      : EPOC(
-                                          onTimeComplete: onTimeComplete,
-                                          timeInMiliseconds:
-                                              _league.matchStartTime,
+                                          textAlign: TextAlign.center,
                                         ),
-                                ),
-                          Column(
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 8.0),
-                                    child: Text(
-                                      _league.teamB.name,
-                                      style: Theme.of(context)
-                                          .primaryTextTheme
-                                          .title
-                                          .copyWith(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
+                                      ),
+                                    ],
                                   ),
-                                  Container(
-                                    padding: EdgeInsets.all(2.0),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 1.0,
-                                          spreadRadius: 0.5,
-                                          offset: Offset(0.0, 2.0),
-                                        )
-                                      ],
-                                    ),
-                                    child: ClipRRect(
-                                      clipBehavior: Clip.hardEdge,
-                                      borderRadius: BorderRadius.circular(
-                                        TEAM_LOGO_HEIGHT,
-                                      ),
-                                      child: CachedNetworkImage(
-                                        imageUrl: _league.teamA != null
-                                            ? _league.teamB.logoUrl
-                                            : "",
-                                        fit: BoxFit.fitHeight,
-                                        placeholder: (context, string) {
-                                          return Container(
-                                            padding: EdgeInsets.all(4.0),
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
-                                            ),
-                                            width: TEAM_LOGO_HEIGHT,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin:
+                          EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.all(2.0),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 1.0,
+                                              spreadRadius: 0.5,
+                                              offset: Offset(0.0, 2.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          clipBehavior: Clip.hardEdge,
+                                          borderRadius: BorderRadius.circular(
+                                            TEAM_LOGO_HEIGHT,
+                                          ),
+                                          child: CachedNetworkImage(
+                                            imageUrl: _league.teamA != null
+                                                ? _league.teamA.logoUrl
+                                                : "",
+                                            fit: BoxFit.fitHeight,
+                                            placeholder: (context, string) {
+                                              return Container(
+                                                padding: EdgeInsets.all(12.0),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2.0,
+                                                ),
+                                                width: TEAM_LOGO_HEIGHT,
+                                                height: TEAM_LOGO_HEIGHT,
+                                              );
+                                            },
                                             height: TEAM_LOGO_HEIGHT,
-                                          );
-                                        },
-                                        height: TEAM_LOGO_HEIGHT,
-                                        width: TEAM_LOGO_HEIGHT,
+                                            width: TEAM_LOGO_HEIGHT,
+                                          ),
+                                        ),
                                       ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 8.0),
+                                        child: Text(
+                                          _league.teamA.name,
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .copyWith(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              _league.status == LeagueStatus.COMPLETED
+                                  ? Container(
+                                      height: 32.0,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "Completed",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .subhead
+                                            .copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                            ),
+                                      ),
+                                    )
+                                  : Container(
+                                      child: _league.status ==
+                                                  LeagueStatus.COMPLETED ||
+                                              _league.status ==
+                                                  LeagueStatus.LIVE
+                                          ? Container(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                contestCount.toString() +
+                                                    " Contest Joined",
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .body1
+                                                    .copyWith(
+                                                      color: Colors.black,
+                                                    ),
+                                              ),
+                                            )
+                                          : EPOC(
+                                              onTimeComplete: onTimeComplete,
+                                              timeInMiliseconds:
+                                                  _league.matchStartTime,
+                                            ),
                                     ),
+                              Column(
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: EdgeInsets.only(right: 8.0),
+                                        child: Text(
+                                          _league.teamB.name,
+                                          style: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .copyWith(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(2.0),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black12,
+                                              blurRadius: 1.0,
+                                              spreadRadius: 0.5,
+                                              offset: Offset(0.0, 2.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          clipBehavior: Clip.hardEdge,
+                                          borderRadius: BorderRadius.circular(
+                                            TEAM_LOGO_HEIGHT,
+                                          ),
+                                          child: CachedNetworkImage(
+                                            imageUrl: _league.teamA != null
+                                                ? _league.teamB.logoUrl
+                                                : "",
+                                            fit: BoxFit.fitHeight,
+                                            placeholder: (context, string) {
+                                              return Container(
+                                                padding: EdgeInsets.all(4.0),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2.0,
+                                                ),
+                                                width: TEAM_LOGO_HEIGHT,
+                                                height: TEAM_LOGO_HEIGHT,
+                                              );
+                                            },
+                                            height: TEAM_LOGO_HEIGHT,
+                                            width: TEAM_LOGO_HEIGHT,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ],
                           ),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: 4.0, top: 4.0),
+                            child: _league.squad == 2
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      border: Border.all(
+                                        width: 1.0,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    height: 20.0,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 2.0, horizontal: 8.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        FittedBox(
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 16.0),
+                                            child:
+                                                Image.asset("images/mic.png"),
+                                          ),
+                                        ),
+                                        FittedBox(
+                                          child: Text(
+                                            "Lineups out!".toUpperCase(),
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .caption
+                                                .copyWith(
+                                                  color: Colors.green,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Container(
+                                    height: 20.0,
+                                  ),
+                          ),
                         ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 4.0),
-                        child: _league.squad == 2
-                            ? Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  border: Border.all(
-                                    width: 1.0,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                                height: 16.0,
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 2.0, horizontal: 8.0),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    FittedBox(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(right: 16.0),
-                                        child: Image.asset("images/mic.png"),
-                                      ),
-                                    ),
-                                    FittedBox(
-                                      child: Text(
-                                        "Lineups out!".toUpperCase(),
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .caption
-                                            .copyWith(
-                                              color: Colors.green,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Container(
-                                height: 16.0,
-                              ),
-                      ),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: <Widget>[
-                      //     Expanded(
-                      //       child: _league.status == LeagueStatus.COMPLETED ||
-                      //               _league.status == LeagueStatus.LIVE
-                      //           ? Container(
-                      //               alignment: Alignment.center,
-                      //               child: Text(
-                      //                 contestCount.toString() +
-                      //                     " Contest Joined",
-                      //                 style: Theme.of(context)
-                      //                     .primaryTextTheme
-                      //                     .body1
-                      //                     .copyWith(
-                      //                       color: Colors.black,
-                      //                     ),
-                      //               ),
-                      //             )
-                      //           : EPOC(
-                      //               onTimeComplete: onTimeComplete,
-                      //               timeInMiliseconds: _league.matchStartTime,
-                      //             ),
-                      //     )
-                      //   ],
-                      // )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               _league.prediction == 1
@@ -341,4 +351,37 @@ class TriangleClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(TriangleClipper oldClipper) => false;
+}
+
+class CardButtonBackground extends CustomPainter {
+  final double width;
+  final double height;
+  final BuildContext context;
+  final Color color;
+  CardButtonBackground(this.context,
+      {this.width = 0.0, this.height = 16.0, @required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Path path = Path();
+    var points = [
+      Offset(0, 0),
+      Offset(size.width, 0),
+      Offset((size.width) - 16, height),
+      Offset(16, height),
+    ];
+    path.addPolygon(points, true);
+
+    Paint paint = new Paint();
+    paint.color = color;
+    paint.strokeWidth = 1.0;
+    paint.style = PaintingStyle.fill;
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
 }

@@ -463,7 +463,7 @@ class OTPSignupState extends State<OTPSignup> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           onLoginAuthenticate(json.decode(res.body));
-          AuthResult(res, _scaffoldKey).processResult(() {});
+          AuthResult(res, _scaffoldKey).processResult(context, () {});
         } else {
           final dynamic response =
               json.decode(res.body).cast<String, dynamic>();
@@ -647,9 +647,7 @@ class OTPSignupState extends State<OTPSignup> {
       showLoader(false);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         onLoginAuthenticate(json.decode(res.body));
-        AuthResult(res, _scaffoldKey).processResult(
-          () {},
-        );
+        AuthResult(res, _scaffoldKey).processResult(context, () {});
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         // setState(() {
@@ -824,6 +822,7 @@ class OTPSignupState extends State<OTPSignup> {
                                         onSaved: (val) => _authName = val,
                                         decoration: InputDecoration(
                                           labelText: "Enter Mobile",
+                                          isDense: true,
                                           labelStyle: Theme.of(context)
                                               .primaryTextTheme
                                               .title

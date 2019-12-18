@@ -426,7 +426,7 @@ class SignupState extends State<Signup> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           onLoginAuthenticate(json.decode(res.body));
-          AuthResult(res, _scaffoldKey).processResult(() {});
+          AuthResult(res, _scaffoldKey).processResult(context, () {});
         } else {
           final dynamic response =
               json.decode(res.body).cast<String, dynamic>();
@@ -616,9 +616,7 @@ class SignupState extends State<Signup> {
       showLoader(false);
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         onLoginAuthenticate(json.decode(res.body));
-        AuthResult(res, _scaffoldKey).processResult(
-          () {},
-        );
+        AuthResult(res, _scaffoldKey).processResult(context, () {});
       } else {
         final dynamic response = json.decode(res.body).cast<String, dynamic>();
         // setState(() {

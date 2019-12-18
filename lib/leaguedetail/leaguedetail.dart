@@ -15,6 +15,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/mysheet.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -36,6 +37,7 @@ import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/leaguedetail/prediction/mysheets.dart';
 import 'package:playfantasy/leaguedetail/prediction/prediction.dart';
 import 'package:playfantasy/leaguedetail/prediction/createsheet/createsheet.dart';
+import 'package:provider/provider.dart';
 
 class LeagueDetail extends StatefulWidget {
   final League league;
@@ -1039,10 +1041,12 @@ class LeagueDetailState extends State<LeagueDetail>
                 style: TextStyle(color: Colors.black),
               ),
             ),
-            AddCashButton(
-              text: formatCurrency.format(widget.cashBalance),
-              onPressed: () {
-                _launchAddCash();
+            Consumer<User>(
+              builder: (context, user, child) {
+                return AddCashButton(
+                  location: "l1-topright",
+                  amount: user.withdrawable + user.depositedAmount,
+                );
               },
             ),
           ],

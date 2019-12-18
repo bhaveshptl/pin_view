@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:playfantasy/action_utils/insifficientfund.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
@@ -18,11 +19,13 @@ import 'package:playfantasy/modal/mysheet.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/modal/prediction.dart';
 import 'package:playfantasy/profilepages/statedob.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/utils/stringtable.dart';
+import 'package:provider/provider.dart';
 
 class ActionUtil {
   ActionUtil._internal();
@@ -151,6 +154,10 @@ class ActionUtil {
           );
         }
       } else if (result != null) {
+        User userData = Provider.of<User>(scaffoldKey.currentContext);
+        userData.updateDepositBucket(result["userData"]["depositBucket"]);
+        userData.updateWithdrawable(result["userData"]["withdrawable"]);
+
         onContestJoinSuccess(
           result["message"].toString(),
           scaffoldKey,
@@ -351,8 +358,12 @@ class ActionUtil {
           }
           break;
         case 12:
-          final result = await _showAddCashConfirmation(context, contest);
-          if (result["launchJoinConfirmation"]) {
+          final result = await _showAddCashConfirmation(
+              context,
+              contest,
+              double.parse(userBalance["cashBalance"].toString()).toInt(),
+              usableBonus.toInt());
+          if (result != null && result["launchJoinConfirmation"]) {
             routeLauncher.launchAddCash(
               context,
               source: "contestbalance",
@@ -477,39 +488,14 @@ class ActionUtil {
     flushbar.show(context);
   }
 
-  _showAddCashConfirmation(BuildContext context, Contest contest) {
+  _showAddCashConfirmation(
+      BuildContext context, Contest contest, int userBalance, int usableBonus) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            strings.get("INSUFFICIENT_FUND").toUpperCase(),
-          ),
-          content: Text(
-            strings.get("INSUFFICIENT_FUND_MSG"),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  "launchJoinConfirmation": false,
-                });
-              },
-              child: Text(
-                strings.get("CANCEL").toUpperCase(),
-              ),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.pop(context, {
-                  "launchJoinConfirmation": true,
-                });
-              },
-              child: Text(
-                strings.get("DEPOSIT").toUpperCase(),
-              ),
-            )
-          ],
+        return InsufficientFundDialog(
+          contestFee: contest.entryFee,
+          userBalance: userBalance + usableBonus,
         );
       },
     );
