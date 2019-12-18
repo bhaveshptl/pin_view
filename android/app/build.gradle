@@ -187,7 +187,7 @@ android {
     defaultConfig {
         applicationId "com.howzat.howzatfantasy"
         minSdkVersion 20
-        targetSdkVersion 26
+        targetSdkVersion 28
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

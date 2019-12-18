@@ -21,6 +21,7 @@ disableDeviceRotation() {
 /// Bootstraping APP.
 ///
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   String channelId = "10";
   const apiBaseUrl = "https://stage.howzat.com";
   String fcmSubscribeId = 'channelId_' + channelId + '_news' + '_stage';

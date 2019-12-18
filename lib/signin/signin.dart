@@ -12,6 +12,7 @@ import 'package:package_info/package_info.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/leadingbutton.dart';
+import 'package:playfantasy/otpsignup/otpsignup.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
@@ -195,7 +196,7 @@ class SignInPageState extends State<SignInPage> {
   _launchSignup(BuildContext context) {
     Navigator.of(context).pushReplacement(
       FantasyPageRoute(
-        pageBuilder: (context) => Signup(),
+        pageBuilder: (context) => OTPSignup(),
       ),
     );
   }
@@ -669,7 +670,7 @@ class SignInPageState extends State<SignInPage> {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
-        leading: LeadingButton(),
+        automaticallyImplyLeading: false,
         title: Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: Row(

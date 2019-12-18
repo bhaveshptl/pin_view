@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,11 +9,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:package_info/package_info.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
-import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/leadingbutton.dart';
-import 'package:playfantasy/commonwidgets/textbox.dart';
-// import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
+import 'package:playfantasy/otpsignup/otpinput.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/authresult.dart';
@@ -27,25 +26,27 @@ import 'package:playfantasy/utils/analytics.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:location_permissions/location_permissions.dart';
 
-class Signup extends StatefulWidget {
+class OTPSignup extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => new SignupState();
+  State<StatefulWidget> createState() => new OTPSignupState();
 }
 
-class SignupState extends State<Signup> {
+class OTPSignupState extends State<OTPSignup> {
   String _authName;
-  String _password;
   String _deviceId;
   String _pfRefCode;
   String googleAddId = "";
   bool _obscureText = true;
   bool isIos = false;
   bool _bShowReferralInput = false;
-  String _installReferring_link = "";
+  String _installReferringLink = "";
   Map<dynamic, dynamic> androidDeviceInfoMap;
   String chosenloginTypeByUser = "";
-  String location_longitude = "";
-  String location_latitude = "";
+  String locationLongitude = "";
+  String locationLatitude = "";
+
+  bool showPromoInput = false;
+
   static const branch_io_platform =
       const MethodChannel('com.algorin.pf.branch');
   static const firebase_fcm_platform =
@@ -100,13 +101,13 @@ class SignupState extends State<Signup> {
     installReferringlinkFromBranch.then((value) {
       if (value != null) {
         if (value.length > 3) {
-          _installReferring_link = value;
+          _installReferringLink = value;
         }
       } else {
         _getInstallReferringLink().then((String link) {
           if (value != null) {
             if (link.length > 3) {
-              _installReferring_link = link;
+              _installReferringLink = link;
             }
           }
         });
@@ -156,7 +157,7 @@ class SignupState extends State<Signup> {
   _initBranchStuff() async {
     _getInstallReferringLink().then((String value) {
       if (value.length > 2) {
-        _installReferring_link = value;
+        _installReferringLink = value;
       }
     });
 
@@ -200,8 +201,7 @@ class SignupState extends State<Signup> {
   }
 
   Future<String> setLongLatValues() async {
-    PermissionStatus permission =
-        await LocationPermissions().requestPermissions();
+    await LocationPermissions().requestPermissions();
     Map<dynamic, dynamic> value;
     PermissionStatus permissionStatus =
         await LocationPermissions().checkPermissionStatus();
@@ -212,8 +212,8 @@ class SignupState extends State<Signup> {
         print(value);
         if (value["bAccessGiven"] != null) {
           if (value["bAccessGiven"] == "true") {
-            location_longitude = value["longitude"];
-            location_latitude = value["latitude"];
+            locationLongitude = value["longitude"];
+            locationLatitude = value["latitude"];
           }
         }
       } catch (e) {
@@ -225,8 +225,7 @@ class SignupState extends State<Signup> {
         PermissionStatus.denied.toString()) {
       await showLocationPermissionInformationPopup();
     } else {
-      PermissionStatus permission =
-          await LocationPermissions().requestPermissions();
+      await LocationPermissions().requestPermissions();
     }
     return "";
   }
@@ -325,11 +324,58 @@ class SignupState extends State<Signup> {
     });
   }
 
-  _doSignUp() async {
+  _doSignUp({bool launchEnterOTP = true}) async {
+    showLoader(true);
+    Map<String, dynamic> _payload = {
+      "mobile": _authName,
+      "context": {
+        "channelId": HttpManager.channelId,
+      }
+    };
+
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.REQUEST_OTP));
+    req.body = json.encode(_payload);
+    await HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+          if (launchEnterOTP) {
+            showModalBottomSheet<void>(
+              context: context,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8.0),
+                  topRight: Radius.circular(8.0),
+                ),
+              ),
+              builder: (context) {
+                return OtpInput(
+                  onResend: () {
+                    _doSignUp(launchEnterOTP: false);
+                  },
+                  onVerify: (String otp) {
+                    print(otp);
+                    authOTP(otp);
+                  },
+                );
+              },
+            );
+          }
+        } else {
+          ActionUtil().showMsgOnTop("error", _scaffoldKey.currentContext);
+        }
+        showLoader(false);
+      },
+    ).whenComplete(() {
+      showLoader(false);
+    });
+  }
+
+  authOTP(String otp) async {
     showLoader(true);
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String app_version_flutter = packageInfo.version;
+    String appVersion = packageInfo.version;
     String model = "";
     String manufacturer = "";
     String serial = "";
@@ -341,7 +387,7 @@ class SignupState extends State<Signup> {
       serial = androidInfo.androidId;
     }
     if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      await deviceInfo.iosInfo;
       try {
         model = androidDeviceInfoMap["model"];
       } catch (e) {}
@@ -349,15 +395,13 @@ class SignupState extends State<Signup> {
       serial = "";
     }
 
-    Map<String, dynamic> _payload = {};
-    if (isMobileNumber(_authName)) {
-      _payload["phone"] = _authName;
-      chosenloginTypeByUser = "FORM_MOBILE";
-    } else {
-      _payload["email"] = _authName;
-      chosenloginTypeByUser = "FORM_EMAIL";
-    }
-    _payload["password"] = _password;
+    Map<String, dynamic> _payload = {
+      "value": {"mobile": _authName, "password": otp}
+    };
+    _payload["mobile"] = _authName;
+    _payload["password"] = otp;
+    chosenloginTypeByUser = "FORM_MOBILE";
+
     _payload["context"] = {
       "refCode": _referralCodeController.text,
       "channel_id": HttpManager.channelId,
@@ -365,18 +409,18 @@ class SignupState extends State<Signup> {
       "model": model,
       "manufacturer": manufacturer,
       "serial": serial,
-      "branchinstallReferringlink": _installReferring_link,
-      "app_version_flutter": app_version_flutter,
-      "location_longitude": location_longitude,
-      "location_latitude": location_latitude
+      "branchinstallReferringlink": _installReferringLink,
+      "app_version_flutter": appVersion,
+      "location_longitude": locationLongitude,
+      "location_latitude": locationLatitude
     };
 
     bool disableBranchIOAttribution =
         PrivateAttribution.disableBranchIOAttribution;
 
     if (!disableBranchIOAttribution) {
-      if (_installReferring_link.length > 0) {
-        var uri = Uri.parse(_installReferring_link);
+      if (_installReferringLink.length > 0) {
+        var uri = Uri.parse(_installReferringLink);
         uri.queryParameters.forEach((k, v) {
           try {
             _payload["context"][k] = v;
@@ -412,11 +456,8 @@ class SignupState extends State<Signup> {
           json.encode(androidDeviceInfoMap["googleEmailList"]);
     } catch (e) {}
 
-    print("############################Sign Up _payload##########");
-    print(_payload["context"]);
-
     http.Request req =
-        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.SIGN_UP));
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.OTP_SIGNUP));
     req.body = json.encode(_payload);
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
@@ -432,11 +473,6 @@ class SignupState extends State<Signup> {
           } else if (error == null) {
             error = strings.get("INVALID_USERNAME_PASSWORD");
           }
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(error),
-          //   ),
-          // );
           ActionUtil().showMsgOnTop(error, _scaffoldKey.currentContext);
         }
         showLoader(false);
@@ -447,7 +483,7 @@ class SignupState extends State<Signup> {
   }
 
   bool isMobileNumber(String input) {
-    if (input.length == 10 || isNumeric(input)) {
+    if (input.length == 10 && isNumeric(input)) {
       return true;
     }
     return false;
@@ -549,18 +585,18 @@ class SignupState extends State<Signup> {
       "model": model,
       "manufacturer": manufacturer,
       "serial": serial,
-      "branchinstallReferringlink": _installReferring_link,
+      "branchinstallReferringlink": _installReferringLink,
       "app_version_flutter": app_version_flutter,
-      "location_longitude": location_longitude,
-      "location_latitude": location_latitude
+      "location_longitude": locationLongitude,
+      "location_latitude": locationLatitude
     };
 
     bool disableBranchIOAttribution =
         PrivateAttribution.disableBranchIOAttribution;
 
     if (!disableBranchIOAttribution) {
-      if (_installReferring_link.length > 0) {
-        var uri = Uri.parse(_installReferring_link);
+      if (_installReferringLink.length > 0) {
+        var uri = Uri.parse(_installReferringLink);
         uri.queryParameters.forEach((k, v) {
           try {
             _payload["context"][k] = v;
@@ -729,73 +765,45 @@ class SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
-      appBar: AppBar(
-        // leading: LeadingButton(),
-        title: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            children: <Widget>[
-              // Image.asset("images/logo_white.png"),
-              SvgPicture.asset(
-                "images/logo_white.svg",
-                color: Colors.white,
-                width: 40.0,
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Image.asset(
-                  "images/logo_name_white.png",
-                  height: 20.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 10.0, bottom: 6.0),
-            child: FlatButton(
-              onPressed: () {
-                _launchSignIn();
-              },
-              child: Image.asset("images/loginButton.png"),
-              // Text(
-              //   "Login".toUpperCase(),
-              //   style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-              //         color: Color.fromRGBO(25, 14, 4, 1),
-              //         fontWeight: FontWeight.w700,
-              //       ),
-              // ),
-              // color: Color.fromRGBO(243, 180, 81, 1),
-            ),
-          )
-        ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: Container(),
       ),
+      backgroundColor: Color.fromRGBO(134, 16, 13, 1),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(!isIos
-                ? "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png"
-                : "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_referral_raf_250_login.jpg"),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
+              padding: EdgeInsets.only(top: 8.0, right: 16.0, bottom: 8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Expanded(
+                  FlatButton(
                     child: Text(
-                      "Register now, It's Free",
-                      textAlign: TextAlign.center,
+                      "LOGIN",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w700,
+                            color: Color.fromRGBO(216, 138, 4, 1),
+                            decoration: TextDecoration.underline,
                           ),
                     ),
+                    onPressed: () {
+                      _launchSignIn();
+                    },
                   ),
                 ],
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset(
+                  "images/hzlogo.png",
+                  width: MediaQuery.of(context).size.width / 2,
+                ),
+              ],
+            ),
             Padding(
-              padding: EdgeInsets.only(left: 56.0, right: 56.0),
+              padding: EdgeInsets.only(top: 32.0, left: 56.0, right: 56.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -812,64 +820,43 @@ class SignupState extends State<Signup> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
-                                      child: SimpleTextBox(
+                                      child: TextFormField(
                                         onSaved: (val) => _authName = val,
-                                        labelText:
-                                            strings.get("EMAIL_OR_MOBILE") +
-                                                "*",
+                                        decoration: InputDecoration(
+                                          labelText: "Enter Mobile",
+                                          labelStyle: Theme.of(context)
+                                              .primaryTextTheme
+                                              .title
+                                              .copyWith(
+                                                color: Colors.white,
+                                              ),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white24,
+                                            ),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings
                                                 .get("EMAIL_OR_MOBILE_ERROR");
-                                          } else if (isNumeric(value) &&
-                                              !isMobileNumber(value)) {
+                                          } else if (!isMobileNumber(value)) {
                                             return "Please enter valid Mobile";
-                                          } else if (!isNumeric(value) &&
-                                              !validateEmail(value)) {
-                                            return "Please enter valid Email";
                                           }
+                                          return null;
                                         },
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(bottom: 16.0),
-                                      child: Stack(
-                                        alignment: Alignment.topRight,
-                                        overflow: Overflow.visible,
-                                        children: <Widget>[
-                                          SimpleTextBox(
-                                            onSaved: (val) => _password = val,
-                                            labelText:
-                                                strings.get("PASSWORD") + "*",
-                                            validator: (value) {
-                                              if (value.isEmpty) {
-                                                return strings
-                                                    .get("PASSWORD_ERROR");
-                                              }
-                                            },
-                                            obscureText: _obscureText,
-                                          ),
-                                          Positioned(
-                                            top: -2.0,
-                                            child: IconButton(
-                                              icon: Icon(Icons.visibility),
-                                              onPressed: () {
-                                                setState(() {
-                                                  _obscureText = !_obscureText;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                        ],
+                                        keyboardType: TextInputType.number,
                                       ),
                                     ),
                                   ),
@@ -877,129 +864,103 @@ class SignupState extends State<Signup> {
                               ),
                               Row(
                                 children: <Widget>[
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(bottom: 16.0),
-                                      child: SimpleTextBox(
-                                        controller: _referralCodeController,
-                                        labelText: strings.get("REFERRAL_CODE"),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Container(
-                                      height: 48.0,
-                                      child: ColorButton(
-                                        onPressed: () {
-                                          if (formKey.currentState.validate()) {
-                                            formKey.currentState.save();
-                                            _doSignUp();
-                                          }
-                                        },
-                                        child: Container(
-                                          child: Text(
-                                            "Register for Free",
-                                            style: Theme.of(context)
-                                                .primaryTextTheme
-                                                .title
-                                                .copyWith(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
+                                  showPromoInput
+                                      ? Expanded(
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.only(bottom: 16.0),
+                                            child: TextFormField(
+                                              controller:
+                                                  _referralCodeController,
+                                              decoration: InputDecoration(
+                                                labelText: strings
+                                                    .get("REFERRAL_CODE"),
+                                                labelStyle: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .title
+                                                    .copyWith(
+                                                      color: Colors.white,
+                                                    ),
+                                                enabledBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: new BorderSide(
+                                                    color: Colors.white24,
+                                                  ),
                                                 ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      flex: 1,
-                                      child: Container(),
-                                    ),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Divider(
-                                              color: Colors.grey.shade400,
-                                            ),
-                                          ),
-                                          CircleAvatar(
-                                            radius: 12.0,
-                                            backgroundColor: Colors.white,
-                                            child: Text(
-                                              strings.get("OR").toUpperCase(),
-                                              textAlign: TextAlign.center,
+                                                focusedBorder:
+                                                    UnderlineInputBorder(
+                                                  borderSide: new BorderSide(
+                                                    color: Colors.white70,
+                                                  ),
+                                                ),
+                                              ),
+                                              textCapitalization:
+                                                  TextCapitalization.characters,
                                               style: Theme.of(context)
                                                   .primaryTextTheme
-                                                  .caption
+                                                  .title
                                                   .copyWith(
-                                                    color: Colors.black54,
+                                                    color: Colors.white,
                                                   ),
                                             ),
                                           ),
-                                          Expanded(
-                                            child: Divider(
-                                              color: Colors.grey.shade400,
+                                        )
+                                      : Container(
+                                          padding: EdgeInsets.only(
+                                              top: 16.0, bottom: 32.0),
+                                          child: InkWell(
+                                            child: Text(
+                                              "Enter Invite Code",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .title
+                                                  .copyWith(
+                                                    color: Color.fromRGBO(
+                                                        216, 138, 4, 1),
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                  ),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Container(),
-                                    ),
-                                  ],
-                                ),
+                                            onTap: () {
+                                              setState(() {
+                                                showPromoInput =
+                                                    !showPromoInput;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                ],
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+                                padding: EdgeInsets.only(top: 16.0),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
-                                      child: FlatButton(
-                                        onPressed: () {
-                                          _doGoogleLogin(context);
-                                        },
-                                        padding: EdgeInsets.all(0.0),
-                                        color: Colors.transparent,
-                                        child: Image.asset(
-                                          "images/googleBtn.png",
-                                          fit: BoxFit.cover,
+                                      child: Container(
+                                        height: 48.0,
+                                        child: ColorButton(
+                                          onPressed: () {
+                                            if (formKey.currentState
+                                                .validate()) {
+                                              formKey.currentState.save();
+                                              _doSignUp();
+                                            }
+                                          },
+                                          child: Container(
+                                            child: Text(
+                                              "SIGNUP",
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .title
+                                                  .copyWith(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: FlatButton(
-                                        padding: EdgeInsets.all(0.0),
-                                        onPressed: () {
-                                          _doFacebookLogin(context);
-                                        },
-                                        color: Colors.transparent,
-                                        child: Image.asset(
-                                          "images/fbButton.png",
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    )
                                   ],
                                 ),
                               ),
@@ -1012,63 +973,37 @@ class SignupState extends State<Signup> {
                 ],
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "By registering you accept you are 18+ and agree to our ",
-                  style: Theme.of(context).primaryTextTheme.caption.copyWith(
-                        color: Colors.grey.shade700,
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.only(bottom: 24.0, top: 8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "By registering you agree to our ",
+              style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                    color: Colors.white,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            InkWell(
+              child: Padding(
+                padding: EdgeInsets.only(right: 8.0, bottom: 8.0, top: 8.0),
+                child: Text(
+                  "Terms & Conditions",
+                  style: Theme.of(context).primaryTextTheme.subhead.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        decoration: TextDecoration.underline,
                       ),
-                  textAlign: TextAlign.center,
                 ),
-                InkWell(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 8.0, bottom: 8.0, top: 8.0),
-                    child: Text(
-                      "T&C.",
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w900,
-                                decoration: TextDecoration.underline,
-                              ),
-                    ),
-                  ),
-                  onTap: () {
-                    openTermsAndConditionsPage();
-                  },
-                )
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Already a Member? ",
-                    style: Theme.of(context).primaryTextTheme.subtitle.copyWith(
-                          color: Colors.grey.shade600,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                  InkWell(
-                    child: Text(
-                      " Login Now",
-                      style: Theme.of(context).primaryTextTheme.title.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                          ),
-                    ),
-                    onTap: () {
-                      _launchSignIn();
-                    },
-                  )
-                ],
               ),
-            ),
+              onTap: () {
+                openTermsAndConditionsPage();
+              },
+            )
           ],
         ),
       ),

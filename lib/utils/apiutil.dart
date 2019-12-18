@@ -56,6 +56,8 @@ class ApiUtil {
   static const FACEBOOK_LOGIN_URL =
       "/api/ups/socialLogin/withcontext/facebook/native";
   static const SIGN_UP = "/api/ups/signup";
+  static const REQUEST_OTP = "/api/ups/getmobileotp";
+  static const OTP_SIGNUP = "/api/ups/otplogin";
   static const FORGOT_PASSWORD = "/api/ups/forgotPassword";
   static const RESET_PASSWORD = "/api/v2/ups/user/forgotPassword/resetpassword";
   static const INIT_DATA = "/api/v2/lobby/initData";
@@ -79,9 +81,9 @@ class ApiUtil {
   static const UPLOAD_DOC = "/api/verify/upload-doc/";
   static const UPLOAD_DOC_PAN = "/api/verify/upload-pan/";
   static const UPLOAD_DOC_ADDRESS = "/api/verify/upload-doc-address/";
-  static const GET_ALLOWED_DOC_SIZE_IN_MB="/api/verify/getAllowedDocSizeInMB";
+  static const GET_ALLOWED_DOC_SIZE_IN_MB = "/api/verify/getAllowedDocSizeInMB";
   static const USER_BALANCE = "/api/lobby/userbalance";
-  
+
   static const GET_MY_CONTESTS = "/api/lobby/user/mycontests/v2/";
   static const GET_CONTEST_TEAMS = "/api/lobby/contest/";
   static const GET_PRIZESTRUCTURE = "/api/lobby/contest/";
@@ -106,7 +108,7 @@ class ApiUtil {
   static const INIT_PAYMENT_SEAMLESS =
       "/api/v2/payment/player/deposit/init-pay-seamless?";
   static const INIT_PAYMENT_TECHPROCESS =
-      "/api/v2/payment/player/deposit/init-pay-techprocess?";    
+      "/api/v2/payment/player/deposit/init-pay-techprocess?";
   static const CONTACTUS_SUBMIT = "/api/ups/contactUs/submit";
   static const CONTACTUS_FORM = "/api/ups/contactUsForm";
 
@@ -119,10 +121,10 @@ class ApiUtil {
   static const SUCCESS_PAY =
       "/api/payment/success-razor-pay?type_id=4&source=RAZORPAY";
   // static const TECHPROCESS_SUCCESS_PAY =
-  //     "/api/v2/payment/success-pay?type_id=5&source=TECHPROCESS_SEAMLESS"; 
+  //     "/api/v2/payment/success-pay?type_id=5&source=TECHPROCESS_SEAMLESS";
 
   static const TECHPROCESS_SUCCESS_PAY =
-      "/api/payment/success-techprocess?type_id=5&source=TECHPROCESS_SEAMLESS";    
+      "/api/payment/success-techprocess?type_id=5&source=TECHPROCESS_SEAMLESS";
   static const SAVE_SHEET = "/api/v2/lobby/quiz/save-answer-sheet";
   static const JOIN_PREDICTION_CONTEST = "/api/v2/lobby/quiz/join";
   static const GET_MY_CONTEST_MY_SHEETS =
