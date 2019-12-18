@@ -1131,7 +1131,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                           .body1
                                           .copyWith(
                                             color: Colors.black,
-                                            fontWeight: FontWeight.w900,
+                                            fontWeight: FontWeight.w800,
                                           ),
                                     ),
                                   )
@@ -1146,7 +1146,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                     .body1
                                     .copyWith(
                                       color: Colors.black,
-                                      fontWeight: FontWeight.w900,
+                                      fontWeight: FontWeight.w800,
                                     ),
                               ),
                             ),
@@ -1205,6 +1205,8 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                               showLoader(false);
                               Navigator.of(context).push(
                                 FantasyPageRoute(
+                                  routeSettings:
+                                      RouteSettings(name: "TeamPreview"),
                                   pageBuilder: (BuildContext context) =>
                                       TeamPreview(
                                     myTeam: myTeam,
@@ -1255,7 +1257,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                               .subhead
                                               .copyWith(
                                                 color: Colors.black87,
-                                                fontWeight: FontWeight.w900,
+                                                fontWeight: FontWeight.w600,
                                               ),
                                         ),
                                         widget.league.status ==
@@ -1370,7 +1372,7 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
                                 child: (bIsMyTeam) &&
                                         (widget.league.status ==
                                             LeagueStatus.UPCOMING) &&
-                                        widget.l1Data != null
+                                        _l1Data != null
                                     ? Container(
                                         child: Row(
                                             mainAxisAlignment:
