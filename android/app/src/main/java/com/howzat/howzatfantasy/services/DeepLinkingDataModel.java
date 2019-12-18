@@ -104,6 +104,23 @@ public class DeepLinkingDataModel {
         return deepLinkingDataObject;
     }
 
+    public static  HashMap getDefaultDeepLinkingDataMap(){
+        HashMap<String, Object> deepLinkingDataObject =new HashMap<>();
+        deepLinkingDataObject.put("activateDeepLinkingNavigation", false);
+        deepLinkingDataObject.put("dl_page_route", " ");
+        deepLinkingDataObject.put("dl_leagueId", " ");
+        deepLinkingDataObject.put("dl_ac_promocode", " ");
+        deepLinkingDataObject.put("dl_ac_promoamount", " ");
+        deepLinkingDataObject.put("dl_sp_pageLocation", " ");
+        deepLinkingDataObject.put("dl_sp_pageTitle", " ");
+        deepLinkingDataObject.put("dl_sport_type", " ");
+        deepLinkingDataObject.put("dl_unique_id", " ");
+        return deepLinkingDataObject;
+    }
+
+
+
+
 }
 
 

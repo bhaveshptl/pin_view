@@ -121,7 +121,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         applicationContext = getApplicationContext();
-        deepLinkingDataObject =new HashMap<>();
+        deepLinkingDataObject = DeepLinkingDataModel.getDefaultDeepLinkingDataMap();
         initPushNotifications();
         setDeepLinkingDataUsingIntentData();
         fetchAdvertisingID(this);
@@ -135,6 +135,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     @Override
     public void onStart() {
         super.onStart();
+        deepLinkingDataObject = DeepLinkingDataModel.getDefaultDeepLinkingDataMap();
         setDeepLinkingDataUsingIntentData();
         if (bActivateIndiusOSAttribution) {
             initIndusOSBranchAttribution();
