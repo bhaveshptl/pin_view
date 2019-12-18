@@ -90,8 +90,8 @@ public class DeepLinkingDataModel {
     }
 
 
-    public Map getDeepLinkingDataMap(){
-        Map deepLinkingDataObject =new HashMap<>();
+    public HashMap getDeepLinkingDataMap(){
+        HashMap<String, Object> deepLinkingDataObject =new HashMap<>();
         deepLinkingDataObject.put("activateDeepLinkingNavigation", activateDeepLinkingNavigation);
         deepLinkingDataObject.put("dl_page_route", dl_page_route);
         deepLinkingDataObject.put("dl_leagueId", dl_leagueId);

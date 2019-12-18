@@ -1,33 +1,36 @@
 package com.howzat.howzatfantasy.services;
-        import java.io.BufferedInputStream;
-        import java.io.ByteArrayOutputStream;
-        import java.io.FileInputStream;
-        import java.net.InetAddress;
-        import java.net.NetworkInterface;
-        import java.util.ArrayList;
-        import java.util.Collections;
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
-        import java.util.regex.Pattern;
-        import android.accounts.Account;
-        import android.accounts.AccountManager;
-        import android.annotation.SuppressLint;
-        import android.app.Activity;
-        import android.content.Context;
-        import android.content.pm.PackageInfo;
-        import android.net.ConnectivityManager;
-        import android.net.NetworkInfo;
-        import android.net.wifi.WifiManager;
-        import android.os.Build;
-        import android.provider.Settings.Secure;
-        import android.telephony.TelephonyManager;
-        import android.util.Patterns;
-        import android.content.pm.PackageManager;
-        import java.math.BigInteger;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
+import android.util.Patterns;
+import android.content.pm.PackageManager;
+import java.math.BigInteger;
+
 public class DeviceInfo {
     private static final String cipherString = "00000000000000000000";
-    private static int			present_deviceType		= 0;
+    private static int present_deviceType = 0;
+
     public static Map<String, String> getDeviceInfoMap(Activity current_activity) {
         PackageManager packageManager = current_activity.getPackageManager();
         Map<String, String> deviceInfoMap = new HashMap<String, String>();
@@ -39,15 +42,14 @@ public class DeviceInfo {
         deviceInfoMap.put("android_Id", Secure.getString(current_activity.getContentResolver(), Secure.ANDROID_ID));
         deviceInfoMap.put("device_ID", getAndroidDeviceId(current_activity));
         deviceInfoMap.put("model", Build.MODEL);
-        try{
+        try {
             PackageInfo info = packageManager.getPackageInfo(current_activity.getPackageName(), PackageManager.GET_ACTIVITIES);
             deviceInfoMap.put("packageName", info.packageName);
             deviceInfoMap.put("versionName", info.versionName);
             deviceInfoMap.put("baseRevisionCode", String.valueOf(info.baseRevisionCode));
             deviceInfoMap.put("firstInstallTime", String.valueOf(info.firstInstallTime));
             deviceInfoMap.put("lastUpdateTime", String.valueOf(info.lastUpdateTime));
-        }
-        catch(PackageManager.NameNotFoundException e){
+        } catch (PackageManager.NameNotFoundException e) {
             deviceInfoMap.put("packageName", "");
             deviceInfoMap.put("versionName", "");
             deviceInfoMap.put("baseRevisionCode", "");
@@ -113,7 +115,7 @@ public class DeviceInfo {
         return googleEmailsList;
     }
 
-    private static String  getAndroidDeviceId(Activity current_activity){
+    private static String getAndroidDeviceId(Activity current_activity) {
         String androidDeviceID = null;
         WifiManager wifiManager = (WifiManager) current_activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (androidDeviceID == null || androidDeviceID == "") {
@@ -129,7 +131,7 @@ public class DeviceInfo {
 
 
     public static String fetchPaddedMAC(String MAC) {
-        if(MAC == null || MAC.isEmpty())
+        if (MAC == null || MAC.isEmpty())
             return null;
         int count = 12;
         int index = 0;
@@ -153,7 +155,7 @@ public class DeviceInfo {
     }
 
     public static String fetchPaddedAndroidID(String AndroidID) {
-        if(AndroidID == null || AndroidID.isEmpty())
+        if (AndroidID == null || AndroidID.isEmpty())
             return null;
         BigInteger toNumeric = new BigInteger(AndroidID, 16);
         return paddedStr(toNumeric.toString());
@@ -164,12 +166,10 @@ public class DeviceInfo {
     }
 
 
-
-
     public static String bytesToHex(byte[] bytes) {
         //Convert byte array to hex string
         StringBuilder sbuf = new StringBuilder();
-        for(int idx=0; idx < bytes.length; idx++) {
+        for (int idx = 0; idx < bytes.length; idx++) {
             int intVal = bytes[idx] & 0xff;
             if (intVal < 0x10) sbuf.append("0");
             sbuf.append(Integer.toHexString(intVal).toUpperCase());
@@ -178,31 +178,38 @@ public class DeviceInfo {
     }
 
     public static byte[] getUTF8Bytes(String str) {
-        try { return str.getBytes("UTF-8"); } catch (Exception ex) { return null; }
+        try {
+            return str.getBytes("UTF-8");
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
 
     public static String loadFileAsString(String filename) throws java.io.IOException {
         /*Load UTF8withBOM or any ansi text file. */
-        final int BUFLEN=1024;
+        final int BUFLEN = 1024;
         BufferedInputStream is = new BufferedInputStream(new FileInputStream(filename), BUFLEN);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(BUFLEN);
             byte[] bytes = new byte[BUFLEN];
-            boolean isUTF8=false;
-            int read,count=0;
-            while((read=is.read(bytes)) != -1) {
-                if (count==0 && bytes[0]==(byte)0xEF && bytes[1]==(byte)0xBB && bytes[2]==(byte)0xBF ) {
-                    isUTF8=true;
-                    baos.write(bytes, 3, read-3); // drop UTF8 bom marker
+            boolean isUTF8 = false;
+            int read, count = 0;
+            while ((read = is.read(bytes)) != -1) {
+                if (count == 0 && bytes[0] == (byte) 0xEF && bytes[1] == (byte) 0xBB && bytes[2] == (byte) 0xBF) {
+                    isUTF8 = true;
+                    baos.write(bytes, 3, read - 3); // drop UTF8 bom marker
                 } else {
                     baos.write(bytes, 0, read);
                 }
-                count+=read;
+                count += read;
             }
             return isUTF8 ? new String(baos.toByteArray(), "UTF-8") : new String(baos.toByteArray());
         } finally {
-            try{ is.close(); } catch(Exception ignored){}
+            try {
+                is.close();
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -215,13 +222,14 @@ public class DeviceInfo {
                     if (!intf.getName().equalsIgnoreCase(interfaceName)) continue;
                 }
                 byte[] mac = intf.getHardwareAddress();
-                if (mac==null) return "";
+                if (mac == null) return "";
                 StringBuilder buf = new StringBuilder();
-                for (byte aMac : mac) buf.append(String.format("%02X:",aMac));
-                if (buf.length()>0) buf.deleteCharAt(buf.length()-1);
+                for (byte aMac : mac) buf.append(String.format("%02X:", aMac));
+                if (buf.length() > 0) buf.deleteCharAt(buf.length() - 1);
                 return buf.toString();
             }
-        } catch (Exception ignored) { } // for now eat exceptions
+        } catch (Exception ignored) {
+        } // for now eat exceptions
         return "";
         /*try {
             // this is so Linux hack
@@ -241,7 +249,7 @@ public class DeviceInfo {
                     if (!addr.isLoopbackAddress()) {
                         String sAddr = addr.getHostAddress();
                         //boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
-                        boolean isIPv4 = sAddr.indexOf(':')<0;
+                        boolean isIPv4 = sAddr.indexOf(':') < 0;
 
                         if (useIPv4) {
                             if (isIPv4)
@@ -249,13 +257,14 @@ public class DeviceInfo {
                         } else {
                             if (!isIPv4) {
                                 int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
-                                return delim<0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
+                                return delim < 0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
                             }
                         }
                     }
                 }
             }
-        } catch (Exception ignored) { } // for now eat exceptions
+        } catch (Exception ignored) {
+        } // for now eat exceptions
         return "";
     }
 

@@ -113,33 +113,29 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     String googleAdId = "";
     private Analytics weAnalytics;
     private User weUser;
-    Function callback;
     boolean bBranchLodead = false;
     private boolean bActivateIndiusOSAttribution = false;
-    Map<String, Object> deepLinkingDataObject;
+    HashMap<String, Object> deepLinkingDataObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         applicationContext = getApplicationContext();
-        deepLinkingDataObject = new HashMap();
-        deepLinkingDataObject.put("activateDeepLinkingNavigation", false);
+        deepLinkingDataObject =new HashMap<>();
         initPushNotifications();
+        setDeepLinkingDataUsingIntentData();
         fetchAdvertisingID(this);
         GeneratedPluginRegistrant.registerWith(this);
         initFlutterChannels();
         initFlutterEvents();
         initWebEngage();
         WebEngage.registerInAppNotificationCallback(this);
-
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        deepLinkingDataObject.put("activateDeepLinkingNavigation", false);
-
+        setDeepLinkingDataUsingIntentData();
         if (bActivateIndiusOSAttribution) {
             initIndusOSBranchAttribution();
             /*For indus OS branch attribution call the async call first and then init the branch plugin*/
@@ -197,10 +193,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return onWEInnAppNotificationCLicked(notificationData,actionId);
     }
 
-
-
-
-
     private void initIndusOSBranchAttribution() {
         if (!getSharedPreferences("branch", 0).getBoolean("branchTrackUrlHit", false)) {
             //IndusOSAttribution runner = new IndusOSAttribution();
@@ -227,6 +219,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     }
 
+
+
     /**************************** BRANCH IO RELATED CODE ************************************************/
 
     private void initBranchPlugin() {
@@ -241,7 +235,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                         if (deepLinkingDataEventSink != null) {
                             deepLinkingDataEventSink.success(deepLinkingDataObject);
                         }
-
                     } else {
                         initBranchSession(referringParams);
                     }
@@ -276,8 +269,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     private Map<String, String> initBranchSession(JSONObject referringParams) {
         JSONObject installParams = Branch.getInstance().getFirstReferringParams();
         JSONObject sessionParams = Branch.getInstance().getLatestReferringParams();
-        setDeepLinkingBranchData(referringParams);
-        setDeepLinkingBranchData(sessionParams);
+        setDeepLinkingDataUsingBranch(referringParams);
+        setDeepLinkingDataUsingBranch(sessionParams);
         Map<String, String> object = new HashMap();
         String refCodeFromBranchTrail0 = "";
         String refCodeFromBranchTrail1 = "";
@@ -338,28 +331,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         return refCodeFromBranch;
     }
 
-    private Map<String, String> getBranchQueryParms() {
-        myHeperClass = new MyHelperClass();
-        Map<String, String> branchQueryParms = new HashMap<String, String>();
-        JSONObject installParams = Branch.getInstance().getFirstReferringParams();
-        String installReferring_link = "";
-        String installAndroid_link = "";
-
-        try {
-            installReferring_link = (String) installParams.get("~referring_link");
-            branchQueryParms.put("installReferring_link", installReferring_link);
-
-        } catch (Exception e) {
-
-        }
-        try {
-            installAndroid_link = (String) installParams.get("$android_url");
-            branchQueryParms.put("installAndroid_link", installAndroid_link);
-        } catch (Exception e) {
-
-        }
-        return branchQueryParms;
-    }
 
     public String getInstallReferringLink() {
         return installReferring_link;
@@ -469,21 +440,82 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
 
-    private void setDeepLinkingBranchData(JSONObject referringParams) {
+    private void setDeepLinkingDataUsingBranch(JSONObject referringParams) {
         String enableDeepLinking = referringParams.optString("enableDeepLinking", "");
         DeepLinkingDataModel deepLinkingDataModel = new DeepLinkingDataModel();
         if (enableDeepLinking.equals("true")) {
             deepLinkingDataModel.setActivateDeepLinkingNavigation(true);
             deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_page_route", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_page_route", ""));
             deepLinkingDataModel.setDlLeagueId(referringParams.optString("dl_leagueId", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_ac_promocode", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_ac_promoamount", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_sp_pageLocation", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_sp_pageTitle", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_sport_type", ""));
-            deepLinkingDataModel.setDlPageRoute(referringParams.optString("dl_unique_id", ""));
+            deepLinkingDataModel.setDlAcPromocode(referringParams.optString("dl_ac_promocode", ""));
+            deepLinkingDataModel.setDlAcPromoamount(referringParams.optString("dl_ac_promoamount", ""));
+            deepLinkingDataModel.setDlSpPageLocation(referringParams.optString("dl_sp_pageLocation", ""));
+            deepLinkingDataModel.setDlSpPageTitle(referringParams.optString("dl_sp_pageTitle", ""));
+            deepLinkingDataModel.setDlSportType(referringParams.optString("dl_sport_type", ""));
+            deepLinkingDataModel.setDlUnique_id(referringParams.optString("dl_unique_id", ""));
             deepLinkingDataObject = deepLinkingDataModel.getDeepLinkingDataMap();
+        }
+    }
+    private void setDeepLinkingDataUsingIntentData(){
+        /*Handling deep linking Data*/
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            Bundle extras = intent.getExtras();
+            try {
+                if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("enableDeepLinking")) {
+                    String enableDeepLinking = extras.getString("enableDeepLinking");
+                    DeepLinkingDataModel deepLinkingDataModel = new DeepLinkingDataModel();
+                    if (enableDeepLinking.equals("true")) {
+                        if (extras.containsKey("dl_page_route")) {
+                            String dl_page_route = extras.getString("dl_page_route");
+                            if (dl_page_route.length() > 2) {
+                                deepLinkingDataModel.setDlPageRoute(dl_page_route);
+                                deepLinkingDataModel.setActivateDeepLinkingNavigation(true);
+                                if (extras.containsKey("dl_leagueId")) {
+                                    deepLinkingDataModel.setDlLeagueId((String) extras.get("dl_leagueId"));
+                                }
+                                if (extras.containsKey("dl_ac_promocode")) {
+                                    deepLinkingDataModel.setDlAcPromocode((String) extras.get("dl_ac_promocode"));
+                                }
+                                if (extras.containsKey("dl_ac_promoamount")) {
+                                    deepLinkingDataModel.setDlAcPromoamount((String) extras.get("dl_ac_promoamount"));
+                                }
+                                if (extras.containsKey("dl_sp_pageLocation")) {
+                                    deepLinkingDataModel.setDlSpPageLocation((String) extras.get("dl_ac_promoamount"));
+                                }
+                                if (extras.containsKey("dl_sp_pageTitle")) {
+                                    deepLinkingDataModel.setDlSpPageTitle((String) extras.get("dl_ac_promoamount"));
+                                }
+                                if (extras.containsKey("dl_sport_type")) {
+                                    deepLinkingDataModel.setDlSportType((String) extras.get("dl_sport_type"));
+                                }
+                                if (extras.containsKey("dl_unique_id")) {
+                                    deepLinkingDataModel.setDlUnique_id((String) extras.get("dl_unique_id"));
+                                }
+                                deepLinkingDataObject = deepLinkingDataModel.getDeepLinkingDataMap();
+                                if (enableDeepLinking.equals("true")) {
+                                    if (this.deepLinkingDataEventSink != null) {
+                                        this.deepLinkingDataEventSink.success(deepLinkingDataModel.getDeepLinkingDataMap());
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+            } catch (Exception e) {
+
+                System.out.println(e);
+
+            }
+        }
+
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                Object value = getIntent().getExtras().get(key);
+                // Log.d(TAG, "Key: " + key + " Value: " + value);
+            }
         }
     }
 
@@ -493,20 +525,14 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private void initFlutterEvents() {
-
         new EventChannel(getFlutterView(), DEEPLINKING_STREAM_CHANNEL).setStreamHandler(
-
                 new EventChannel.StreamHandler() {
-
                     @Override
                     public void onListen(Object args, final EventChannel.EventSink events) {
                         deepLinkingDataEventSink = events;
                     }
-
                     @Override
                     public void onCancel(Object args) {
-
-
                     }
                 }
         );
@@ -525,14 +551,13 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             result.success(pfRefCode);
                         }
                         if (methodCall.method.equals("_initBranchIoPlugin")) {
-                            Map<String, String> object = new HashMap();
+                            Map<String, String> object = new HashMap<>();
                             if (!bActivateIndiusOSAttribution) {
                                 if (bBranchLodead) {
                                     String pfRefCode = (String) getRefCodeUsingBranch();
                                     String installReferring_link = (String) getInstallReferringLink();
                                     object.put("installReferring_link", installReferring_link);
                                     object.put("refCodeFromBranch", pfRefCode);
-
                                     result.success(object.toString());
                                 } else {
                                     getBranchData(result);
@@ -919,7 +944,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
     private String webengageTrackEvent(Map<String, Object> arguments) {
         /* Track Event without any Attributes */
-        System.out.print((String) arguments.get("eventName"));
         String eventName = "" + (String) arguments.get("eventName");
         boolean priority = true;
         weAnalytics.track(eventName, new Analytics.Options().setHighReportingPriority(priority));
@@ -937,8 +961,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
     }
 
     private String webengageAddScreenData(Map<String, Object> arguments) {
-        System.out.println(arguments);
-        System.out.println(arguments);
 
         String screenName = (String) arguments.get("screenName");
         Map<String, Object> addedAttributes = new HashMap<>();
@@ -964,7 +986,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         if (email != null && email.length() > 3) {
             weUser.setHashedEmail(email);
-            System.out.println(email);
+
         }
 
         if (phone != null && phone.length() > 3) {
@@ -972,7 +994,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         }
 
-        System.out.print((String) arguments.get("chosenloginTypeByUser"));
+
         weUser.setAttribute("loginType", (String) arguments.get("chosenloginTypeByUser"));
 
         return "Web engage Sign Up Track event added";
@@ -993,11 +1015,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
         weUser.setAttribute("loginType", "" + (String) arguments.get("loginType"));
 
-        System.out.print(phone);
 
         if (email != null && email.length() > 3) {
             weUser.setHashedEmail(email);
-            System.out.println(email);
         }
         if (phone != null && phone.length() > 3) {
             weUser.setHashedPhoneNumber(phone);
@@ -1479,62 +1499,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW));
         }
 
-        /*Handling deep linking Data*/
-        Intent intent = getIntent();
-        if (intent != null && intent.getExtras() != null) {
-            Bundle extras = intent.getExtras();
-            try {
-                if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("enableDeepLinking")) {
-                    String enableDeepLinking = extras.getString("enableDeepLinking");
-                    DeepLinkingDataModel deepLinkingDataModel = new DeepLinkingDataModel();
 
-                    if (enableDeepLinking.equals("true")) {
-                        if (extras.containsKey("dl_page_route")) {
-                            String dl_page_route = extras.getString("dl_page_route");
-                            if (dl_page_route.length() > 2) {
-                                deepLinkingDataModel.setDlPageRoute(dl_page_route);
-                                deepLinkingDataModel.setActivateDeepLinkingNavigation(true);
-                                if (extras.containsKey("dl_leagueId")) {
-                                    deepLinkingDataModel.setDlLeagueId((String) extras.get("dl_leagueId"));
-                                }
-                                if (extras.containsKey("dl_ac_promocode")) {
-                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promocode"));
-                                }
-                                if (extras.containsKey("dl_ac_promoamount")) {
-                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promoamount"));
-                                }
-
-                                if (extras.containsKey("dl_sp_pageLocation")) {
-                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promoamount"));
-                                }
-                                if (extras.containsKey("dl_sp_pageTitle")) {
-                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_ac_promoamount"));
-                                }
-
-                                if (extras.containsKey("dl_sport_type")) {
-                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_sport_type"));
-                                }
-
-                                if (extras.containsKey("dl_unique_id")) {
-                                    deepLinkingDataModel.setDlPageRoute((String) extras.get("dl_unique_id"));
-                                }
-                                deepLinkingDataObject = deepLinkingDataModel.getDeepLinkingDataMap();
-                            }
-
-                        }
-                    }
-                }
-            } catch (Exception e) {
-
-            }
-        }
-
-        if (getIntent().getExtras() != null) {
-            for (String key : getIntent().getExtras().keySet()) {
-                Object value = getIntent().getExtras().get(key);
-                // Log.d(TAG, "Key: " + key + " Value: " + value);
-            }
-        }
 
         String fmChannelName = "news";
         FirebaseMessaging.getInstance().subscribeToTopic(fmChannelName)
@@ -1558,6 +1523,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     }
                 });
     }
+
+
+
+
 
     private String getFireBaseToken() {
         FirebaseInstanceId.getInstance().getInstanceId()
@@ -1627,9 +1596,8 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         try {
             if (fileOrDirectory.isDirectory()) {
                 if (fileOrDirectory.exists()) {
-                    System.out.print(fileOrDirectory);
                     for (File child : fileOrDirectory.listFiles()) {
-                        System.out.print(child);
+
                         deleteFileRecursive(child, fileName);
 
                     }
@@ -1640,13 +1608,11 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
             System.out.print(e);
         }
 
-        System.out.print(fileOrDirectory);
 
         try {
             if (fileOrDirectory.isFile()) {
                 if (fileOrDirectory.getName().endsWith(fileName)) {
                     Boolean deleted = fileOrDirectory.delete();
-                    System.out.print(deleted);
                 }
             }
 
@@ -1663,7 +1629,6 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
 
             if (applictionFile != null && applictionFile.exists()) {
                 deleted = applictionFile.delete();
-                System.out.print(deleted);
             }
 
         } catch (Exception e) {
@@ -1747,11 +1712,9 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                             }
                             if (nameValue[0].equals("dl_leagueId")) {
                                 deepLinkingDataModel.setDlLeagueId(nameValue[1]);
-
                             }
                             if (nameValue[0].equals("dl_ac_promocode")) {
                                 deepLinkingDataModel.setDlAcPromocode(nameValue[1]);
-
                             }
                             if (nameValue[0].equals("dl_sp_pageLocation")) {
                                 deepLinkingDataModel.setDlSpPageLocation(nameValue[1]);
