@@ -129,8 +129,9 @@ class SplashScreenState extends State<SplashScreen>
       setLoadingPercentage(99.0);
       final result =
           await SharedPrefHelper().getFromSharedPref(ApiUtil.REGISTERED_USER);
-      if ((initData["otpSignUpSource"] as List<dynamic>).indexOf(source) !=
-          -1) {
+      if (initData["otpSignUpSource"] != null &&
+          (initData["otpSignUpSource"] as List<dynamic>).indexOf(source) !=
+              -1) {
         Navigator.of(context).pushReplacement(
           FantasyPageRoute(
             pageBuilder: (context) => OTPSignup(),

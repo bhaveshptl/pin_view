@@ -66,14 +66,17 @@ class InsufficientFundDialog extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
-              child: FittedBox(
-                child: Text(
-                  "Please deposit to join this contest.",
-                  style: Theme.of(context).primaryTextTheme.title.copyWith(
-                        color: Colors.grey.shade600,
-                      ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
+                child: FittedBox(
+                  fit: BoxFit.fitHeight,
+                  child: Text(
+                    "Please deposit to join this contest.",
+                    style: Theme.of(context).primaryTextTheme.title.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                  ),
                 ),
               ),
             ),
@@ -85,12 +88,18 @@ class InsufficientFundDialog extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 child: Container(
-                  child: Text(
-                    "Contest Fee",
-                    style: Theme.of(context).primaryTextTheme.title.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800,
-                        ),
+                  constraints: BoxConstraints(
+                    maxHeight: 24.0,
+                  ),
+                  alignment: Alignment.centerLeft,
+                  child: FittedBox(
+                    child: Text(
+                      "Contest Fee",
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                    ),
                   ),
                 ),
               ),
@@ -120,21 +129,21 @@ class InsufficientFundDialog extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    FittedBox(
-                      child: Text(
-                        "Available balance",
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade800,
-                                ),
-                        textAlign: TextAlign.start,
-                      ),
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  constraints: BoxConstraints(
+                    maxHeight: 20.0,
+                  ),
+                  child: FittedBox(
+                    child: Text(
+                      "Available balance",
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                      textAlign: TextAlign.start,
                     ),
-                  ],
+                  ),
                 ),
               ),
               Text(
@@ -181,21 +190,21 @@ class InsufficientFundDialog extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    FittedBox(
-                      child: Text(
-                        "Sortage of balance",
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey.shade800,
-                                ),
-                        textAlign: TextAlign.start,
-                      ),
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  constraints: BoxConstraints(
+                    maxHeight: 20.0,
+                  ),
+                  child: FittedBox(
+                    child: Text(
+                      "Sortage of balance",
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                      textAlign: TextAlign.start,
                     ),
-                  ],
+                  ),
                 ),
               ),
               Text(
