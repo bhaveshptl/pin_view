@@ -1650,6 +1650,7 @@ class WithdrawState extends State<Withdraw>
         title: Text(
           "withdrawal".toUpperCase(),
         ),
+        titleSpacing: 0.0,
         actions: <Widget>[
           IconButton(
             icon: Icon(

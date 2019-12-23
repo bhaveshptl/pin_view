@@ -178,6 +178,7 @@ class MyTeamsState extends State<MyTeams> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         leading: LeadingButton(),
+        titleSpacing: 0.0,
         title: Row(
           children: <Widget>[
             LeagueTitleEPOC(

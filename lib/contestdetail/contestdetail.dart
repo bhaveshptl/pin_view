@@ -816,6 +816,9 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
               ),
               Consumer<User>(
                 builder: (context, user, child) {
+                  if (user == null) {
+                    return Container();
+                  }
                   return AddCashButton(
                     location: "l2-topright",
                     amount: user.withdrawable + user.depositedAmount,

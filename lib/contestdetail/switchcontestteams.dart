@@ -242,6 +242,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
             )
           ],
         ),
+        titleSpacing: 0.0,
         elevation: 0.0,
       ),
       body: _myUniqueTeams.length == 0

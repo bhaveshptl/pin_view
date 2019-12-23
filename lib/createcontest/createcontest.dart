@@ -514,6 +514,7 @@ class CreateContestState extends State<CreateContest> {
       scaffoldKey: _scaffoldKey,
       appBar: AppBar(
         leading: LeadingButton(),
+        titleSpacing: 0.0,
         title: Row(
           children: <Widget>[
             Expanded(
@@ -526,15 +527,17 @@ class CreateContestState extends State<CreateContest> {
             ),
             Consumer<User>(
               builder: (context, user, child) {
+                if (user == null) {
+                    return Container();
+                  }
                 return AddCashButton(
-                  location: "pc-topright",
+                  location: "cc-topright",
                   amount: user.withdrawable + user.depositedAmount,
                 );
               },
             ),
           ],
         ),
-        titleSpacing: 0.0,
         elevation: 0.0,
       ),
       body: Column(

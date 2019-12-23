@@ -313,6 +313,7 @@ class JoinContestState extends State<JoinContest> {
       scaffoldKey: scaffoldKey,
       appBar: AppBar(
         leading: LeadingButton(),
+        titleSpacing: 0.0,
         title: Row(
           children: <Widget>[
             LeagueTitleEPOC(

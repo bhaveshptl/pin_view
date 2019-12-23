@@ -99,6 +99,7 @@ class SearchContestState extends State<SearchContest> {
         title: Text(
           strings.get("SEARCH_CONTEST").toUpperCase(),
         ),
+        titleSpacing: 0.0,
         elevation: 0.0,
       ),
       body: Form(

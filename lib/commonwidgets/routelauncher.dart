@@ -12,6 +12,7 @@ import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/modal/deposit.dart';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -27,6 +28,7 @@ import 'package:playfantasy/profilepages/myaccount.dart';
 import 'package:playfantasy/utils/joincontesterror.dart';
 import 'package:playfantasy/deposit/transactionsuccess.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
+import 'package:provider/provider.dart';
 
 RouteLauncher routeLauncher = new RouteLauncher();
 
@@ -51,10 +53,10 @@ class RouteLauncher {
     Function onComplete,
     double prefilledAmount,
   }) async {
-
     Deposit depositData = await getDepositInfo(context);
 
-    List<dynamic> promoCodes = await routeLauncher.getPromoCodes(depositData.chooseAmountData.isFirstDeposit);
+    List<dynamic> promoCodes = await routeLauncher
+        .getPromoCodes(depositData.chooseAmountData.isFirstDeposit);
 
     promoCodes.sort((a, b) {
       return a["minimum"] - b["minimum"];
@@ -62,37 +64,31 @@ class RouteLauncher {
 
     List<dynamic> filteredPromo = [];
     promoCodes.forEach((promocode) {
-
-      if(promocode["public"]) {
-
-        if(
-          (depositData.chooseAmountData.isFirstDeposit && promocode["firstPayment"])
-          || (!depositData.chooseAmountData.isFirstDeposit && !promocode["firstPayment"])
-        ) {
+      if (promocode["public"]) {
+        if ((depositData.chooseAmountData.isFirstDeposit &&
+                promocode["firstPayment"]) ||
+            (!depositData.chooseAmountData.isFirstDeposit &&
+                !promocode["firstPayment"])) {
           filteredPromo.add(promocode);
         }
-
       }
+    });
 
-    });    
-
-    
     showLoader(context, false);
 
     try {
       Event event = Event(name: "addcash");
       event.setFirstDeposit(depositData.chooseAmountData.isFirstDeposit);
-      if(prefilledAmount !=null){
+      if (prefilledAmount != null) {
         event.setDepositAmount(prefilledAmount.round());
       }
-      if(promoCode !=null){
+      if (promoCode != null) {
         event.setPromoCode(promoCode);
       }
       addAnalyticsEvent(
         journey: "Deposit",
         source: source,
         event: event,
-        
       );
     } catch (e) {}
 
@@ -136,6 +132,14 @@ class RouteLauncher {
   showTransactionResult(
       BuildContext context, Map<String, dynamic> transactionResult) {
     if (transactionResult["authStatus"] == "Authorised") {
+      double withdrawable =
+          double.tryParse(transactionResult["withdrawable"].toString());
+      double depositBucket =
+          double.tryParse(transactionResult["depositBucket"].toString());
+      User user = Provider.of<User>(context);
+      user.updateDepositBucket(depositBucket);
+      user.updateWithdrawable(withdrawable);
+
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -500,7 +504,7 @@ class RouteLauncher {
         title = "PRIVACY POLICY";
         url = BaseUrl().staticPageUrls["PRIVACY"];
         break;
-      case "PROMOS_OFFERS": 
+      case "PROMOS_OFFERS":
         title = "PROMOS & OFFERS";
         url = BaseUrl().staticPageUrls["PROMOS_OFFERS"];
         break;

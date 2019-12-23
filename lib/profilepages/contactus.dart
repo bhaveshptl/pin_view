@@ -226,6 +226,7 @@ class ContactUsState extends State<ContactUs> {
             title: Text(
               title.toUpperCase(),
             ),
+            titleSpacing: 0.0,
           ),
         ),
       ),
@@ -241,6 +242,7 @@ class ContactUsState extends State<ContactUs> {
         title: Text(
           "Contact Us".toUpperCase(),
         ),
+        titleSpacing: 0.0,
       ),
       body: SingleChildScrollView(
         child: Column(

@@ -1024,6 +1024,9 @@ class LobbyState extends State<Lobby>
               ),
               Consumer<User>(
                 builder: (context, user, child) {
+                  if (user == null) {
+                    return Container();
+                  }
                   return AddCashButton(
                     location: "topright",
                     amount: user.withdrawable + user.depositedAmount,

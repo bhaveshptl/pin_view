@@ -69,6 +69,7 @@ class MyAccountState extends State<MyAccount> {
         title: Text(
           "My account".toUpperCase(),
         ),
+        titleSpacing: 0.0,
       ),
       body: Column(
         children: <Widget>[

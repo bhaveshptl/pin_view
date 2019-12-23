@@ -120,12 +120,21 @@ class InsufficientFundDialog extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Expanded(
-                child: Text(
-                  "Available balance",
-                  style: Theme.of(context).primaryTextTheme.title.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    FittedBox(
+                      child: Text(
+                        "Available balance",
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade800,
+                                ),
+                        textAlign: TextAlign.start,
                       ),
+                    ),
+                  ],
                 ),
               ),
               Text(
@@ -169,14 +178,24 @@ class InsufficientFundDialog extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(left: 56.0, right: 56.0, top: 8.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: Text(
-                  "Sortage of balance",
-                  style: Theme.of(context).primaryTextTheme.title.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    FittedBox(
+                      child: Text(
+                        "Sortage of balance",
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade800,
+                                ),
+                        textAlign: TextAlign.start,
                       ),
+                    ),
+                  ],
                 ),
               ),
               Text(

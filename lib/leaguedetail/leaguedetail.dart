@@ -1043,6 +1043,9 @@ class LeagueDetailState extends State<LeagueDetail>
             ),
             Consumer<User>(
               builder: (context, user, child) {
+                if (user == null) {
+                  return Container();
+                }
                 return AddCashButton(
                   location: "l1-topright",
                   amount: user.withdrawable + user.depositedAmount,
@@ -1084,100 +1087,117 @@ class LeagueDetailState extends State<LeagueDetail>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.fitHeight,
-                    child: Container(
-                      margin: EdgeInsets.only(left: 16.0, right: 16.0),
-                      height: 24.0,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4.0),
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0.0, 0),
-                            color: Colors.grey.shade300,
-                            blurRadius: 1.0,
-                            spreadRadius: 1.0,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 16.0, right: 16.0),
+                    height: 32.0,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.0),
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0.0, 0),
+                          color: Colors.grey.shade300,
+                          blurRadius: 1.0,
+                          spreadRadius: 1.0,
+                        ),
+                      ],
+                    ),
+                    child: FlatButton(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                      ),
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(right: 8.0),
+                            child: Image.asset(
+                              "images/Contest_Icon.png",
+                              height: 16.0,
+                            ),
+                          ),
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                "CREATE CONTEST",
+                                style: Theme.of(context)
+                                    .primaryTextTheme
+                                    .title
+                                    .copyWith(
+                                      color: Color.fromRGBO(41, 41, 41, 1),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      child: FlatButton(
-                        color: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Image.asset(
-                                "images/Contest_Icon.png",
-                                height: 12.0,
-                              ),
-                            ),
-                            Text(
-                              "CREATE CONTEST",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Color.fromRGBO(41, 41, 41, 1),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          _onCreateContest(context);
-                        },
-                      ),
+                      onPressed: () {
+                        _onCreateContest(context);
+                      },
                     ),
                   ),
                 ),
                 Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.fitHeight,
-                    child: Container(
-                      margin: EdgeInsets.only(right: 16.0, left: 16.0),
-                      height: 24.0,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(4.0),
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0.0, 0),
-                            color: Colors.grey.shade300,
-                            blurRadius: 1.0,
-                            spreadRadius: 1.0,
+                  child: Container(
+                    margin: EdgeInsets.only(right: 16.0, left: 16.0),
+                    height: 32.0,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4.0),
+                      boxShadow: [
+                        BoxShadow(
+                          offset: Offset(0.0, 0),
+                          color: Colors.grey.shade300,
+                          blurRadius: 1.0,
+                          spreadRadius: 1.0,
+                        ),
+                      ],
+                    ),
+                    child: FlatButton(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(right: 8.0),
+                            child: Image.asset(
+                              "images/ContestCode_Icon.png",
+                              height: 16.0,
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Container(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        "CONTEST CODE",
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color:
+                                                  Color.fromRGBO(41, 41, 41, 1),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      child: FlatButton(
-                        color: Colors.white,
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Image.asset(
-                                "images/ContestCode_Icon.png",
-                                height: 12.0,
-                              ),
-                            ),
-                            Text(
-                              "CONTEST CODE",
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Color.fromRGBO(41, 41, 41, 1),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          _onSearchContest();
-                        },
-                      ),
+                      onPressed: () {
+                        _onSearchContest();
+                      },
                     ),
                   ),
                 ),

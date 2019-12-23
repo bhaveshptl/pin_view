@@ -72,6 +72,7 @@ class PartnerState extends State<Partner> {
         title: Text(
           "Partner request".toUpperCase(),
         ),
+        titleSpacing: 0.0,
       ),
       body: SingleChildScrollView(
         child: Column(

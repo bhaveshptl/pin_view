@@ -50,6 +50,7 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
                 title: Text(
                   title.toUpperCase(),
                 ),
+                titleSpacing: 0.0,
               ),
             ),
       ),

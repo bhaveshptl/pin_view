@@ -186,6 +186,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
             title: Text(
               title.toUpperCase(),
             ),
+            titleSpacing: 0.0,
           ),
         ),
       ),
@@ -1664,8 +1665,10 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                 padding: EdgeInsets.all(0.0),
                 onPressed: () {
                   const twentyMillis = const Duration(milliseconds: 50);
-                  new Timer(twentyMillis,
-                      () => Scrollable.ensureVisible(paymentCardWidgetDataKey.currentContext));
+                  new Timer(
+                      twentyMillis,
+                      () => Scrollable.ensureVisible(
+                          paymentCardWidgetDataKey.currentContext));
                   if (paymentTypeData != null) {
                     Event event = Event(name: "pay_mode_select");
                     event.setDepositAmount(widget.amount);
@@ -1744,9 +1747,11 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
               child: FlatButton(
                 padding: EdgeInsets.all(0.0),
                 onPressed: () {
-                   const twentyMillis = const Duration(milliseconds: 50);
-                  new Timer(twentyMillis,
-                      () => Scrollable.ensureVisible(paymentCardWidgetDataKey.currentContext));
+                  const twentyMillis = const Duration(milliseconds: 50);
+                  new Timer(
+                      twentyMillis,
+                      () => Scrollable.ensureVisible(
+                          paymentCardWidgetDataKey.currentContext));
                   if (paymentTypeData != null) {
                     Event event = Event(name: "pay_mode_select");
                     event.setDepositAmount(widget.amount);
@@ -2001,7 +2006,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                               Padding(
                                 padding: EdgeInsets.only(top: 4.0),
                                 child: DottedBorder(
-                                  gap: 2,
+                                  dashPattern: [2.0],
                                   strokeWidth: 1,
                                   color: Colors.green,
                                   child: Container(
@@ -2043,7 +2048,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
                               Padding(
                                 padding: EdgeInsets.only(top: 4.0),
                                 child: DottedBorder(
-                                  gap: 2,
+                                  dashPattern: [2.0],
                                   strokeWidth: 1,
                                   color: Colors.green,
                                   child: Container(
@@ -2325,6 +2330,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
         title: Text(
           "Payment".toUpperCase(),
         ),
+        titleSpacing: 0.0,
       ),
       body: new GestureDetector(
         onTap: () {

@@ -506,6 +506,7 @@ class VerificationState extends State<Verification> {
         title: Text(
           strings.get("ACCOUNT_VERIFICATION").toUpperCase(),
         ),
+        titleSpacing: 0.0,
       ),
       body: SingleChildScrollView(
         child: Column(

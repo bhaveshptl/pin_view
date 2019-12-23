@@ -409,6 +409,7 @@ class TeamPreview extends StatelessWidget {
             leading: LeadingButton(),
             title:
                 Text(myTeam == null || myTeam.name == null ? "" : myTeam.name),
+            titleSpacing: 0.0,
             actions: <Widget>[
               allowEditTeam && league.status == LeagueStatus.UPCOMING
                   ? FlatButton(

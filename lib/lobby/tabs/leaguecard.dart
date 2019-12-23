@@ -139,15 +139,20 @@ class LeagueCard extends StatelessWidget {
                                       ),
                                       Padding(
                                         padding: EdgeInsets.only(left: 8.0),
-                                        child: Text(
-                                          _league.teamA.name,
-                                          style: Theme.of(context)
-                                              .primaryTextTheme
-                                              .title
-                                              .copyWith(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                        child: Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 24.0,
+                                          ),
+                                          child: Text(
+                                            _league.teamA.name,
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .title
+                                                .copyWith(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -200,15 +205,20 @@ class LeagueCard extends StatelessWidget {
                                     children: <Widget>[
                                       Padding(
                                         padding: EdgeInsets.only(right: 8.0),
-                                        child: Text(
-                                          _league.teamB.name,
-                                          style: Theme.of(context)
-                                              .primaryTextTheme
-                                              .title
-                                              .copyWith(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                        child: Container(
+                                          constraints: BoxConstraints(
+                                            minWidth: 24.0,
+                                          ),
+                                          child: Text(
+                                            _league.teamB.name,
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .title
+                                                .copyWith(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
                                         ),
                                       ),
                                       Container(
@@ -277,14 +287,18 @@ class LeagueCard extends StatelessWidget {
                                           MainAxisAlignment.center,
                                       children: <Widget>[
                                         FittedBox(
+                                          fit: BoxFit.fitHeight,
                                           child: Padding(
                                             padding:
-                                                EdgeInsets.only(right: 16.0),
-                                            child:
-                                                Image.asset("images/mic.png"),
+                                                EdgeInsets.only(right: 8.0),
+                                            child: Image.asset(
+                                              "images/mic.png",
+                                              height: 12.0,
+                                            ),
                                           ),
                                         ),
                                         FittedBox(
+                                          fit: BoxFit.fitHeight,
                                           child: Text(
                                             "Lineups out!".toUpperCase(),
                                             style: Theme.of(context)
@@ -294,6 +308,7 @@ class LeagueCard extends StatelessWidget {
                                                   color: Colors.green,
                                                   fontWeight: FontWeight.bold,
                                                 ),
+                                            textAlign: TextAlign.start,
                                           ),
                                         ),
                                       ],

@@ -116,6 +116,7 @@ class ChooseCaptainState extends State<ChooseCaptain> {
     return ScaffoldPage(
       appBar: AppBar(
         leading: LeadingButton(),
+        titleSpacing: 0.0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[

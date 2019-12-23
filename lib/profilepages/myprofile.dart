@@ -641,6 +641,7 @@ class MyProfileState extends State<MyProfile> {
         title: Text(
           "MY PROFILE".toUpperCase(),
         ),
+        titleSpacing: 0.0,
       ),
       body: SingleChildScrollView(
         child: Container(

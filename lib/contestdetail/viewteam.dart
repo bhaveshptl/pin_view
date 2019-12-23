@@ -185,6 +185,7 @@ class _ViewTeamState extends State<ViewTeam> {
       appBar: AppBar(
         title: Text(widget.team.name),
         leading: LeadingButton(),
+        titleSpacing: 0.0,
         actions: <Widget>[
           widget.league.status == LeagueStatus.UPCOMING
               ? IconButton(

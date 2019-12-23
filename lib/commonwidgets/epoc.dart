@@ -20,6 +20,7 @@ class EPOCState extends State<EPOC> {
   int leftSeconds = 0;
 
   bool bIsTimerClosed = false;
+  Duration remainingTime;
 
   @override
   void initState() {
@@ -28,7 +29,7 @@ class EPOCState extends State<EPOC> {
   }
 
   startTimerToCalculateEPOC() {
-    Duration remainingTime =
+    remainingTime =
         DateTime.fromMillisecondsSinceEpoch(widget.timeInMiliseconds)
             .difference(DateTime.now());
     setState(() {
@@ -64,6 +65,10 @@ class EPOCState extends State<EPOC> {
 
   @override
   Widget build(BuildContext context) {
+    Color timerColor = remainingTime < Duration(minutes: 30)
+        ? Colors.red
+        : Colors.grey.shade800;
+
     return bIsTimerClosed
         ? Text(
             "CLOSED",
@@ -102,7 +107,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.grey.shade800,
+                                color: timerColor,
                                 fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
@@ -114,7 +119,7 @@ class EPOCState extends State<EPOC> {
                         child: Text(
                           " : ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: timerColor,
                           ),
                         ),
                       ),
@@ -128,7 +133,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.grey.shade800,
+                                color: timerColor,
                                 fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
@@ -140,7 +145,7 @@ class EPOCState extends State<EPOC> {
                         child: Text(
                           " : ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: timerColor,
                           ),
                         ),
                       ),
@@ -154,7 +159,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.grey.shade800,
+                                color: timerColor,
                                 fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
@@ -166,7 +171,7 @@ class EPOCState extends State<EPOC> {
                         child: Text(
                           " : ",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: timerColor,
                           ),
                         ),
                       ),
@@ -180,7 +185,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .subtitle
                               .copyWith(
-                                color: Colors.grey.shade800,
+                                color: timerColor,
                                 fontWeight: FontWeight.w500,
                               ),
                           textAlign: TextAlign.center,
@@ -202,7 +207,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .overline
                               .copyWith(
-                                color: Color.fromRGBO(211, 169, 169, 1),
+                                color: Color.fromRGBO(134, 14, 11, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),
@@ -219,7 +224,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .overline
                               .copyWith(
-                                color: Color.fromRGBO(211, 169, 169, 1),
+                                color: Color.fromRGBO(134, 14, 11, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),
@@ -236,7 +241,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .overline
                               .copyWith(
-                                color: Color.fromRGBO(211, 169, 169, 1),
+                                color: Color.fromRGBO(134, 14, 11, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),
@@ -253,7 +258,7 @@ class EPOCState extends State<EPOC> {
                               .primaryTextTheme
                               .overline
                               .copyWith(
-                                color: Color.fromRGBO(211, 169, 169, 1),
+                                color: Color.fromRGBO(134, 14, 11, 1),
                                 fontWeight: FontWeight.w300,
                               ),
                         ),

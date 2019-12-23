@@ -50,6 +50,7 @@ class ScaffoldPage extends StatelessWidget {
                         action,
                       ],
                       leading: LeadingButton(),
+                      titleSpacing: 0.0,
                     )
               : appBar,
           body: body,

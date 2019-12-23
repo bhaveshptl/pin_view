@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/lobby/lobby.dart';
+import 'package:playfantasy/otpsignup/otpsignup.dart';
 import 'package:playfantasy/profilepages/update.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/analytics.dart';
@@ -57,6 +58,10 @@ class SplashScreenState extends State<SplashScreen>
   bool activateDeepLinkingNavigation = false;
   Map<dynamic, dynamic> deepLinkingRoutingData;
 
+  String branchURL =
+      "https://11zy.app.link/landing?landing_page=%2Fassets%2Flp17.html&utm_source=Facebook-Social&utm_medium=FB-Post&utm_campaign=knplmatch26aug19&utm_content=knplmatch26aug19&fbclid=IwAR2iQynrTVFF1p3XnPLXcDc8eA-sMiaY21QOlKCoiVU7sbHb90xQsEY69lg&fbp=fb.1.1564146311319.762651542&fbc=fb.1.1566823286637.IwAR2iQynrTVFF1p3XnPLXcDc8eA-sMiaY21QOlKCoiVU7sbHb90xQsEY69lg";
+  String source = "";
+
   @override
   void initState() {
     super.initState();
@@ -82,6 +87,8 @@ class SplashScreenState extends State<SplashScreen>
     final initData = await getInitData();
     if (!isIos) {
       await _initBranchIoPlugin();
+      branchURL = await _getInstallReferringLink();
+      setSource(branchURL);
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
     } else {
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
@@ -122,11 +129,32 @@ class SplashScreenState extends State<SplashScreen>
       setLoadingPercentage(99.0);
       final result =
           await SharedPrefHelper().getFromSharedPref(ApiUtil.REGISTERED_USER);
-      Navigator.of(context).pushReplacement(
-        FantasyPageRoute(
-          pageBuilder: (context) => result == null ? Signup() : SignInPage(),
-        ),
-      );
+      if ((initData["otpSignUpSource"] as List<dynamic>).indexOf(source) !=
+          -1) {
+        Navigator.of(context).pushReplacement(
+          FantasyPageRoute(
+            pageBuilder: (context) => OTPSignup(),
+          ),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          FantasyPageRoute(
+            pageBuilder: (context) => result != null ? Signup() : SignInPage(),
+          ),
+        );
+      }
+    }
+  }
+
+  setSource(String url) {
+    if (url.indexOf("?") != -1) {
+      Map<String, dynamic> queryParams = {};
+      List<String> params = url.split("?")[1].split("&");
+      params.forEach((param) {
+        var value = param.split("=");
+        queryParams[value[0]] = value[1];
+      });
+      source = queryParams["landing_page"].replaceAll("%2Fassets%2F", "");
     }
   }
 
@@ -215,6 +243,14 @@ class SplashScreenState extends State<SplashScreen>
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_REFCODE_BRANCH, "");
     }
+  }
+
+  Future<String> _getInstallReferringLink() async {
+    String value;
+    try {
+      value = await branch_io_platform.invokeMethod('_getInstallReferringLink');
+    } catch (e) {}
+    return value;
   }
 
   Future<String> _getFirebaseToken() async {

@@ -22,11 +22,11 @@ class User extends ChangeNotifier {
     this.isNewUser,
     this.isEmailVerified,
     this.isMobileVerified,
-    this.withdrawable,
-    this.depositedAmount,
-    this.nonWithdrawable,
-    this.playableBonus,
-    this.bonusBalance,
+    this.withdrawable = 0.0,
+    this.depositedAmount = 0.0,
+    this.nonWithdrawable = 0.0,
+    this.playableBonus = 0.0,
+    this.bonusBalance = 0.0,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -57,9 +57,15 @@ class User extends ChangeNotifier {
     this.isEmailVerified = json["verificationStatus"] == null
         ? null
         : (json["verificationStatus"]["email_verification"] == true);
-    this.withdrawable = double.tryParse(json["withdrawable"].toString());
-    this.depositedAmount = double.tryParse(json["depositBucket"].toString());
-    this.nonWithdrawable = double.tryParse(json["nonWithdrawable"].toString());
+    this.withdrawable = json["withdrawable"] == null
+        ? 0.0
+        : double.tryParse(json["withdrawable"].toString());
+    this.depositedAmount = json["depositBucket"] == null
+        ? 0.0
+        : double.tryParse(json["depositBucket"].toString());
+    this.nonWithdrawable = json["nonWithdrawable"] == null
+        ? 0.0
+        : double.tryParse(json["nonWithdrawable"].toString());
 
     notifyListeners();
   }

@@ -747,6 +747,7 @@ class OTPSignupState extends State<OTPSignup> {
             title: Text(
               title.toUpperCase(),
             ),
+            titleSpacing: 0.0,
           ),
         ),
       ),
@@ -796,7 +797,7 @@ class OTPSignupState extends State<OTPSignup> {
               children: <Widget>[
                 Image.asset(
                   "images/hzlogo.png",
-                  width: MediaQuery.of(context).size.width / 2,
+                  width: MediaQuery.of(context).size.width * 0.4,
                 ),
               ],
             ),

@@ -21,7 +21,7 @@ import 'package:playfantasy/deposit/initpay.dart';
 import 'package:playfantasy/deposit/promo.dart';
 import 'package:playfantasy/modal/analytics.dart';
 import 'package:playfantasy/modal/deposit.dart';
-import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -32,6 +32,7 @@ import 'package:playfantasy/deposit/transactionfailed.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:provider/provider.dart';
 import 'cardpayment.dart';
 
 class AddCash extends StatefulWidget {
@@ -195,6 +196,16 @@ class AddCashState extends State<AddCash> {
       amount = widget.depositData.chooseAmountData.amountTiles[0];
       customAmountController.text = amount.toString();
     }
+
+    if (widget.prefilledAmount != null && widget.depositData != null) {
+      prefilledAmountInRupees = widget.prefilledAmount <
+              widget.depositData.chooseAmountData.minAmount.toDouble()
+          ? widget.depositData.chooseAmountData.minAmount.toDouble()
+          : widget.prefilledAmount;
+      widget.depositData.chooseAmountData.minAmount.toDouble();
+      customAmountController.text = prefilledAmountInRupees.ceil().toString();
+      amount = prefilledAmountInRupees.round();
+    }
   }
 
   webengageAddCashInitEvent() {
@@ -226,12 +237,9 @@ class AddCashState extends State<AddCash> {
   updateUserInfo() async {
     var _user = await getUserInfo();
     if (_user != null) {
-      setState(() {
-        userBalance =
-            (_user.nonWithdrawable == null ? 0.0 : _user.nonWithdrawable) +
-                (_user.withdrawable == null ? 0.0 : _user.withdrawable) +
-                (_user.depositBucket == null ? 0.0 : _user.depositBucket);
-      });
+      User user = Provider.of<User>(context);
+      user.updateDepositBucket(double.parse(_user["depositBucket"].toString()));
+      user.updateWithdrawable(double.parse(_user["withdrawable"].toString()));
     }
   }
 
@@ -247,15 +255,10 @@ class AddCashState extends State<AddCash> {
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 299) {
         Map<String, dynamic> user = json.decode(res.body)["user"];
-
-        SharedPrefHelper.internal().saveToSharedPref(
-            ApiUtil.SHARED_PREFERENCE_USER_KEY, json.encode(user));
-        return User.fromJson(user);
+        return user;
       } else {
         return null;
       }
-    }).whenComplete(() {
-      showLoader(false);
     });
   }
 
@@ -277,6 +280,7 @@ class AddCashState extends State<AddCash> {
             title: Text(
               title.toUpperCase(),
             ),
+            titleSpacing: 0.0,
           ),
         ),
       ),
@@ -514,11 +518,16 @@ class AddCashState extends State<AddCash> {
                         color: Colors.grey.shade800,
                       ),
                 ),
-                Text(
-                  formatCurrency.format(userBalance),
-                  style: Theme.of(context).primaryTextTheme.title.copyWith(
-                        color: Colors.grey.shade800,
-                      ),
+                Consumer<User>(
+                  builder: (context, user, child) {
+                    return Text(
+                      formatCurrency
+                          .format(user.withdrawable + user.depositedAmount),
+                      style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            color: Colors.grey.shade800,
+                          ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -625,7 +634,7 @@ class AddCashState extends State<AddCash> {
       child: DottedBorder(
         padding: EdgeInsets.all(0),
         strokeWidth: 3,
-        gap: 4,
+        dashPattern: [4.0],
         color: Colors.green,
         child: Container(
           padding: EdgeInsets.all(10),
@@ -1493,7 +1502,7 @@ class AddCashState extends State<AddCash> {
       width: 55,
       margin: EdgeInsets.all(6),
       child: DottedBorder(
-        gap: 3,
+        dashPattern: [3.0],
         //padding: EdgeInsets.all(4),
         color: Colors.green,
         child: Column(

@@ -111,10 +111,11 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
         }
       });
     });
-    var maxLength = updatedSuggestedContests.length - 1;
+    var maxLength = updatedSuggestedContests.length;
     setState(() {
-      contests =
-          updatedSuggestedContests.getRange(0, maxLength > 2 ? 2 : maxLength);
+      contests = updatedSuggestedContests
+          .getRange(0, maxLength > 2 ? 2 : maxLength)
+          .toList();
     });
   }
 
@@ -311,6 +312,9 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
                                             ),
                                             Expanded(
                                               child: Container(
+                                                constraints: BoxConstraints(
+                                                  maxHeight: 24.0,
+                                                ),
                                                 margin:
                                                     EdgeInsets.only(top: 8.0),
                                                 child: FittedBox(

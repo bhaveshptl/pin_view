@@ -155,8 +155,12 @@ class ActionUtil {
         }
       } else if (result != null) {
         User userData = Provider.of<User>(scaffoldKey.currentContext);
-        userData.updateDepositBucket(result["userData"]["depositBucket"]);
-        userData.updateWithdrawable(result["userData"]["withdrawable"]);
+        userData.updateDepositBucket(
+          double.parse((result["userBalance"]["depositBucket"]).toString()),
+        );
+        userData.updateWithdrawable(
+          double.parse((result["userBalance"]["withdrawable"]).toString()),
+        );
 
         onContestJoinSuccess(
           result["message"].toString(),
@@ -188,7 +192,9 @@ class ActionUtil {
   }) async {
     var leagueContestIds =
         await getMyContestIds(scaffoldKey.currentContext, sportId);
-    List<dynamic> contestIds = (leagueContestIds[league.leagueId.toString()]);
+    List<dynamic> contestIds = leagueContestIds == null
+        ? []
+        : (leagueContestIds[league.leagueId.toString()]);
     Map<int, List<MyTeam>> myJoinedTeams;
     if (contestIds == null) {
       myJoinedTeams = {};

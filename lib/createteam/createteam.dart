@@ -892,6 +892,7 @@ class CreateTeamState extends State<CreateTeam>
                           ],
                         ),
                         elevation: 0.0,
+                        titleSpacing: 0.0,
                         centerTitle: true,
                         backgroundColor: Colors.transparent,
                       ),

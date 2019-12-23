@@ -667,6 +667,7 @@ class JoinedContestsState extends State<JoinedContests>
       appBar: AppBar(
         elevation: 0.0,
         leading: LeadingButton(),
+        titleSpacing: 0.0,
         title: Row(
           children: <Widget>[
             LeagueTitleEPOC(
