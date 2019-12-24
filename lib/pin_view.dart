@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sms/sms.dart';
 
 class SmsListener {
-  final String from;
+  final Pattern from;
   final Function formatBody;
 
   SmsListener({@required this.from, this.formatBody});
@@ -66,7 +66,7 @@ class _PinViewState extends State<PinView> {
   void _listenSms() async {
     _smsReceiver = SmsReceiver();
     _smsReceiver.onSmsReceived.listen((SmsMessage message) {
-      if (message.sender == widget.sms.from) {
+      if (widget.sms.from.allMatches(message.sender).length > 0) {
         String code = widget.sms.formatBody != null
             ? widget.sms.formatBody(message.body)
             : message.body;
