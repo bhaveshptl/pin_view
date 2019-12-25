@@ -107,48 +107,57 @@ class _PinViewState extends State<PinView> {
 
   Widget _singlePinView(int index) {
     return Flexible(
-        flex: 3,
-        child: Container(
-            margin: widget.margin,
-            child: TextField(
-              enabled: widget.enabled,
-              controller: _controllers[index],
-              obscureText: widget.obscureText,
-              autofocus: widget.autoFocusFirstField ? index == 0 : false,
-              focusNode: _focusNodes[index],
-              keyboardType: TextInputType.number,
-              textAlign: TextAlign.center,
-              style: widget.style,
-              decoration: widget.inputDecoration,
-              textInputAction: TextInputAction.next,
-              onChanged: (String val) {
-                if (val.length == 1) {
-                  _pin[index] = val;
-                  if (index != _focusNodes.length - 1) {
-                    _focusNodes[index].unfocus();
-                    FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
-                  }
-                } else if (val.length == 2) {
-                  _controllers[index].text = val.substring(0, 1);
-                  _pin[index] = val.substring(0, 1);
-                  if ((index + 1) < _controllers.length) {
-                    _controllers[index + 1].text = "";
-                    _controllers[index + 1].text = val.substring(1);
-                    _pin[index + 1] = val.substring(1);
-                    FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
-                  }
-                } else {
-                  _pin[index] = "";
-                  if (index != 0) {
-                    _focusNodes[index].unfocus();
-                    FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
-                  }
-                }
+      flex: 3,
+      child: Container(
+        margin: widget.margin,
+        child: TextField(
+          enabled: widget.enabled,
+          controller: _controllers[index],
+          obscureText: widget.obscureText,
+          autofocus: widget.autoFocusFirstField ? index == 0 : false,
+          focusNode: _focusNodes[index],
+          keyboardType: TextInputType.number,
+          textAlign: TextAlign.center,
+          style: widget.style,
+          decoration: widget.inputDecoration,
+          textInputAction: TextInputAction.next,
+          onChanged: (String val) {
+            if (widget.count - index <= val.length && val.length > 0) {
+              for (int i = index; i < widget.count; i++) {
+                String character = val.substring(i, i + 1);
+                _controllers[i].text = character;
+                _pin[i] = character;
 
-                if (_pin.indexOf("") == -1) {
-                  widget.submit(_pin.join());
+                if (i != widget.count - 1) {
+                  index = i + 1;
+                  FocusScope.of(context).requestFocus(_focusNodes[index]);
                 }
-              },
-            )));
+              }
+            } else if (val.length > 0) {
+              for (int i = 0; i < widget.count && i < val.length; i++) {
+                String character = val.substring(i, i + 1);
+                _controllers[i].text = character;
+                _pin[i] = character;
+
+                if (i != widget.count - 1) {
+                  index = i + 1;
+                  FocusScope.of(context).requestFocus(_focusNodes[index]);
+                }
+              }
+            } else {
+              _pin[index] = "";
+              if (index != 0) {
+                _focusNodes[index].unfocus();
+                FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
+              }
+            }
+
+            if (_pin.indexOf("") == -1) {
+              widget.submit(_pin.join());
+            }
+          },
+        ),
+      ),
+    );
   }
 }
