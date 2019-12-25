@@ -64,6 +64,7 @@ class SharedPrefHelper {
   }
 
   saveToSharedPref(String key, String value) async {
+    print("Saving data for $key with value $value");
     final pref = await _prefs;
     pref.setString(key, value);
   }

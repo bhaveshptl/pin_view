@@ -58,8 +58,7 @@ class SplashScreenState extends State<SplashScreen>
   bool activateDeepLinkingNavigation = false;
   Map<dynamic, dynamic> deepLinkingRoutingData;
 
-  String branchURL =
-      "https://11zy.app.link/landing?landing_page=%2Fassets%2Flp17.html&utm_source=Facebook-Social&utm_medium=FB-Post&utm_campaign=knplmatch26aug19&utm_content=knplmatch26aug19&fbclid=IwAR2iQynrTVFF1p3XnPLXcDc8eA-sMiaY21QOlKCoiVU7sbHb90xQsEY69lg&fbp=fb.1.1564146311319.762651542&fbc=fb.1.1566823286637.IwAR2iQynrTVFF1p3XnPLXcDc8eA-sMiaY21QOlKCoiVU7sbHb90xQsEY69lg";
+  String branchURL = "";
   String source = "";
 
   @override
@@ -87,7 +86,11 @@ class SplashScreenState extends State<SplashScreen>
     final initData = await getInitData();
     if (!isIos) {
       await _initBranchIoPlugin();
+
+      print("Getting branch url");
       branchURL = await _getInstallReferringLink();
+      print("Branch url is: $branchURL");
+
       setSource(branchURL);
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
     } else {
@@ -123,15 +126,23 @@ class SplashScreenState extends State<SplashScreen>
       }
 
       setLoadingPercentage(99.0);
-      SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
       navigateToHomePage();
     } else {
       setLoadingPercentage(99.0);
+
       final result =
           await SharedPrefHelper().getFromSharedPref(ApiUtil.REGISTERED_USER);
-      if (initData["otpSignUpSource"] != null &&
-          (initData["otpSignUpSource"] as List<dynamic>).indexOf(source) !=
-              -1) {
+      final disabledEmailOtp = await SharedPrefHelper()
+          .getFromSharedPref(ApiUtil.DISABLED_EMAIL_SIGNUP);
+
+      if ((initData["otpSignUpSource"] != null &&
+              (initData["otpSignUpSource"] as List<dynamic>).indexOf(source) !=
+                  -1) ||
+          (disabledEmailOtp != null && disabledEmailOtp == "true")) {
+        SharedPrefHelper()
+            .saveToSharedPref(ApiUtil.DISABLED_EMAIL_SIGNUP, "true");
+        SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
+
         Navigator.of(context).pushReplacement(
           FantasyPageRoute(
             pageBuilder: (context) => OTPSignup(),
@@ -140,7 +151,7 @@ class SplashScreenState extends State<SplashScreen>
       } else {
         Navigator.of(context).pushReplacement(
           FantasyPageRoute(
-            pageBuilder: (context) => result != null ? Signup() : SignInPage(),
+            pageBuilder: (context) => result == null ? Signup() : SignInPage(),
           ),
         );
       }

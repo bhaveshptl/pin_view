@@ -155,7 +155,11 @@ class ContestDetailState extends State<ContestDetail> with RouteAware {
   }
 
   _createAndReqL1WS() async {
-    await _getSportsType();
+    if (widget.sportsType == null) {
+      await _getSportsType();
+    } else {
+      _sportType = widget.sportsType;
+    }
 
     l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
     l1UpdatePackate["bResAvail"] = true;

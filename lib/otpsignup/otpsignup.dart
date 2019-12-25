@@ -324,7 +324,7 @@ class OTPSignupState extends State<OTPSignup> {
     });
   }
 
-  _doSignUp({bool launchEnterOTP = true}) async {
+  _doSignUp() async {
     showLoader(true);
     Map<String, dynamic> _payload = {
       "mobile": _authName,
@@ -339,36 +339,58 @@ class OTPSignupState extends State<OTPSignup> {
     await HttpManager(http.Client()).sendRequest(req).then(
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
-          if (launchEnterOTP) {
-            showModalBottomSheet<void>(
-              context: context,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8.0),
-                  topRight: Radius.circular(8.0),
-                ),
+          showModalBottomSheet<void>(
+            context: context,
+            isScrollControlled: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                topRight: Radius.circular(8.0),
               ),
-              builder: (context) {
-                return OtpInput(
-                  onResend: () {
-                    _doSignUp(launchEnterOTP: false);
-                  },
-                  onVerify: (String otp) {
-                    print(otp);
-                    authOTP(otp);
-                  },
-                );
-              },
-            );
-          }
+            ),
+            builder: (context) {
+              return OtpInput(
+                onResend: () {
+                  resendOTP();
+                },
+                onVerify: (String otp) {
+                  authOTP(otp);
+                },
+              );
+            },
+          );
         } else {
-          ActionUtil().showMsgOnTop("error", _scaffoldKey.currentContext);
+          Map<String, dynamic> response = json.decode(res.body);
+          ActionUtil()
+              .showMsgOnTop(response["error"], _scaffoldKey.currentContext);
         }
         showLoader(false);
       },
     ).whenComplete(() {
       showLoader(false);
     });
+  }
+
+  resendOTP() async {
+    Map<String, dynamic> _payload = {
+      "mobile": _authName,
+      "context": {
+        "channelId": HttpManager.channelId,
+      }
+    };
+
+    http.Request req =
+        http.Request("POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.RESEND_OTP));
+    req.body = json.encode(_payload);
+    await HttpManager(http.Client()).sendRequest(req).then(
+      (http.Response res) {
+        if (res.statusCode >= 200 && res.statusCode <= 299) {
+        } else {
+          ActionUtil()
+              .showMsgOnTop("Unable to send OTP.", _scaffoldKey.currentContext);
+        }
+      },
+    );
   }
 
   authOTP(String otp) async {
@@ -463,16 +485,12 @@ class OTPSignupState extends State<OTPSignup> {
       (http.Response res) {
         if (res.statusCode >= 200 && res.statusCode <= 299) {
           onLoginAuthenticate(json.decode(res.body));
+          Navigator.of(context).pop();
           AuthResult(res, _scaffoldKey).processResult(context, () {});
         } else {
           final dynamic response =
               json.decode(res.body).cast<String, dynamic>();
-          String error = response['error']['erroMessage'];
-          if (error == null && response['error']['errorCode'] != null) {
-            error = strings.get(response['error']['errorCode']);
-          } else if (error == null) {
-            error = strings.get("INVALID_USERNAME_PASSWORD");
-          }
+          String error = response['error'];
           ActionUtil().showMsgOnTop(error, _scaffoldKey.currentContext);
         }
         showLoader(false);
@@ -821,6 +839,14 @@ class OTPSignupState extends State<OTPSignup> {
                                       padding: EdgeInsets.only(bottom: 16.0),
                                       child: TextFormField(
                                         onSaved: (val) => _authName = val,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(
+                                            10,
+                                          ),
+                                          BlacklistingTextInputFormatter(
+                                            RegExp("[\/,.-/#\$]"),
+                                          ),
+                                        ],
                                         decoration: InputDecoration(
                                           labelText: "Enter Mobile",
                                           isDense: true,
@@ -848,10 +874,8 @@ class OTPSignupState extends State<OTPSignup> {
                                               color: Colors.white,
                                             ),
                                         validator: (value) {
-                                          if (value.isEmpty) {
-                                            return strings
-                                                .get("EMAIL_OR_MOBILE_ERROR");
-                                          } else if (!isMobileNumber(value)) {
+                                          if (value.isEmpty ||
+                                              !isMobileNumber(value)) {
                                             return "Please enter valid Mobile";
                                           }
                                           return null;
@@ -873,8 +897,7 @@ class OTPSignupState extends State<OTPSignup> {
                                               controller:
                                                   _referralCodeController,
                                               decoration: InputDecoration(
-                                                labelText: strings
-                                                    .get("REFERRAL_CODE"),
+                                                labelText: "Invite Code",
                                                 labelStyle: Theme.of(context)
                                                     .primaryTextTheme
                                                     .title
@@ -948,7 +971,7 @@ class OTPSignupState extends State<OTPSignup> {
                                           },
                                           child: Container(
                                             child: Text(
-                                              "SIGNUP",
+                                              "GET OTP",
                                               style: Theme.of(context)
                                                   .primaryTextTheme
                                                   .title

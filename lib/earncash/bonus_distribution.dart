@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:playfantasy/commonwidgets/customdialog.dart';
 import 'package:playfantasy/utils/stringtable.dart';
 
 class BonusDistribution extends StatefulWidget {
@@ -44,39 +45,34 @@ class BonusDistributionState extends State<BonusDistribution> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
               ),
+              color: Color.fromRGBO(235, 251, 255, 1),
             ),
             child: Row(
               children: <Widget>[
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5.0),
-                    ),
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-                      child: Text(
-                        "1st Slab",
-                        textAlign: TextAlign.left,
-                        style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
-                                  color: Colors.black,
-                                ),
-                      ),
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+                    child: Text(
+                      "1st Slab",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -86,17 +82,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                     child: Text(
                       getTotalWagerAmount(widget.bonusDistribution["referral"])
                           .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -107,17 +102,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                       getWagerReleaseAmount(
                               widget.bonusDistribution["referral"])
                           .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
               ],
@@ -127,15 +121,16 @@ class BonusDistributionState extends State<BonusDistribution> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
               ),
+              color: Color.fromRGBO(210, 245, 255, 1),
             ),
             child: Row(
               children: <Widget>[
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -148,9 +143,9 @@ class BonusDistributionState extends State<BonusDistribution> {
                           EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
                       child: Text(
                         "2st Slab",
-                        textAlign: TextAlign.left,
+                        textAlign: TextAlign.center,
                         style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
+                            Theme.of(context).primaryTextTheme.body1.copyWith(
                                   color: Colors.black,
                                 ),
                       ),
@@ -158,8 +153,8 @@ class BonusDistributionState extends State<BonusDistribution> {
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -169,17 +164,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                     child: Text(
                       getTotalWagerAmount(widget.bonusDistribution["referral"])
                           .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -190,17 +184,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                       getWagerReleaseAmount(
                               widget.bonusDistribution["referral"])
                           .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
               ],
@@ -210,15 +203,16 @@ class BonusDistributionState extends State<BonusDistribution> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
               ),
+              color: Color.fromRGBO(235, 251, 255, 1),
             ),
             child: Row(
               children: <Widget>[
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -231,9 +225,9 @@ class BonusDistributionState extends State<BonusDistribution> {
                           EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
                       child: Text(
                         "-",
-                        textAlign: TextAlign.left,
+                        textAlign: TextAlign.center,
                         style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
+                            Theme.of(context).primaryTextTheme.body1.copyWith(
                                   color: Colors.black,
                                 ),
                       ),
@@ -241,8 +235,8 @@ class BonusDistributionState extends State<BonusDistribution> {
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -251,17 +245,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                         EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
                     child: Text(
                       "-",
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -270,17 +263,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                         EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
                     child: Text(
                       "-",
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
               ],
@@ -290,15 +282,16 @@ class BonusDistributionState extends State<BonusDistribution> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
               ),
+              color: Color.fromRGBO(210, 245, 255, 1),
             ),
             child: Row(
               children: <Widget>[
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -313,9 +306,9 @@ class BonusDistributionState extends State<BonusDistribution> {
                         (widget.bonusDistribution["referral"]["chunks"])
                                 .toString() +
                             "th slab",
-                        textAlign: TextAlign.left,
+                        textAlign: TextAlign.center,
                         style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
+                            Theme.of(context).primaryTextTheme.body1.copyWith(
                                   color: Colors.black,
                                 ),
                       ),
@@ -323,8 +316,8 @@ class BonusDistributionState extends State<BonusDistribution> {
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -334,17 +327,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                     child: Text(
                       getTotalWagerAmount(widget.bonusDistribution["referral"])
                           .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -355,17 +347,16 @@ class BonusDistributionState extends State<BonusDistribution> {
                       getWagerReleaseAmount(
                               widget.bonusDistribution["referral"])
                           .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
               ],
@@ -375,41 +366,36 @@ class BonusDistributionState extends State<BonusDistribution> {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey,
+                  color: Colors.white,
                 ),
               ),
+              color: Color.fromRGBO(235, 251, 255, 1),
             ),
             child: Row(
               children: <Widget>[
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
                   flex: 2,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(5.0),
-                    ),
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-                      child: Text(
-                        "Total locked bonus ${strings.rupee}${getWagerReleaseAmount(widget.bonusDistribution['referral']).toString()}*${(widget.bonusDistribution["referral"]["chunks"]).toString()}",
-                        textAlign: TextAlign.left,
-                        style:
-                            Theme.of(context).primaryTextTheme.caption.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+                    child: Text(
+                      "Total locked bonus ${strings.rupee}${getWagerReleaseAmount(widget.bonusDistribution['referral']).toString()}*${(widget.bonusDistribution["referral"]["chunks"]).toString()}",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
                 Expanded(
@@ -421,18 +407,17 @@ class BonusDistributionState extends State<BonusDistribution> {
                           (getLockedBonusAmount(
                                   widget.bonusDistribution['referred']))
                               .toString(),
-                      textAlign: TextAlign.right,
-                      style:
-                          Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).primaryTextTheme.body1.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ),
                 ),
                 Container(
-                  width: 1.0,
-                  color: Colors.grey,
+                  width: 2.0,
+                  color: Colors.white,
                   height: 36.0,
                 ),
               ],
@@ -445,34 +430,18 @@ class BonusDistributionState extends State<BonusDistribution> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      titlePadding: EdgeInsets.symmetric(horizontal: 0.0),
-      title: Container(
-        width: MediaQuery.of(context).size.width,
+    return CustomDialog(
+      padding: EdgeInsets.symmetric(horizontal: 16.0),
+      dialog: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4.0),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Stack(
-              alignment: Alignment.centerRight,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        "Refer and Earn Bonus",
-                        style:
-                            Theme.of(context).primaryTextTheme.title.copyWith(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
-                ),
                 InkWell(
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
@@ -486,139 +455,196 @@ class BonusDistributionState extends State<BonusDistribution> {
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-      contentPadding: EdgeInsets.all(0.0),
-      content: SingleChildScrollView(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      "Howzat offers a very lucrative refer and earn bonus for their users. You can earn cash everytime your friends play any cash tournament.",
-                      textAlign: TextAlign.justify,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Row(
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        "You earn instant cash of ${strings.rupee}${getInstantBonus(widget.bonusDistribution['referred'])} and bonus of ${strings.rupee}${getPlayableBonus(widget.bonusDistribution['referred'])} when your friend make deposit. Also you will get upto ${strings.rupee}${getLockedBonusAmount(widget.bonusDistribution['referred'])} for additional ${strings.rupee}${getTotalWagerAmount(widget.bonusDistribution['referred']) * widget.bonusDistribution['referred']["chunks"]} that your friend plays.",
-                        // "You earn your first bonus part of ${strings.rupee}${getWagerReleaseAmount(widget.bonusDistribution["referred"])} when your friend play for ${strings.rupee}${getTotalWagerAmount(widget.bonusDistribution["referred"])} and then you can get upto ${strings.rupee} bonus of 10 for additional 500 that your friend plays.",
-                        textAlign: TextAlign.justify,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                          "You can earn upto ${strings.rupee}${widget.amount}/Friend"),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        "Locked Bonus Release",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Container(
-                  color: Theme.of(context).primaryColor,
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(5.0),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text(
+                            "Refer and Earn Bonus",
+                            style: Theme.of(context)
+                                .primaryTextTheme
+                                .title
+                                .copyWith(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                            textAlign: TextAlign.center,
                           ),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 12.0),
-                            child: Text(
-                              "Slab",
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .primaryTextTheme
-                                  .caption
-                                  .copyWith(
-                                    color: Colors.white,
+                        ),
+                      ],
+                    ),
+                    SingleChildScrollView(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: Text(
+                                    "Howzat offers a very lucrative refer and earn bonus for their users. You can earn cash everytime your friends play any cash tournament.",
+                                    style: Theme.of(context)
+                                        .primaryTextTheme
+                                        .body2
+                                        .copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                    textAlign: TextAlign.justify,
                                   ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 1.0,
-                        color: Colors.grey,
-                        height: 36.0,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12.0),
-                          child: Text(
-                            "Friend's Played amount",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .copyWith(
-                                  color: Colors.white,
+                            Padding(
+                              padding: EdgeInsets.only(top: 16.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      "You earn instant cash of ${strings.rupee}${getInstantBonus(widget.bonusDistribution['referred'])} and bonus of ${strings.rupee}${getPlayableBonus(widget.bonusDistribution['referred'])} when your friend make deposit. Also you will get upto ${strings.rupee}${getLockedBonusAmount(widget.bonusDistribution['referred'])} for additional ${strings.rupee}${getTotalWagerAmount(widget.bonusDistribution['referred']) * widget.bonusDistribution['referred']["chunks"]} that your friend plays.",
+                                      // "You earn your first bonus part of ${strings.rupee}${getWagerReleaseAmount(widget.bonusDistribution["referred"])} when your friend play for ${strings.rupee}${getTotalWagerAmount(widget.bonusDistribution["referred"])} and then you can get upto ${strings.rupee} bonus of 10 for additional 500 that your friend plays.",
+                                      textAlign: TextAlign.justify,
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body2
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 16.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      "You can earn upto ${strings.rupee}${widget.amount}/Friend",
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .body2
+                                          .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 16.0),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      "Locked Bonus Release",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 16.0),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(8.0),
+                                  topRight: Radius.circular(8.0),
                                 ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 1.0,
-                        color: Colors.grey,
-                        height: 36.0,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12.0),
-                          child: Text(
-                            "Bonus Released",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context)
-                                .primaryTextTheme
-                                .caption
-                                .copyWith(
-                                  color: Colors.white,
+                                child: IntrinsicHeight(
+                                  child: Container(
+                                    color: Color.fromRGBO(2, 139, 205, 1),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(5.0),
+                                            ),
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 12.0),
+                                              child: Text(
+                                                "Slab",
+                                                textAlign: TextAlign.center,
+                                                style: Theme.of(context)
+                                                    .primaryTextTheme
+                                                    .body1
+                                                    .copyWith(
+                                                      color: Colors.white,
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 2.0,
+                                          color: Colors.white,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 12.0),
+                                            child: Text(
+                                              "Friend's Played amount",
+                                              textAlign: TextAlign.center,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .body1
+                                                  .copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 2.0,
+                                          color: Colors.white,
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 12.0),
+                                            child: Text(
+                                              "Bonus Released",
+                                              textAlign: TextAlign.center,
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .body1
+                                                  .copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                          ),
+                              ),
+                            ),
+                            getBonusDistributionWidget(),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
               ),
-              getBonusDistributionWidget(),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

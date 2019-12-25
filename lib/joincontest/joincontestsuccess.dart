@@ -102,21 +102,24 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
       widget.l1Data.contests = updatedContests;
     }
 
-    List<Contest> updatedSuggestedContests = [];
-    contests.forEach((suggestedContest) {
-      widget.l1Data.contests.forEach((contest) {
-        if (contest.brand["id"] == suggestedContest.brand["id"] &&
-            contest.entryFee == suggestedContest.entryFee) {
-          updatedSuggestedContests.add(contest);
-        }
+    if (contests != null) {
+      List<Contest> updatedSuggestedContests = [];
+      contests.forEach((suggestedContest) {
+        widget.l1Data.contests.forEach((contest) {
+          if (contest.brand["id"] == suggestedContest.brand["id"] &&
+              contest.size == suggestedContest.size &&
+              contest.entryFee == suggestedContest.entryFee) {
+            updatedSuggestedContests.add(contest);
+          }
+        });
       });
-    });
-    var maxLength = updatedSuggestedContests.length;
-    setState(() {
-      contests = updatedSuggestedContests
-          .getRange(0, maxLength > 2 ? 2 : maxLength)
-          .toList();
-    });
+      var maxLength = updatedSuggestedContests.length;
+      setState(() {
+        contests = updatedSuggestedContests
+            .getRange(0, maxLength > 2 ? 2 : maxLength)
+            .toList();
+      });
+    }
   }
 
   _updateJoinCount(Map<String, dynamic> _data) {
@@ -127,11 +130,13 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
         });
       }
     }
-    for (Contest _contest in contests) {
-      if (_contest.id == _data["cId"]) {
-        setState(() {
-          _contest.joined = _data["iJC"];
-        });
+    if (contests != null) {
+      for (Contest _contest in contests) {
+        if (_contest.id == _data["cId"]) {
+          setState(() {
+            _contest.joined = _data["iJC"];
+          });
+        }
       }
     }
   }
@@ -217,7 +222,7 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
         ],
       ),
       contentPadding: EdgeInsets.all(0.0),
-      content: contests.length == 0
+      content: contests == null || contests.length == 0
           ? Container(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -313,7 +318,7 @@ class JoinContestSuccessState extends State<JoinContestSuccess> {
                                             Expanded(
                                               child: Container(
                                                 constraints: BoxConstraints(
-                                                  maxHeight: 24.0,
+                                                  maxHeight: 20.0,
                                                 ),
                                                 margin:
                                                     EdgeInsets.only(top: 8.0),

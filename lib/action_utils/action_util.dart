@@ -120,6 +120,7 @@ class ActionUtil {
                   launchPageSource: "privateContest"),
             ),
           );
+
           onContestJoinSuccess(
             response["message"].toString(),
             scaffoldKey,
@@ -130,9 +131,6 @@ class ActionUtil {
                 ? "jc_cc"
                 : "privateContest",
             balance,
-            contests: (response["contests"] as List)
-                .map((i) => Contest.fromJson(i))
-                .toList(),
           );
         } else {
           final result = onJoinContestError(

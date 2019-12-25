@@ -791,6 +791,10 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
                     String message = methodCall.arguments();
                     inviteFriendViaWhatsapp(message);
                     result.success("Social Share init success");
+                } else if (methodCall.method.equals("shareViaTelegram")) {
+                    String message = methodCall.arguments();
+                    inviteFriendViaTelegram(message);
+                    result.success("Social Share init success");
                 } else if (methodCall.method.equals("shareViaGmail")) {
                     String message = methodCall.arguments();
                     inviteFriendViaGmail(message);
@@ -1673,6 +1677,19 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         } catch (android.content.ActivityNotFoundException ex) {
             inviteFriend(message);
         }
+    }
+
+    private inviteFriendViaTelegram(String message)
+    {    
+        Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
+        whatsappIntent.setType("text/plain");
+        whatsappIntent.setPackage("org.telegram.messenger");
+        whatsappIntent.putExtra(Intent.EXTRA_TEXT, message);
+        try {
+            startActivity(whatsappIntent);
+        } catch (android.content.ActivityNotFoundException ex) {
+            inviteFriend(message);
+        }        
     }
 
     private void inviteFriendViaGmail(String message) {

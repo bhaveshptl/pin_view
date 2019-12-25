@@ -9,6 +9,7 @@ import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/routelauncher.dart';
+import 'package:playfantasy/earncash/bonus_distribution.dart';
 import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -66,6 +67,18 @@ class EarnCashState extends State<EarnCash> {
     AppConfig.of(context)
         .store
         .dispatch(bShow ? LoaderShowAction() : LoaderHideAction());
+  }
+
+  showBonusDistribution() async {
+    final result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BonusDistribution(
+          amount: refAAmount,
+          bonusDistribution: widget.data["bonusDistribution"],
+        );
+      },
+    );
   }
 
   _launchAddCash(
@@ -172,6 +185,17 @@ class EarnCashState extends State<EarnCash> {
     return value;
   }
 
+  Future<String> _shareNowViaTelegram(String msg) async {
+    String value;
+    try {
+      value = await social_share_platform.invokeMethod('shareViaTelegram', msg);
+    } catch (e) {
+      print(e);
+      _shareNowViaSystemApplication(msg);
+    }
+    return value;
+  }
+
   Future<String> _shareNowViaFacebookApplication(String msg) async {
     String value;
     try {
@@ -220,6 +244,22 @@ class EarnCashState extends State<EarnCash> {
     }
     if (Platform.isIOS) {
       _shareNowViaWhatsAppApplication(inviteMsg);
+    }
+  }
+
+  _shareNowTelegram() {
+    inviteMsg =
+        "I'm having a lot of fun playing Fantasy Sports on Howzat and winning cash prizes! Join me and get started with free " +
+            strings.rupee +
+            refBAmount.toString() +
+            " in your account - Click " +
+            inviteUrl +
+            " to download the Howzat app and use my code " +
+            refCode +
+            " to register.";
+
+    if (Platform.isAndroid) {
+      _shareNowViaTelegram(inviteMsg);
     }
   }
 
@@ -375,12 +415,17 @@ class EarnCashState extends State<EarnCash> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding:
-                          EdgeInsets.only(right: 4.0, top: 4.0, bottom: 4.0),
-                      child: Image.asset(
-                        "images/Info_Icon.png",
-                        height: 32.0,
+                    InkWell(
+                      onTap: () {
+                        showBonusDistribution();
+                      },
+                      child: Padding(
+                        padding:
+                            EdgeInsets.only(right: 4.0, top: 4.0, bottom: 4.0),
+                        child: Image.asset(
+                          "images/Info_Icon.png",
+                          height: 32.0,
+                        ),
                       ),
                     ),
                   ],
@@ -434,13 +479,16 @@ class EarnCashState extends State<EarnCash> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   ColorButton(
-                    child: Text(
-                      "DEPOSIT",
-                      style:
-                          Theme.of(context).primaryTextTheme.subhead.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        "DEPOSIT",
+                        style:
+                            Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
                     ),
                     onPressed: () {
                       showLoader(true);
@@ -561,10 +609,10 @@ class EarnCashState extends State<EarnCash> {
                       padding: EdgeInsets.all(0.0),
                       iconSize: 48.0,
                       onPressed: () {
-                        _copyCode();
+                        _shareNowTelegram();
                       },
                       icon: Image.asset(
-                        "images/Copy_Icon.png",
+                        "images/TG_Icon.png",
                       ),
                     ),
                   ),

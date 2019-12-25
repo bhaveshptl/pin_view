@@ -436,11 +436,7 @@ class SignupState extends State<Signup> {
           } else if (error == null) {
             error = strings.get("INVALID_USERNAME_PASSWORD");
           }
-          // _scaffoldKey.currentState.showSnackBar(
-          //   SnackBar(
-          //     content: Text(error),
-          //   ),
-          // );
+
           ActionUtil().showMsgOnTop(error, _scaffoldKey.currentContext);
         }
         showLoader(false);
@@ -731,73 +727,45 @@ class SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     return ScaffoldPage(
       scaffoldKey: _scaffoldKey,
-      appBar: AppBar(
-        // leading: LeadingButton(),
-        title: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            children: <Widget>[
-              // Image.asset("images/logo_white.png"),
-              SvgPicture.asset(
-                "images/logo_white.svg",
-                color: Colors.white,
-                width: 40.0,
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Image.asset(
-                  "images/logo_name_white.png",
-                  height: 20.0,
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(top: 10.0, bottom: 6.0),
-            child: FlatButton(
-              onPressed: () {
-                _launchSignIn();
-              },
-              child: Image.asset("images/loginButton.png"),
-              // Text(
-              //   "Login".toUpperCase(),
-              //   style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-              //         color: Color.fromRGBO(25, 14, 4, 1),
-              //         fontWeight: FontWeight.w700,
-              //       ),
-              // ),
-              // color: Color.fromRGBO(243, 180, 81, 1),
-            ),
-          )
-        ],
+      backgroundColor: Color.fromRGBO(134, 16, 13, 1),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: Container(),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Image.network(!isIos
-                ? "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_howzat_firstdeposit_new1_lobby_v2.png"
-                : "https://d2cbroser6kssl.cloudfront.net/images/banners_10/banner_ios_howzat_referral_raf_250_login.jpg"),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 16.0),
+              padding: EdgeInsets.only(top: 8.0, right: 16.0, bottom: 8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Expanded(
+                  FlatButton(
                     child: Text(
-                      "Register now, It's Free",
-                      textAlign: TextAlign.center,
+                      "SIGNIN",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.w700,
+                            color: Color.fromRGBO(216, 138, 4, 1),
+                            decoration: TextDecoration.underline,
                           ),
                     ),
+                    onPressed: () {
+                      _launchSignIn();
+                    },
                   ),
                 ],
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset(
+                  "images/hzlogo.png",
+                  width: MediaQuery.of(context).size.width * 0.4,
+                ),
+              ],
+            ),
             Padding(
-              padding: EdgeInsets.only(left: 56.0, right: 56.0),
+              padding: EdgeInsets.only(top: 32.0, left: 56.0, right: 56.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -814,22 +782,40 @@ class SignupState extends State<Signup> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
-                                      child: SimpleTextBox(
+                                      child: TextFormField(
                                         onSaved: (val) => _authName = val,
-                                        labelText:
-                                            strings.get("EMAIL_OR_MOBILE") +
-                                                "*",
+                                        decoration: InputDecoration(
+                                          labelText: "Email / Mobile",
+                                          isDense: true,
+                                          labelStyle: Theme.of(context)
+                                              .primaryTextTheme
+                                              .subhead
+                                              .copyWith(
+                                                color: Colors.white,
+                                              ),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white24,
+                                            ),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
                                         validator: (value) {
                                           if (value.isEmpty) {
                                             return strings
-                                                .get("EMAIL_OR_MOBILE_ERROR");
-                                          } else if (isNumeric(value) &&
-                                              !isMobileNumber(value)) {
-                                            return "Please enter valid Mobile";
-                                          } else if (!isNumeric(value) &&
-                                              !validateEmail(value)) {
-                                            return "Please enter valid Email";
+                                                .get("USERNAME_ERROR");
                                           }
+                                          return null;
                                         },
                                         keyboardType:
                                             TextInputType.emailAddress,
@@ -848,22 +834,52 @@ class SignupState extends State<Signup> {
                                         alignment: Alignment.topRight,
                                         overflow: Overflow.visible,
                                         children: <Widget>[
-                                          SimpleTextBox(
+                                          TextFormField(
                                             onSaved: (val) => _password = val,
-                                            labelText:
-                                                strings.get("PASSWORD") + "*",
+                                            decoration: InputDecoration(
+                                              isDense: true,
+                                              labelText: "Password",
+                                              labelStyle: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subhead
+                                                  .copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                              enabledBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: new BorderSide(
+                                                  color: Colors.white24,
+                                                ),
+                                              ),
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                borderSide: new BorderSide(
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                            ),
+                                            style: Theme.of(context)
+                                                .primaryTextTheme
+                                                .title
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                ),
                                             validator: (value) {
                                               if (value.isEmpty) {
                                                 return strings
                                                     .get("PASSWORD_ERROR");
                                               }
+                                              return null;
                                             },
                                             obscureText: _obscureText,
                                           ),
                                           Positioned(
                                             top: -2.0,
                                             child: IconButton(
-                                              icon: Icon(Icons.visibility),
+                                              icon: Icon(
+                                                Icons.visibility,
+                                                color: Colors.white,
+                                              ),
                                               onPressed: () {
                                                 setState(() {
                                                   _obscureText = !_obscureText;
@@ -882,9 +898,35 @@ class SignupState extends State<Signup> {
                                   Expanded(
                                     child: Padding(
                                       padding: EdgeInsets.only(bottom: 16.0),
-                                      child: SimpleTextBox(
+                                      child: TextFormField(
                                         controller: _referralCodeController,
-                                        labelText: strings.get("REFERRAL_CODE"),
+                                        decoration: InputDecoration(
+                                          labelText:
+                                              strings.get("REFERRAL_CODE"),
+                                          isDense: true,
+                                          labelStyle: Theme.of(context)
+                                              .primaryTextTheme
+                                              .subhead
+                                              .copyWith(
+                                                color: Colors.white,
+                                              ),
+                                          enabledBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white24,
+                                            ),
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: new BorderSide(
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                        style: Theme.of(context)
+                                            .primaryTextTheme
+                                            .title
+                                            .copyWith(
+                                              color: Colors.white,
+                                            ),
                                       ),
                                     ),
                                   )
@@ -920,7 +962,8 @@ class SignupState extends State<Signup> {
                                 ],
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 8.0),
+                                padding:
+                                    EdgeInsets.only(top: 32.0, bottom: 16.0),
                                 child: Row(
                                   children: <Widget>[
                                     Expanded(
@@ -933,26 +976,26 @@ class SignupState extends State<Signup> {
                                         children: <Widget>[
                                           Expanded(
                                             child: Divider(
-                                              color: Colors.grey.shade400,
+                                              color: Colors.redAccent,
                                             ),
                                           ),
-                                          CircleAvatar(
-                                            radius: 12.0,
-                                            backgroundColor: Colors.white,
+                                          Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 24.0),
                                             child: Text(
                                               strings.get("OR").toUpperCase(),
                                               textAlign: TextAlign.center,
                                               style: Theme.of(context)
                                                   .primaryTextTheme
-                                                  .caption
+                                                  .title
                                                   .copyWith(
-                                                    color: Colors.black54,
+                                                    color: Colors.white,
                                                   ),
                                             ),
                                           ),
                                           Expanded(
                                             child: Divider(
-                                              color: Colors.grey.shade400,
+                                              color: Colors.redAccent,
                                             ),
                                           )
                                         ],
@@ -965,45 +1008,33 @@ class SignupState extends State<Signup> {
                                   ],
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: FlatButton(
-                                        onPressed: () {
-                                          _doGoogleLogin(context);
-                                        },
-                                        padding: EdgeInsets.all(0.0),
-                                        color: Colors.transparent,
-                                        child: Image.asset(
-                                          "images/googleBtn.png",
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  IconButton(
+                                    iconSize: 48.0,
+                                    icon: Image.asset(
+                                      "images/Google_Icon.png",
+                                      height: 48.0,
                                     ),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 8.0),
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: FlatButton(
-                                        padding: EdgeInsets.all(0.0),
-                                        onPressed: () {
-                                          _doFacebookLogin(context);
-                                        },
-                                        color: Colors.transparent,
-                                        child: Image.asset(
-                                          "images/fbButton.png",
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                    onPressed: () {
+                                      _doGoogleLogin(context);
+                                    },
+                                  ),
+                                  Container(
+                                    width: 48.0,
+                                  ),
+                                  IconButton(
+                                    iconSize: 48.0,
+                                    icon: Image.asset(
+                                      "images/FB_Icon.png",
+                                      height: 48.0,
+                                    ),
+                                    onPressed: () {
+                                      _doFacebookLogin(context);
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -1020,7 +1051,7 @@ class SignupState extends State<Signup> {
                 Text(
                   "By registering you accept you are 18+ and agree to our ",
                   style: Theme.of(context).primaryTextTheme.caption.copyWith(
-                        color: Colors.grey.shade700,
+                        color: Colors.grey.shade300,
                       ),
                   textAlign: TextAlign.center,
                 ),
@@ -1031,7 +1062,7 @@ class SignupState extends State<Signup> {
                       "T&C.",
                       style:
                           Theme.of(context).primaryTextTheme.caption.copyWith(
-                                color: Colors.black,
+                                color: Colors.grey.shade300,
                                 fontWeight: FontWeight.w900,
                                 decoration: TextDecoration.underline,
                               ),

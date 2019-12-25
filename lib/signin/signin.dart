@@ -51,6 +51,7 @@ class SignInPageState extends State<SignInPage> {
   bool isIos = false;
   String location_longitude = "";
   String location_latitude = "";
+  String source;
   Map<dynamic, dynamic> androidDeviceInfoMap;
 
   final formKey = new GlobalKey<FormState>();
@@ -107,6 +108,7 @@ class SignInPageState extends State<SignInPage> {
     getbranchReferringLink.then((value) {
       if (value != null && value.length > 0) {
         _installReferring_link = value;
+        setSource(value);
         print("<<<<<<<<<<<<<<Ref Link>>>>>>>>>>>>>");
         print(_installReferring_link);
       } else {
@@ -123,6 +125,18 @@ class SignInPageState extends State<SignInPage> {
         _getFirebaseToken();
       }
     });
+  }
+
+  setSource(String url) {
+    if (url.indexOf("?") != -1) {
+      Map<String, dynamic> queryParams = {};
+      List<String> params = url.split("?")[1].split("&");
+      params.forEach((param) {
+        var value = param.split("=");
+        queryParams[value[0]] = value[1];
+      });
+      source = queryParams["landing_page"].replaceAll("%2Fassets%2F", "");
+    }
   }
 
   Future<String> getAndroidDeviceInfo() async {
@@ -193,12 +207,23 @@ class SignInPageState extends State<SignInPage> {
     );
   }
 
-  _launchSignup(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      FantasyPageRoute(
-        pageBuilder: (context) => OTPSignup(),
-      ),
-    );
+  _launchSignup(BuildContext context) async {
+    final disabledEmailOtp = await SharedPrefHelper()
+        .getFromSharedPref(ApiUtil.DISABLED_EMAIL_SIGNUP);
+
+    if (disabledEmailOtp != null && disabledEmailOtp == "true") {
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => OTPSignup(),
+        ),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        FantasyPageRoute(
+          pageBuilder: (context) => Signup(),
+        ),
+      );
+    }
   }
 
   Future<String> setLongLatValues() async {

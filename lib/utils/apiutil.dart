@@ -32,6 +32,7 @@ class BaseUrl {
 
 class ApiUtil {
   static const REGISTERED_USER = "registered_user";
+  static const DISABLED_EMAIL_SIGNUP = "disabled_signup";
   static const SHARED_PREFERENCE_KEY = "fantasy_cookie";
   static const ANALYTICS_COOKIE = "fantasy_analytics_cookie";
   static const SHARED_PREFERENCE_USER_KEY = "fantasy_user";
@@ -57,6 +58,7 @@ class ApiUtil {
       "/api/ups/socialLogin/withcontext/facebook/native";
   static const SIGN_UP = "/api/ups/signup";
   static const REQUEST_OTP = "/api/ups/getmobileotp";
+  static const RESEND_OTP = "/api/ups/resendotp";
   static const OTP_SIGNUP = "/api/ups/otplogin";
   static const FORGOT_PASSWORD = "/api/ups/forgotPassword";
   static const RESET_PASSWORD = "/api/v2/ups/user/forgotPassword/resetpassword";
@@ -161,7 +163,7 @@ class PrivateAttribution {
       case "2":
         return "xiaomi";
       case "3":
-        return "indusos";  
+        return "indusos";
       default:
         return "";
     }
@@ -179,7 +181,7 @@ class PrivateAttribution {
         break;
       case "3":
         apkNameToDelete = "hz_indusos" + currentVersion + ".apk";
-        break;  
+        break;
       default:
         apkNameToDelete = "howzat.apk";
         break;

@@ -575,7 +575,7 @@ class LeagueDetailState extends State<LeagueDetail>
   }
 
   _createL1WSObject() async {
-    await _getSportsType();
+    // await _getSportsType();
     l1UpdatePackate["iType"] = RequestType.GET_ALL_L1;
     l1UpdatePackate["bResAvail"] = true;
     l1UpdatePackate["sportsId"] = _sportType;
@@ -588,15 +588,15 @@ class LeagueDetailState extends State<LeagueDetail>
     FantasyWebSocket().sendMessage(l1UpdatePackate);
   }
 
-  _getSportsType() async {
-    Future<dynamic> futureSportType =
-        SharedPrefHelper.internal().getSportsType();
-    await futureSportType.then((value) {
-      if (value != null) {
-        _sportType = int.parse(value);
-      }
-    });
-  }
+  // _getSportsType() async {
+  //   Future<dynamic> futureSportType =
+  //       SharedPrefHelper.internal().getSportsType();
+  //   await futureSportType.then((value) {
+  //     if (value != null) {
+  //       _sportType = int.parse(value);
+  //     }
+  //   });
+  // }
 
   _getMyContests() async {
     http.Request req = http.Request(
@@ -1108,6 +1108,7 @@ class LeagueDetailState extends State<LeagueDetail>
                         horizontal: 8.0,
                       ),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Padding(
                             padding: EdgeInsets.only(right: 8.0),
@@ -1116,19 +1117,11 @@ class LeagueDetailState extends State<LeagueDetail>
                               height: 16.0,
                             ),
                           ),
-                          Expanded(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                "CREATE CONTEST",
-                                style: Theme.of(context)
-                                    .primaryTextTheme
-                                    .title
-                                    .copyWith(
-                                      color: Color.fromRGBO(41, 41, 41, 1),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
+                          Text(
+                            "CREATE CONTEST",
+                            style: TextStyle(
+                              color: Color.fromRGBO(41, 41, 41, 1),
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -1159,6 +1152,7 @@ class LeagueDetailState extends State<LeagueDetail>
                       color: Colors.white,
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Padding(
                             padding: EdgeInsets.only(right: 8.0),
@@ -1167,29 +1161,20 @@ class LeagueDetailState extends State<LeagueDetail>
                               height: 16.0,
                             ),
                           ),
-                          Expanded(
+                          Container(
+                            alignment: Alignment.centerLeft,
                             child: Container(
-                              alignment: Alignment.centerLeft,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        "CONTEST CODE",
-                                        style: Theme.of(context)
-                                            .primaryTextTheme
-                                            .title
-                                            .copyWith(
-                                              color:
-                                                  Color.fromRGBO(41, 41, 41, 1),
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                    ],
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "CONTEST CODE",
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(41, 41, 41, 1),
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ),

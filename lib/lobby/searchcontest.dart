@@ -70,6 +70,7 @@ class SearchContestState extends State<SearchContest> {
                   pageBuilder: (context) => ContestDetail(
                     contest: contest,
                     league: league,
+                    sportsType: league.teamA.sportType,
                   ),
                 ),
               );

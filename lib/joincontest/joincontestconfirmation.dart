@@ -44,15 +44,15 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => WebviewScaffold(
-              url: url,
-              appBar: AppBar(
-                leading: LeadingButton(),
-                title: Text(
-                  title.toUpperCase(),
-                ),
-                titleSpacing: 0.0,
-              ),
+          url: url,
+          appBar: AppBar(
+            leading: LeadingButton(),
+            title: Text(
+              title.toUpperCase(),
             ),
+            titleSpacing: 0.0,
+          ),
+        ),
       ),
     );
   }
@@ -62,11 +62,13 @@ class JoinContestConfirmationState extends State<JoinContestConfirmation> {
     double bonusUsable = widget.entryFees == null || widget.bonusAllowed == null
         ? 0.0
         : (widget.entryFees * widget.bonusAllowed) / 100;
-    double usableBonus = widget.userBalance["bonusBalance"] > bonusUsable
-        ? (bonusUsable > widget.userBalance["playableBonus"]
-            ? widget.userBalance["playableBonus"]
-            : bonusUsable)
-        : widget.userBalance["bonusBalance"];
+    double usableBonus = widget.userBalance == null
+        ? 0.0
+        : (widget.userBalance["bonusBalance"] > bonusUsable
+            ? (bonusUsable > widget.userBalance["playableBonus"]
+                ? widget.userBalance["playableBonus"]
+                : bonusUsable)
+            : widget.userBalance["bonusBalance"]);
 
     final formatCurrency = NumberFormat.currency(
       locale: "hi_IN",

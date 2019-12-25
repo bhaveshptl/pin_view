@@ -11,6 +11,7 @@ import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/createteam/sports.dart';
 // import 'package:playfantasy/commonwidgets/webview_scaffold.dart';
 import 'package:playfantasy/modal/user.dart';
+import 'package:playfantasy/otpsignup/otpsignup.dart';
 import 'package:playfantasy/signin/signin.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -726,13 +727,26 @@ class AppDrawerState extends State<AppDrawer> {
                     ),
               ),
               onTap: () async {
-                _doLogout();
                 HttpManager.cookie = null;
+                final disabledEmailOtp = await SharedPrefHelper()
+                    .getFromSharedPref(ApiUtil.DISABLED_EMAIL_SIGNUP);
+
+                bool showOtpSignIn =
+                    disabledEmailOtp != null && disabledEmailOtp == "true";
+
+                _doLogout();
                 SharedPrefHelper.internal().removeCookie();
-                Navigator.pop(context);
+
+                try {
+                  while (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                } catch (e) {}
+
                 Navigator.of(context).pushReplacement(
                   FantasyPageRoute(
-                    pageBuilder: (context) => SignInPage(),
+                    pageBuilder: (context) =>
+                        showOtpSignIn ? OTPSignup() : SignInPage(),
                   ),
                 );
               },

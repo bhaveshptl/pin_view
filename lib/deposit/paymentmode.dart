@@ -2328,7 +2328,7 @@ class ChoosePaymentModeState extends State<ChoosePaymentMode> {
       appBar: AppBar(
         leading: LeadingButton(),
         title: Text(
-          "Payment".toUpperCase(),
+          "Payments".toUpperCase(),
         ),
         titleSpacing: 0.0,
       ),
