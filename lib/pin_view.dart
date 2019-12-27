@@ -122,28 +122,30 @@ class _PinViewState extends State<PinView> {
           decoration: widget.inputDecoration,
           textInputAction: TextInputAction.next,
           onChanged: (String val) {
-            if (widget.count - index <= val.length && val.length > 0) {
-              for (int i = index; i < widget.count; i++) {
-                String character = val.substring(i, i + 1);
-                _controllers[i].text = character;
-                _pin[i] = character;
-
-                if (i != widget.count - 1) {
-                  index = i + 1;
-                  FocusScope.of(context).requestFocus(_focusNodes[index]);
-                }
+            if (val.length == 1) {
+              _pin[index] = val;
+              if (index != _focusNodes.length - 1) {
+                _focusNodes[index].unfocus();
+                FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
               }
             } else if (val.length > 0) {
-              for (int i = 0; i < widget.count && i < val.length; i++) {
-                String character = val.substring(i, i + 1);
-                _controllers[i].text = character;
-                _pin[i] = character;
+              int endIndex =
+                  val.length >= widget.count ? widget.count : val.length;
+              int focusIndex =
+                  endIndex == widget.count ? endIndex - 1 : endIndex;
 
-                if (i != widget.count - 1) {
-                  index = i + 1;
-                  FocusScope.of(context).requestFocus(_focusNodes[index]);
+              for (int i = 0; i < widget.count; i++) {
+                if (i >= endIndex) {
+                  _controllers[i].text = "";
+                  _pin[i] = "";
+                } else {
+                  String character = val.substring(i, i + 1);
+                  _controllers[i].text = character;
+                  _pin[i] = character;
                 }
               }
+
+              FocusScope.of(context).requestFocus(_focusNodes[focusIndex]);
             } else {
               _pin[index] = "";
               if (index != 0) {
