@@ -128,6 +128,18 @@ class _PinViewState extends State<PinView> {
                 _focusNodes[index].unfocus();
                 FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
               }
+            } else if (val.length == 2) {
+              _controllers[index].text = val.substring(0, 1);
+              _pin[index] = val.substring(0, 1);
+              if ((index + 1) < _controllers.length) {
+                _controllers[index + 1].text = "";
+                _controllers[index + 1].text = val.substring(1);
+                _pin[index + 1] = val.substring(1);
+                FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
+              } else {
+                _controllers[index].selection =
+                    TextSelection.fromPosition(TextPosition(offset: 0));
+              }
             } else if (val.length > 0) {
               int endIndex =
                   val.length >= widget.count ? widget.count : val.length;
