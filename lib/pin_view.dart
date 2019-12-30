@@ -1,6 +1,7 @@
 library pin_view;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sms/sms.dart';
 
 class SmsListener {
@@ -23,22 +24,22 @@ class PinView extends StatefulWidget {
   final InputDecoration inputDecoration;
   final EdgeInsetsGeometry margin;
 
-  PinView(
-      {@required this.submit,
-      @required this.count,
-      this.obscureText: false,
-      this.autoFocusFirstField: true,
-      this.enabled: true,
-      this.dashPositions: const [],
-      this.sms,
-      this.dashStyle: const TextStyle(fontSize: 30.0, color: Colors.grey),
-      this.style: const TextStyle(
-        fontSize: 20.0,
-        fontWeight: FontWeight.w500,
-      ),
-      this.inputDecoration:
-          const InputDecoration(border: UnderlineInputBorder()),
-      this.margin: const EdgeInsets.all(5.0)});
+  PinView({
+    @required this.submit,
+    @required this.count,
+    this.obscureText: false,
+    this.autoFocusFirstField: true,
+    this.enabled: true,
+    this.dashPositions: const [],
+    this.sms,
+    this.dashStyle: const TextStyle(fontSize: 30.0, color: Colors.grey),
+    this.style: const TextStyle(
+      fontSize: 20.0,
+      fontWeight: FontWeight.w500,
+    ),
+    this.inputDecoration: const InputDecoration(border: UnderlineInputBorder()),
+    this.margin: const EdgeInsets.all(5.0),
+  });
 
   @override
   _PinViewState createState() => _PinViewState();
@@ -119,6 +120,11 @@ class _PinViewState extends State<PinView> {
           keyboardType: TextInputType.number,
           textAlign: TextAlign.center,
           style: widget.style,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(
+              index == widget.count - 1 ? 1 : 2,
+            ),
+          ],
           decoration: widget.inputDecoration,
           textInputAction: TextInputAction.next,
           onChanged: (String val) {
