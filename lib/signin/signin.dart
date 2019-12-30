@@ -706,7 +706,7 @@ class SignInPageState extends State<SignInPage> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 8.0, right: 16.0, bottom: 8.0),
+              padding: EdgeInsets.only(right: 12.0, top: 8.0, bottom: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -819,7 +819,21 @@ class SignInPageState extends State<SignInPage> {
                                             color: Colors.white70,
                                           ),
                                         ),
+                                        suffixIcon: IconButton(
+                                          icon: Icon(
+                                            _obscureText
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            color: Colors.white,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _obscureText = !_obscureText;
+                                            });
+                                          },
+                                        ),
                                       ),
+                                      obscureText: _obscureText,
                                       style: Theme.of(context)
                                           .primaryTextTheme
                                           .title
@@ -832,7 +846,6 @@ class SignInPageState extends State<SignInPage> {
                                         }
                                         return null;
                                       },
-                                      obscureText: _obscureText,
                                     ),
                                   ),
                                   Padding(

@@ -57,7 +57,7 @@ void main() async {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<User>.value(
-            value: User(),
+            value: User(verificationStatus: VerificationStatus()),
           ),
         ],
         child: MaterialApp(

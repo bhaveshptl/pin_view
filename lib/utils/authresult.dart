@@ -42,6 +42,7 @@ class AuthResult {
       SharedPrefHelper.internal()
           .saveToSharedPref(ApiUtil.SHARED_PREFERENCE_USER_KEY, response.body);
       SharedPrefHelper().saveToSharedPref(ApiUtil.REGISTERED_USER, "1");
+
       AnalyticsManager().setUser(json.decode(response.body));
       await setWSCookie();
       Navigator.of(scaffoldKey.currentContext).pushReplacement(

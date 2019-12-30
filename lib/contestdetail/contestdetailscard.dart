@@ -5,7 +5,6 @@ import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
 import 'package:playfantasy/utils/stringtable.dart';
-import 'package:playfantasy/commonwidgets/color_button.dart';
 
 class ContestDetailsCard extends StatelessWidget {
   final League league;
@@ -542,7 +541,7 @@ class ContestDetailsCard extends StatelessWidget {
                             },
                             child: Container(
                               height: 48.0,
-                              child: Image.asset("images/Share_Icon.png"),
+                              child: Image.asset("images/share_contest_icon.png"),
                             ),
                           )
                         ],

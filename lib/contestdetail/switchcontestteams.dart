@@ -214,7 +214,7 @@ class SwitchMyContestTeamsState extends State<SwitchMyContestTeams> {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$result")));
     }
   }

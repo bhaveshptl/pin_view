@@ -10,11 +10,11 @@ description: A new Flutter project.
 version: 3.60+4
 
 environment:
-  sdk: '>=2.2.0 <3.0.0'
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
-    sdk: flutter  
+    sdk: flutter
   http: ^0.12.0
   intl: ^0.15.8
   provider: 3.1.0+1
@@ -26,28 +26,29 @@ dependencies:
   image_picker: 0.5.4
   flutter_redux: ^0.5.3
   google_sign_in: 4.0.1
-  carousel_slider: ^1.0.1  
+  carousel_slider: ^1.0.1
   animated_text_kit: ^1.2.0
   shared_preferences: 0.4.3
   web_socket_channel: ^1.0.9
   cached_network_image: 1.1.0
-  flutter_facebook_login: 3.0.0  
+  flutter_facebook_login: 3.0.0
   firebase_analytics: 3.0.3
   firebase_core: 0.4.0+6
   flutter_webview_plugin: ^0.3.5
-  location_permissions: '^2.0.0'
+  location_permissions: "^2.0.0"
   crypto: ^2.0.6
   cipher2: ^0.3.5
   pin_view:
-    path: ../../../git_personal/pin_view
+    git:
+      url: https://github.com/bhaveshptl/pin_view.git
   flutter_downloader:
     git:
-      url: https://github.com/bhaveshptl/flutter_downloader.git      
-  webview_flutter: 
+      url: https://github.com/bhaveshptl/flutter_downloader.git
+  webview_flutter:
     git:
       url: git://github.com/bhaveshptl/plugins.git
       path: packages/webview_flutter
-  android_intent: 
+  android_intent:
     git:
       url: git://github.com/bhaveshptl/plugins.git
       path: packages/android_intent
@@ -55,7 +56,7 @@ dependencies:
     git:
       url: git://github.com/bhaveshptl/permission.git
   # use flutter_webview_plugin: ^0.3.5 for ios
-  # use flutter_webview_plugin: ^0.2.1+2 for android 
+  # use flutter_webview_plugin: ^0.2.1+2 for android
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
@@ -117,4 +118,3 @@ flutter:
           weight: 600
         - asset: fonts/MuliBold.ttf
           weight: 700
-        

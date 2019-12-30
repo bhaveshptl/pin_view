@@ -781,7 +781,10 @@ class CreateTeamState extends State<CreateTeam>
       if (res.statusCode >= 200 && res.statusCode <= 300) {
         CreateTeamResponse response =
             CreateTeamResponse.fromJson(json.decode(res.body));
-        Navigator.pop(context, response.message);
+        Navigator.pop(context, {
+          "id": response.id,
+          "message": response.message,
+        });
       } else {
         _showErrorMessage(
           strings.get("SAVE_TEAM_ERROR"),
@@ -813,7 +816,10 @@ class CreateTeamState extends State<CreateTeam>
         .then((http.Response res) {
       if (res.statusCode >= 200 && res.statusCode <= 300) {
         Map<String, dynamic> response = json.decode(res.body);
-        Navigator.of(context).pop(response["message"]);
+        Navigator.of(context).pop({
+          "id": response["id"],
+          "message": response["message"],
+        });
       } else {
         _showErrorMessage(
           strings.get("UPDATE_TEAM_ERROR"),

@@ -351,7 +351,7 @@ class CreateContestState extends State<CreateContest> {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // _scaffoldKey.currentState
       //     .showSnackBar(SnackBar(content: Text("$result")));
       if (curContest != null) {

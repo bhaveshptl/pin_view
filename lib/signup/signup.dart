@@ -877,7 +877,9 @@ class SignupState extends State<Signup> {
                                             top: -2.0,
                                             child: IconButton(
                                               icon: Icon(
-                                                Icons.visibility,
+                                                _obscureText
+                                                    ? Icons.visibility
+                                                    : Icons.visibility_off,
                                                 color: Colors.white,
                                               ),
                                               onPressed: () {

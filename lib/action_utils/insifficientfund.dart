@@ -23,50 +23,35 @@ class InsufficientFundDialog extends StatelessWidget {
             Container(
               width: MediaQuery.of(context).size.width,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Expanded(child: Container()),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Icon(
-                        Icons.error_outline,
-                        color: Colors.orange,
-                        size: 72.0,
-                      ),
-                    ),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    padding: EdgeInsets.all(0.0),
                   ),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.topRight,
-                      child: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        padding: EdgeInsets.all(0.0),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.orange,
+                  size: 32.0,
+                ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: FittedBox(
-                    child: Text(
-                      "Insufficient Balance",
-                      style:
-                          Theme.of(context).primaryTextTheme.headline.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -1.0,
-                              ),
-                    ),
+                  padding: EdgeInsets.only(left: 8.0),
+                  child: Text(
+                    "Insufficient Balance",
+                    style: Theme.of(context).primaryTextTheme.headline.copyWith(
+                          color: Colors.grey.shade900,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                 ),
               ],
@@ -81,13 +66,11 @@ class InsufficientFundDialog extends StatelessWidget {
                       fit: BoxFit.scaleDown,
                       child: Text(
                         "Please deposit to join this contest.",
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .headline
-                            .copyWith(
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.w400,
-                            ),
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.w400,
+                                ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -110,6 +93,7 @@ class InsufficientFundDialog extends StatelessWidget {
                           "Contest Fee",
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
+                                    fontSize: 18.0,
                                     color: Colors.grey.shade800,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -122,6 +106,7 @@ class InsufficientFundDialog extends StatelessWidget {
                     child: Text(
                       ":",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontSize: 18.0,
                             color: Colors.grey.shade800,
                             fontWeight: FontWeight.bold,
                           ),
@@ -133,6 +118,7 @@ class InsufficientFundDialog extends StatelessWidget {
                     child: Text(
                       strings.rupee + contestFee.toString(),
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.grey.shade800,
                           ),
@@ -156,6 +142,7 @@ class InsufficientFundDialog extends StatelessWidget {
                           "Available balance",
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
+                                    fontSize: 18.0,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.grey.shade800,
                                   ),
@@ -169,6 +156,7 @@ class InsufficientFundDialog extends StatelessWidget {
                     child: Text(
                       ":",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontSize: 18.0,
                             color: Colors.grey.shade800,
                             fontWeight: FontWeight.bold,
                           ),
@@ -180,6 +168,7 @@ class InsufficientFundDialog extends StatelessWidget {
                     child: Text(
                       strings.rupee + userBalance.toString(),
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
+                            fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                             color: Colors.grey.shade800,
                           ),
@@ -222,6 +211,7 @@ class InsufficientFundDialog extends StatelessWidget {
                           "Shortage of balance",
                           style:
                               Theme.of(context).primaryTextTheme.title.copyWith(
+                                    fontSize: 18.0,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.grey.shade800,
                                   ),
@@ -236,6 +226,7 @@ class InsufficientFundDialog extends StatelessWidget {
                       ":",
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
                             color: Colors.grey.shade800,
+                            fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
                     ),
@@ -247,6 +238,7 @@ class InsufficientFundDialog extends StatelessWidget {
                       strings.rupee + (contestFee - userBalance).toString(),
                       style: Theme.of(context).primaryTextTheme.title.copyWith(
                             fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
                             color: Colors.red,
                           ),
                     ),
@@ -264,13 +256,11 @@ class InsufficientFundDialog extends StatelessWidget {
                       padding: EdgeInsets.only(top: 12.0, bottom: 12.0),
                       child: Text(
                         "DEPOSIT ${strings.rupee + (contestFee - userBalance).toString()} & JOIN",
-                        style: Theme.of(context)
-                            .primaryTextTheme
-                            .title
-                            .copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).primaryTextTheme.title.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       onPressed: () {
                         Navigator.of(context)

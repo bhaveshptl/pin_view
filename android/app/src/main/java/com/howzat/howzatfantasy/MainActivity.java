@@ -1679,8 +1679,7 @@ public class MainActivity extends FlutterActivity implements PaymentResultWithDa
         }
     }
 
-    private inviteFriendViaTelegram(String message)
-    {    
+    private void inviteFriendViaTelegram(String message) {
         Intent whatsappIntent = new Intent(Intent.ACTION_SEND);
         whatsappIntent.setType("text/plain");
         whatsappIntent.setPackage("org.telegram.messenger");

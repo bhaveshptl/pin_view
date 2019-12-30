@@ -50,130 +50,113 @@ class ActionUtil {
       contestId: contest == null ? null : contest.id,
     );
     showLoader(scaffoldKey.currentContext, false);
-    final joinConfirmMsg = await showDialog(
-      context: scaffoldKey.currentContext,
-      builder: (BuildContext context) {
-        return JoinContestConfirmation(
-          userBalance: balance,
-          entryFees: contest == null
-              ? createContestPayload["entryFee"]
-              : contest.entryFee,
-          prizeType: contest == null
-              ? createContestPayload["prizeType"]
-              : contest.prizeType,
-          bonusAllowed: contest == null ? 0 : contest.bonusAllowed,
-        );
-      },
-    );
-    if (joinConfirmMsg != null && joinConfirmMsg["confirm"]) {
-      showLoader(scaffoldKey.currentContext, contest == null ? false : true);
-      final result = await Navigator.of(scaffoldKey.currentContext).push(
-        FantasyPageRoute(
-          routeSettings: RouteSettings(name: "JoinContest"),
-          pageBuilder: (context) => JoinContest(
-            league: league,
-            l1Data: l1Data,
-            sportsType: sportsType,
-            contest: contest,
-            myTeams: myTeams,
-            createContestPayload: createContestPayload,
-            onError: ((Contest contest, Map<String, dynamic> errorResponse) {
-              if (errorResponse["resultCode"] == -2) {
-                showMsgOnTop(errorResponse["message"], context);
-              } else {
-                final result = onJoinContestError(
-                  scaffoldKey.currentContext,
-                  contest,
-                  errorResponse,
-                  createContestPayload: createContestPayload,
-                  onJoin: () {
-                    launchJoinContest(
-                      league: league,
-                      l1Data: l1Data,
-                      sportsType: sportsType,
-                      contest: contest,
-                      myTeams: myTeams,
-                      scaffoldKey: scaffoldKey,
-                    );
-                  },
-                  userBalance: balance,
-                );
-              }
-            }),
-          ),
+
+    final result = await Navigator.of(scaffoldKey.currentContext).push(
+      FantasyPageRoute(
+        routeSettings: RouteSettings(name: "JoinContest"),
+        pageBuilder: (context) => JoinContest(
+          league: league,
+          l1Data: l1Data,
+          sportsType: sportsType,
+          contest: contest,
+          myTeams: myTeams,
+          createContestPayload: createContestPayload,
+          onError: ((Contest contest, Map<String, dynamic> errorResponse) {
+            if (errorResponse["resultCode"] == -2) {
+              showMsgOnTop(errorResponse["message"], context);
+            } else {
+              final result = onJoinContestError(
+                scaffoldKey.currentContext,
+                contest,
+                errorResponse,
+                createContestPayload: createContestPayload,
+                onJoin: () {
+                  launchJoinContest(
+                    league: league,
+                    l1Data: l1Data,
+                    sportsType: sportsType,
+                    contest: contest,
+                    myTeams: myTeams,
+                    scaffoldKey: scaffoldKey,
+                  );
+                },
+                userBalance: balance,
+              );
+            }
+          }),
         ),
-      );
+      ),
+    );
 
-      if (createContestPayload != null && result != null) {
-        final response = json.decode(result);
-        if (!response["error"]) {
-          final createdContest = Contest.fromJson(response["contest"]);
-          Navigator.of(scaffoldKey.currentContext).push(
-            FantasyPageRoute(
-              routeSettings: RouteSettings(name: "ContestDetail"),
-              pageBuilder: (context) => ContestDetail(
-                  l1Data: l1Data,
-                  contest: createdContest,
-                  league: league,
-                  sportsType: sportsType,
-                  myTeams: myTeams,
-                  launchPageSource: "privateContest"),
-            ),
-          );
-
-          onContestJoinSuccess(
-            response["message"].toString(),
-            scaffoldKey,
-            l1Data,
-            league,
-            myTeams,
-            (launchPageSource != null && launchPageSource == "jc_cc")
-                ? "jc_cc"
-                : "privateContest",
-            balance,
-          );
-        } else {
-          final result = onJoinContestError(
-            scaffoldKey.currentContext,
-            contest,
-            response,
-            userBalance: balance,
-            createContestPayload: createContestPayload,
-            onJoin: () {
-              launchJoinContest(
-                league: league,
+    if (createContestPayload != null && result != null) {
+      final response = json.decode(result);
+      if (!response["error"]) {
+        final createdContest = Contest.fromJson(response["contest"]);
+        Navigator.of(scaffoldKey.currentContext).push(
+          FantasyPageRoute(
+            routeSettings: RouteSettings(name: "ContestDetail"),
+            pageBuilder: (context) => ContestDetail(
                 l1Data: l1Data,
-                contest: contest,
+                contest: createdContest,
+                league: league,
                 sportsType: sportsType,
                 myTeams: myTeams,
-                scaffoldKey: scaffoldKey,
-              );
-            },
-          );
-        }
-      } else if (result != null) {
-        User userData = Provider.of<User>(scaffoldKey.currentContext);
-        userData.updateDepositBucket(
-          double.parse((result["userBalance"]["depositBucket"]).toString()),
-        );
-        userData.updateWithdrawable(
-          double.parse((result["userBalance"]["withdrawable"]).toString()),
+                launchPageSource: "privateContest"),
+          ),
         );
 
         onContestJoinSuccess(
-          result["message"].toString(),
+          response["message"].toString(),
           scaffoldKey,
           l1Data,
           league,
           myTeams,
-          launchPageSource != null ? launchPageSource : "",
+          (launchPageSource != null && launchPageSource == "jc_cc")
+              ? "jc_cc"
+              : "privateContest",
           balance,
-          sportId: sportsType,
-          contests: (result["contests"] as List)
-              .map((i) => Contest.fromJson(i))
-              .toList(),
+        );
+      } else {
+        final result = onJoinContestError(
+          scaffoldKey.currentContext,
+          contest,
+          response,
+          userBalance: balance,
+          createContestPayload: createContestPayload,
+          onJoin: () {
+            launchJoinContest(
+              league: league,
+              l1Data: l1Data,
+              contest: contest,
+              sportsType: sportsType,
+              myTeams: myTeams,
+              scaffoldKey: scaffoldKey,
+            );
+          },
         );
       }
+    } else if (result != null) {
+      User userData = Provider.of<User>(scaffoldKey.currentContext);
+      userData.updateDepositBucket(
+        double.parse((result["userBalance"]["depositBucket"]).toString()),
+      );
+      userData.updateWithdrawable(
+        double.parse((result["userBalance"]["withdrawable"]).toString()),
+      );
+
+      onContestJoinSuccess(
+        result["message"].toString(),
+        scaffoldKey,
+        l1Data,
+        league,
+        myTeams,
+        launchPageSource != null ? launchPageSource : "",
+        balance,
+        sportId: sportsType,
+        contests: (result["contests"] as List)
+            .map((i) => Contest.fromJson(i))
+            .toList(),
+      );
     }
   }
 
@@ -359,27 +342,6 @@ class ActionUtil {
           );
           if (result["success"] && createContestPayload == null) {
             onJoin();
-          }
-          break;
-        case 12:
-          final result = await _showAddCashConfirmation(
-              context,
-              contest,
-              double.parse(userBalance["cashBalance"].toString()).toInt(),
-              usableBonus.toInt());
-          if (result != null && result["launchJoinConfirmation"]) {
-            routeLauncher.launchAddCash(
-              context,
-              source: "contestbalance",
-              prefilledAmount: contest.entryFee - usableBonus > 25
-                  ? contest.entryFee - usableBonus
-                  : 25,
-              onSuccess: (result) {
-                if (result != null) {
-                  onJoin();
-                }
-              },
-            );
           }
           break;
         case 6:

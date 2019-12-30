@@ -27,6 +27,9 @@ import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:location_permissions/location_permissions.dart';
 
 class OTPSignup extends StatefulWidget {
+  final bool showEmailSignin;
+  OTPSignup({this.showEmailSignin = true});
+
   @override
   State<StatefulWidget> createState() => new OTPSignupState();
 }
@@ -791,33 +794,16 @@ class OTPSignupState extends State<OTPSignup> {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 8.0, right: 16.0, bottom: 8.0),
+              padding: EdgeInsets.only(top: 8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  FlatButton(
-                    child: Text(
-                      "LOGIN",
-                      style: Theme.of(context).primaryTextTheme.title.copyWith(
-                            color: Color.fromRGBO(216, 138, 4, 1),
-                            decoration: TextDecoration.underline,
-                          ),
-                    ),
-                    onPressed: () {
-                      _launchSignIn();
-                    },
+                  Image.asset(
+                    "images/hzlogo.png",
+                    width: MediaQuery.of(context).size.width * 0.4,
                   ),
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Image.asset(
-                  "images/hzlogo.png",
-                  width: MediaQuery.of(context).size.width * 0.4,
-                ),
-              ],
             ),
             Padding(
               padding: EdgeInsets.only(top: 32.0, left: 56.0, right: 56.0),
@@ -999,36 +985,65 @@ class OTPSignupState extends State<OTPSignup> {
           ],
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(bottom: 24.0, top: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "By registering you agree to our ",
-              style: Theme.of(context).primaryTextTheme.subhead.copyWith(
-                    color: Colors.white,
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          widget.showEmailSignin
+              ? Padding(
+                  padding: EdgeInsets.only(top: 8.0, right: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text(
+                          "E-mail Login".toUpperCase(),
+                          style:
+                              Theme.of(context).primaryTextTheme.title.copyWith(
+                                    color: Color.fromRGBO(216, 138, 4, 1),
+                                    decoration: TextDecoration.underline,
+                                  ),
+                        ),
+                        onPressed: () {
+                          _launchSignIn();
+                        },
+                      ),
+                    ],
                   ),
-              textAlign: TextAlign.center,
-            ),
-            InkWell(
-              child: Padding(
-                padding: EdgeInsets.only(right: 8.0, bottom: 8.0, top: 8.0),
-                child: Text(
-                  "Terms & Conditions",
+                )
+              : Container(),
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "By registering you agree to our ",
                   style: Theme.of(context).primaryTextTheme.subhead.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        decoration: TextDecoration.underline,
                       ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              onTap: () {
-                openTermsAndConditionsPage();
-              },
-            )
-          ],
-        ),
+                InkWell(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 8.0, bottom: 8.0, top: 8.0),
+                    child: Text(
+                      "Terms & Conditions",
+                      style:
+                          Theme.of(context).primaryTextTheme.subhead.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                decoration: TextDecoration.underline,
+                              ),
+                    ),
+                  ),
+                  onTap: () {
+                    openTermsAndConditionsPage();
+                  },
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

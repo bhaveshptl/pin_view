@@ -13,6 +13,7 @@ class User extends ChangeNotifier {
   double depositedAmount;
   double playableBonus;
   double bonusBalance;
+  VerificationStatus verificationStatus = VerificationStatus();
 
   User({
     this.userId,
@@ -27,6 +28,7 @@ class User extends ChangeNotifier {
     this.nonWithdrawable = 0.0,
     this.playableBonus = 0.0,
     this.bonusBalance = 0.0,
+    this.verificationStatus,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -44,10 +46,15 @@ class User extends ChangeNotifier {
       depositedAmount: json["depositBucket"],
       nonWithdrawable: json["nonWithdrawable"],
       playableBonus: json["playableBonus"],
+      verificationStatus: json['verificationStatus'] == null
+          ? VerificationStatus()
+          : VerificationStatus.fromJson(json['verificationStatus']),
     );
   }
 
   setUserFromJson(Map<String, dynamic> json) {
+    json["verificationStatus"]["forceVerification"] =
+        this.verificationStatus.forceVerification;
     this.userId = json["user_id"];
     this.mobile = json["mobile"];
     this.emailId = json["email_id"];
@@ -66,6 +73,9 @@ class User extends ChangeNotifier {
     this.nonWithdrawable = json["nonWithdrawable"] == null
         ? 0.0
         : double.tryParse(json["nonWithdrawable"].toString());
+    this.verificationStatus = json['verificationStatus'] == null
+        ? VerificationStatus()
+        : VerificationStatus.fromJson(json['verificationStatus']);
 
     notifyListeners();
   }
@@ -90,6 +100,64 @@ class User extends ChangeNotifier {
 
   updateBonus(double bonus) {
     this.bonusBalance = bonus;
+
+    notifyListeners();
+  }
+}
+
+class VerificationStatus with ChangeNotifier {
+  String addressVerificationStatus;
+  bool isEmailVerified;
+  bool isMobileVerified;
+  bool forceVerification;
+  String panVerificationStatus;
+
+  VerificationStatus({
+    this.panVerificationStatus = "",
+    this.addressVerificationStatus = "",
+    this.isEmailVerified = false,
+    this.isMobileVerified = false,
+    this.forceVerification = false,
+  });
+
+  factory VerificationStatus.fromJson(Map<String, dynamic> json) {
+    return VerificationStatus(
+      panVerificationStatus: json["pan_verification"],
+      isEmailVerified: json["email_verification"] == null
+          ? false
+          : json["email_verification"],
+      isMobileVerified: json["mobile_verification"] == null
+          ? false
+          : json["mobile_verification"],
+      forceVerification:
+          json["forceVerification"] == null ? false : json["forceVerification"],
+      addressVerificationStatus: json["address_verification"],
+    );
+  }
+
+  setForceVerification(bool forceVerification) {
+    this.forceVerification = forceVerification;
+
+    notifyListeners();
+  }
+
+  setVeriicationStatus(Map<String, dynamic> json) {
+    this.addressVerificationStatus = json["address_verification"];
+    this.panVerificationStatus = json["pan_verification"];
+    this.isEmailVerified = json["email_verification"];
+    this.isMobileVerified = json["mobile_verification"];
+
+    notifyListeners();
+  }
+
+  updateMobileVerificationStatus(bool isVerified) {
+    this.isMobileVerified = isVerified;
+
+    notifyListeners();
+  }
+
+  updateEmailVerificationStatus(bool isVerified) {
+    this.isEmailVerified = isVerified;
 
     notifyListeners();
   }

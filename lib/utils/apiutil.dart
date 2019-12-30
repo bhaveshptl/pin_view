@@ -33,6 +33,7 @@ class BaseUrl {
 class ApiUtil {
   static const REGISTERED_USER = "registered_user";
   static const DISABLED_EMAIL_SIGNUP = "disabled_signup";
+  static const CHECK_MOBILE_VERIFICATION = "CHECK_MOBILE_VERIFICATION";
   static const SHARED_PREFERENCE_KEY = "fantasy_cookie";
   static const ANALYTICS_COOKIE = "fantasy_analytics_cookie";
   static const SHARED_PREFERENCE_USER_KEY = "fantasy_user";

@@ -9,6 +9,7 @@ import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/lobby/lobby.dart';
 import 'package:playfantasy/otpsignup/otpsignup.dart';
 import 'package:playfantasy/profilepages/update.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/signup/signup.dart';
 import 'package:playfantasy/utils/analytics.dart';
 import 'package:playfantasy/utils/apiutil.dart';
@@ -19,6 +20,7 @@ import 'package:playfantasy/utils/stringtable.dart';
 import 'package:playfantasy/utils/sharedprefhelper.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:permission/permission.dart';
+import 'package:provider/provider.dart';
 import 'dart:math';
 import 'modal/deeplinkingdata.dart';
 
@@ -97,6 +99,10 @@ class SplashScreenState extends State<SplashScreen>
       deepLinkingRoutingData = await _deepLinkingRoutingHandler();
     }
     await setInitData(initData);
+    User user = Provider.of(context);
+    user.verificationStatus
+        .setForceVerification(initData["forceMobileVerification"]);
+
     setLoadingPercentage(60.0);
     final result = await AuthCheck().checkStatus(context, widget.apiBaseUrl);
     setLoadingPercentage(90.0);
@@ -149,6 +155,8 @@ class SplashScreenState extends State<SplashScreen>
           ),
         );
       } else {
+        SharedPrefHelper()
+            .saveToSharedPref(ApiUtil.CHECK_MOBILE_VERIFICATION, "false");
         Navigator.of(context).pushReplacement(
           FantasyPageRoute(
             pageBuilder: (context) => result == null ? Signup() : SignInPage(),

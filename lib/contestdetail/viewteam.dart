@@ -137,7 +137,7 @@ class _ViewTeamState extends State<ViewTeam> {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // _scaffoldKey.currentState
       //     .showSnackBar(SnackBar(content: Text("$result")));
     }
@@ -160,7 +160,7 @@ class _ViewTeamState extends State<ViewTeam> {
       ),
     );
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // _scaffoldKey.currentState
       //     .showSnackBar(SnackBar(content: Text("$result")));
     }

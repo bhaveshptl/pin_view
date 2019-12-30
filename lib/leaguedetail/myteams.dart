@@ -75,7 +75,7 @@ class MyTeamsState extends State<MyTeams> {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // _scaffoldKey.currentState
       //     .showSnackBar(SnackBar(content: Text("$result")));
     }
@@ -95,7 +95,7 @@ class MyTeamsState extends State<MyTeams> {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
     }
   }
@@ -117,7 +117,7 @@ class MyTeamsState extends State<MyTeams> {
       ),
     );
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // _scaffoldKey.currentState.showSnackBar(
       //   SnackBar(
       //     content: Text("$result"),

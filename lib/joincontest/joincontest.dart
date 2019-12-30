@@ -3,13 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:playfantasy/action_utils/action_util.dart';
+import 'package:playfantasy/action_utils/insifficientfund.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/leadingbutton.dart';
 import 'package:playfantasy/commonwidgets/leaguetitleepoc.dart';
+import 'package:playfantasy/commonwidgets/routelauncher.dart';
 import 'dart:io';
 import 'package:playfantasy/modal/l1.dart';
 import 'package:playfantasy/modal/league.dart';
 import 'package:playfantasy/modal/myteam.dart';
+import 'package:playfantasy/providers/user.dart';
 import 'package:playfantasy/redux/actions/loader_actions.dart';
 import 'package:playfantasy/utils/apiutil.dart';
 import 'package:playfantasy/utils/httpmanager.dart';
@@ -20,6 +23,7 @@ import 'package:playfantasy/commonwidgets/color_button.dart';
 import 'package:playfantasy/commonwidgets/scaffoldpage.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/utils/analytics.dart';
+import 'package:provider/provider.dart';
 
 class JoinContest extends StatefulWidget {
   final L1 l1Data;
@@ -48,6 +52,7 @@ class JoinContest extends StatefulWidget {
 
 class JoinContestState extends State<JoinContest> {
   MyTeam _teamToJoin;
+  int lastCreatedTeamId;
   List<MyTeam> _myTeams;
   List<MyTeam> _myUniqueTeams = [];
   List<dynamic> contestMyTeams = [];
@@ -100,17 +105,17 @@ class JoinContestState extends State<JoinContest> {
     }
   }
 
-  _joinContest(BuildContext context) async {
-    if (_teamToJoin == null) {
+  _joinContest(BuildContext buildContext, {int teamId}) async {
+    if (_teamToJoin == null && teamId == null) {
       widget.onCreateTeam(
-        context,
+        buildContext,
         widget.contest,
       );
     } else {
       http.Request req = http.Request(
           "POST", Uri.parse(BaseUrl().apiUrl + ApiUtil.JOIN_CONTEST));
       req.body = json.encode({
-        "teamId": _teamToJoin.id,
+        "teamId": teamId == null ? _teamToJoin.id : teamId,
         "context": {"channel_id": HttpManager.channelId},
         "sportsId": widget.sportsType,
         "contestId": widget.contest.id,
@@ -125,21 +130,46 @@ class JoinContestState extends State<JoinContest> {
         "matchId": widget.l1Data.league.rounds[0].matches[0].id,
       });
       await HttpManager(http.Client()).sendRequest(req).then(
-        (http.Response res) {
+        (http.Response res) async {
           if (res.statusCode >= 200 && res.statusCode <= 299) {
             Map<String, dynamic> response = json.decode(res.body);
             if (response["error"] == false) {
               webEngageJoinContestEvent();
               /* On contest joined successfully */
-              Navigator.of(context).pop(response);
+              Navigator.of(buildContext).pop(response);
             } else if (response["error"] == true) {
               // Navigator.of(context).pop(response["message"]);
               widget.onError(widget.contest, response);
             }
           } else if (res.statusCode == 401) {
             Map<String, dynamic> response = json.decode(res.body);
-            if (response["error"]["reasons"].length > 0) {
-              widget.onError(widget.contest, response["error"]);
+            User user = Provider.of(buildContext);
+            if (response["error"]["reasons"] != null &&
+                response["error"]["reasons"].length > 0) {
+              if (response["error"]["reasons"].indexOf(12) != -1) {
+                double usableBonus = getUsableBonus(user);
+                final result = await _showAddCashConfirmation(
+                    buildContext,
+                    widget.contest,
+                    (user.withdrawable + user.depositedAmount).toInt(),
+                    usableBonus.toInt());
+                if (result != null && result["launchJoinConfirmation"]) {
+                  routeLauncher.launchAddCash(
+                    context,
+                    source: "contestbalance",
+                    prefilledAmount: widget.contest.entryFee - usableBonus > 25
+                        ? widget.contest.entryFee - usableBonus
+                        : 25,
+                    onSuccess: (result) {
+                      if (result != null) {
+                        _joinContest(buildContext);
+                      }
+                    },
+                  );
+                }
+              } else {
+                widget.onError(widget.contest, response["error"]);
+              }
             }
           }
         },
@@ -147,6 +177,33 @@ class JoinContestState extends State<JoinContest> {
         showLoader(false);
       });
     }
+  }
+
+  getUsableBonus(User user) {
+    double bonusUsable = widget.createContestPayload == null
+        ? (widget.contest.entryFee == null ||
+                widget.contest.bonusAllowed == null
+            ? 0.0
+            : (widget.contest.entryFee * widget.contest.bonusAllowed) / 100)
+        : 0.0;
+    double usableBonus = user.bonusBalance > bonusUsable
+        ? (bonusUsable > user.playableBonus ? user.playableBonus : bonusUsable)
+        : user.bonusBalance;
+
+    return usableBonus;
+  }
+
+  _showAddCashConfirmation(
+      BuildContext context, Contest contest, int userBalance, int usableBonus) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return InsufficientFundDialog(
+          contestFee: contest.entryFee,
+          userBalance: userBalance + usableBonus,
+        );
+      },
+    );
   }
 
   _createAndJoinContest(BuildContext context) async {
@@ -197,10 +254,20 @@ class JoinContestState extends State<JoinContest> {
       }
     }
     if (myUniqueTeams.length > 0) {
-      setState(() {
-        _teamToJoin = myUniqueTeams[0];
-        _myUniqueTeams = myUniqueTeams;
-      });
+      if (lastCreatedTeamId != null) {
+        _myUniqueTeams.forEach((team) {
+          if (team.id == lastCreatedTeamId) {
+            setState(() {
+              _teamToJoin = team;
+            });
+          }
+        });
+      } else {
+        setState(() {
+          _teamToJoin = myUniqueTeams[0];
+          _myUniqueTeams = myUniqueTeams;
+        });
+      }
     }
   }
 
@@ -296,7 +363,9 @@ class JoinContestState extends State<JoinContest> {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      lastCreatedTeamId = result["id"];
+      _joinContest(context, teamId: lastCreatedTeamId);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("$result")));
     }
   }
@@ -400,6 +469,7 @@ class JoinContestState extends State<JoinContest> {
                                     onPressed: () {
                                       setState(() {
                                         _teamToJoin = team;
+                                        lastCreatedTeamId = null;
                                       });
                                     },
                                     padding: EdgeInsets.all(0.0),

@@ -39,7 +39,7 @@ class TeamPreview extends StatelessWidget {
     );
 
     if (result != null) {
-      ActionUtil().showMsgOnTop(result, context);
+      ActionUtil().showMsgOnTop(result["message"], context);
       // Scaffold.of(context).showSnackBar(SnackBar(content: Text("$result")));
     }
   }

@@ -7,12 +7,12 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:playfantasy/action_utils/action_util.dart';
 import 'package:playfantasy/appconfig.dart';
 import 'package:playfantasy/commonwidgets/addcashbutton.dart';
 import 'package:playfantasy/commonwidgets/fantasypageroute.dart';
 import 'package:playfantasy/createteam/sports.dart';
 import 'package:playfantasy/leaguedetail/leaguedetail.dart';
+import 'package:playfantasy/lobby/mobileverificationalert.dart';
 import 'package:playfantasy/modal/account.dart';
 import 'package:playfantasy/modal/deeplinkingdata.dart';
 import 'package:playfantasy/modal/deposit.dart';
@@ -108,9 +108,30 @@ class LobbyState extends State<Lobby>
         SharedPrefHelper().saveSportsType(_sportType.toString());
       }
     });
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => deepLinkingPageRouting(context));
+    WidgetsBinding.instance.addPostFrameCallback((_) => setData(context));
     subscribeToDeepLinkingListener();
+  }
+
+  setData(BuildContext context) {
+    deepLinkingPageRouting(context);
+    checkForMobileVerification(context);
+  }
+
+  checkForMobileVerification(BuildContext context) async {
+    User user = Provider.of<User>(context);
+    final shouldCheck = await SharedPrefHelper()
+        .getFromSharedPref(ApiUtil.CHECK_MOBILE_VERIFICATION);
+    if (shouldCheck != "false" &&
+        user.verificationStatus.forceVerification &&
+        !user.verificationStatus.isMobileVerified) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return MobileVerificationAlert();
+        },
+        barrierDismissible: false,
+      );
+    }
   }
 
   // @override
