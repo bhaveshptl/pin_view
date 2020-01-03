@@ -13,6 +13,7 @@ class SmsListener {
 
 class PinView extends StatefulWidget {
   final Function submit;
+  final Function(String) onChange;
   final int count;
   final bool obscureText;
   final bool autoFocusFirstField;
@@ -23,10 +24,12 @@ class PinView extends StatefulWidget {
   final TextStyle dashStyle;
   final InputDecoration inputDecoration;
   final EdgeInsetsGeometry margin;
+  final Widget title;
 
   PinView({
     @required this.submit,
     @required this.count,
+    this.onChange,
     this.obscureText: false,
     this.autoFocusFirstField: true,
     this.enabled: true,
@@ -39,6 +42,7 @@ class PinView extends StatefulWidget {
     ),
     this.inputDecoration: const InputDecoration(border: UnderlineInputBorder()),
     this.margin: const EdgeInsets.all(5.0),
+    this.title,
   });
 
   @override
@@ -75,7 +79,11 @@ class _PinViewState extends State<PinView> {
           controller.text = code[_controllers.indexOf(controller)];
           _pin[_controllers.indexOf(controller)] = controller.text;
         }
+        FocusScope.of(context).requestFocus(_focusNodes[_pin.length - 1]);
 
+        if (widget.onChange != null) {
+          widget.onChange(_pin.join());
+        }
         widget.submit(_pin.join());
       }
     });
@@ -98,11 +106,15 @@ class _PinViewState extends State<PinView> {
       }
     }
 
-    return Container(
-      child: Row(
+    return Column(
+      children: <Widget>[
+        widget.title == null ? Container() : widget.title,
+        Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: pins),
+          children: pins,
+        ),
+      ],
     );
   }
 
@@ -146,7 +158,7 @@ class _PinViewState extends State<PinView> {
                 _controllers[index].selection = TextSelection.fromPosition(
                     TextPosition(offset: _controllers[index].text.length));
               }
-            } else if (val.length > 0) {
+            } else if (val.length > 2) {
               int endIndex =
                   val.length >= widget.count ? widget.count : val.length;
               int focusIndex =
@@ -170,6 +182,10 @@ class _PinViewState extends State<PinView> {
                 _focusNodes[index].unfocus();
                 FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
               }
+            }
+
+            if (widget.onChange != null) {
+              widget.onChange(_pin.join());
             }
 
             if (_pin.indexOf("") == -1) {
